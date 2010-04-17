@@ -68,6 +68,8 @@ class Voicemail extends FreePbx_Record
         $this->actAs('Timestampable');
         $this->actAs('Polymorphic');
         $this->actAs('TelephonyEnabled');
+
+        $this->actAs('MultiTenant');
     }
 
     public function postValidate($event)
