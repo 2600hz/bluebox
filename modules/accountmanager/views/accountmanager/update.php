@@ -21,6 +21,13 @@
     ?>
     </div>
 
+    <div class="field">
+    <?php
+        echo form::label('account[expire]', 'Expiration Date:');
+        echo form::input('account[expire]');
+    ?>
+    </div>
+
     <?php echo form::close_section(); ?>
 
     <?php if (isset($views)) echo subview::renderAsSections($views); ?>
