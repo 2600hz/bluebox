@@ -30,8 +30,7 @@ class AccountManager_Controller extends FreePbx_Controller
         'name',
         'basedata',
         'sampledata',
-        'user_id',
-        'expire'
+        'user_id'
     );
 
     protected $baseModel = 'Account';

@@ -21,13 +21,6 @@
     ?>
     </div>
 
-    <div class="field">
-    <?php
-        echo form::label('account[expire]', 'Expiration Date:');
-        echo form::input('account[expire]');
-    ?>
-    </div>
-
     <?php echo form::close_section(); ?>
 
     <?php echo form::open_section('Account Setup'); ?>
