@@ -1,0 +1,162 @@
+/* --------------------------------------------------------------
+    This file holds css rules that implement the top level
+    layout and positioning:
+
+    -- wrapper
+         |-- header
+         |   |-- topbar
+         |   `-- bottom
+         |-- content
+         |   `-- wrapper
+         |       |-- nav
+         |       `-- main
+         `-- footer
+             |-- topbar
+             |-- nav
+             `-- bottom
+-------------------------------------------------------------- */
+
+/* Default HTML element styles
+-------------------------------------------------------------- */
+html, body {
+    background:#f5f5f5;
+    margin:0;
+    padding:0;
+    border:0;
+    font-weight:inherit;
+    font-style:inherit;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:90%;
+    vertical-align:baseline;
+    line-height:1.4;
+}
+a {
+    color:#75A51F;
+}
+a:visited {
+    color:#75A51F;
+}
+
+
+/* Layout element styles
+-------------------------------------------------------------- */
+.container {
+    width:950px;
+    margin:0 auto;
+
+}
+
+/* Header styles
+-------------------------------------------------------------- */
+#logo_container{
+    float:left;
+}
+#profileLinks .loginManager {
+    text-align:right;
+}
+#profileLinks .loginManager span {
+    display:block;
+}
+#profileLinks .dash {
+    position:relative;
+    right:15px;
+    top:60px;
+}
+.header {
+    height:98px;
+    position:relative;
+    padding:11px 0 0;
+}
+.header .topbar {
+    position:relative;
+    clear:both;
+}
+.header #logo {
+    display:block;
+    height:98px;
+    width:332px;
+    overflow:hidden;
+    position:relative;
+
+}
+
+/* Content styles
+-------------------------------------------------------------- */
+.content {
+    background-color:#FFFFFF;
+    -moz-border-radius:8px;
+    -webkit-border-radius:8px;
+}
+.content .nav {
+    padding:25px;
+}
+.content .wrapper .main {
+    /* push the content away from the walls of container */
+    padding:0px 25px 25px;
+}
+
+/* Footer styles
+-------------------------------------------------------------- */
+.footer {
+    padding:10px 0 0;
+}
+
+.footer .topbar,
+.footer .bottom {
+    float:right;
+    padding:0 10px;
+}
+
+#destination_selector_choices {
+    float:left;
+    width:100%;
+    clear:both;
+    overflow:hidden;
+}
+
+#destination_selector ul#choices  {
+    float:left;
+    left:50%;
+    position:relative;
+}
+
+#destination_selector #choices li {
+    float:left;
+    right:50%;
+    position:relative;
+}
+
+#destination_conference {
+    background-image:url(../img/destinations/conference_tab.png);
+    width: 80px;
+    height: 80px;
+    text-indent:1000px;
+}
+
+#destination_devices {
+    background-image:url(../img/destinations/phone_tab.png);
+    width: 80px;
+    height: 80px;
+    text-indent:1000px;
+}
+
+#destination_autoattendant {
+    background-image:url(../img/destinations/ivr_tab.png);
+    width: 80px;
+    height: 80px;
+    text-indent:1000px;
+}
+
+#destination_ringgroup {
+    background-image:url(../img/destinations/group_tab.png);
+    width: 80px;
+    height: 80px;
+    text-indent:1000px;
+}
+
+#destination_voicemail {
+    background-image:url(../img/destinations/voicemail_tab.png);
+    width: 80px;
+    height: 80px;
+    text-indent:1000px;
+}

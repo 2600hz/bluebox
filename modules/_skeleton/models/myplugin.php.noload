@@ -1,0 +1,60 @@
+<?php defined('SYSPATH') or die('No direct access allowed.');
+/*
+ * FreePBX Modular Telephony Software Library / Application
+ * Copyright (C) 2005-2009, Darren Schreiber <d@d-man.org>
+ *
+ * Version: FPL 1.0 (a modified version of MPL 1.1)
+ *
+ * The contents of this file are subject to the FreePBX Public License Version
+ * 1.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.freepbx.org/FPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is FreePBX Modular Telephony Software Library / Application
+ *
+ * The Initial Developer of the Original Code is
+ * Darren Schreiber <d@d-man.org>
+ * Portions created by the Initial Developer are Copyright (C)
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *
+ * Darren Schreiber <d@d-man.org>
+ *
+ */
+
+/**
+ * myplugin.php - Description of the plug-in model
+ *
+ * @author Your Name <your@email.org>
+ * @license Your License
+ * @package _Skeleton
+ */
+
+class MyPlugin extends FreePbx_Record {
+	function setTableDefinition(){
+		$this->hasColumn('myplugin_id', 'integer', 11, array('primary' => true, 'autoincrement' => true));
+        $this->hasColumn('mydatafield1', 'integer', 11);
+        $this->hasColumn('mydatafield2', 'string', 200, array('notnull' => true, 'notblank' => true));
+	}
+
+	public function setUp() {
+        /*
+         * Relationships
+         */
+        $this->hasOne('SomeOtherModel', array('local'    => 'someothermodel_id',
+                                              'foreign'  => 'someothermodel_id'));
+     
+        /*
+         * Behaviors
+         */
+        $this->actAs('Timestampable');      // Keep track of timestamps on records in this table
+        //$this->actAs('DeviceRelation');     // Relate this table to devices, adding the appropriate relations and fields to do so 1:1
+        //$this->actAs('Versionable');      // Keep track in a seperate table of all changes to this table
+	}
+}

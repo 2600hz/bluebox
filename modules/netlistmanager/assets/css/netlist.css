@@ -1,0 +1,27 @@
+/* 
+    Document   : netlist
+    Created on : Dec 24, 2009, 10:35:34 AM
+    Author     : Darren Schreiber <d@d-man.org>
+    Description:
+        Purpose of the stylesheet follows.
+*/
+#deny_range_mask,
+#allow_range_mask {
+    width:auto;
+    min-width:0;
+}
+
+.netlist_allow .asmListItem {
+    background: #E6EFC2;
+    color: #264409;
+    border-color: #C6D880;
+}
+
+.netlist_deny .asmListItem {
+    background: #FBE3E4;
+    color: #8a1f11;
+    border-color: #FBC2C4;
+}
+.netlist_deny .asmListItem a{
+    color: #8a1f11;
+}

@@ -1,0 +1,61 @@
+/* Formating for Main Nav
+-------------------------------------------------------------- */
+.navMenuContainer {
+    overflow:auto;
+    position:relative;
+    width:930px;
+    text-align:center;
+    margin:0 0 0 4px;
+}
+.navMenuGroup {
+    display: inline;
+    border-right: 1px solid #B9B9B9;
+    padding: 5px 10px 10px;
+    margin: 0 5px;
+    float: left;
+}
+.navMenuGroup h1 {
+    width: 100%;
+    position: relative;
+    text-align: center;
+    margin-bottom: 5px;
+    color: #B9B9B9;
+}
+.navMenuList a {
+    display: block;
+    text-decoration: none;
+    float: left;
+    margin: 0 5px;
+    color:#b9b9b9;
+}
+.navMenuList a:hover,
+.navMenuList a:visited{
+    color:#b9b9b9;
+}
+.navMenuList span {
+  display: block;
+  margin-top: 3px;
+  text-align: center;
+  font-size: 12px;
+  color: #b9b9b9;
+}
+.navMenuList a:hover span {
+  display: block;
+  color: #077;
+}
+
+
+/* Nav item icons
+-------------------------------------------------------------- */
+.navMenuList .navIcon {
+    border: 0;
+    width: 94px;
+    height: 71px;
+    margin: 0 auto;
+    text-align: center;
+    background-position: left top;
+    background-repeat: no-repeat;
+}
+.navMenuList .navCurrentItem .navIcon {
+    background-position: 0 -71px;
+}

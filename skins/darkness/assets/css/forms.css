@@ -1,0 +1,244 @@
+/* Basic form layout
+-------------------------------------------------------------- */
+fieldset {clear: both;}
+fieldset.hidden_inputs {display:none;}
+
+* html legend {margin-left: -7px;} /* ie6 */
+*+html legend {margin-left: -7px;} /* ie7 */
+
+form.form .field {
+    clear: both;
+    margin: 0 0 5px 25px;
+}
+
+/* form labels
+-------------------------------------------------------------- */
+form.form .field label {
+    display: block;
+    font-size:12px;
+    padding-top:5px;
+    height:18px;
+    font-weight:bold;
+    color:#999999;
+}
+form.form label.has_error {
+    color: #8a1f11;
+    padding-top:0px;
+}
+form.form label.has_hint {
+    padding-top:0px;
+}
+form.form label.has_error span.issue {
+    width:100%;
+    font-size:9px;
+    padding-left:5px;
+    font-weight:normal;
+}
+form.form label.has_hint span.hint {
+    display:none;
+}
+form.form label.has_help {
+    line-height:12px;
+    padding-top:5px;
+}
+
+
+/* form lists
+-------------------------------------------------------------- */
+form.form ul.fields {
+    margin: 0 0 1.5em;
+    padding: 0;
+}
+form.form ul.fields li {
+    list-style-type: none;
+    margin: 0;
+}
+form.form ul.inline li,
+form.form ul.inline label {
+    display: inline;
+}
+form.form ul.inline li {
+    padding: 0 .75em 0 0;
+}
+
+/* form para
+-------------------------------------------------------------- */
+form.form p {
+    font-size:11px;
+    color:#666666;
+    margin-bottom:10px;
+    border-bottom:solid 1px #ccc;
+    padding:0 10px;
+}
+
+/* inputs
+-------------------------------------------------------------- */
+form.form input.input,
+form.form input.password,
+form.form .textarea,
+form.form .dropdown {
+    min-width:185px;
+}
+form.form input.input,
+form.form input.password,
+form.form .textarea {
+    min-width:182px;
+}
+form.form label,
+form.form button,
+form.form input.submit,
+form.form input.image {
+    cursor: pointer;
+}
+form.form textarea {
+    overflow:auto;
+}
+form.form input.input,
+form.form input.password,
+form.form .textarea,
+form.form .dropdown {
+    margin: 0;
+    vertical-align: baseline;
+}
+form.form .dropdown {
+    margin-right:10px;
+}
+form.form input.input,
+form.form input.password,
+form.form .textarea {
+    background-color:#EEEEEE;
+    padding:2px;
+    border:2px solid #c2c2c2;
+}
+form.form input.input:focus,
+form.form input.password:focus,
+form.form .textarea:focus {
+    padding:2px;
+    border:2px solid #00498f;
+}
+form.form input.has_error,
+form.form input.password.has_error,
+form.form .textarea.has_error {
+    padding:2px;
+    border:2px solid #8a1f11;
+}
+form.form input.radio,
+form.form input.checkbox {
+    vertical-align:top;
+    margin-top:5px;
+}
+* html form.form input.radio, * html input.checkbox {vertical-align: middle;} /* ie6 */
+*+html form.form input.radio, *+html input.checkbox {vertical-align: middle;} /* ie7 */
+
+/* Legends
+-------------------------------------------------------------- */
+form.form fieldset legend  {
+    text-align:left;
+    padding-bottom:7px;
+    padding-top:10px;
+}
+form.form fieldset legend span {
+    display:block;
+    height:34px;
+    width:700px;
+    line-height:30px;
+    font-weight:bold;
+    color: #999999;
+    border-bottom:3px solid #999999;
+    font-size:16px;
+}
+form.form fieldset.hidden_inputs + fieldset.fieldset .legend,
+form.form fieldset:first-child .legend {
+    padding-top:0px;
+}
+form.form fieldset.hidden_inputs + fieldset.fieldset .legend span,
+form.form fieldset:first-child .legend span {
+    border-top:0;
+}
+form.form fieldset fieldset {
+    padding-left:15px;
+    padding-bottom:0px;
+    padding-top:0px;
+}
+form.form fieldset fieldset legend span {
+    border:0;
+    height:auto;
+    font-size:14px;
+}
+form.form fieldset .help {
+     background-image:url('../img/help_icon_small.gif');
+     background-repeat:no-repeat;
+     height:12px;
+     width: 12px;
+     padding-right:5px;
+     float:left;
+}
+
+/* form bottom cap
+-------------------------------------------------------------- */
+.form_bottom {
+    border-top:3px solid #999999;
+    text-align:right;
+    padding:9px 15px;
+}
+
+/* Buttons
+-------------------------------------------------------------- */
+button.small_green_button,
+input.input.submit.small_green_button,
+button.small_red_button,
+input.input.submit.small_red_button{
+    background-color:transparent;
+    border:medium none;
+    color:white;
+    font-size:10pt;
+    font-weight:bold;
+    padding:0px 1.75em;
+    text-decoration:none;
+}
+input.button:focus,
+input.input.submit:focus {
+    border:0 !important;
+}
+button.small_green_button,
+input.input.submit.small_green_button {
+    min-width: 150px;
+    color:green;
+}
+
+button.small_red_button,
+input.input.submit.small_red_button{
+    color:red;
+}
+
+/* Numbering
+-------------------------------------------------------------- */
+form.form .number {
+    clear: left;
+}
+form.form fieldset.module_destination {
+    padding-left: 210px;
+}
+form.form fieldset.module_destination label {
+    margin-left: -200px;
+}
+
+/* Deletes
+-------------------------------------------------------------- */
+form.form fieldset.delete {
+    text-align:center;
+}
+form.form .delete_warning {
+    margin:10px 0;
+    display:inline-block;
+    line-height:25px;
+    text-indent:37px;
+    height:32px;
+    background:url(../img/warning_32.png) no-repeat;
+}
+
+/* link buttons
+-------------------------------------------------------------- */
+a.button {
+    padding:0 25px;
+}

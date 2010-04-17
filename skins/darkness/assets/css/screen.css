@@ -1,0 +1,29 @@
+/* --------------------------------------------------------------
+
+    This file holds css that addresses specific on-screen elements
+
+-------------------------------------------------------------- */
+.module_header {
+    margin-bottom:26px;
+    margin-top:-65px;
+}
+
+/* Layout modifiers
+-------------------------------------------------------------- */
+.hide {display:none;}
+.hidden {position: absolute !important; top: -10000px !important; }
+
+.clear {clear:both;}
+.clr-left {clear:left;}
+.clr-right {clear:right;}
+.clearfix:after, .container:after, .line-break:after {
+        content:"\0020";
+        display:block;
+        height:0;
+        clear:both;
+        visibility:hidden;
+        overflow:hidden;
+}
+
+.clearfix, .container {display:block;}
+/*.clearfix {display: inline-block;}   for IE/Mac */

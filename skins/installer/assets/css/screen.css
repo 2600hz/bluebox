@@ -1,0 +1,97 @@
+/* Module headers
+-------------------------------------------------------------- */
+.module_header {
+    -moz-border-radius-topleft:4px;
+    -moz-border-radius-topright:4px;
+    line-height:28px;
+    background:#F2F2E5;
+    border-bottom:3px solid #EEEED7;
+    text-align:left;
+    height:39px;
+}
+.module_header h2 {
+    -moz-border-radius-topleft:4px;
+    -moz-border-radius-topright:4px;
+    color:#629800;
+    font-size:16px;
+    font-weight:bold;
+    padding-left:11px;
+    padding-top:9px;
+}
+.module_header .freepbx_desc {
+    
+}
+
+/* grid lines
+-------------------------------------------------------------- */
+.alternate {
+    background:#EEEEEE;
+}
+
+/* Message items
+-------------------------------------------------------------- */
+.error, .alert, .info, .success {
+    -moz-border-radius-topleft:4px;
+    -moz-border-radius-topright:4px;
+    -moz-border-radius-bottomleft:4px;
+    -moz-border-radius-bottomright:4px;
+    padding: .8em;
+    margin-bottom: 1em;
+    border: 2px solid #ddd;
+    text-align: center;
+    font-weight:bold;
+}
+
+.error {
+    background: #FBE3E4;
+    color: #8a1f11;
+    border-color: #FBC2C4;
+ }
+.error a { color: #8a1f11; }
+
+.alert {
+    background: #FFF6BF;
+    color: #514721;
+    border-color: #FFD324;
+}
+.alert a { color: #514721; }
+
+.info {
+    background: #E3E3FB;
+    color: #514721;
+    border-color: #9696FA;
+}
+.info a { color: #514721; }
+
+.success {
+    background: #E6EFC2;
+    color: #264409;
+    border-color: #C6D880;
+}
+.success a  { color: #264409; }
+.error_details {
+    font-size:11px;
+    font-style:italic;
+    font-weight:normal;
+    padding:0 10px;
+}
+
+/* Layout modifiers
+-------------------------------------------------------------- */
+.hide {display:none;}
+.hidden {position: absolute !important; top: -10000px !important; }
+
+.clear {clear:both;}
+.clr-left {clear:left;}
+.clr-right {clear:right;}
+.clearfix:after, .container:after, .line-break:after {
+        content:"\0020";
+        display:block;
+        height:0;
+        clear:both;
+        visibility:hidden;
+        overflow:hidden;
+}
+
+.clearfix, .container {display:block;}
+/*.clearfix {display: inline-block;}   for IE/Mac */

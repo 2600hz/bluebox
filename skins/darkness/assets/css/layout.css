@@ -1,0 +1,110 @@
+/* --------------------------------------------------------------
+    This file holds css rules that implement the top level
+    layout and positioning:
+
+    -- wrapper
+         |-- header
+         |   |-- topbar
+         |   `-- bottom
+         |-- content
+         |   `-- wrapper
+         |       |-- nav
+         |       `-- main
+         `-- footer
+             |-- topbar
+             |-- nav
+             `-- bottom
+
+/* Default HTML element styles
+-------------------------------------------------------------- */
+html, body {
+    background-image: url("../../../../assets/css/jquery/black-tie/images/ui-bg_diagonals-thick_8_333333_40x40.png");
+    color: #999999;
+    margin:0;
+    padding:0;
+    border:0;
+    font-weight:inherit;
+    font-style:inherit;
+    font-family:Helvetica, Helvetica Neue, Lucida Grande, Arial, Helvetica, sans-serif;
+    font-size:90%;
+    vertical-align:baseline;
+    line-height:1.4;
+}
+a {
+    color:#b3b3b3;
+}
+a:visited {
+    color:#b3b3b3;
+}
+h1, h2 {
+    color:#c2c2c2;
+    font-size:21px;
+    font-weight:bold;
+    margin:0.5em 0;
+    text-align:center;
+    text-transform:uppercase;
+}
+h3 {
+    color:#c2c2c2;
+    font-size:1.2em;
+    font-weight:bold;
+    margin:1.4em 0 0;
+    text-transform:none;
+}
+
+/* Main layout style and position
+-------------------------------------------------------------- */
+.header, .topbar, .bottom,
+.content, .nav, .main,
+.footer, .topbar {
+    position:relative;
+    background-color: transparent;
+}
+.container {
+    width:950px;
+    margin:0 auto;
+
+}
+/* Header styles
+-------------------------------------------------------------- */
+
+/* Content styles
+-------------------------------------------------------------- */
+.content {
+    float:left;
+}
+.wrapper {
+    float:left;
+    background: #111111 url(../../../../assets/css/jquery/dot-luv/images/ui-bg_gloss-wave_20_111111_500x100.png) repeat-x scroll 50% top;
+    border: 1px solid #efefef;
+}
+.wrapper .main {
+    float: left;
+    width: 700px;
+    margin:65px 25px 25px;
+}
+
+/* Footer styles
+-------------------------------------------------------------- */
+.footer {
+}
+
+/* Attribution element styles
+-------------------------------------------------------------- */
+.poweredby {
+    z-index: 99;
+    margin-left: auto;
+    margin-right: auto;
+    height: 45px;
+    width: 130px;
+    font-size:8px !important;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-image: url(../../../../assets/img/poweredby.png);
+}
+
+.attribution {
+    font-size:10px;
+    text-align:center;
+    width:100%
+}

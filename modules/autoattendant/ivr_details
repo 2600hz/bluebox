@@ -1,0 +1,39 @@
+IVR:
+- Playfile initial greeting
+- Playfile (second+ tries)
+- Playfile for error
+- Playfile for retry message
+- Playfile for too many tries
+
+- # of Digits (optional, defaults to auto-detect via numbering plan)
+- Timeout
+- Timeout dest
+- Invalid
+- Invalid dest
+- Number of Errors
+- Error out dest
+- Inter-digit timeout
+- Count errors globally? (true/false)
+
+IVR DIGIT MAPPINGS:
+- id
+- digit
+- destination
+
+IVR MODULE MAPPINGS:
+- id
+- module_id
+- context (optional)
+
+
+IVR allows "digits" to override "mappings"
+IVR is responsible for making sure that no two results of module + context number lookups overlap
+# of errors should be set as a channel variable on/before exiting the IVR, so if the person ever ends back up in an IVR and continues to error out, we count this globally
+Can use a perl program to compress to regexs like numbers
+Regex compression scheme can be used in multiple places, not just IVR
+
+
+
+FIND OUT FROM FREESWITCH GUYS:
+- How to tell if a number exists, when coming from an IVR, so we can stay in the IVR if the input is invalid (w/out having to use RegExs/etc.)
+- How to wait for # of digits dynamically based on dialplan

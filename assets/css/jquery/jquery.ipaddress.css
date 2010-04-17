@@ -1,0 +1,9 @@
+.ip_container {
+  border: 1px inset #999 !important;
+  float:left;
+}
+.ip_octet {
+  border: 0 !important;
+  text-align: center !important;
+  width: 2em !important;
+}

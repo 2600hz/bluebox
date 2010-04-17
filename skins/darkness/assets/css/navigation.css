@@ -1,0 +1,82 @@
+/* nav container
+-------------------------------------------------------------- */
+.nav {
+    float: left;
+    width: 150px;
+    font-size:12px;
+    margin-top:65px;
+}
+
+/* parent list
+-------------------------------------------------------------- */
+.nav ul {
+    margin:0px;
+    padding:0px;
+    background-color:#333333;
+    background:#333333 url(../../../../assets/css/jquery/dot-luv/images/ui-bg_dots-small_20_333333_2x2.png) repeat scroll 50% 50%;
+}
+.nav ul li {
+    line-height:25px;
+    list-style:none;
+    padding-left:10px;
+    color:#FFF;
+    border-top:2px solid #999999;
+    cursor:pointer;
+    text-align: left;
+}
+.nav ul li:first-child {
+    border-top:0;
+}
+.nav ul li a {
+    color:#FFF;
+    text-align: left;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* parent list hover effects
+-------------------------------------------------------------- */
+.nav ul li:hover {
+    background:#00498f url(../../../../assets/css/jquery/dot-luv/images/ui-bg_dots-small_40_00498f_2x2.png) repeat scroll 50% 50%;
+    position:relative;
+}
+
+/* current nav parent
+-------------------------------------------------------------- */
+.nav .currentNavItem {
+    padding-bottom:10px;
+}
+.nav .currentNavItem,
+.nav .currentNavItem:hover {
+    background:#00498f url(../../../../assets/css/jquery/dot-luv/images/ui-bg_dots-small_40_00498f_2x2.png) repeat scroll 50% 50%;
+}
+.nav .currentNavItem span {
+    color:#FFF;
+    text-align: left;
+    text-decoration: none;
+    font-weight: bold;
+}
+.nav .currentNavItem li:hover {
+    background:#00498f url(../../../../assets/css/jquery/dot-luv/images/ui-bg_dots-small_40_00498f_2x2.png) repeat scroll 50% 50%;
+}
+
+/* child list
+-------------------------------------------------------------- */
+.nav ul ul {
+    border:0;
+    background:transparent;
+}
+.nav ul ul li {
+    padding-left:25px;
+    border: 0px;
+}
+
+/* child list hover effects
+-------------------------------------------------------------- */
+.nav ul ul .currentNavItem {
+    padding-bottom:0;
+    background:#111111;
+}
+.nav ul .currentNavItem ul li:hover {
+    background:#111111;
+}

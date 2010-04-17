@@ -1,0 +1,53 @@
+ul.geogoer_vchecks{
+	list-style-type: none;
+	padding: 0px 0px 0px 0px;
+	margin: 0px 0px 0px 10px;
+    width: 415px;
+}
+
+ul.geogoer_vchecks li{
+	position: relative;
+    width: 100%;
+    float: left;
+	cursor: pointer;
+    background: #FFFFFF;
+}
+
+ul.geogoer_vchecks li span {
+    height:20px;
+    color:#222222;
+    cursor:pointer;
+    float:left;
+    height:21px;
+    text-align:right;
+    width:175px;
+}
+
+ul.geogoer_vchecks li label {
+    margin-left: 0px;
+}
+
+ul.geogoer_vchecks li.checked div.check_div{
+	background-image: url(../../img/jquery/vchecks/tick.png);
+	background-repeat: no-repeat;
+}
+
+ul.geogoer_vchecks li.unchecked div.check_div{
+	background-image: url(../../img/jquery/vchecks/cross.png);
+	background-repeat: no-repeat;
+}
+
+ul.geogoer_vchecks li.unchecked span{
+	color: #999999;
+}
+
+ul.geogoer_vchecks li div.check_div{
+	height: 16px;
+	width: 16px;
+    float: left;
+    margin: 5px 0 5px 10px !important;
+}
+
+ul.geogoer_vchecks li.hover{
+	background: #FFF6BF;
+}

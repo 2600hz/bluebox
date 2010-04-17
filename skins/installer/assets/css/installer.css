@@ -1,0 +1,232 @@
+/* Welcome Page
+-------------------------------------------------------------- */
+#license {
+    margin:10px 0;
+    padding:10px;
+    width:728px;
+}
+#accept_div {
+    padding-left:240px;
+    padding-bottom:5px;
+}
+#accept_div label {
+    padding-right:10px;
+    text-align:right;
+    width:450px;
+}
+
+/* Test Environment
+-------------------------------------------------------------- */
+.test_group {
+    clear:both;
+}
+.test_group.fail,
+.test_group.fail a {
+    color:#C60C30;
+}
+.test_group.optional,
+.test_group.optional a {
+    color:#F69000;
+}
+.test_group .test {
+    float:left;
+    padding-left:10px;
+    width:165px;
+}
+.test_group .result {
+    padding-right:10px;
+    padding-left:450px;
+    text-align:center;
+}
+.test_group.fail .result,
+.test_group.optional .result {
+    padding-left:175px;
+    text-align:right;
+}
+
+/* Initial Configuration
+-------------------------------------------------------------- */
+form.form .field label {
+    width:497px;
+}
+.domain label {
+    width:150px !important;
+}
+.domain div {
+    float:left;
+    width:350px;
+    text-align:right;
+    padding-top:5px;
+}
+
+/* Telephony Configuration
+-------------------------------------------------------------- */
+form.form .conflict_files {
+    padding-left:10px;
+}
+.write_help {
+    font-size:11px;
+    font-weight:normal;
+    text-align:left;
+    padding:5px 0 2px 0;
+}
+
+/* Changes to the default form styles
+-------------------------------------------------------------- */
+form.form fieldset legend.module {
+    padding:0px;
+    cursor:pointer;
+    border:0;
+    color:#888888;
+    font-size:12px;
+    font-weight:normal;
+    padding:5px 0;
+    margin:0;
+}
+form.form fieldset legend.module span{
+    line-height:normal;
+    height:18px;
+}
+form.form fieldset legend.module:hover span {
+    color:#000000;
+}
+form.form fieldset fieldset legend.module .details {
+    display:none;
+    font-size:10px;
+}
+form.form fieldset fieldset legend.module:hover .details {
+    display:inline;
+    color:#888888;
+}
+
+/* Actions style
+-------------------------------------------------------------- */
+form.form fieldset fieldset legend.module .module_actions,
+form.form fieldset fieldset legend.module .module_actions span {
+    display:inline;
+    border:0;
+    padding:0 5px;
+    margin:0;
+    width:auto;
+    float:none;
+    font-weight:normal;
+}
+form.form fieldset fieldset legend.module .module_actions {
+    float:right;
+}
+form.form fieldset fieldset legend.module .module_actions label {
+    display:inline;
+    float:none;
+    padding:0;
+    margin:0;
+    font-weight:normal;
+}
+form.form .module_actions input.checkbox {
+    margin-top:2px;
+    margin-left:2px;
+}
+
+/* Module Messages
+-------------------------------------------------------------- */
+.module_messages {
+    clear:both;
+    width:100%;
+}
+.module_messages .fail {
+    -moz-border-radius-topleft:4px;
+    -moz-border-radius-topright:4px;
+    -moz-border-radius-bottomleft:4px;
+    -moz-border-radius-bottomright:4px;
+    padding: .8em;
+    margin:10px 25px;
+    border: 2px solid #FBC2C4;
+    background: #FBE3E4;
+    color: #8a1f11;
+    font-size:12px;
+    font-weight:bold;
+}
+.module_messages .fail ul {
+    padding-left:25px;
+    font-weight:normal;
+}
+.module_messages .fail a {
+    color:blue;
+}
+.module_messages .warning {
+    -moz-border-radius-topleft:4px;
+    -moz-border-radius-topright:4px;
+    -moz-border-radius-bottomleft:4px;
+    -moz-border-radius-bottomright:4px;
+    padding: .8em;
+    margin:10px 25px;
+    border: 2px solid #FFD324;
+    background: #FFF6BF;
+    color: #514721;
+    font-size:12px;
+    font-weight:bold;
+}
+.module_messages .warning ul {
+    padding-left:25px;
+    font-weight:normal;
+}
+.module_messages .warning a {
+    color:blue;
+}
+
+/* Parameter lists
+-------------------------------------------------------------- */
+.module_parameters {
+    clear:both;
+    display:none;
+    padding:0 25px 10px;
+    border-bottom:1px solid #888888;
+}
+.parameter {
+    float:left;
+    width:212px;
+}
+.parameter_label {
+    font-weight:bold;
+    display:block;
+    width:100%
+}
+.parameter_value {
+    display:block;
+    width:100%;
+    padding-left:20px;
+}
+.parameter.parameter_summary,
+.parameter.parameter_description {
+    clear:both;
+    width:100%;
+}
+
+
+/* Installation
+-------------------------------------------------------------- */
+.clickNext {
+    margin-bottom:1em;
+    padding:0.8em;
+    text-align:center;
+    font-weight:bold;
+}
+
+.inProgress {
+    margin-bottom:1em;
+    padding:0.8em;
+    text-align:center;
+    font-weight:bold;
+}
+
+/* Finalize
+-------------------------------------------------------------- */
+.finalize {
+    margin-bottom:1em;
+    padding:0.8em;
+    text-align:center;
+}
+.finalize a {
+    color:blue;
+    font-size:16px;
+    font-weight:bold
+}

@@ -1,0 +1,127 @@
+/* --------------------------------------------------------------
+    This file holds css rules that implement the top level
+    layout and positioning:
+
+    -- wrapper
+         |-- header
+         |   |-- topbar
+         |   `-- bottom
+         |-- content
+         |   `-- wrapper
+         |       |-- nav
+         |       `-- main
+         `-- footer
+             |-- topbar
+             |-- nav
+             `-- bottom
+-------------------------------------------------------------- */
+
+/* HTML element styles
+-------------------------------------------------------------- */
+html, body {
+    background:#f5f5f5;
+    margin:0;
+    padding:0;
+    border:0;
+    font-weight:inherit;
+    font-style:inherit;
+    font-family:Helvetica, Arial, sans-serif;
+    font-size:90%;
+    vertical-align:baseline;
+    line-height:1.4;
+}
+h2 {
+    font-size:16px;
+    font-weight:bold;
+    color:#333333;
+    background-color:#DDDDDD;
+    height:32px;
+    text-align:left;
+    margin:.0;
+    padding:10px 0px 0px 20px;
+    clear:both;
+}
+
+/* Main layout style and position
+-------------------------------------------------------------- */
+.header, .topbar, .bottom,
+.wrapper, .main,
+.footer, .topbar {
+    position:relative;
+    padding: 5px;
+    background: #ffffff;
+}
+
+html,
+.header, .topbar, .bottom,
+.footer, .topbar, .bottom {
+    background: #f4f4f4;
+}
+
+.container {
+    position:relative;
+    width:950px;
+    margin:0 auto;
+    padding: 5px;
+    background: #f4f4f4;
+}
+
+.wrapper {
+    border: 1px solid #efefef;
+    -moz-border-radius-bottomleft:8px;
+    -moz-border-radius-bottomright:8px;
+    -moz-border-radius-topleft:8px;
+    -moz-border-radius-topright:8px;
+}
+
+.main {
+    margin-bottom: 10px;
+}
+
+/* Header style
+-------------------------------------------------------------- */
+.header .topbar {
+    text-align:right;
+    color:#666;
+}
+.header .topbar a img {
+    float:left;
+}
+.header .topbar #lang {
+    display:none;
+}
+
+/* Content style
+-------------------------------------------------------------- */
+.content .wrapper .left-corner-dot {
+    float:left;
+}
+.content .wrapper .left-corner-dot img {
+    margin:5px 0 0 5px;
+}
+.content .wrapper .right-corner-dot {
+    text-align:right;
+}
+.content .wrapper .right-corner-dot img {
+    margin:5px 5px 0 0;
+}
+
+
+/* Attribution element styles
+-------------------------------------------------------------- */
+.poweredby {
+    z-index: 99;
+    /*margin-left: auto;*/
+    height: 45px;
+    float:right;
+    width: 130px;
+    font-size:8px !important;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-image: url(../../../../assets/img/poweredby.png);
+}
+
+.attribution {
+    font-size:10px;
+    text-align:center;
+}

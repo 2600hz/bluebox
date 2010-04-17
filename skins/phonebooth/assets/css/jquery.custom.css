@@ -1,0 +1,99 @@
+/* This removes the left and right padding on tab panel content
+-------------------------------------------------------------- */
+.ui-tabs .ui-tabs-panel {
+    padding: 10px 2px;
+}
+
+/* The reset removes the table spacing, so add it back....
+-------------------------------------------------------------- */
+.ui-searchFilter table, .ui-jqdialog-content table {
+    border-collapse:separate;
+    border-spacing:2px;
+}
+
+/* We have our own font reset so lets keep with what we got!
+-------------------------------------------------------------- */
+.ui-widget, .ui-helper-reset {
+    font-size:1em;
+}
+
+/* Our resets clobers jqgrids manditory 11px settings
+-------------------------------------------------------------- */
+.ui-jqgrid {
+    font-size: 11px;
+}
+
+/* The new jqgrid adds lines between columns, and we dont like it...
+-------------------------------------------------------------- */
+.ui-jqgrid .ui-jqgrid-view tr.jqgrow td {
+    border-right:0;
+}
+
+/* For most browser make an empty grid one row height
+-------------------------------------------------------------- */
+.ui-jqgrid .ui-jqgrid-bdiv {
+    min-height:22px;
+}
+
+/* The new jqrid draws a weird box around everything. Removing that...
+-------------------------------------------------------------- */
+#tab-panel {
+    border: 0;
+}
+
+/* This will shrink the navbar on the tabs
+-------------------------------------------------------------- */
+.ui-tabs-nav {
+    line-height:1.1em;
+    padding:0px 0px 0px 0px;
+}
+
+.ui-jqgrid .action_seperator {
+    padding:0 2px;
+}
+
+/* jGrowl
+-------------------------------------------------------------- */
+div.jGrowl div.jGrowl-notification, div.jGrowl div.jGrowl-closer {
+    opacity: 100 !important;
+    min-height: 10px !important;
+}
+div.jGrowl .error {
+    background-color: #BF0B0B;
+}
+div.jGrowl .alert {
+    background-color: orange;
+    color: black;
+}
+div.jGrowl .info {
+    background-color: #0C5F0C;
+}
+div.jGrowl .success {
+    background-color: #0C5F0C;
+}
+
+/* ASM Selects
+-------------------------------------------------------------- */
+form.form .asmContainer {
+    width:716px;
+}
+form.form .asmList {
+    margin:0.25em 0 1em 50px;
+    width:auto;
+}
+
+/* numbering multi-select
+-------------------------------------------------------------- */
+.ui-multiselect {
+    float:left;
+}
+
+/* Block UI message
+-------------------------------------------------------------- */
+.blockMsg .thinking {
+    background-image:url('../img/thinking.gif');
+    background-repeat:no-repeat;
+    background-position:center bottom;
+    font-weight:bold;
+    height:32px
+}

@@ -1,0 +1,104 @@
+/* --------------------------------------------------------------
+
+    This file holds css that addresses specific on-screen elements
+
+-------------------------------------------------------------- */
+
+/* Module Headers
+-------------------------------------------------------------- */
+.module_header h2 {
+    background-color:#FFFFFF;
+    padding:10px 0 0;
+    text-align:center;
+}
+
+/* Language change notice
+-------------------------------------------------------------- */
+#lang_bar{
+    display: none;
+    background-color: #FFFFE1;
+    border-style: none none solid none;
+    border-color: grey;
+    border-width: 1px;
+    font-size: 12px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Link buttons
+-------------------------------------------------------------- */
+a.button,
+a.random_pwd_link{
+    display:block;
+    color:#555555;
+    height:30px;
+    line-height:29px;
+    width:191px;
+    float:right;
+    text-align:center;
+    margin: 0 118px 0px 118px;
+}
+a:hover.button,
+a:hover.random_pwd_link{
+    color:#0066CC;
+}
+a.button span .add{
+    background:url(../img/nicebutton/add.gif) no-repeat 10px 8px;
+    text-indent:30px;
+    display:block;
+}
+a.button span .delete{
+    background:url(../img/nicebutton/delete.gif) no-repeat 10px 8px;
+    text-indent:30px;
+    display:block;
+}
+a.button span .user{
+    background:url(../img/nicebutton/user.gif) no-repeat 10px 8px;
+    text-indent:30px;
+    display:block;
+}
+a.button span .alert{
+    background:url(../img/nicebutton/alert.gif) no-repeat 10px 8px;
+    text-indent:30px;
+    display:block;
+}
+a.button span .msg{
+    background:url(../img/nicebutton/msg.gif) no-repeat 10px 8px;
+    text-indent:30px;
+    display:block;
+}
+a.button span .download{
+    background:url(../img/nicebutton/download.gif) no-repeat 10px 8px;
+    text-indent:30px;
+    display:block;
+}
+a.button span .lens{
+    background:url(../img/nicebutton/lens.gif) no-repeat 10px 8px;
+    text-indent:30px;
+    display:block;
+}
+a.button span .info{
+    background:url(../img/nicebutton/info.gif) no-repeat 10px 8px;
+    text-indent:30px;
+    display:block;
+}
+
+/* Layout modifiers
+-------------------------------------------------------------- */
+.hide {display:none;}
+.hidden {position: absolute !important; top: -10000px !important; }
+
+.clear {clear:both;}
+.clr-left {clear:left;}
+.clr-right {clear:right;}
+.clearfix:after, .container:after, .line-break:after {
+        content:"\0020";
+        display:block;
+        height:0;
+        clear:both;
+        visibility:hidden;
+        overflow:hidden;
+}
+
+.clearfix, .container {display:block;}
+/*.clearfix {display: inline-block;}   for IE/Mac */

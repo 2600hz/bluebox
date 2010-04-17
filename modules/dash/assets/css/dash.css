@@ -1,0 +1,46 @@
+/* Formating for Quick Click Actions on top right
+-------------------------------------------------------------- */
+#quickActions {
+    position:absolute;
+    right:0;
+    bottom:0;
+    margin:15px 0;
+    clear:both;
+}
+
+#quickActions .dialog_link {
+    padding: .4em 1em .4em 20px;
+    text-decoration: none;
+    position: relative;
+    float:left;
+}
+
+#quickActions .dialog_link span.ui-icon {
+    margin: 0 5px 0 0;
+    position: absolute;
+    left: .2em;
+    top: 50%;
+    margin-top: -8px;
+}
+
+/* Ensure the dash forms render as horizontal layout
+-------------------------------------------------------------- */
+#dashCallForm .field,
+#dashMobileForm .field {
+    padding-left: 13px;
+}
+#dashCallForm .field label,
+#dashMobileForm .field label {
+    display: inline;
+    float: left;
+    width: 200px;
+    margin-left: 0px;
+}
+
+/* Fix the dash form submit buttons
+-------------------------------------------------------------- */
+#callDialog .buttons,
+#mobileDialog .buttons{
+    padding-top:10px;
+    text-align:center;
+}
