@@ -21,6 +21,13 @@
     ?>
     </div>
 
+    <div class="field">
+    <?php
+        echo form::label('account[expire]', 'Expiration Date:');
+        echo form::input('account[expire]');
+    ?>
+    </div>
+
     <?php echo form::close_section(); ?>
 
     <?php echo form::open_section('Account Setup'); ?>
@@ -29,6 +36,7 @@
     <?php
         echo form::label('account_domain', 'Account Domain:');
         echo form::input('account_domain');
+        echo '  <small>Clients register their devices to this domain via sipUser@domain.com</small>';
     ?>
     </div>
 
