@@ -53,7 +53,7 @@ class Account extends FreePbx_Record
     {
         // COLUMN DEFINITIONS
         $this->hasColumn('account_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
-        $this->hasColumn('name', 'string', 100, array('notnull' => true, 'notblank' => true));
+        $this->hasColumn('name', 'string', 100, array('notnull' => true, 'notblank' => true, 'unique' => true));
         $this->hasColumn('type', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'default' => 0));
         $this->hasColumn('description', 'string', 255);
     }
