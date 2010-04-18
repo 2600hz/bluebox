@@ -1,0 +1,40 @@
+#permissionTreeContainter {
+    float:left;
+    display: block;
+    margin-right: 10px;
+    padding-right: 10px;
+    border-right: 1px solid gray;
+}
+.permission .module {
+    padding: 5px;
+    font-weight:bold;
+}
+.permission .module:hover {
+    color:#629800;
+}
+.permission .alternate {
+    background: #F2F2E5;
+}
+.permission .fields .label {
+    margin-right:10px;
+    font-weight:normal;
+    color:#000000;
+}
+
+.permission .module_permissions,
+.permission .custom_permissions {
+    float:right;
+}
+
+.permission .custom {
+    margin:2px 10px 10px 10px;
+    color:#000000;
+    font-weight:normal;
+}
+.permission .custom.hide {
+    display:none;
+}
+.permission .custom .field .label {
+    width:25%;
+    font-weight:normal;
+}
