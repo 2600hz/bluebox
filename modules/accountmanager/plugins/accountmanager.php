@@ -20,8 +20,8 @@ class AccountManager_Plugin extends FreePbx_Plugin {
         $this->view->account_domain = $domain;
         
         $user = new User();
-        $user->first_name = 'Admin';
-        $user->last_name = 'User';
+        $user->first_name = $base->name;
+        $user->last_name = 'Admin';
         $user->email_address = $email;
         $user->username = $email;
         $user->password = $passwd;
@@ -36,6 +36,21 @@ class AccountManager_Plugin extends FreePbx_Plugin {
 
         try {
             $user->save();
+
+            Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+
+            $context = new Context();
+            $context->name = $base->name .' Private';
+            $context->locked = FALSE;
+            $context->account_id = $base->account_id;
+            $context->save();
+
+            $context = new Context();
+            $context->name = $base->name .' Public';
+            $context->locked = FALSE;
+            $context->account_id = $base->account_id;
+            $context->save();
+
         } catch (FreePbx_Validation_Exception $e) {
 
             $errors = FreePbx_Controller::$validation->errors();
@@ -105,6 +120,12 @@ class AccountManager_Plugin extends FreePbx_Plugin {
         $locations = Doctrine::getTable('Location')->findByAccountId($base->account_id);
         foreach($locations as $location) {
             $location->delete();
+        }
+
+        Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+        $contexts = Doctrine::getTable('Context')->findByAccountId($base->account_id);
+        foreach($contexts as $context) {
+            $context->delete();
         }
     }
 }
