@@ -13,13 +13,19 @@ class Permission_Controller extends FreePbx_Controller
     
     protected $baseModel = 'Permission';
 
-    public function index() {
+    public function __construct() {
+        parent::__construct();
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+        Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+    }
 
+    public function index() {
         // set the title
         $this->view->title = __('Manage Permissions');
 
         // include our stylesheet
         stylesheet::add('permission', 50);
+
 
         // if this form is submitted
         if ($this->submitted()) {
@@ -173,7 +179,7 @@ class Permission_Controller extends FreePbx_Controller
                 // modules permissions
                 if(!isset($subViews[$controller])) {
                     // if not create a new customize view and initalize it
-                    $subViews[$controller] = &new View('permission/customize');
+                    $subViews[$controller] = new View('permission/customize');
                     $subViews[$controller]->module = $controller;
                     $subViews[$controller]->customizable = self::getCustomizable($packages[$controller]);
                 }

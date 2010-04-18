@@ -10,6 +10,10 @@
 class Permission_Plugin extends FreePbx_Plugin
 {
     public function bootstrapPermission() {
+        if (Router::$method == 'disabled' && Router::$controller == 'permission') {
+            return TRUE;
+        }
+
         $allowed = Permissions::allow(Router::$controller, Router::$method);
         if(!$allowed) {
             url::redirect('permission/disabled');
