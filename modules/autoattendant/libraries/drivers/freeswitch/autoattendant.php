@@ -20,8 +20,18 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver {
 					$greeting,
 					$greeting);
                                     
-        $xml->update($node); // work from this location
+       if (!empty($obj->extension_context_id)) {
+           $node .= '{@digit-len="' .$obj->extension_digits .'"}';
+       }
 
+       $xml->update($node); // work from this location
+
+       $xml->setXmlRoot(sprintf('//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]/menus/menu[@name="%s"]', 'auto_attendant_' . $obj->auto_attendant_id));
+       $xml->deleteChildren();
+
+       if (!empty($obj->extension_context_id)) {
+           $xml->update(sprintf('/entry[@action="menu-exec-app"][@name="catch_all"][@digits="\/^([0-9]{%s})$\/"][@param="execute_extension $1 XML context_%s"]', $obj->extension_digits, $obj->extension_context_id));
+       }
     }
 
     public static function delete($obj)
@@ -46,6 +56,4 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver {
         $xml->update('/action[@application="answer"]');
         $xml->update('/action[@application="ivr"]{@data="auto_attendant_' . $obj->AutoAttendant->auto_attendant_id .'"}');
     }
-
-
 }

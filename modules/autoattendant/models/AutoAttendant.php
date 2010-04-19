@@ -24,7 +24,7 @@ class AutoAttendant extends FreePbx_Record
         $this->hasColumn('tts_string', 'blob');
         $this->hasColumn('file_id', 'integer', 11);
         $this->hasColumn('type', 'enum', null, array('values' => array('tts', 'audio')) );
-        $this->hasColumn('extension_dialing', 'boolean', array('default' => FALSE));
+        $this->hasColumn('extension_context_id', 'integer', 11, array('unsigned' => true, 'notnull' => true));
         $this->hasColumn('extension_digits', 'integer', 11, array('unsigned' => true, 'default' => 4));
     }
 

@@ -53,6 +53,11 @@
 }
 
 /* Other fields */
+.auto_attendant input#autoattendant_extension_digits {
+    width: 30px;
+    min-width: 30px;
+}
+
 .auto_attendant input#autoattendant_timeout {
     width: 30px;
     min-width: 30px;

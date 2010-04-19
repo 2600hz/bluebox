@@ -19,6 +19,10 @@ class FreeSwitch_AutoAttendantKey_Driver extends FreeSwitch_Base_Driver {
 					$greeting,
 					$greeting);
 
+       if (!empty($obj->AutoAttendant->extension_context_id)) {
+           $node .= '{@digit-len="' .$obj->AutoAttendant->extension_digits .'"}';
+       }
+
         if (empty($obj->auto_attendant_key) && $obj->auto_attendant_key !== 0) return;
 
         $key = $obj->auto_attendant_key;

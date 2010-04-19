@@ -19,7 +19,9 @@ class AutoAttendant_Controller extends FreePbx_Controller
         'auto_attendant',
         'tts_string',
         'audio_file',
-        'file_id'
+        'file_id',
+        'extension_context_id',
+        'extension_digits'
     );
 
     public function __construct()

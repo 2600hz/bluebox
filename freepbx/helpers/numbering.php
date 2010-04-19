@@ -541,17 +541,33 @@ class numbering extends form
         return '<a href="' . url::current() .'" ' .html::attributes($attributes) .'><span>' .$title .'</span></a>';
     }
 
-    public static function selectContext($fieldName, $selected)
+    public static function selectContext($data, $selected = NULL)
     {
+        // standardize the $data as an array, strings default to the class_type
+        if ( ! is_array($data))
+        {
+            $data = array('name' => $data);
+        }
+
+        // add in all the defaults if they are not provided
+        $data += array(
+            'nullOption' => FALSE
+        );
+
         // TODO: optimize this query, use DQL?
         $options = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
+
+        if (!empty($data['nullOption'])) {
+            $nullOption = array('context_id' => 0, 'name' => __($data['nullOption']));
+            array_unshift($options, $nullOption);
+            unset($data['nullOption']);
+        }
 
         foreach ($options as $option) {
             $contextOptions[$option['context_id']] = $option['name'];
         }
 
-        return form::dropdown($fieldName, $contextOptions, $selected);
-
+        return form::dropdown($data, $contextOptions, $selected);
     }
 
 
