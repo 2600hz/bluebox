@@ -38,7 +38,7 @@ class Installer_Controller extends FreePbx_Controller
      *
      * @var int $log_threshold the log_threshold starts at 0 and this is what to set to post-install
      */
-    public $log_threshold = 4;
+    public $log_threshold = 2;
     /**
      * @var array $steps List of functions to process for install (order is important)
      */
