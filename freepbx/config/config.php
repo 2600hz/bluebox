@@ -2,14 +2,14 @@
 /**
  * Allow the installer to be run.  This should be set to false after installation
  */
-$config['installer_enabled'] = FALSE;
+$config['installer_enabled'] = TRUE;
 
 /**
  * Base path of the web site. If this includes a domain, eg: localhost/kohana/
  * then a full URL will be used, eg: http://localhost/kohana/. If it only includes
  * the path, and a site_protocol is specified, the domain will be auto-detected.
  */
-$config['site_domain'] = '/freepbx-multitenant/';
+$config['site_domain'] = '/';
 
 /**
  * Force a default protocol to be used by the site. If no site_protocol is
@@ -66,7 +66,7 @@ $config['enable_hooks'] = TRUE;     // FreePbx will fail miserably if you turn t
  *  3 - Notices
  *  4 - Debugging
  */
-$config['log_threshold'] = 4;
+$config['log_threshold'] = 0;
 
 /**
  * Message logging directory.
@@ -118,13 +118,13 @@ $config['require_login'] = TRUE;
 /**
  * If this is true the user has allowed us to collect anonymous statistics about what modules they use
  */
-$config['anonymous_statistics'] = TRUE;
+$config['anonymous_statistics'] = FALSE;
 
 /**
  * Is this an oxymoron? Well we need to be able to group
  * multiple responses, it is not used for any other reason. Promise :)
  */
-$config['anonymous_id'] = '29D2DAE47B0AB65CAEE0D0D7A6ACDA73';
+$config['anonymous_id'] = '';
 
 /**
  * If true then a minimum password complexity is enforced
