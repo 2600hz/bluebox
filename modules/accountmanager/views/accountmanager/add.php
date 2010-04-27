@@ -61,8 +61,8 @@
 
     <div class="field">
     <?php
-        echo form::label('account_email', 'Master User Email:');
-        echo form::input('account_email');
+        echo form::label('account_username', 'Master Username:');
+        echo form::input('account_username');
     ?>
     </div>
 

@@ -37,6 +37,8 @@ class AccountManager_Plugin extends FreePbx_Plugin {
         try {
             $user->save();
 
+            FreePbx_Tenant::initializeTenant($email, $passwd, $base->name, 'New Location');
+
             Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
 
             $context = new Context();

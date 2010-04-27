@@ -95,20 +95,81 @@ class AccountManager_Controller extends FreePbx_Controller
 
     public function add()
     {
+        // Account management is a bit "deeper" then most functions, so we do NOT utilize formSave() and instead
+        // we use a custom version of that, and just about everything else
+
         // Overload the add view
         $this->view->title = 'Add Account';
         $this->view->errors = array();
         $this->account = new Account();
-        // Are we supposed to be saving stuff? (received a form post?)
+
+        if ($_POST) {
+            $this->account->fromArray($this->input->post('account'));
+
+            // Process all posted form fields manually
+            $username = $this->input->post('account_username', '');
+            $password = $this->input->post('account_password', '');
+            $domain = $this->input->post('account_domain', '');
+            $url = $this->input->post('account_url', '');
+                //if (!filter_var('http://' . $domain, FILTER_VALIDATE_URL)) {
+                //if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        } else {
+            $username = $password = $domain = $url = '';
+        }
+
+        // Save data and all relations
         if ($this->submitted()) {
-            // TODO: Make this secure.
-            if ($this->formSave($this->account)) {
-                url::redirect(Router_Core::$controller);
+            // Check for unique domain name
+            Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+            if (Doctrine::getTable('Location')->findOneBy('domain', $domain)) {
+                message::set('You must specify a unique domain name.');
+            } elseif ((!$username) or (!$password)) {
+                message::set('Username and password are required.');
+            } else {
+                // Looks good.
+                try {
+                    // Allow plugins to process any form-related data we just got back and attach to our data object
+                    plugins::save($this);
+
+                    $options = array();
+                    $options['account'] = $this->account->toArray();
+                    $options['location'] = array('name' => 'New Location', 'domain' => $domain);
+                    $options['user'] = array('username' => $username, 'password' => $password);
+                    FreePbx_Tenant::initializeTenant($options);
+                    // TODO: Create a site based on URL...
+
+                    // Success - display a custom save message, or a generalized one using the class name
+                    message::set('New tenant created!', array(
+                        'type' => 'success'
+                    ));
+
+                    url::redirect(Router_Core::$controller);
+                }
+                catch(Doctrine_Connection_Exception $e) {
+                    message::set('Doctrine error: ' . $e->getMessage());
+                }
+                catch(FreePbx_Exception $e) {
+                    kohana::log('alert', $e->getMessage());
+                    // Note that $this->view->errors is automatically populated by FreePbx_Record
+                    message::set('Please correct the errors listed below.');
+                }
+                catch (Exception $e) {
+                    message::set($e->getMessage());
+                }
             }
         }
+        
+        // Tell other plugins that we want to repopulate form fields with the invalid data
+        // these fields will not auto-populate
+        $this->view->account_username = $username;
+        $this->view->account_password = $password;
+        $this->view->account_domain = $domain;
+        $this->view->account_url = $url;
 
         // Allow our account object to be seen by the view
         $this->view->account = $this->account;
+
         // Execute plugin hooks here, after we've loaded the core data sets
         plugins::views($this);
     }
