@@ -1503,7 +1503,8 @@ class FreePbx_Installer
             'disable',
             'uninstall',
             'repair',
-            'verify'
+            'verify',
+            'createTenant'
         );
         return in_array($action, $validActions);
     }

@@ -2,11 +2,14 @@
 class FreePbx_Initialize
 {
     // NOTE: For multi-tenancy to work this section MUST appear first!
-    public static function initializeUser() {
-        $session = Session::instance();
+    public static function initializeMasterTenant() {
+       $session = Session::instance();
 
+       FreePbx_Tenant::initializeTenant($session->get('installer.adminEmailAddress'), $session->get('installer.adminPassword'), 'Master Account', 'Main Location');
+       FreePbx_Tenant::initializeSite('localhost', 1);
+       
         // Add the core admin user to the system
-        $user = new User();
+/*        $user = new User();
         $user->first_name = 'Admin';
         $user->last_name = 'User';
         $user->email_address = $session->get('installer.adminEmailAddress');
@@ -30,6 +33,7 @@ class FreePbx_Initialize
         $user->Account = $user->Location->Account;
         $user->save();
         $user->free(TRUE);
+ */
 
         // Force a login of the master/admin user for the remainder of the install
         Auth::instance()->force_login($session->get('installer.adminEmailAddress'));
@@ -37,7 +41,7 @@ class FreePbx_Initialize
 
     }
 
-    public static function initializeContext() {
+/*    public static function initializeContext() {
         FreePbx_Installer::disableTelephony();
 
         // Add a couple samples in there, too
@@ -54,19 +58,7 @@ class FreePbx_Initialize
         $context->free();
 
         FreePbx_Installer::restoreTelephony();
-    }
-
-    public static function initializeDeviceNumber() {
-        FreePbx_Installer::disableTelephony();
-
-        $numberType = new NumberType();
-        $numberType->class = 'DeviceNumber';
-        $numberType->module_id = 0;
-        $numberType->save();
-        $numberType->free();
-
-       FreePbx_Installer::restoreTelephony();
-    }
+    }*/
 
     public static function initializeNetList() {
         FreePbx_Installer::disableTelephony();
@@ -94,28 +86,8 @@ class FreePbx_Initialize
        FreePbx_Installer::restoreTelephony();
     }
 
-    public static function initializeSite() {
-        FreePbx_Installer::disableTelephony();
-
-        $site = new Site();
-
-        // Is the skins module installed? If so, get the key of the default skin
-        $skin = Doctrine::getTable('Skin')->findOneByDefault(TRUE);
-        if ($skin)
-            $site->skin_id = $skin->skin_id;
-
-        // Create default site setttings
-        $site->url = 'localhost';
-        $site->homepage = '/welcome';
-        $site->wildcard = 0;
-        $site->default = 1;
-        $site->save();
-        $site->free(TRUE);
-
-       FreePbx_Installer::restoreTelephony();
-    }
-
-    public static function initializeSkin() {
+    public static function initializeSkins() {
+        // TODO: Move this to the individual skins once skins are actual modules
         FreePbx_Installer::disableTelephony();
         
         // Install stock FreePBX skin
@@ -154,7 +126,20 @@ class FreePbx_Initialize
         FreePbx_Installer::restoreTelephony();
     }
 
-    public static function initializeSystemNumber() {
+    /** Initialize default number types **/
+     public static function initializeDeviceNumber() {
+        FreePbx_Installer::disableTelephony();
+
+        $numberType = new NumberType();
+        $numberType->class = 'DeviceNumber';
+        $numberType->module_id = 0;
+        $numberType->save();
+        $numberType->free();
+
+       FreePbx_Installer::restoreTelephony();
+    }
+
+   public static function initializeSystemNumber() {
         FreePbx_Installer::disableTelephony();
         
         $numberType = new NumberType();
