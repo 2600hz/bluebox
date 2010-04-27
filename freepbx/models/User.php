@@ -90,8 +90,8 @@ class User extends FreePbx_Record
         $this->hasColumn('location_id', 'integer', 11, array('unsigned' => true));
         $this->hasColumn('first_name', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('last_name', 'string', 100, array('notnull' => true, 'notblank' => true));
-        $this->hasColumn('username', 'string', 100, array('unique' => true, 'notnull' => true, 'notblank' => true));
-        $this->hasColumn('email_address', 'string', 100, array('unique' => true, 'notnull' => true, 'notblank' => true));
+        $this->hasColumn('username', 'string', 100, array('notnull' => true, 'notblank' => true));
+        $this->hasColumn('email_address', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('password', 'string', 64, array('notnull' => true, 'notblank' => true, 'minlength' => 8));
         $this->hasColumn('logins', 'integer', 11, array('unsigned' => true));
         $this->hasColumn('last_login', 'timestamp', null, array('past' => true));
