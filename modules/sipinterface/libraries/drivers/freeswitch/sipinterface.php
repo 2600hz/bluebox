@@ -112,7 +112,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver {
 
         $xml->update('/settings/param[@name="inbound-codec-negotiation"]{@value="generous"}');
 
-        $xml->update('/settings/param[name="inbound-reg-force-matching-username"]{@value="true"}');
+        $xml->update('/settings/param[@name="inbound-reg-force-matching-username"]{@value="true"}');
 
         $xml->update('/settings/param[@name="nonce-ttl"]{@value="86400"}');
 
