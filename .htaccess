@@ -1,0 +1,25 @@
+<IfModule mod_rewrite.c>
+    # Turn on URL rewriting
+    RewriteEngine On
+
+    # Installation directory
+    #RewriteBase /kohana/
+
+    # If the request is for a modules assets directory allow it
+    RewriteRule ^modules/.*/assets/.*$ - [L]
+
+    # Protect application and system files from being viewed
+    RewriteRule ^(freepbx|modules|system|upload)/ - [F,L]
+
+    # Catch requests for XML or JSON and send them through an alternate entry point
+    RewriteRule ^(.+)\.json$ json.php/$1 [T=application/json,L]
+    RewriteRule ^(.+)\.xml$ xml.php/$1 [T=text/xml,L]
+
+    # Allow any files or directories that exist to be displayed directly
+    RewriteCond %{REQUEST_FILENAME} installer\.html [OR]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Rewrite all other URLs to index.php/URL
+    RewriteRule .* index.php/$0 [PT,L]
+</IfModule>
