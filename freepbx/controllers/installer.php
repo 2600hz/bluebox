@@ -67,7 +67,8 @@ class Installer_Controller extends FreePbx_Controller
         if (!Kohana::config('config.installer_enabled')) {
             throw new Exception('The installer has been administratively disabled. (You can re-enable it in freepbx/config/config.php)');
         }
-        Kohana::config_set('core.site_domain', '/' . url::guess_site_domain() . '/');
+        $siteDomain = str_replace('installer', '', url::guess_site_domain());
+        Kohana::config_set('core.site_domain', '/' . trim($siteDomain, '/') . '/');
         skins::setSkin($this->template);
         parent::__construct();
         /**
