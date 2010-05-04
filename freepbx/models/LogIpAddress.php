@@ -31,7 +31,7 @@
 class LogIpAddress extends Doctrine_Template {
     public function setTableDefinition()
     {
-		$this->hasColumn('last_logged_ip', 'string', 20);
+		$this->hasColumn('last_logged_ip', 'string', 40);
 
         $this->addListener(new LogIpAddressListener());
     }
