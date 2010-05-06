@@ -1,0 +1,79 @@
+/* 
+    Document   : autoattendant
+    Author     : Michael Phillips
+    Description:
+        Auto-Attendant CSS layout sheet
+*/
+.powerdns_records .remove_record {
+    display:inline-block;
+    width: 16px;
+    height: 16px;
+    background-image: url(../img/delete.png);
+    background-repeat: no-repeat;
+    vertical-align: middle;
+    margin-left: 20px;
+}
+
+.powerdns_records .record {
+    border-bottom:1px solid #D0D0D0;
+    margin:10px 0;
+}
+
+.new_record_container {
+    margin: 10px 0;
+    height: 30px;
+}
+
+form.form .powerdns_records .field label {
+    width: 60px;
+    padding-left:35px;
+}
+
+/* Other fields */
+form.form .record_name.field {
+    float:left;
+    clear:none;
+}
+form.form .record_name.field input {
+    width: 100px;
+    min-width:100px;
+    text-align:right;
+}
+form.form .record_name.field .record_soa {
+    width: 106px;
+    min-width:106px;
+    text-align:right;
+    float:left;
+}
+
+form.form .record_type.field {
+    float:left;
+    clear:none;
+}
+form.form .record_type.field select {
+    width:auto;
+    min-width:0;
+}
+
+form.form .record_ttl.field {
+    float:left;
+    clear:none;
+}
+form.form .record_ttl.field input {
+    width:50px;
+    min-width:50px;
+}
+
+form.form .record_prio.field {
+    float:left;
+    clear:none;
+}
+form.form .record_prio.field input {
+    width:50px;
+    min-width:50px;
+}
+
+form.form .record_content.field input {
+    width: 662px;
+    min-width: 662px;
+}
