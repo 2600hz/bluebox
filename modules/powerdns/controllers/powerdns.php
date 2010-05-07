@@ -153,6 +153,8 @@ class PowerDns_Controller extends FreePbx_Controller {
             foreach ($records as $key => $record) {
                 if ($record['type'] == 'SOA') {
                     $records[$key]['name'] = $_POST['pdnsdomain']['name'];
+                } else {
+                    $records[$key]['name'] .= '.' .$_POST['pdnsdomain']['name'];
                 }
 
                 if (empty($record['prio'])) {
@@ -175,9 +177,11 @@ class PowerDns_Controller extends FreePbx_Controller {
         // populate the keys
         $records = array();
         foreach ($this->pdnsDomain->PdnsRecord as $record) {
-            $records[$record['id']] = $record->toArray();
+            $record = $record->toArray();
+            $record['name'] = str_replace('.' .$this->pdnsDomain['name'], '', $record['name']);
+            $records[$record['id']] = $record;
         }
-        $this->view->records = $this->pdnsDomain->PdnsRecord->toArray();
+        $this->view->records = $records;
 
         // Allow our location object to be seen by the view
         $this->view->pdnsdomain = $this->pdnsDomain;
