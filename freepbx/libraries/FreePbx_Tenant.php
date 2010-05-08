@@ -1,6 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class FreePbx_Tenant
 {
+    public static $accountName = NULL;
+    
     public static function initializeAccount($options) {
         $account = new Account();
         $account->name = (isset($options['name']) ? $options['name'] : 'New Account');
@@ -29,7 +31,7 @@ class FreePbx_Tenant
         return $location->location_id;
     }
 
-    public static function initializeUser($locationId, $options) {
+    public static function initializeUser($accountId, $locationId, $options) {
         $user = new User();
         $user->first_name = (isset($options['first']) ? $options['first'] : 'Admin');
         $user->last_name = (isset($options['last']) ? $options['last'] : 'Admin');
@@ -37,6 +39,7 @@ class FreePbx_Tenant
         $user->email_address = (isset($options['email']) ? $options['email'] : $user->username);     // Use username as email address is no email is specified
         $user->password = (isset($options['password']) ? $options['password'] : substr(mdr(rand(1000000, 9999999)), 0, 5)); // Create a random password if none is given
         $user->location_id = $locationId;
+        $user->account_id = $accountId;
         $user->save();
 
         return $user->user_id;
@@ -77,6 +80,7 @@ class FreePbx_Tenant
         Kohana::log('debug', 'Initializing account...');
         try {
             $accountId = self::initializeAccount($options['account']);
+            self::$accountName = $options['account']['name'];
         } catch (Exception $e) {
             Kohana::log('error', 'Creating account failed.');
             
@@ -92,13 +96,15 @@ class FreePbx_Tenant
             $account = Doctrine::getTable('Account')->find($accountId);
             $account->delete();
 
+            self::$accountName = NULL;
+
             // Bubble up
             throw $e;
         }
 
         Kohana::log('debug', 'Initializing user...');
         try {
-            $userId = self::initializeUser($locationId, $options['user']);
+            $userId = self::initializeUser($accountId, $locationId, $options['user']);
         } catch (Exception $e) {
             Kohana::log('error', 'Creating user failed. Rolling back tenant.');
             $location = Doctrine::getTable('Location')->find($locationId);
@@ -106,6 +112,8 @@ class FreePbx_Tenant
 
             $account = Doctrine::getTable('Account')->find($accountId);
             $account->delete();
+
+            self::$accountName = NULL;
 
             // Bubble up
             throw $e;
@@ -130,12 +138,17 @@ class FreePbx_Tenant
                     message::set('Unable to initialize tenant!'
                             .'<div class="error_details">' . $e->getMessage() . '</div>'
                     );
+
+                    self::$accountName = NULL;
+
                     return false;
                 }
             }
         }
 
         Kohana::log('debug', 'Done creating tenant.');
+
+        self::$accountName = NULL;
 
         return array ('userId' => $userId, 'locationId' => $locationId, 'accountId' => $accountId); // You can get everything you need from here
     }
