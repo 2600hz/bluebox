@@ -169,6 +169,9 @@ class AutoAttendant_Controller extends FreePbx_Controller
             $this->autoAttendant->AutoAttendantKey->synchronizeWithArray(array());
             $this->autoAttendant->AutoAttendantKey->synchronizeWithArray($autoAttendantKeys);
 
+            // Force rebuild of dialplan for these numbers
+            $this->autoAttendant->_dirtyNumbers = array('type' => 'AutoAttendantNumber', 'id' => 'auto_attendant_id');
+
             if ($this->formSave($this->autoAttendant)) {
                 url::redirect(Router_Core::$controller);
             }
