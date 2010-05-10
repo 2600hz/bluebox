@@ -23,7 +23,9 @@ class FreeSwitch_AutoAttendantKey_Driver extends FreeSwitch_Base_Driver {
            $node .= '{@digit-len="' .$obj->AutoAttendant->extension_digits .'"}';
        }
 
-        if (empty($obj->auto_attendant_key) && $obj->auto_attendant_key !== 0) return;
+        // This logic keeps the auto-attendant from contiaing an empty key, but
+        // for some reason it seems to fail when intensionally set to zero...
+        //if (empty($obj->auto_attendant_key) && $obj->auto_attendant_key !== 0) return;
 
         $key = $obj->auto_attendant_key;
         $key = ($key === 'asterisk') ? '*' : $key;   
@@ -32,7 +34,7 @@ class FreeSwitch_AutoAttendantKey_Driver extends FreeSwitch_Base_Driver {
         Kohana::log('debug', 'Setting xml for Auto Attendant ' . $obj->AutoAttendant->auto_attendant_id . ', key ' . $obj->auto_attendant_key);
 
         $transferTo = dialplan::getTransfer($obj->number_id);
-        $xml->update($node . sprintf('/entry[@action="menu-exec-app"][@digits="%s"][@param="%s"]', $key, $transferTo));
+        $xml->update($node . sprintf('/entry[@action="menu-exec-app"][@digits="%s"][@param="%s"]', (string)$key, $transferTo)); 
     }
 
     public static function delete($obj)
