@@ -33,6 +33,11 @@
 abstract class FreePbx_Record extends Doctrine_Record {
 
     /**
+     * @var string $_dirtyNumbers                 number types to regenerate each time this record type is saved (if any)
+     */
+    public $_dirtyNumbers = NULL;
+
+    /**
      * @var array this is an array of defaul validation error messages based on the type of failure, it only applies to freepbx_record
      */
     public static $defaultErrors = array(
@@ -105,7 +110,29 @@ abstract class FreePbx_Record extends Doctrine_Record {
             }
             
             parent::save();
-          
+
+            // See if the base object requires phone number re-generation
+            // And the Doctrine hacks get even dirtier... [sigh]
+            if ($this->_dirtyNumbers) {
+                $id_column = $this->_dirtyNumbers['id'];
+                $class_type = $this->_dirtyNumbers['type'];
+
+                $results = Doctrine_Query::create()
+                    ->select('number_id')
+                    ->from('Number')
+                    ->where('foreign_id = ?', $this->$id_column)
+                    ->andWhere('class_type = ?', $class_type)
+                    ->execute();
+
+                foreach ($results as $result) {
+                    Telephony::set($result);
+                }
+
+                Telephony::save();
+
+                Telephony::commit();
+            }
+
             // Done with any events that may use this
             if (self::getBaseTransactionObject() == $this) {
                 self::setBaseSaveObject(NULL);
