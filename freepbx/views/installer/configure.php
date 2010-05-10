@@ -103,7 +103,7 @@
     <?php echo form::open_section('Anonymous Usage Statistics'); ?>
 
         <p>
-            <?php echo __('If you decide to enable anonymous usage statistics, information about how you use the FreePBX 3 will be collected. This does not include any personal information, such as who you are or any phone numbers. We will use this data to improve our software - for example, we may change the system requirements to better suite our users or enhance the package selection in future versions of FreePBX. -Thank you!'); ?>
+            <?php echo __('This option enables reporting on which modules you use. The data is sent to the FreePBX team via the Internet. We DO NOT transmit any configuration options or personally identifiable information. This feature ensures our focus remains on the modules people use most. Thank you for your support!'); ?> 
         </p>
 
         <div class="field">
