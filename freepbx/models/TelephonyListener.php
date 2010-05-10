@@ -101,6 +101,13 @@ class TelephonyListener extends Doctrine_EventListener {
                             Kohana::log('debug', 'An unknown action (' . $change['action'] . ') was performed on model ' . get_class($change['record']));
                             break;
                     }
+
+                    // As a safety net, re-generate all items with a direct relation to the base object
+                    $base = FreePbx_Record::getBaseTransactionObject();
+                    foreach ($base->getReferences() as $reference) {
+                        Telephony::set($reference);
+                    }
+
                     FreePbx_Record::setBaseSaveObject(NULL);
                 }
 
