@@ -38,7 +38,7 @@ abstract class FreePbx_Controller extends Template_Controller
      *
      * @var float The freepbx core version
      */
-    public static $version = '3.0RC1';
+    public static $version = '3.0';
     /*************************
     * AUTH RELATED SETTINGS *
     *************************/
