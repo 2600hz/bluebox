@@ -71,13 +71,12 @@ form.form p {
 
 /* inputs
 -------------------------------------------------------------- */
-form.form input.input,
 form.form input.password,
 form.form .textarea,
 form.form .dropdown {
     min-width:185px;
 }
-form.form input.input,
+form.form input.input[type=text],
 form.form input.password,
 form.form .textarea {
     min-width:182px;
