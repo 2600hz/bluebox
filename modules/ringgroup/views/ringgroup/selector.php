@@ -27,7 +27,7 @@
     <?php
         echo form::label('number[options][timeout]', 'If no answer, transfer to: ');
         echo numbering::selectContext('number[options][timeout_context]', $fallback_context);
-        echo form::dropdown('number[options][timeout]', $fallback_number);
+        echo form::dropdown('number[options][timeout_number]', $fallback_number);
     ?>
     </div>
 

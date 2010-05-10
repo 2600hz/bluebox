@@ -59,25 +59,19 @@ class FreeSwitch_RingGroup_Driver extends FreeSwitch_Base_Driver
         FreeSwitch::setSection('ringgroup', $domain, 'ringgroup_' . $obj->ring_group_id);
         $xml->deleteNode();
     }
+
     public static function dialplan($obj)
     {
         $xml = Telephony::getDriver()->xml;
         kohana::log('debug', 'Saving ring group to dialplan');
         $dest = 'ringgroup_' . $obj->RingGroup->ring_group_id;
-        $timeout = $obj->RingGroup->timeout;
-        //+F will return the group members in a serial fashion (separated by |) and +A will return them in a parallel fashion (separated by ,)
-        $strategy = ($obj->RingGroup->strategy == 0) ? '+F' : '+A';
-        //$context  = $obj->NumberContext->Context->name; //this fails
-        $strategy = ''; // Until I get more information on this, disable it for now.
-        
+        $timeout = (isset($obj->options['timeout']) ? $obj->options['timeout'] : 30);
+        $strategy = ($obj->RingGroup->strategy == 2) ? ':order' : '';
+
         $xml->update('/action[@application="set"][@freepbx="rg_hangup_after_bridge"]{@data="hangup_after_bridge=true"}');
-        if (empty($obj->RingGroup->fallback_number_id)) {
-            $xml->update('/action[@application="set"][@freepbx="rg_continue_on_fail"]{@data="continue_on_fail=false"}');
-        } else {
-            $xml->update('/action[@application="set"][@freepbx="rg_continue_on_fail"]{@data="continue_on_fail=true"}');
-        }
+        $xml->update('/action[@application="set"][@freepbx="rg_continue_on_fail"]{@data="continue_on_fail=true"}');
         $xml->update('/action[@application="set"][@freepbx="rg_call_timeout"]{@data="call_timeout=' . $timeout . '"}');
-        $xml->update('/action[@application="bridge"]{@data="${group_call(' . $dest . $strategy . '@$${location_' . $obj->RingGroup->location_id . '})}"}');
+        $xml->update('/action[@application="bridge"]{@data="{leg_timeout=' . $obj->options['timeout'] . ',ignore_early_media=true}${group(call:' . $dest . '@$${location_' . $obj->RingGroup->location_id . '}' . $strategy . ')}"}');
 
         // Nobody answered?
         // Grab the destination we're routing to. We don't care which context we end up in per say, as long as it's the right destination.
@@ -93,6 +87,6 @@ class FreeSwitch_RingGroup_Driver extends FreeSwitch_Base_Driver
         //
         // For example, to get the ring group ID, do $obj->RingGroup->ring_group_id (NOT $obj->ring_group_id, which is what
         // you would do in the other functions)
-        
+
     }
 }

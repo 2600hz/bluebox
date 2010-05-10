@@ -6,7 +6,7 @@
  */
 class RingGroup_Plugin extends FreePbx_Plugin
 {
-    private $updateNumbers = FALSE;
+    /*private $updateNumbers = FALSE;*/
 
     public function selector() {
         $subview = new View('ringgroup/selector');
@@ -32,7 +32,7 @@ class RingGroup_Plugin extends FreePbx_Plugin
         $this->views[] = $subview;
     }
 
-    public function checkChanges() {
+/*    public function checkChanges() {
         // get the base ring group
         $base = $this->ringgroup;
 
@@ -50,7 +50,7 @@ class RingGroup_Plugin extends FreePbx_Plugin
             kohana::log('debug', 'Flagging this ringgroup as needing a diaplan rebuild.');
             $this->updateNumbers = TRUE;
         }
-    }
+    }*/
 
     public function dirtyNumbers()
     {

@@ -11,10 +11,7 @@ class RingGroup_Controller extends FreePbx_Controller
 {
     public $writable = array(
         'name',
-        'strategy',
-        'location_id',
-        'timeout',
-        'fallback_number_id'
+        'location_id'
     ); // update this to match inputs from forms
 
     protected $baseModel = 'RingGroup';
@@ -92,11 +89,11 @@ class RingGroup_Controller extends FreePbx_Controller
 
             // check the fallback number and avoid constraint issue by setting it to NULL
             // instead of 0 if there is no fallback selected
-            $fallbackNumber = $_POST['ringgroup']['fallback_number_id'];
+            /*$fallbackNumber = $_POST['ringgroup']['fallback_number_id'];
             if (empty($fallbackNumber)) {
                 $this->ringgroup->fallback_number_id = NULL;
                 $_POST['ringgroup']['fallback_number_id'] = NULL;
-            }
+            }*/
 
             if($this->ringgroup->RingGroupMember->isModified()) {
                 // this forces the directory xml to be generated even if only
@@ -138,10 +135,10 @@ class RingGroup_Controller extends FreePbx_Controller
 
             // check the fallback number and avoid constraint issue by setting it to NULL
             // instead of 0 if there is no fallback selected
-            $fallbackNumber = $_POST['ringgroup']['fallback_number_id'];
+            /*$fallbackNumber = $_POST['ringgroup']['fallback_number_id'];
             if (empty($fallbackNumber)) {
                 $_POST['ringgroup']['fallback_number_id'] = NULL;
-            } 
+            } */
 
             if ($this->formSave($this->ringgroup)) {
                 url::redirect(Router_Core::$controller);
