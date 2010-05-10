@@ -60,7 +60,7 @@ class Voicemail_Plugin extends FreePbx_Plugin
         }
         $view->voicemail = $base->Voicemail->toArray();
 
-        
+
         $boxes = Doctrine::getTable('Voicemail')->findByAccountId(users::$user->Location->account_id);
         $voicemailBoxes = array('0' => 'None');
         foreach($boxes as $box) {
@@ -87,9 +87,11 @@ class Voicemail_Plugin extends FreePbx_Plugin
             // try to remove these voicemail settings from the base
             if (!empty($base->Voicemail->foreign_id) and ($base->Voicemail->voicemail_id > 0)) {
                 //$base->Voicemail->unlink('Device');
+                // Regenerate the numbers formerly attached to this
+                /*$this->_dirtyNumbers = array('type' => 'VoicemailNumber', 'id' => $base->Voicemail->foreign_id);*/
+
                 $base->Voicemail->class_type = NULL;
                 $base->Voicemail->foreign_id = 0;
-                $this->dirtyNumbers($base);
             } else {
                 unset ($base->Voicemail);
             }
@@ -101,17 +103,18 @@ class Voicemail_Plugin extends FreePbx_Plugin
             if (!$box) {
                 return FALSE;
             }
-            
+
             if (($base instanceof Device) and ($base->class_type == 'SipDevice')) {
                 $box->class_type = 'DeviceVoicemail';
             }
 
             $base->Voicemail = $box;
-            $this->dirtyNumbers($base);
+            /*$this->_dirtyNumbers = array($box->class_type, 'id' => $base->Voicemail->foreign_id);*/
+            //$this->dirtyNumbers($base);
         }
     }
 
-    private function dirtyNumbers($obj) {
+    /*private function dirtyNumbers($obj) {
         if ($this->input->post('containsAssigned')) //hidden input to let us know the page needs to have assigned numbers processed
         {
             $primaryKeyCol = $obj->_table->getIdentifier(); //get the column name, like confernce_id
@@ -131,6 +134,6 @@ class Voicemail_Plugin extends FreePbx_Plugin
                 Telephony::set($result);
             }
         }
-    }
+    }*/
 }
-    
+
