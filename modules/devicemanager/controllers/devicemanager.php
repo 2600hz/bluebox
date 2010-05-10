@@ -86,8 +86,12 @@ class DeviceManager_Controller extends FreePbx_Controller
             ));
             return TRUE;
         }
+
         // Are we supposed to be saving stuff? (received a form post?)
         if ($this->submitted()) {
+            // Force rebuild of dialplan for these numbers 
+            $this->device->_dirtyNumbers = array('type' => 'DeviceNumber', 'id' => 'device_id');
+
             if ($this->formSave($this->device)) {
                  url::redirect(Router_Core::$controller);
             }
