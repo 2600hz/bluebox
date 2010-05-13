@@ -15,6 +15,7 @@ class AutoAttendant_Controller extends FreePbx_Controller
         'name',
         'type',
         'timeout',
+        'digit_timeout', 
         'description',
         'auto_attendant',
         'tts_string',
