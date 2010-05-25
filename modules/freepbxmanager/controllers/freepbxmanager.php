@@ -418,7 +418,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
 
     public function maintenance()
     {
-        if ($_POST['submit'] == 'Regenerate Now') {
+        if ($this->input->post('submit') == 'Regenerate Now') {
             $devices = Doctrine::getTable('SipDevice')->findAll();
             foreach ($devices as $device) {
                 FreePbx_Record::setBaseSaveObject($device);
