@@ -1,16 +1,16 @@
 <div id="welcome_container">
     <div id="conferences_update_header" class="update conferenece module_header">
-        <h2><span class="helptip"></span><?php echo __('Welcome to FreePBX v3!'); ?></h2>
+        <h2><span class="helptip"></span><?php echo __('Welcome to ' . $product . '!'); ?></h2>
     </div>
 
     <?php echo form::open(); ?>
     <?php echo form::open_section('Getting Started'); ?>
 
     <div>
-        <div><?php echo __('Welcome to the next generation of FreePBX. The options below will help you get started using your system. Or use the'); ?>
+        <div><?php echo __('Welcome to the next generation of ' . $product . '. The options below will help you get started using your system. Or use the'); ?>
             <?php echo __('navigation bar above to access all features installed on the system.'); ?></div>
     </div>
-    
+
     <?php echo form::close_section(); ?>
 
     <?php echo form::open_section('Phones and Equipment'); ?>
@@ -21,7 +21,7 @@
     <div>
         <?php echo html::anchor('devicemanager', 'Configure Phones & Equipment'); ?>
         - <?php echo __('You can start exploring your system by setting up'); ?>
-        <?php echo __('phones and other equipment. If you installed FreePBX with the sample data option enabled, you already have devices configured'); ?>
+        <?php echo __('phones and other equipment. If you installed ' . $product . ' with the sample data option enabled, you already have devices configured'); ?>
         <?php echo __('and ready to go. Look up the usernames and passwords and configure your phones accordingly.'); ?>
     </div>
 <?php
@@ -44,7 +44,7 @@
 
     <?php echo form::close_section(); ?>
 
-    
+
     <?php echo form::open_section('Connectivity'); ?>
 
 <?php

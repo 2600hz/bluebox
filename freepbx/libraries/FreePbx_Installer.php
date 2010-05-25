@@ -80,7 +80,7 @@ class FreePbx_Installer
     {
         // Reset the error and warning vars, also create a instance if it doesnt exist
         self::init();
-                
+
         // Initialize a empty packages array
         $packages = array();
         // Check if there are any filters
@@ -93,7 +93,7 @@ class FreePbx_Installer
                     )
                 );
                 // If we are given a one dimentional array then assume it is also an include filter
-                
+
             } else if (is_array($filter) && empty($filter['include']) && empty($filter['exclude'])) {
                 $filter = array(
                     'include' => $filter
@@ -282,7 +282,7 @@ class FreePbx_Installer
      */
     public static function createCatalog() {
         $packages = self::listPackages(NULL, TRUE);
-        
+
         $xml = new SimpleXMLElement('<?xml version=\'1.0\' standalone=\'yes\'?><modules></modules>');
 
         foreach ($packages as $packageName => $package) {
@@ -338,7 +338,7 @@ class FreePbx_Installer
                 }
             }
         }
-        
+
         if (!empty($xml->retrieved)) {
             kohana::log('debug', 'Comparing packages to catalog');
             foreach ($xml as $module) {
@@ -357,7 +357,7 @@ class FreePbx_Installer
 
                 $avaliableVersion = $module->version;
                 settype($avaliableVersion, gettype($package['version']));
-                
+
                 if (self::_compareVersions($package['version'], $avaliableVersion, '>')) {
                     $packages[$packageName]['updateAvaliable'] = $avaliableVersion;
 
@@ -842,11 +842,10 @@ class FreePbx_Installer
                     if (self::_setIssue($result, $name)) self::rollback($name);
                 }
                 catch(Exception $e) {
-                    Kohana::log('error', 'Recording error for ' . get_class($package['instance']) . ' / completed' . $package['action']);
                     self::_setError($e->getMessage());
                 }
             }
-        }        
+        }
     }
     /**
      * This function is designed to handle any INTERNAL routines that need
@@ -855,7 +854,7 @@ class FreePbx_Installer
     private function finalize()
     {
         FreePbx_Installer::disableTelephony();
-        
+
         foreach(self::$packages as $name => $package) {
             switch ($package['action']) {
             case 'downgrade':
@@ -1001,7 +1000,7 @@ class FreePbx_Installer
                 break;
             }
         }
-        
+
         FreePbx_Installer::restoreTelephony();
     }
     /**
@@ -1413,13 +1412,13 @@ class FreePbx_Installer
             // The requirements status determines the behavoir
             switch (self::packageAvailable($packages, $required)) {
                 // Case where a required module can not be found
-                
+
             case -1:
                 // This should have been caught above, but just incase....
                 self::_setError('The required module ' . $required . ' could not be found', $name);
                 break;
                 // Case where a module can be found but is, and wont be, installed
-                
+
             case 0:
                 // If a required module is not installed but avaliable for installation then produce an error
                 if ($versionSatisfied)
@@ -1435,7 +1434,7 @@ class FreePbx_Installer
                 self::_setError('The required version of ' . $required . ' could not be found', $name);
                 break;
                 // Case where a module is, or will be, installed but disabled
-                
+
             case 1:
                 if (!$versionSatisfied) {
                     // The installed version does not met the requirement version
@@ -1450,7 +1449,7 @@ class FreePbx_Installer
                 }
                 break;
                 // Case where a module is, or will be, installed
-                
+
             case 2:
                 if (!$versionSatisfied) {
                     // The installed version does not met the requirement version
@@ -1503,8 +1502,7 @@ class FreePbx_Installer
             'disable',
             'uninstall',
             'repair',
-            'verify',
-            'createTenant'
+            'verify'
         );
         return in_array($action, $validActions);
     }
@@ -1535,7 +1533,7 @@ class FreePbx_Installer
      * This function recursively handles a mixed message body
      * adding child tags where necessary.  Note: arrays with
      * numerical indexs will result in tags called {key}_{index}
-     * 
+     *
      * @param mixed $mixed The mixed element to operate on
      * @param string $key The name to use for any non-associative array child tags
      * @param object $parent the parent tag
@@ -1627,7 +1625,7 @@ class FreePbx_Installer
             kohana::log('error', 'Could not determine the remote file mod time: ' .$errstr);
             return 0;
         }
-        
+
         $http_response = explode("\r\n", $http_response);
 
         foreach( $http_response as $response )
@@ -1654,12 +1652,12 @@ class FreePbx_Installer
             'author' => 'FreePBX Team',
             'vendor' => 'FreePBX',
             'license' => 'MPL',
-            'summary' => 'FreePBX Core Application',
+            'summary' => 'Core Application',
             'description' => '',
             'default' => TRUE,
             'type' => FreePbx_Installer::TYPE_MODULE,
             'required' => array (),
-            'displayName' => 'FreePBX Core',
+            'displayName' => 'System Core',
             'canBeDisabled' => FALSE,
             'canBeRemoved' => FALSE,
             'directory' => 'freepbx',
@@ -1667,7 +1665,7 @@ class FreePbx_Installer
             'installedAs' => array (
                 'module_id' => '0',
                 'name' => 'core',
-                'display_name' => 'FreePBX Core',
+                'display_name' => 'System Core',
                 'module_version' => FreePbx_Controller::$version,
                 'enabled' => TRUE,
                 'basedir' => 'freepbx',
@@ -1677,12 +1675,12 @@ class FreePbx_Installer
                     'author' => 'FreePBX Team',
                     'vendor' => 'FreePBX',
                     'license' => 'MPL',
-                    'summary' => 'FreePBX Core Application',
+                    'summary' => 'Core Application',
                     'description' => '',
                     'default' => TRUE,
                     'type' => FreePbx_Installer::TYPE_MODULE,
                     'required' => array(),
-                    'displayName' => 'FreePBX Core',
+                    'displayName' => 'System Core',
                     'canBeDisabled' => FALSE,
                     'canBeRemoved' => FALSE,
                     'directory' => 'freepbx',
