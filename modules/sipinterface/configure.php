@@ -42,7 +42,7 @@ class InterfaceManager_Configure extends FreePbx_Configure
         $sipInterface->port = 5060;
         $sipInterface->auth = TRUE;
         $sipInterface->nat_type = 1;
-        $sipInterface->Context = Doctrine::getTable('Context')->findOneByName('Publicly Accessible');
+        $sipInterface->Context = Doctrine::getTable('Context')->findOneByName('In-house Only');
         $sipInterface->nat_net_list_id = netlists::getSystemListId('nat.auto');
         $sipInterface->save();
     }

@@ -39,7 +39,7 @@ class Context extends FreePbx_Record
     {
         // COLUMN DEFINITIONS
         $this->hasColumn('context_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
-        $this->hasColumn('name', 'string', 40, array('notnull' => true, 'notblank' => true, 'unique' => true));
+        $this->hasColumn('name', 'string', 40, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('locked', 'boolean', NULL, array('default' => false));
     }
 

@@ -49,13 +49,13 @@ class FreePbx_Tenant
             Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
 
             $context = new Context();
-            $context->name = 'Account ' . $accountId .' - Private';
+            $context->name = 'In-house Only';
             $context->locked = FALSE;
             $context->account_id = $accountId;
             $context->save();
 
             $context = new Context();
-            $context->name = 'Account ' . $accountId .' - Public';
+            $context->name = 'Publicly Accessible';
             $context->locked = FALSE;
             $context->account_id = $accountId;
             $context->save();

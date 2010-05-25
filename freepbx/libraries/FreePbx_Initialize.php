@@ -5,8 +5,13 @@ class FreePbx_Initialize
     public static function initializeMasterTenant() {
        $session = Session::instance();
 
-       FreePbx_Tenant::initializeTenant($session->get('installer.adminEmailAddress'), $session->get('installer.adminPassword'), 'Master Account', 'Main Location');
-       FreePbx_Tenant::initializeSite('localhost', 1);
+        $options = array();
+        $options['account'] = array('name' => 'Master Account');
+        $options['location'] = array('name' => 'Main Location', 'domain' => 'localhost');
+        $options['user'] = array('username' => $session->get('installer.adminEmailAddress'), 'password' => $session->get('installer.adminPassword'));
+
+        FreePbx_Tenant::initializeTenant($options);
+        FreePbx_Tenant::initializeSite('localhost', 1);
        
         // Add the core admin user to the system
 /*        $user = new User();
@@ -82,6 +87,17 @@ class FreePbx_Initialize
         $netList->name = 'Loopback Network (auto)';
         $netList->system_list = 'loopback.auto';
         $netList->save(TRUE);
+
+
+        $netList = new NetList();
+        $netList->name = 'Public Internet';
+        $netList->save(TRUE);
+        
+        $netItem = new NetListItem();
+        $netItem->NetList = $netList;
+        $netItem->record = '0.0.0.0/0';
+        $netItem->allow = TRUE;
+        $netItem->save(TRUE);
 
        FreePbx_Installer::restoreTelephony();
     }
