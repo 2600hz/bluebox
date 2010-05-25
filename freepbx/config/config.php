@@ -153,3 +153,8 @@ $config['username_is_email'] = TRUE;
  * This is a list of repositories to use to check for updates
  */
 $config['repositories'] = array();
+
+/**
+ * Product display name. If you want to rebrand FreePBX with another name, change this 
+ */
+$config['product_name'] = 'FreePBX';
