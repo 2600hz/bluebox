@@ -243,7 +243,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
         // we go...
         $destination = @fopen($cacheDir .$updateName, 'w');
         $source = @fopen($updateURL, 'r');
-        
+
         // sanity check our file handles
         if (!$destination) {
             message::set('Unable to cache update for ' .$package['displayName']);
@@ -266,7 +266,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
                 return FALSE;
             }
         }
-        
+
         fclose($source);
         fclose($destination);
 
@@ -279,7 +279,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
                 url::redirect(Router::$controller);
                 return FALSE;
             }
-        
+
             if ((filesystem::createDirectory($cacheDir .'migration') && $zip->extractTo($cacheDir .'migration/')) === FALSE) {
                 message::set('Could not extract downloaded update for ' .$package['displayName']);
                 url::redirect(Router::$controller);
@@ -291,8 +291,8 @@ class FreePbxManager_Controller extends FreePbx_Controller
             url::redirect(Router::$controller);
             return FALSE;
         }
-        
-        $zip->close(); 
+
+        $zip->close();
 
         if ($packageName == 'core') {
             $this->updateCore($cacheDir);
@@ -349,11 +349,11 @@ class FreePbxManager_Controller extends FreePbx_Controller
         $packages = FreePbx_Installer::listPackages();
         $packages[$packageName]['action'] = 'upgrade';
         $packages[$packageName]['default'] = $isCurrentlyEnabled;
-        
+
         FreePbx_Installer::processActions($packages);
 
         message::set('Update of ' .$packages[$packageName]['displayName'] .' complete!', 'success');
-      
+
         url::redirect(Router::$controller);
     }
     public function updateCore($cacheDir) {
@@ -385,7 +385,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
                 if (is_file(APPPATH .$relative) && is_link(APPPATH .$relative)) {
                     if (!filesystem::delete(APPPATH .$relative, FALSE)) {
                         message::set('Failed to remove core file prior to update');
-                        return FALSE;                        
+                        return FALSE;
                     }
                 }
 
@@ -399,19 +399,66 @@ class FreePbxManager_Controller extends FreePbx_Controller
                 message::set('Error during core update: ' .$e->getMessage());
                 return FALSE;
         }
-        message::set('Update of FreePBX Core complete!', 'success');
+        message::set('Update of Core complete!', 'success');
     }
+
     public static function exception_handler($errno, $errstr, $errfile, $errline, $errcontext) {
         throw new Exception($errstr, $errno);
     }
+
     public function delete()
     {
     }
+
     public function upload()
     {
         if ($this->input->post()) {
         }
     }
+
+    public function maintenance()
+    {
+        if ($_POST['submit'] == 'Regenerate Now') {
+            $devices = Doctrine::getTable('SipDevice')->findAll();
+            foreach ($devices as $device) {
+                FreePbx_Record::setBaseSaveObject($device);
+
+                foreach ($device->getReferences() as $reference) {
+                    echo get_class($reference);
+                    Telephony::set($reference);
+                }
+            }
+            FreePbx_Record::setBaseSaveObject(NULL);
+
+            $numbers = Doctrine::getTable('Number')->findAll();
+            foreach ($numbers as $number) {
+                FreePbx_Record::setBaseSaveObject($number);
+                Telephony::set($number);
+            }
+            FreePbx_Record::setBaseSaveObject(NULL);
+
+            if (class_exists('Trunk')) {
+                $trunks = Doctrine::getTable('Trunk')->findAll();
+                foreach ($trunks as $trunk) {
+                    Telephony::set($trunk);
+                }
+            }
+
+            if (class_exists('SipInterface')) {
+                $interfaces = Doctrine::getTable('SipInterface')->findAll();
+                foreach ($interfaces as $interface) {
+                    Telephony::set($interface);
+                }
+            }
+
+            Telephony::save();
+
+            Telephony::commit();
+
+            echo 'Done!';
+        }
+    }
+
     private function createPackageList($packages, $installed = TRUE, $packageErrors = array(), $packageWarnings = array())
     {
        // what package parameters to display
@@ -435,7 +482,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
             }
 
             $display = &$packageList[$name];
-            
+
             if (empty($installed)) {
                 $parameters = &$package;
 
