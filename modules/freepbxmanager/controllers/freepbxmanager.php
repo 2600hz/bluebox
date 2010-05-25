@@ -455,7 +455,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
 
             Telephony::commit();
 
-            echo 'Done!';
+            message::set('Successfully regenerated core configs.');
         }
     }
 
