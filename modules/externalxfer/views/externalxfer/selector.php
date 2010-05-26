@@ -1,4 +1,8 @@
 <?php echo form::open_section('Route to an External Destination...'); ?>
+    <?php
+        echo form::hidden('number[class_type]', 'ExternalXfer');
+        echo form::hidden('number[foreign_id]', 0);
+    ?>
 
     <div class="field">
     <?php
@@ -11,14 +15,14 @@
         <div class="field">
         <?php
             echo form::label(array('for' => 'number[options][number]'), 'Number to Call:');
-            echo form::input('number[options][trunk_number]');
+            echo form::input('number[options][number]');
         ?>
         </div>
 
         <div class="field">
         <?php
             echo form::label(array('for' => 'number[options][trunk]', 'hint' => 'Trunk to make call via'), 'via Trunk:');
-            echo form::dropdown('number[options][trunk_id]', $trunks);
+            echo form::dropdown('number[options][trunk]', $trunks);
         ?>
         </div>
     </div>
@@ -62,11 +66,19 @@
 <?php javascript::codeBlock(); ?>
 $('form#destination_selector #number_options_routetype').change(function() {
     if ($('form#destination_selector #number_options_routetype').val() == 1) {
-        $('form#destination_selector #via_trunk').show();
         $('form#destination_selector #via_uri').hide();
+        $('form#destination_selector #via_trunk').fadeIn();
     } else {
         $('form#destination_selector #via_trunk').hide();
-        $('form#destination_selector #via_uri').show();
+        $('form#destination_selector #via_uri').fadeIn();
+    }
+}).trigger('change');
+
+$(document).bind('destination_externalxfer_submit', function() {
+    if ($('form#destination_selector #number_options_routetype').val() == 1) {
+        $('form#destination_selector input[name="friendly_name"]').val('External Transfer to ' + $('.destination_externalxfer #number_options_number').val() + ' (via trunk ' + $('.destination_externalxfer #number_options_trunk option:selected').text() + ')');
+    } else {
+        $('form#destination_selector input[name="friendly_name"]').val('External Transfer to ' + $('.destination_externalxfer #number_options_sipuri').val() + ' (via interface ' + $('.destination_externalxfer #number_options_interface option:selected').text() + ')');
     }
 });
 <?php javascript::blockEnd(); ?>

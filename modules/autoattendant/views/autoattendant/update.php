@@ -65,12 +65,27 @@
     <?php echo form::close_section(); ?>
 
 
-    <?php echo form::open_section('Event Handling'); ?>
+    <?php echo form::open_section('General Behavior'); ?>
+
+        <div class="field">
+            <?php echo form::label('autoattendant[digit_timeout]', 'Inter-Digit Timeout:'); ?>
+            <?php echo form::input('autoattendant[digit_timeout]'); ?> seconds
+        </div>
+
+        <div class="field">
+            <?php echo form::label('autoattendant[timeout]', 'No Entry Timeout:'); ?>
+            <?php echo form::input('autoattendant[timeout]'); ?> seconds
+        </div>
+
+    <?php echo form::close_section(); ?>
+
+
+    <?php echo form::open_section('Dial by Extension'); ?>
 
         <div class="field">
             <?php echo form::label(array(
                     'for' => 'autoattendant[extension_context_id]',
-                    'hint' => 'Context that callers can directly dial into',
+                    'hint' => 'Numbers that callers can directly dial into',
                 ),'Internal Extension Context:');
             ?>
             <?php echo numbering::selectContext(array(
@@ -81,18 +96,8 @@
         </div>
 
         <div class="field">
-            <?php echo form::label('autoattendant[extension_digits]', 'Internal Extension Length:'); ?>
+            <?php echo form::label('autoattendant[extension_digits]', 'Maximum Extension Length:'); ?>
             <?php echo form::input('autoattendant[extension_digits]'); ?> digits
-        </div>
-
-        <div class="field">
-            <?php echo form::label('autoattendant[digit_timeout]', 'Inter-Digit Timeout:'); ?>
-            <?php echo form::input('autoattendant[digit_timeout]'); ?> seconds
-        </div>
-
-        <div class="field">
-            <?php echo form::label('autoattendant[timeout]', 'No Entry Timeout:'); ?>
-            <?php echo form::input('autoattendant[timeout]'); ?> seconds
         </div>
 
     <?php echo form::close_section(); ?>
