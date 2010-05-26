@@ -160,3 +160,10 @@ a:visited {
     height: 80px;
     text-indent:1000px;
 }
+
+#destination_externalxfer {
+    background-image:url(../img/destinations/phone_tab.png);
+    width: 80px;
+    height: 80px;
+    text-indent:1000px;
+}
