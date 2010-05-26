@@ -17,6 +17,13 @@ class FreePbxManager_Configure extends FreePbx_Configure
     public static $canBeRemoved = FALSE;
 
     public static $navStructures = array(
+        array(
+            'navLabel' => 'Maintenance',
+            'summary' => 'Perform maintenance on the system',
+            'navIcon' => '',
+            'navBranch' => '/System/',
+            'navURL' => 'freepbxmanager/maintenance'
+        ),
         array (
             'navLabel' => 'Package Manager',
             'summary' => 'Install, enable, disable, or uninstall Freepbx packages.',
@@ -31,13 +38,7 @@ class FreePbxManager_Configure extends FreePbx_Configure
                     'url' => '/freepbxmanager/settings'
                 )
             )
-        ),
-        array(
-            'navLabel' => 'Maintenance',
-            'summary' => 'Perform maintenance on the system',
-            'navIcon' => '',
-            'navBranch' => '/System/',
-            'navURL' => 'freepbxmanager/maintenance')
+        )
     );
 
 
