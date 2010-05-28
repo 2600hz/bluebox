@@ -92,7 +92,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver {
         Doctrine::initializeModels('DeviceVoicemail');
         Doctrine::initializeModels('UserVoicemail');
 
-        $ringtpye = "us-ring";
+        $ringtype = "us-ring";
         $timeout = 20;
 
         $obj = Event::$data;
