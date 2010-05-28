@@ -199,14 +199,7 @@ class NumberManager_Controller extends FreePbx_Controller
             // TODO: This is horribly ugly. My lord. Please fix.
             if (isset($_POST['destination'])) {
                 parse_str($_POST['destination']['destination_1'], $destination);
-                if (isset($destination['number']['foreign_id'])) {
-                    $_POST['number']['foreign_id'] = $destination['number']['foreign_id'];
-                    unset ($destination['number']['foreign_id']);
-                }
-                if (isset($destination['number']['class_type'])) {
-                    $_POST['number']['class_type'] = $destination['number']['class_type'];
-                }
-                $_POST['number']['options'] = array_merge($_POST['number']['options'], $destination['number']);
+                $_POST['number'] = array_merge($_POST['number'], $destination['number']);
             }
 
             $contexts = $_POST['number']['NumberContext'];
@@ -229,8 +222,6 @@ class NumberManager_Controller extends FreePbx_Controller
                 $_POST['number']['class_type'] = NULL;
                 $_POST['number']['foreign_id'] = 0;
             }
-
-            var_dump($_POST);
             if ($this->formSave($this->number)) {
                 url::redirect(Router::$controller);
             }

@@ -10,8 +10,8 @@
 
     <div class="field">
     <?php
-        echo form::label('number[ringtype]', 'Ring Type on Transfer: ');
-        echo form::dropdown('number[ringtype]', array('Ringing' => 'Ringing', 'MOH' => 'Hold Music'));
+        echo form::label('number[options][ringtype]', 'Ring Type on Transfer: ');
+        echo form::dropdown('number[options][ringtype]', array('Ringing' => 'Ringing', 'MOH' => 'Hold Music'));
     ?>
     </div>
 

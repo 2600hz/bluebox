@@ -10,24 +10,24 @@
 
     <div class="field">
     <?php
-        echo form::label('number[ringtype]', 'Ring Type: ');
-        echo form::dropdown('number[ringtype]', array('Ringing' => 'Ringing', 'MOH' => 'Hold Music'));
+        echo form::label('number[options][ringtype]', 'Ring Type: ');
+        echo form::dropdown('number[options][ringtype]', array('Ringing' => 'Ringing', 'MOH' => 'Hold Music'));
     ?>
     </div>
 
     <div class="field">
     <?php
-        echo form::label('number[timeout]', 'Ring this device for:');
-        echo form::input('number[timeout]');
+        echo form::label('number[options][timeout]', 'Ring this device for:');
+        echo form::input('number[options][timeout]');
         echo ' seconds';
     ?>
     </div>
 
     <div class="field">
     <?php
-        echo form::label('number[timeout]', 'If no answer, transfer to: ');
+        echo form::label('number[options][fallback]', 'If no answer, transfer to: ');
         //echo numbering::selectContext('number[options][timeout_context]', $fallback_context);
-        echo numbering::numbersDropdown('number[options][timeout]');
+        echo numbering::numbersDropdown('number[options][fallback]');
     ?>
         <small><B>Note: leave blank to default to voicemail, if configured</B></small>
     </div>
