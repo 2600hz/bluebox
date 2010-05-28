@@ -14,9 +14,9 @@ $(document).ready(function() {
             when: 'click', // Show it on click
             solo: true // And hide all other tooltips
         },
-        hide: {
-            when: 'unload'
-        },
+//        hide: {
+//            when: 'unload'
+//        },
         api: {
             beforeShow: function() {
                 // Fade in the modal "blanket" using the defined show speed
