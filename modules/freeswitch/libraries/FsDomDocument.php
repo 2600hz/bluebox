@@ -48,7 +48,8 @@ class FsDomDocument extends DOMDocument
      * @var string
      */
     protected $xmlRoot = NULL;
-
+    protected $xmlExtenRoot = NULL;
+    
     /**
      * Get the currently set prefix
      * @return <type>
@@ -57,7 +58,13 @@ class FsDomDocument extends DOMDocument
     {
         return $this->xmlRoot;
     }
+    public function getExtensionRoot() {
+        return $this->xmlExtenRoot;
+    }
 
+    public function setExtensionRoot($xmlExtenRoot) {
+        $this->xmlExtenRoot = $xmlExtenRoot;
+    }
     /**
      * Set the prefix to be appended to all set() and update() XPath calls
      * @param string $prefix XPath prefix to append before paths passed to set() and update(). Set to NULL to clear.
