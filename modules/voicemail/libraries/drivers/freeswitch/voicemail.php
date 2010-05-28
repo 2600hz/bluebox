@@ -92,11 +92,21 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver {
         Doctrine::initializeModels('DeviceVoicemail');
         Doctrine::initializeModels('UserVoicemail');
 
+        $ringtpye = "us-ring";
+        $timeout = 20;
+
         $obj = Event::$data;
         if (($obj instanceof DeviceNumber) and ($obj->Device->Voicemail)) {
             $base = $obj->Device->Voicemail;
             $domain = 'voicemail_' . $obj->Device->Voicemail->account_id;
             $mailbox = $obj->Device->Voicemail->mailbox;
+            if (isset($obj->options['ringtype'])) {
+                // We only support moh or ringing. Need to expand this heavily
+                $ringtype = ($obj->options['ringtype'] == 'Ringing' ? "us-ring" : 'moh');
+            }
+            if (isset($obj->options['timeout'])) {
+                $timeout = $obj->options['timeout'];
+            }
         } elseif (($obj instanceof Device) and ($obj->Device->Voicemail)) {
             $base = $obj->Voicemail;
             $domain = 'voicemail_' . $obj->Device->Voicemail->account_id;
@@ -105,8 +115,10 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver {
 
         if (!empty($base->foreign_id) && !empty($domain) && !empty($mailbox)) {
             $xml->update('/action[@application="set"][@freepbx="settingEndBridge"][@data="hangup_after_bridge=true"]');
-            $xml->update('/action[@application="set"][@freepbx="settingTimeout"]{@data="call_timeout=' . 30 . '"}');
+            $xml->update('/action[@application="set"][@freepbx="settingTimeout"]{@data="call_timeout=' . $timeout . '"}');
             $xml->update('/action[@application="set"][@freepbx="settingFail"]{@data="continue_on_fail=true"}');
+            $xml->update('/action[@application="set"][@freepbx="ring"]{@data="ringback=${' . $ringtype . '}"}');
+            $xml->update('/action[@application="set"][@freepbx="ring"]{@data="transfer_ringback=${' . $ringtype . '}"}');
         }
     }
 

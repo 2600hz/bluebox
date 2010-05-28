@@ -2,8 +2,16 @@
 
     <div class="field">
     <?php
+        echo form::label('number[options][device]', 'Device to Ring:');
+        echo form::hidden('number[class_type]', 'DeviceNumber');
+        echo form::dropdown('number[foreign_id]', $devices);
+    ?>
+    </div>
+
+    <div class="field">
+    <?php
         echo form::label('number[options][ringtype]', 'Ring Type: ');
-        echo form::dropdown('number[options][ringtype]', array('Ringing', 'Hold Music', 'Screaming Monkeys'));
+        echo form::dropdown('number[options][ringtype]', array('Ringing', 'Hold Music'));
     ?>
     </div>
 
@@ -12,14 +20,6 @@
         echo form::label('number[options][timeout]', 'Ring this device for:');
         echo form::input('number[options][timeout]');
         echo ' seconds';
-    ?>
-    </div>
-
-    <div class="field">
-    <?php
-        echo form::label('number[options][device]', 'Device:');
-        echo form::hidden('number[class_type]', 'DeviceNumber');
-        echo form::dropdown('number[foreign_id]', $devices);
     ?>
     </div>
 
