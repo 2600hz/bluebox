@@ -4,7 +4,14 @@
     <?php
         echo form::label('number[options][autoattendant]', 'Auto Attendant:');
         echo form::hidden('number[class_type]', 'AutoAttendantNumber');
-        echo form::dropdown('number[foreign_id]]', $autoAttendants);
+        echo form::dropdown('number[foreign_id]', $autoAttendants);
+    ?>
+    </div>
+
+    <div class="field">
+    <?php
+        echo form::label('number[options][ringtype]', 'Ring Type on Transfer: ');
+        echo form::dropdown('number[options][ringtype]', array('Ringing' => 'Ringing', 'MOH' => 'Hold Music'));
     ?>
     </div>
 

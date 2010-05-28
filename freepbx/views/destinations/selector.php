@@ -25,7 +25,8 @@
     <?php echo form::hidden('friendly_name'); ?>
 
     <div class="buttons form_bottom">
-        <?php echo form::button(array('name' => 'submit', 'class' => 'destination_submit submit small_red_button'), 'Cancel'); ?>
+        <?php //echo form::button(array('name' => 'submit', 'class' => 'destination_submit submit small_red_button'), 'Cancel');
+        ?>
         <?php echo form::button(array('name' => 'submit', 'class' => 'destination_submit submit small_green_button'), 'Confirm Destination'); ?>
     </div>
 

@@ -11,8 +11,10 @@ selinuxenabled 0
 
 # Change permissions
 echo '  Changing folder permissions to allow read/write...'
+mkdir -p freepbx/logs
 chgrp -R $webuser freepbx/logs/
 chmod -R a+w freepbx/logs
+mkdir -p freepbx/cache
 chgrp -R $webuser freepbx/cache/
 chmod -R a+w freepbx/cache/
 chgrp -R $webuser freepbx/config/
