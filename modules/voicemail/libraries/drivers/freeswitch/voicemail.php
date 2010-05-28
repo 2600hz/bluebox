@@ -118,7 +118,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver {
             $xml->update('/action[@application="set"][@freepbx="settingTimeout"]{@data="call_timeout=' . $timeout . '"}');
             $xml->update('/action[@application="set"][@freepbx="settingFail"]{@data="continue_on_fail=true"}');
             $xml->update('/action[@application="set"][@freepbx="ring"]{@data="ringback=${' . $ringtype . '}"}');
-            $xml->update('/action[@application="set"][@freepbx="ring"]{@data="transfer_ringback=${' . $ringtype . '}"}');
+            $xml->update('/action[@application="set"][@freepbx="ring-xfer"]{@data="transfer_ringback=${' . $ringtype . '}"}');
         }
     }
 
