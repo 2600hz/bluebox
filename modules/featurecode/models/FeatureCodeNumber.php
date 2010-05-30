@@ -15,7 +15,6 @@
  * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
  *
  * Contributor(s):
- * Michael Phillips <michael.j.phillips { at } gmail dot com>
  *
  *
  */
@@ -28,7 +27,7 @@
  *
  * Created on Jan 23, 2010
  *
- * @author Michael Phillips
+ * @author Darren Schreiber
  * @license MPL
  * @package FreePBX3
  * @subpackage Core
@@ -50,8 +49,8 @@ class FeatureCodeNumber extends Number {
         // Relate the conference (conference_id) with a generic number identifier (foreign_id) in the Number class.
         // Note carefully that this only works because this model is related to Number
         // The Number class has some "magic" that auto relates the class
-        $this->hasOne('Conference', array('local'   => 'foreign_id',
-                                          'foreign' => 'conference_id',
+        $this->hasOne('FeatureCode', array('local'   => 'foreign_id',
+                                          'foreign' => 'feature_code_id',
                                           'owningSide' => FALSE));
 
         // Add relation on the other side, too, including all extended models that may have already loaded

@@ -29,15 +29,38 @@
  * @subpackage ExternalXfer
  */
 class FreeSwitch_ExternalXfer_Driver extends FreeSwitch_Base_Driver {
+    public static function set($obj) {
+
+    }
+
+    public static function delete($obj) {
+        
+    }
+
     public static function dialplan()
     {
-        Kohana::log('debug', 'Adding external routing info');
-        
-        // Reference to our XML document, positioned at the right extension for us :-)
-        $xml = FreeSWITCH::createExtension('externalxfer');
-        $condition = '/condition[@field="${internal_caller_id_number}"][@expression="^.+$"]';
-        $xml->update($condition . '/action[@application="set"][@data="effective_caller_id_name=${internal_caller_id_name}"]');
-        $xml->update($condition .'/action[@application="set"][@data="effective_caller_id_number=${internal_caller_id_number}"]');
+        $xml = Telephony::getDriver()->xml;
+        kohana::log('debug', 'Saving external destination to dialplan');
+        $timeout = (isset($obj->options['timeout']) ? $obj->options['timeout'] : 30);
+
+        if ($obj->ExternalXfer->route_type == 1) {
+            $dialstring = 'sofia/';
+        } else {
+            $dialstring = 'sofia/';
+        }
+
+        $xml->update('/action[@application="set"][@freepbx="hangup_after_bridge"]{@data="hangup_after_bridge=true"}');
+        $xml->update('/action[@application="set"][@freepbx="continue_on_fail"]{@data="continue_on_fail=true"}');
+        $xml->update('/action[@application="set"][@freepbx="call_timeout"]{@data="call_timeout=' . $timeout . '"}');
+        $xml->update('/action[@application="bridge"]{@data="{' . $dialstring . '}"}');
+
+        // Nobody answered?
+        // Grab the destination we're routing to. We don't care which context we end up in per say, as long as it's the right destination.
+        // TODO: Handle contexts better?
+        //if (!empty($obj->options['fallback_number_id']) and $obj->options['fallback_number_context']) {
+        //    $context = $obj->RingGroup->FallbackNumber->NumberContext[0]->context_id;
+        //    $xml->update('/action[@application="transfer"]{@data="' . $obj->RingGroup->FallbackNumber->number . ' XML context_' . $context. '"}');
+        //}
 
     }
 }

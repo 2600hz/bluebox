@@ -10,8 +10,25 @@ class ExternalXfer_Configure extends FreePbx_Configure
     public static $summary = 'Route calls directly to any external SIP URI or trunk';
     public static $description = 'A plug-in that allows routing a number directly to a SIP uri with no other configuration required or to a trunk that is configured already.';
     public static $default = true;
-    public static $type = FreePbx_Installer::TYPE_PLUGIN;
+    public static $type = FreePbx_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
+    );
+    
+    public static $navIcon = 'assets/img/icons/mainSettingsX.png';
+    public static $navLabel = 'External Destination';
+    public static $navBranch = '/Destinations/';
+    public static $navURL = 'externalxfer/index';
+    public static $navSubmenu = array(
+        'Search External Destination' => 'externalxfer/index',
+        'Add External Destination' => 'externalxfer/add',
+        'Edit Feature Code' => array(
+            'url' => 'externalxfer/edit',
+            'disabled' => true
+        ) ,
+        'Delete External Destination' => array(
+            'url' => 'externalxfer/delete',
+            'disabled' => true
+        )
     );
 }

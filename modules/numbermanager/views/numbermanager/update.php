@@ -66,6 +66,7 @@
             <?php echo __('Number pools allow you to keep similar types of numbers grouped together. For example, you can block out 2XXX for Devices, 30XX for Auto-Attendants, 31XX for Ring Groups, etc. Check the boxes below to specify what types of features can be assigned to this number.'); ?>
         </p>
 
+        <b>Only allow this number to be used for a:</b>
         <?php
             foreach ($numberTypes as $numberType) {
                 echo '<div class="field">';
