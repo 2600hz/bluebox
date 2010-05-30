@@ -11,6 +11,6 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver {
     public static function dialplan($obj) {
         $xml = Telephony::getDriver()->xml;
 
-        $xml->replaceWithXml($obj->xml);
+        $xml->replaceWithXml($obj->FeatureCode->xml);
     }
 }
