@@ -48,7 +48,8 @@ class FsDomDocument extends DOMDocument
      * @var string
      */
     protected $xmlRoot = NULL;
-
+    protected $xmlExtenRoot = NULL;
+    
     /**
      * Get the currently set prefix
      * @return <type>
@@ -57,7 +58,13 @@ class FsDomDocument extends DOMDocument
     {
         return $this->xmlRoot;
     }
+    public function getExtensionRoot() {
+        return $this->xmlExtenRoot;
+    }
 
+    public function setExtensionRoot($xmlExtenRoot) {
+        $this->xmlExtenRoot = $xmlExtenRoot;
+    }
     /**
      * Set the prefix to be appended to all set() and update() XPath calls
      * @param string $prefix XPath prefix to append before paths passed to set() and update(). Set to NULL to clear.
@@ -417,7 +424,7 @@ class FsDomDocument extends DOMDocument
         return $success;
     }
 
-    public function replaceWithXml($query = '', $xml)
+    public function replaceWithXml($newXml, $query = '')
     {
         // Create the base if it doesn't already exist. Delete all children of the base
         $query = $this->preUpdate($query);
@@ -426,13 +433,13 @@ class FsDomDocument extends DOMDocument
         $this->deleteChildren($query);
 
         // Grab an XPath pointer to the query we just ran
-        $xp = new DOMXPath($this->xml);
+        $xp = new DOMXPath($this);
         $base = $xp->query($query);
 
         // Create a new XML fragment and append it to wherever $query pointed to
-        $newXmlFragment = $doc->createDocumentFragment();
-        $newXmlFragment->appendXML($xml);
-        $base->documentElement->appendChild($newXmlFragment);
+        $newXmlFragment = $xmlDoc->createDocumentFragment();
+        $newXmlFragment->appendXML($newXml);
+        $base->item(0)->appendChild($newXmlFragment);
     }
 
     public function deleteNode($query = '')

@@ -455,7 +455,8 @@ class FreeSwitch extends Telephony_Driver
 
         // Set our XML Root automatically to be inside this extension, presuming the next commands will add/modify stuff to it
         self::$instance->xml->setXmlRoot('//document/section[@name="dialplan"]/context[@name="' . $context . '"]/extension[@name="' . $section . '_' . $extensionName . '"]');
-
+        self::$instance->xml->setExtensionRoot('//document/section[@name="dialplan"]/context[@name="' . $context . '"]/extension[@name="' . $section . '_' . $extensionName . '"]');
+        
         return self::$instance->xml;
     }
 

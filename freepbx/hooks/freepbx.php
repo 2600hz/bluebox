@@ -82,7 +82,7 @@ class FreePbxHook
                     $hooks = Kohana::list_files('hooks', TRUE, $module . '/hooks');
                     foreach($hooks as $file) {
                         // Load the hook
-                        include $file;
+                        include_once $file;
                     }
                 }
             }

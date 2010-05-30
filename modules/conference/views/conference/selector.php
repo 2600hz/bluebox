@@ -1,17 +1,18 @@
 <?php echo form::open_section('Route to a Conference Bridge...'); ?>
 
-    <div class="field">
+<!--    <div class="field">
     <?php
-        echo form::label('number[options][existing]', 'Route to a specific conference? ');
-        echo form::checkbox(array('class' => 'determinant agent_for_existing', 'name' => 'number[options][existing]'));
+        //echo form::label('number[options][existing]', 'Route to a specific conference? ');
+        //echo form::checkbox(array('class' => 'determinant agent_for_existing', 'name' => 'number[options][existing]'));
     ?>
-    </div>
+    </div>-->
 
     <div class="field">
     <?php
         echo form::label('number[options][conference]', 'Conference:');
         echo form::hidden('number[class_type]', 'ConferenceNumber');
-        echo form::dropdown(array('class' => 'dependent_positive rely_on_existing', 'name' => 'number[foreign_id]'), $conferences);
+        echo form::dropdown(array('class' => '', 'name' => 'number[foreign_id]'), $conferences);
+        //echo form::dropdown(array('class' => 'dependent_positive rely_on_existing', 'name' => 'number[foreign_id]'), $conferences);
     ?>
     </div>
 

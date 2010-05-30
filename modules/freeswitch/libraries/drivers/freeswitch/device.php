@@ -49,7 +49,6 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver {
         Kohana::log('debug', $obj->Device->class_type);
 
         if ($obj->Device->class_type == 'SipDevice') {
-            Kohana::log('debug', 'Got Here');
             Doctrine::initializeModels('SipDevice');
             $xml->update('/action[@application="bridge"]{@data="user\/' . $obj->Device->Sip->username . '@' . $domain . '"}');
         }

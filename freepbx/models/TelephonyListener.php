@@ -93,6 +93,14 @@ class TelephonyListener extends Doctrine_EventListener {
                             Telephony::set($change['record']);
                             break;
 
+                            // As a safety net, re-generate all items with a direct relation to the base object
+                            $base = FreePbx_Record::getBaseTransactionObject();
+                            foreach ($base->getReferences() as $reference) {
+                                Telephony::set($reference);
+                            }
+
+                            FreePbx_Record::setBaseSaveObject(NULL);
+                            
                         case 'delete':
                             Telephony::delete($change['record']);
                             break;
@@ -102,13 +110,6 @@ class TelephonyListener extends Doctrine_EventListener {
                             break;
                     }
 
-                    // As a safety net, re-generate all items with a direct relation to the base object
-                    $base = FreePbx_Record::getBaseTransactionObject();
-                    foreach ($base->getReferences() as $reference) {
-                        Telephony::set($reference);
-                    }
-
-                    FreePbx_Record::setBaseSaveObject(NULL);
                 }
 
                 Telephony::save();

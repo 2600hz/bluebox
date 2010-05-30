@@ -218,10 +218,10 @@ class NumberManager_Controller extends FreePbx_Controller
             $this->number->NumberContext->synchronizeWithArray(array());
             $this->number->NumberPool->synchronizeWithArray(array());
             $this->number->synchronizeWithArray($_POST['number']);
-            if (!isset($_POST['number']['foreign_id']) || !$_POST['number']['foreign_id']) {
-                $_POST['number']['class_type'] = NULL;
-                $_POST['number']['foreign_id'] = 0;
-            }
+            //if (!isset($_POST['number']['foreign_id']) || !$_POST['number']['foreign_id']) {
+            //    $_POST['number']['class_type'] = NULL;
+            //    $_POST['number']['foreign_id'] = 0;
+            //}
             if ($this->formSave($this->number)) {
                 url::redirect(Router::$controller);
             }

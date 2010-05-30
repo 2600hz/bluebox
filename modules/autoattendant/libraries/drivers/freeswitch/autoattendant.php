@@ -53,6 +53,10 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver {
     {
         $xml = Telephony::getDriver()->xml;
 
+        $ringtype = ($obj->options['ringtype'] == 'Ringing' ? "us-ring" : 'moh');
+        
+        $xml->update('/action[@application="set"][@freepbx="ring"]{@data="ringback=${' . $ringtype . '}"}');
+        $xml->update('/action[@application="set"][@freepbx="xfer-ring"]{@data="transfer_ringback=${' . $ringtype . '}"}');
         $xml->update('/action[@application="answer"]');
         $xml->update('/action[@application="ivr"]{@data="auto_attendant_' . $obj->AutoAttendant->auto_attendant_id .'"}');
     }

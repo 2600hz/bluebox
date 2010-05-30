@@ -87,7 +87,7 @@ class DeviceManager_Configure extends FreePbx_Configure
                 'mac_address' => NULL
             ),
             'Number' => array (
-                'location_id' => NULL,
+                'location_id' => $user->location_id,
                 'status' => 0,
                 'class_type' => 'DeviceNumber',
                 'NumberContext' => $contexts,

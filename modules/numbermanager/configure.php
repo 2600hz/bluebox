@@ -19,9 +19,9 @@ class NumberManagement_Configure extends FreePbx_Configure
     public static $navURL = 'numbermanager/index';    
     public static $navSubmenu = array(
         'Search Numbers' => '/numbermanager/index',
-        'Add a Number' => '/numbermanager/add',
+        'Add a Number' => '/numbermanager/add/dummy',
         'Add Multiple Numbers' => array(
-            'url' => '/numbermanager/bulkadd'
+            'url' => '/numbermanager/bulkadd/dummy'
         ) ,
         'Import Numbers' => array(
             'url' => '/numbermanager/import',

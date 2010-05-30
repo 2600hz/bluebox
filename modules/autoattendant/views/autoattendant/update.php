@@ -19,7 +19,7 @@
 
     <?php echo form::close_section(); ?>
 
-    
+
     <?php echo form::open_section('Assign Auto Attendant Number(s)'); ?>
 
         <div class="field assign_numbers">
@@ -35,7 +35,7 @@
         </div>
 
     <?php echo form::close_fieldset(); ?>
-    
+
 
     <?php echo form::open_section('Prompt'); ?>
 
@@ -106,7 +106,7 @@
     <?php echo form::open_section('Key Mapping'); ?>
 
         <div id="auto_attendant_table" class="auto_attendant_keymap field">
-            
+
             <?php $iteration = 0; foreach($keys as $digits => $number_id): $iteration++; ?>
 
                 <div id="key_<?php echo $iteration; ?>" class="key">
@@ -157,7 +157,7 @@
 
             <span class="remove_key"></span>
         </div>
-        
+
         <?php javascript::codeBlock(); ?>
             var divCount = $('.auto_attendant_keymap > div').length;
 
@@ -166,7 +166,7 @@
                 newKey = $('#key_template').clone().appendTo('#auto_attendant_table');
 
                 divCount++;
-                
+
                 newKey.attr('id', 'key_' + divCount);
                 newKey.find('#key_class_type').attr('id', 'key_' + divCount + '_class_type');
                 newKey.find('#key_number').attr('id', 'key_' + divCount + '_number').attr('name', 'keys[' + divCount + '][number_id]');
@@ -200,6 +200,6 @@
             $(\'#\' + type + \'_prompt\').slideDown();
         }
     }')->trigger('change');
-    
+
     jquery::addPlugin('dependent');
 ?>
