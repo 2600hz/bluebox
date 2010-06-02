@@ -1,5 +1,5 @@
 <div id="user_container_header" class="user login_containter module_header">
-    <h2><span class="helptip"></span><?php echo __('Welcome to FreePBX'); ?></h2>
+    <h2><span class="helptip"></span><?php echo __('Welcome to ' . Kohana::config('core.product_name')); ?></h2>
 </div>
 
 <div id="login_container_form" class="user login_containter">
