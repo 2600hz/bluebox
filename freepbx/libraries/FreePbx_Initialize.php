@@ -91,6 +91,7 @@ class FreePbx_Initialize
 
         $netList = new NetList();
         $netList->name = 'Public Internet';
+        $netList->allow = TRUE;
         $netList->save(TRUE);
         
         $netItem = new NetListItem();
