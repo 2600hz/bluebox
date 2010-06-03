@@ -538,7 +538,7 @@ class numbering extends form
         unset($attributes['jgrowl']);
 
         // Parsed URL
-        return '<a href="' . url::current() .'" ' .html::attributes($attributes) .'><span>' .$title .'</span></a>';
+        return '<a href="#" ' .html::attributes($attributes) .'><span>' .$title .'</span></a>';
     }
 
     public static function selectContext($data, $selected = NULL)
