@@ -1,15 +1,15 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class FreePbxManager_Configure extends FreePbx_Configure
+class BlueboxManager_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
-    public static $packageName = 'freepbxmanager';
+    public static $packageName = 'blueboxmanager';
     public static $displayName = 'Package Manager';
     public static $author = 'K Anderson';
-    public static $vendor = 'FreePBX';
+    public static $vendor = 'Bluebox';
     public static $license = 'LGPL';
-    public static $summary = 'Management module for the freepbx system.';
+    public static $summary = 'Management module for the bluebox system.';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );
@@ -22,20 +22,20 @@ class FreePbxManager_Configure extends FreePbx_Configure
             'summary' => 'Perform maintenance on the system',
             'navIcon' => '',
             'navBranch' => '/System/',
-            'navURL' => 'freepbxmanager/maintenance'
+            'navURL' => 'blueboxmanager/maintenance'
         ),
         array (
             'navLabel' => 'Package Manager',
-            'summary' => 'Install, enable, disable, or uninstall Freepbx packages.',
+            'summary' => 'Install, enable, disable, or uninstall Bluebox packages.',
             'navIcon' => 'assets/img/icons/mainToolsX.png',
             'navBranch' => '/System/',
-            'navURL' => 'freepbxmanager/index',
+            'navURL' => 'blueboxmanager/index',
             'navSubmenu' => array(
-                'Installed Modules' => '/freepbxmanager/index',
-                'Available Packages' => '/freepbxmanager/packages',
+                'Installed Modules' => '/blueboxmanager/index',
+                'Available Packages' => '/blueboxmanager/packages',
                 'Settings' => array(
                     'disabled' => 'true',
-                    'url' => '/freepbxmanager/settings'
+                    'url' => '/blueboxmanager/settings'
                 )
             )
         )

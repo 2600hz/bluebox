@@ -1,6 +1,6 @@
 <?php
 
-class ExternalXfer_Plugin extends FreePbx_Plugin {
+class ExternalXfer_Plugin extends Bluebox_Plugin {
     public function selector() {
         $subview = new View('externalxfer/selector');
         $subview->section = 'ExternalXfer';

@@ -45,7 +45,7 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver {
 
     /**
      * Add Auto Attendant to the dialplan
-     * @param FreePbx_Record $obj
+     * @param Bluebox_Record $obj
      *
      * @author Dale Hege
      */
@@ -55,8 +55,8 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver {
 
         $ringtype = ($obj->options['ringtype'] == 'Ringing' ? "us-ring" : 'moh');
         
-        $xml->update('/action[@application="set"][@freepbx="ring"]{@data="ringback=${' . $ringtype . '}"}');
-        $xml->update('/action[@application="set"][@freepbx="xfer-ring"]{@data="transfer_ringback=${' . $ringtype . '}"}');
+        $xml->update('/action[@application="set"][@bluebox="ring"]{@data="ringback=${' . $ringtype . '}"}');
+        $xml->update('/action[@application="set"][@bluebox="xfer-ring"]{@data="transfer_ringback=${' . $ringtype . '}"}');
         $xml->update('/action[@application="answer"]');
         $xml->update('/action[@application="ivr"]{@data="auto_attendant_' . $obj->AutoAttendant->auto_attendant_id .'"}');
     }

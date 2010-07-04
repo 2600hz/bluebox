@@ -1,5 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class MisdnManager_Configure extends FreePbx_Configure
+class MisdnManager_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'misdnmanager';
@@ -9,7 +9,7 @@ class MisdnManager_Configure extends FreePbx_Configure
     public static $license = 'FPL';
     public static $summary = 'Configuration of mISDN compatible interface cards';
     public static $default = false;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

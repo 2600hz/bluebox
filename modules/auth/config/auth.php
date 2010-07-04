@@ -37,7 +37,7 @@ $config['lifetime'] = 1209600;
 /**
  * Set the session key that will be used to store the current user.
  */
-$config['session_key'] = 'freepbx_user';
+$config['session_key'] = 'bluebox_user';
 
 /**
  * Usernames (keys) and hashed passwords (values) used by the File driver.

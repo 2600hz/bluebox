@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
- * FreePBX Modular Telephony Software Library / Application
+ * Bluebox Modular Telephony Software Library / Application
  *
  * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
  * you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -9,7 +9,7 @@
  * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
  * express or implied. See the License for the specific language governing rights and limitations under the License.
  *
- * The Original Code is FreePBX Telephony Configuration API and GUI Framework.
+ * The Original Code is Bluebox Telephony Configuration API and GUI Framework.
  * The Original Developer is the Initial Developer.
  * The Initial Developer of the Original Code is Darren Schreiber
  * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
@@ -27,11 +27,11 @@
  *
  * @author Darren Schreiber <d@d-man.org>
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage MediaOption
  */
 
-class MediaOption_Plugin extends FreePbx_Plugin
+class MediaOption_Plugin extends Bluebox_Plugin
 {
     protected $preloadModels = array('DeviceMediaOption', 'TrunkMediaOption');
 
@@ -86,7 +86,7 @@ class MediaOption_Plugin extends FreePbx_Plugin
 
         // If this is a brand new record, we must instantiate the right aggregated type
         if ((!$base->MediaOption) or (!$base->MediaOption->media_option_id)) {
-            if (get_parent_class($base) == 'FreePbx_Record')
+            if (get_parent_class($base) == 'Bluebox_Record')
                 $class = get_class($base) . 'MediaOption';
             else
                 $class = get_parent_class($base) . 'MediaOption';

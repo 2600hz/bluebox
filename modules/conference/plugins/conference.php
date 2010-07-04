@@ -1,6 +1,6 @@
 <?php
 
-class Conference_Plugin extends FreePbx_Plugin {
+class Conference_Plugin extends Bluebox_Plugin {
     public function selector() {
         $subview = new View('conference/selector');
         $subview->section = 'conference';

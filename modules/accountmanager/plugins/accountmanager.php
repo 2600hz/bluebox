@@ -4,7 +4,7 @@
  *
  * @author kanderson
  */
-class AccountManager_Plugin extends FreePbx_Plugin {
+class AccountManager_Plugin extends Bluebox_Plugin {
     
     public function createAccountAdmin() {
 
@@ -37,7 +37,7 @@ class AccountManager_Plugin extends FreePbx_Plugin {
         try {
             $user->save();
 
-            FreePbx_Tenant::initializeTenant($email, $passwd, $base->name, 'New Location');
+            Bluebox_Tenant::initializeTenant($email, $passwd, $base->name, 'New Location');
 
             Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
 
@@ -53,25 +53,25 @@ class AccountManager_Plugin extends FreePbx_Plugin {
             $context->account_id = $base->account_id;
             $context->save();
 
-        } catch (FreePbx_Validation_Exception $e) {
+        } catch (Bluebox_Validation_Exception $e) {
 
-            $errors = FreePbx_Controller::$validation->errors();
+            $errors = Bluebox_Controller::$validation->errors();
 
             // remap errors back to the fields
             if (!empty($errors['user[username]'])) {
-                FreePbx_Controller::$validation->add_error('account_email', $errors['user[username]']);
+                Bluebox_Controller::$validation->add_error('account_email', $errors['user[username]']);
             }
             if (!empty($errors['user[password]'])) {
-                FreePbx_Controller::$validation->add_error('account_password', $errors['user[password]']);
+                Bluebox_Controller::$validation->add_error('account_password', $errors['user[password]']);
             }
             if (!empty($errors['location[domain]'])) {
-                FreePbx_Controller::$validation->add_error('account_domain', $errors['location[domain]']);
+                Bluebox_Controller::$validation->add_error('account_domain', $errors['location[domain]']);
             }
 
             // NOTE: the gotcha of doing this is if the user model fails validation
             // the base model IS NOT CHECKED so after correcting a field error on
             // the user email, password, or domain you could still get an error elsewhere....
-            throw new FreePbx_Validation_Exception($e->getMessage());
+            throw new Bluebox_Validation_Exception($e->getMessage());
             return FALSE;
         }
 
@@ -83,7 +83,7 @@ class AccountManager_Plugin extends FreePbx_Plugin {
             return TRUE;
         }
 
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
 
         foreach($packages as $name => $package) {
             if (empty($package['installedAs'])) {
@@ -93,7 +93,7 @@ class AccountManager_Plugin extends FreePbx_Plugin {
             }
         }
 
-        FreePbx_Installer::_dependencySort($packages);
+        Bluebox_Installer::_dependencySort($packages);
 
         foreach($packages as $name => $package) {
             $instance = new $package['configureClass'];

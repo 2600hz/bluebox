@@ -24,7 +24,7 @@
         <?php jquery::addPlugin(array('growl', 'qtip')); ?>
         <?php echo $js; ?>
     </head>
-    <body id="freepbx-com">
+    <body id="bluebox-com">
     <?php echo $header;?>
     <div class="container">
 
@@ -124,7 +124,7 @@
     <script type="text/javascript">
         //<![CDATA[
         $(document).ready(function () {
-            $('form.form input.checkbox').not('form.freepbxmanager input.checkbox').each(function() {
+            $('form.form input.checkbox').not('form.blueboxmanager input.checkbox').each(function() {
                 label = $(this).parent().find('.label');
                 $(label).css({
                     'display': 'inline',

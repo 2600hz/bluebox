@@ -1,6 +1,6 @@
 <?php
 
-class Misdn extends FreePbx_Record
+class Misdn extends Bluebox_Record
 {
     public function setTableDefinition()
     {

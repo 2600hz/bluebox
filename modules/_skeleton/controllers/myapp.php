@@ -12,7 +12,7 @@
  *
  * Views are automatically rendered for each method unless you override this functionality. The view file rendered, by default, is
  *  /views/controllername/methodname
- * Using the above example, the view for http://myserver/freepbx/voicemail/send would live in
+ * Using the above example, the view for http://myserver/bluebox/voicemail/send would live in
  *  /views/voicemail/send
  *
  * To set variables that will be accessible in the view, use the format:
@@ -23,7 +23,7 @@
  * @author Darren Schreiber
  * @package _Skeleton
  */
-class MyModule_Controller extends FreePbx_Controller {
+class MyModule_Controller extends Bluebox_Controller {
     /**
      * You can override the system/user's default skin on a per-controller basis if you need to. Note that this is the highest
      * level override you can do - it will always override any user or system defaults.

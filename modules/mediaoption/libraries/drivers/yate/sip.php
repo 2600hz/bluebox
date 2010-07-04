@@ -1,9 +1,9 @@
 <?php
 /* 
- * This software is licensed under the terms of the FPL (FreePBX Public License), a
+ * This software is licensed under the terms of the FPL (Bluebox Public License), a
  * modified version of the MPL (Mozilla Public License).
  * 
- * The full text of the license can be obtained at http://www.freepbx.org/fpl/.
+ * The full text of the license can be obtained at http://www.bluebox.org/fpl/.
  * 
  */
 

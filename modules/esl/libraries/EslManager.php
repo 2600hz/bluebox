@@ -149,7 +149,7 @@ class EslManager
     {
             //user->CallerID now
             $this->sendBgAPI("originate",
-            sprintf("{origination_caller_id_number=1231231234,ignore_early_media=true,originate_timeout=30}sofia/external/%s@trunk1.freepbx.com %d", $external, $internal));
+            sprintf("{origination_caller_id_number=1231231234,ignore_early_media=true,originate_timeout=30}sofia/external/%s@trunk1.bluebox.com %d", $external, $internal));
     }
 
     /**
@@ -159,7 +159,7 @@ class EslManager
     {
             //user->CallerID now
             $this->sendBgAPI("originate",
-            sprintf("{origination_caller_id_number=1231231234,ignore_early_media=true,originate_timeout=30}sofia/external/%s@trunk1.freepbx.com %d", $external, $internal));
+            sprintf("{origination_caller_id_number=1231231234,ignore_early_media=true,originate_timeout=30}sofia/external/%s@trunk1.bluebox.com %d", $external, $internal));
     }
 
     /**

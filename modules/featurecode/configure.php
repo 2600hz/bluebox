@@ -1,16 +1,16 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class FeatureCode_Configure extends FreePbx_Configure
+class FeatureCode_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'featurecode';
     public static $displayName = 'Feature Codes';
     public static $author = 'Darren Schreiber';
-    public static $vendor = 'FreePbx';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'FreeSWTICH feature code module';
     public static $description = 'Allows configuration of feature codes and stock FreeSWITCH features';
     public static $default = FALSE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'freeswitch' => 0.1,
         'core' => 0.1

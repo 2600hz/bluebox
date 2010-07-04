@@ -1,5 +1,5 @@
 <?php
-class Rosetta extends FreePbx_Record
+class Rosetta extends Bluebox_Record
 {
 	public function setTableDefinition()
     {

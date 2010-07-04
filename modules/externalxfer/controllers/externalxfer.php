@@ -6,10 +6,10 @@
  *
  * @author Darren Schreiber
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage ExternalXfer
  */
-class ExternalXfer_Controller extends FreePbx_Controller
+class ExternalXfer_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'ExternalXfer';
     protected $writable = array(

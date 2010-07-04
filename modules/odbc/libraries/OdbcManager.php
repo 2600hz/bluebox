@@ -21,7 +21,7 @@ class OdbcManager
         $odbc->fromArray($connection);  // Clobber our defaults (intentionally) with user settings, if any
 		/* look up the port by type since its a required field. */
         $odbc->port = self::lookupPort($odbc->type);
-        $odbc->dsn_name = 'freepbx';
+        $odbc->dsn_name = 'bluebox';
         $odbc->module = $module;
         $odbc->xpath = $xpath;
         $odbc->description = $description;

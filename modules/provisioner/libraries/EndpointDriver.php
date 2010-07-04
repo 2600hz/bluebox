@@ -5,7 +5,7 @@
  * @author Michael Phillips
  * @author Karl Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  */
 abstract class EndpointDriver
 {

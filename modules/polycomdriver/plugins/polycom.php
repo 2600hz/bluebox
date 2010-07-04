@@ -3,9 +3,9 @@
  * freeswitch.php - Provides logic for the installer telephony configuration step
  * @author K Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  */
-class Polycom_Plugin extends FreePbx_Plugin
+class Polycom_Plugin extends Bluebox_Plugin
 {
     public static $phoneParameterMappings = array(
         'User Preferences' => array(

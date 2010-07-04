@@ -5,12 +5,12 @@
  *
  * @author reto.haile <reto.haile@selmoni.ch>
  * @license CPAL-1.0
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage CardManager
  *
  */
 
-class MisdnCardModel extends FreePbx_Record
+class MisdnCardModel extends Bluebox_Record
 {
     function setTableDefinition()
     {

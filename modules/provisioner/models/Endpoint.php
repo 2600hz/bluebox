@@ -1,10 +1,10 @@
 <?php
 /**
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Provisioner
  *
  */
-class Endpoint extends FreePbx_Record
+class Endpoint extends Bluebox_Record
 {
     public static $errors = array(
         'mac' => array(

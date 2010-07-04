@@ -4,7 +4,7 @@
  *
  * @author K Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Core
  */
 

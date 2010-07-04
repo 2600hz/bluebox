@@ -6,10 +6,10 @@
  * TODO: Change this class. It doesn't allow multi-key IVRs.
  *
  * @author Michael Phillips
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage AutoAttendant
  */
-class AutoAttendantKey extends FreePbx_Record {
+class AutoAttendantKey extends Bluebox_Record {
 
     public function setTableDefinition()
     {
@@ -18,7 +18,7 @@ class AutoAttendantKey extends FreePbx_Record {
         $this->hasColumn('auto_attendant_id', 'integer', 11, array('unsigned' => true, 'notnull' => true));
         $this->hasColumn('auto_attendant_key', 'string', 32, array('default' => NULL));
 
-        //ALTER TABLE `freepbx`.`auto_attendant_key` ADD COLUMN `destination` VARCHAR(32) NOT NULL AFTER `auto_attendant_key`;
+        //ALTER TABLE `bluebox`.`auto_attendant_key` ADD COLUMN `destination` VARCHAR(32) NOT NULL AFTER `auto_attendant_key`;
         //$this->hasColumn('destination', 'string', 11, array('default' => NULL));
         
         $this->hasColumn('number_id', 'integer', 11, array('unsigned' => true, 'notnull' => true));

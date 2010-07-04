@@ -1,6 +1,6 @@
 <?php
 
-class MisdnCardSetting extends FreePbx_Record {
+class MisdnCardSetting extends Bluebox_Record {
     function setTableDefinition()
     {
         $this->hasColumn('card_setting_id', 'integer', null, array('primary' => true, 'autoincrement' => true));

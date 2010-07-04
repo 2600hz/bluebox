@@ -1,6 +1,6 @@
 <?php
 
-class MisdnSetting extends FreePbx_Record {
+class MisdnSetting extends Bluebox_Record {
     function setTableDefinition()
     {
         $this->hasColumn('id', 'integer', null, array('primary' => true));

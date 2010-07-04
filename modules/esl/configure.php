@@ -1,16 +1,16 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class Esl_Configure extends FreePbx_Configure
+class Esl_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'esl';
     public static $displayName = 'ESL';
     public static $author = '<ul><li>Michael Phillips</li><li>Karl Anderson</li></ul>';
-    public static $vendor = 'FreePbx';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'FreeSWTICH Even Socket Layer Support';
     public static $description = 'FreeSWITCH ESL access. Provides real-time data to modules that interact directly with the switch, such as voicemail interactions';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'freeswitch' => 0.1,
         'core' => 0.1

@@ -5,20 +5,20 @@
  * Gives info about how to install this module
  *
  * @author K Anderson
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage PermissionManager_Manager
  */
-class PermissionManager_Configure extends FreePbx_Configure
+class PermissionManager_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'permission';
     public static $displayName = 'Permission Manager';
     public static $author = 'K Anderson';
-    public static $vendor = 'FreePBX';
+    public static $vendor = 'Bluebox';
     public static $license = 'LGPL';
     public static $summary = 'Provides Permission Management';
     public static $default = true;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

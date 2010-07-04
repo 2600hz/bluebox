@@ -4,7 +4,7 @@
  *
  * @author K Anderson
  */
-class PowerDns_Controller extends FreePbx_Controller {
+class PowerDns_Controller extends Bluebox_Controller {
     public $writable = array('name', 'type', 'content', 'ttl', 'prio');
 
     protected $baseModel = 'PdnsDomain';

@@ -8,7 +8,7 @@
  *
  * @author K Anderson
  * @license LGPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Conference
  */
 class Asterisk_Conference_Driver extends Asterisk_Base_Driver {

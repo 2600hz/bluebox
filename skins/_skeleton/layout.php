@@ -10,7 +10,7 @@
 
         <link rel="stylesheet" type="text/css" href="<?php echo $skin; ?>assets/css/reset.css" media="screen" />
         <link rel="stylesheet" type="text/css" href="<?php echo $skin; ?>assets/css/layout.css" media="screen" />
-        <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/freepbx/assets/css/navigation.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/bluebox/assets/css/navigation.css" media="screen" />
         <link rel="stylesheet" type="text/css" href="<?php echo $skin; ?>assets/css/screen.css" media="screen" />
         <link rel="stylesheet" type="text/css" href="<?php echo $skin; ?>assets/css/forms.css" media="screen" />
 
@@ -24,7 +24,7 @@
 
         <?php echo $js; ?>
     </head>
-    <body id="freepbx-com">
+    <body id="bluebox-com">
 
     <?php echo $header;?>
     <div class="container">

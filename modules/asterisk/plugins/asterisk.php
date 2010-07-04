@@ -4,10 +4,10 @@
  *
  * @author Karl Anderson
  * @license LGPL
- * @package FreePBX3
+ * @package Bluebox
  */
 
-class Asterisk_Plugin extends FreePbx_Plugin
+class Asterisk_Plugin extends Bluebox_Plugin
 {
     public function trunkView()
     {

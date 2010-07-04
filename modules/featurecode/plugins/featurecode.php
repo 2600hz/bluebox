@@ -1,6 +1,6 @@
 <?php
 
-class FeatureCode_Plugin extends FreePbx_Plugin {
+class FeatureCode_Plugin extends Bluebox_Plugin {
     public function selector() {
         $subview = new View('featurecode/selector');
         $subview->section = 'featurecode';

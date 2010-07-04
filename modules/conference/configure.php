@@ -1,14 +1,14 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class Conferences_Configure extends FreePbx_Configure
+class Conferences_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'conference';
     public static $author = 'Darren Schreiber';
-    public static $vendor = 'FreePBX';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'Conference Management';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

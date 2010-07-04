@@ -2,9 +2,9 @@
 /**
  * @author K Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  */
-class MediaManager_Plugin extends FreePbx_Plugin
+class MediaManager_Plugin extends Bluebox_Plugin
 {
 
     public function deleteFile()

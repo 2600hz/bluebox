@@ -4,10 +4,10 @@
  *
  * @author Karl Anderson
  * @license LGPL
- * @package FreePBX3
+ * @package Bluebox
  */
 
-class Permission_Plugin extends FreePbx_Plugin
+class Permission_Plugin extends Bluebox_Plugin
 {
     public function bootstrapPermission() {
         if (Router::$method == 'disabled' && Router::$controller == 'permission') {

@@ -4,10 +4,10 @@
  *
  * @author Michael Phillips <michael.j.phillips@gmail.com>
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage MediaManager
  */
-class PowerDns_Configure extends FreePbx_Configure
+class PowerDns_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'powerdns';
@@ -17,7 +17,7 @@ class PowerDns_Configure extends FreePbx_Configure
     public static $license = 'MPL';
     public static $summary = 'PowerDNS Management';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

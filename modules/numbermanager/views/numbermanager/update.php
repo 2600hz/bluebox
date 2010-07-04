@@ -27,7 +27,7 @@
             echo '<span class="destination_1">';
 
             if ($assigned = numbering::getDestinationByNumber($number['number_id'])) {
-                 if (get_parent_class($assigned) == 'FreePbx_Record') {
+                 if (get_parent_class($assigned) == 'Bluebox_Record') {
                      echo ucfirst(get_class($assigned));
                  } else {
                      echo ucfirst(get_parent_class($assigned));

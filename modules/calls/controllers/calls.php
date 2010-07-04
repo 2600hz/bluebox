@@ -3,10 +3,10 @@
  * Description of calls
  *
  * @author Michael Phillips
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Calls
  */
-class Calls_Controller extends FreePbx_Controller {
+class Calls_Controller extends Bluebox_Controller {
 	private $grid;
 	
 	public function __construct()

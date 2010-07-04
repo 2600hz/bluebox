@@ -2,11 +2,11 @@
 
 /**
  * Timezone.php doctrine record
- * @author freepbx team
- * @package FreePBX3
+ * @author bluebox team
+ * @package Bluebox
  * @subpackage Timezone
  */
-class Timezone extends FreePbx_Record
+class Timezone extends Bluebox_Record
 {
     /**
      * Sets the table name, and defines the table columns.

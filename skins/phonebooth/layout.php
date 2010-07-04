@@ -5,7 +5,7 @@
         <?php echo $meta ?>
 
         <title>
-            FreePBX<?php if (strlen($title) > 0) echo ' : ' . $title; ?>
+            Bluebox<?php if (strlen($title) > 0) echo ' : ' . $title; ?>
         </title>
 
         <?php stylesheet::add(array('reset','layout', 'navigation', 'screen', 'forms'), 10); ?>
@@ -21,7 +21,7 @@
         <?php echo html::link('skins/phonebooth/assets/img/favicon.ico', 'icon', 'image/x-icon'); ?>
     </head>
     
-    <body id="freepbx-com">
+    <body id="bluebox-com">
     <div id="lang_bar"></div>
 
     <div class="container">
@@ -29,7 +29,7 @@
             <div class="topbar clearfix">
                 
             <?php
-                $logoImg = html::image('assets/img/logo.png','FreePBX v3 Let freedom ring!');
+                $logoImg = html::image('assets/img/logo.png','Bluebox v3 Let freedom ring!');
                 echo html::anchor('/welcome',  $logoImg, array(
                     'id' => 'logo'
                 ));

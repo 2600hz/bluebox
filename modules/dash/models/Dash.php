@@ -1,4 +1,4 @@
 <?php
-class Dash extends FreePbx_Record
+class Dash extends Bluebox_Record
 {
 }

@@ -1,10 +1,10 @@
 <?php
 ///**
-// * @package FreePBX3
+// * @package Bluebox
 // * @subpackage Provisioner
 // *
 // */
-//class EndpointFile extends FreePbx_Record
+//class EndpointFile extends Bluebox_Record
 //{
 //    public function setTableDefinition()
 //    {

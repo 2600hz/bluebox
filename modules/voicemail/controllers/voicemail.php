@@ -4,10 +4,10 @@
  *
  * @author Karl Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Voicemail
  */
-class Voicemail_Controller extends FreePbx_Controller
+class Voicemail_Controller extends Bluebox_Controller
 {
     protected $writable = array('mailbox', 'password', 'email_all_messages', 'email_address', 'delete_file', 'attach_audio_file', 'name');
 

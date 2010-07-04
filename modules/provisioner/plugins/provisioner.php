@@ -2,9 +2,9 @@
 /**
  * @author K Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  */
-class Provisioner_Plugin extends FreePbx_Plugin
+class Provisioner_Plugin extends Bluebox_Plugin
 {
    protected $driver = NULL;
 

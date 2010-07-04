@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
- * FreePBX Modular Telephony Software Library / Application
+ * Bluebox Modular Telephony Software Library / Application
  *
  * Module:
  * 
@@ -31,7 +31,7 @@
  * @package Esl
  */
 
-class Esl_Controller extends FreePbx_Controller
+class Esl_Controller extends Bluebox_Controller
 {
     //protected $noAuth = array('index', 'eslRepsonse');
     public function index()
@@ -180,7 +180,7 @@ class Esl_Controller extends FreePbx_Controller
                 break;
 
             default:
-                $result =  $_POST['type'] .__(' command not supported by FreePBX ESL plugin.');
+                $result =  $_POST['type'] .__(' command not supported by Bluebox ESL plugin.');
                 break;
         }
 

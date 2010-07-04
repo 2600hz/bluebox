@@ -1,15 +1,15 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class InterfaceManager_Configure extends FreePbx_Configure
+class InterfaceManager_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'sipinterface';
     public static $displayName = 'SIP Interface Manager';
     public static $author = 'Darren Schreiber';
-    public static $vendor = 'FreePBX';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'SIP Interface Management Controller Class (FreeSWITCH Specific)';
     public static $default = true;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'freeswitch' => 0.1,

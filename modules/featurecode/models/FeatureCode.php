@@ -1,5 +1,5 @@
 <?php
-class FeatureCode extends FreePbx_Record
+class FeatureCode extends Bluebox_Record
 {
     /**
      * Sets the table name, and defines the table columns.

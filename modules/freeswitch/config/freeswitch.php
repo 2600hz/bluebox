@@ -25,12 +25,12 @@ $config['filemap'][] = array (
 );
 
 $config['filemap'][] = array (
-    'filename' => $config['cfg_root'] .'/sip_profiles/freepbx_sipinterfaces.xml',
+    'filename' => $config['cfg_root'] .'/sip_profiles/bluebox_sipinterfaces.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile'
 );
 
 $config['filemap'][] = array (
-    'filename' => $config['cfg_root'] .'/dialplan/freepbx_dialplan.xml',
+    'filename' => $config['cfg_root'] .'/dialplan/bluebox_dialplan.xml',
     'query' => '//document/section[@name="dialplan"]/context'
 );
 
@@ -45,7 +45,7 @@ $config['filemap'][] = array (
 );
 
 $config['filemap'][] = array (
-    'filename' => $config['cfg_root'] .'/autoload_configs/freepbx_odbc.conf.xml',
+    'filename' => $config['cfg_root'] .'/autoload_configs/bluebox_odbc.conf.xml',
     'query' => '//document/section[@name="odbc"]'
 );
 

@@ -21,7 +21,7 @@
 <p>&nbsp;</p>
 <p>This will allow the web service to run nmap and nmap only for the purpose of scanning.  Nmap needs to run at an elevated security level in order to probe your network.</p>
 <h3>FTP</h3>
-<p>The officially supported FTP daemon of the FreePBX project is <a href="http://www.proftpd.org/">ProFTPD</a>.  With the official FreePBX distribution you will find that all your sip devices's logins and passwords are also FTP credentials to the provision evironment for each phone. There are two modes for running FTP.  1.) each account is given it's own private directory (private mode) and 2.) public mode in which all files are in a shared directory.</p>
+<p>The officially supported FTP daemon of the Bluebox project is <a href="http://www.proftpd.org/">ProFTPD</a>.  With the official Bluebox distribution you will find that all your sip devices's logins and passwords are also FTP credentials to the provision evironment for each phone. There are two modes for running FTP.  1.) each account is given it's own private directory (private mode) and 2.) public mode in which all files are in a shared directory.</p>
 <h2>TFTP</h2>
 TFTP is a very common way to provision phones. It's use it however discourges.  Although not offically supported it easy to use.  Your provision configuration settings can be set to:
 <pre>

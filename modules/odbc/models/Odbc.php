@@ -1,5 +1,5 @@
 <?php
-class Odbc extends FreePbx_Record
+class Odbc extends Bluebox_Record
 {
     /**
      * Sets the table name, and defines the table columns.

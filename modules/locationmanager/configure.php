@@ -5,20 +5,20 @@
  * Gives info about how to install this module
  *
  * @author Darren Schreiber
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Location_Manager
  */
-class LocationManager_Configure extends FreePbx_Configure
+class LocationManager_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'locationmanager';
     public static $displayName = 'Location Manager';
     public static $author = 'Darren Schreiber';
-    public static $vendor = 'FreePBX';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'Provides Location Management Tools';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

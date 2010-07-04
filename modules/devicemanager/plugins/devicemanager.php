@@ -1,6 +1,6 @@
 <?php
 
-class DeviceManager_Plugin extends FreePbx_Plugin {
+class DeviceManager_Plugin extends Bluebox_Plugin {
     public function selector() {
         $subview = new View('devicemanager/selector');
         $subview->section = 'devices';

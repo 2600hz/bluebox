@@ -1,5 +1,5 @@
 <?php
-class VoicemailMessage extends FreePbx_Record
+class VoicemailMessage extends Bluebox_Record
 {
 	public function setTableDefinition()
 	{

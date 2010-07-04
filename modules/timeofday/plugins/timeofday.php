@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class TimeOfDay_Plugin extends FreePbx_Plugin {
+class TimeOfDay_Plugin extends Bluebox_Plugin {
     private $updateNumbers = FALSE;
 
     public function checkChanges() {

@@ -4,10 +4,10 @@
  *
  * @author Karl Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage ConferenceManager
  */
-class Conference_Controller extends FreePbx_Controller
+class Conference_Controller extends Bluebox_Controller
 {
     protected $writable = array('name', 'room_pin', 'record', 'record_location', 'comfort_noise', 'moh_type', 'moh_file', 'conference_soundmap_id');
 
@@ -232,7 +232,7 @@ class Conference_Controller extends FreePbx_Controller
             $primaryKeyCol = $obj->_table->getIdentifier(); //get the column name, like confernce_id
             $foreign_id = $obj->$primaryKeyCol; //get the keuy value
 
-            if (get_parent_class($obj) == 'FreePbx_Record') $class_type = get_class($obj) . 'Number'; //transform to class name
+            if (get_parent_class($obj) == 'Bluebox_Record') $class_type = get_class($obj) . 'Number'; //transform to class name
             else $class_type = get_parent_class($obj) . 'Number'; //transform to original parent's class name
 
             $results = Doctrine_Query::create()

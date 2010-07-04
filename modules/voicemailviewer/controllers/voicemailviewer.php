@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
- * FreePBX Modular Telephony Software Library / Application
+ * Bluebox Modular Telephony Software Library / Application
  *
  * Module:
  * 
@@ -28,13 +28,13 @@
  *
  * @author Michael Phillips <michael.j.phillips@gmail.com>
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Voicemail
  * @class Voicemail_Controller
- * @extends FreePbx_Controller
+ * @extends Bluebox_Controller
  * @todo Finish archive function
  */
-class VoicemailViewer_Controller extends FreePbx_Controller
+class VoicemailViewer_Controller extends Bluebox_Controller
 {
 	public function index($folder = 'inbox')
     {

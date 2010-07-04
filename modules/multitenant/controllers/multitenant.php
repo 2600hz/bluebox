@@ -4,7 +4,7 @@
  *
  * @author dschreiber
  */
-class MultiTenant extends FreePbx_Controller {
+class MultiTenant extends Bluebox_Controller {
     public function index() {
         $this->view->interfaces = array();
         $this->view->interfaces[] = array('Name' => 'Primary Box', 'DNS' => 'fred.somehost.com', 'IP1' => '216.82.223.1');

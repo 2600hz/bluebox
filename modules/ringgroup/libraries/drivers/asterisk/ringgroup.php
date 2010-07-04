@@ -5,7 +5,7 @@
  *
  * @author K Anderson
  * @license LGPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage RingGroup
  */
 class Asterisk_RingGroup_Driver extends Asterisk_Base_Driver {

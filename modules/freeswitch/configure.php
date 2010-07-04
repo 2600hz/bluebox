@@ -1,5 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class Freeswitch_Configure extends FreePbx_Configure
+class Freeswitch_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'freeswitch';
@@ -9,7 +9,7 @@ class Freeswitch_Configure extends FreePbx_Configure
     public static $license = 'MPL';
     public static $summary = 'Driver for FreeSWITCH';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_DRIVER;
+    public static $type = Bluebox_Installer::TYPE_DRIVER;
     public static $required = array(
         'core' => 0.1,
         'not' => array(

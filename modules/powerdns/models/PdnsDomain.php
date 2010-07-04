@@ -5,7 +5,7 @@
  * @author K Anderson
  */
 
-class PdnsDomain extends FreePbx_Record {
+class PdnsDomain extends Bluebox_Record {
     public static $errors = array (
         'name' => array (
             'unique' => 'Domain is not unique'

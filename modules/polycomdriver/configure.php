@@ -1,15 +1,15 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class Polycomdriver_Configure extends FreePbx_Configure
+class Polycomdriver_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'polycomdriver';
     public static $displayName = 'Polycom Driver';
     public static $author = 'Karl Anderson';
-    public static $vendor = 'FreePbx';
+    public static $vendor = 'Bluebox';
     public static $license = 'LGPL';
     public static $summary = 'Polycom Provision Driver';
     public static $default = true;
-    public static $type = FreePbx_Installer::TYPE_ENDPOINT;
+    public static $type = Bluebox_Installer::TYPE_ENDPOINT;
     public static $required = array(
         'core' => 0.1,
         'provisioner' => 0.1

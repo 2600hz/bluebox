@@ -1,6 +1,6 @@
 <?php
 
-class AutoAttendant_Plugin extends FreePbx_Plugin {
+class AutoAttendant_Plugin extends Bluebox_Plugin {
     public function selector() {
         $subview = new View('autoattendant/selector');
         $subview->section = 'autoattendant';

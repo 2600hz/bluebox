@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class TimeOfDay extends FreePbx_Record
+class TimeOfDay extends Bluebox_Record
 {
     /**
      * Sets the table name, and defines the table columns.

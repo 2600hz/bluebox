@@ -1,5 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/*class Lcr_Configure extends FreePbx_Configure
+/*class Lcr_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'lcr';
@@ -10,7 +10,7 @@
     public static $summary = 'Least Cost Routing Module';
     public static $description = 'When this module is loaded, it will provide an interface for managing your least cost routing table';
     public static $default = FALSE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'freeswitch' => 0.1,

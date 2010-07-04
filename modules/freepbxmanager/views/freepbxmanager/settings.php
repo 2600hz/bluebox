@@ -1,9 +1,9 @@
-<div id="freepbxmanager_settings_header" class="settings freepbxmanager module_header">
+<div id="blueboxmanager_settings_header" class="settings blueboxmanager module_header">
     <h2><?php echo __('Module Settings'); ?></h2>
 </div>
 
 
-<div id="freepbxmanager_settings_form" class="settings freepbxmanager">
+<div id="blueboxmanager_settings_form" class="settings blueboxmanager">
     <?php echo form::open(); ?>
 
     <?php if (isset($views)) echo subview::render($views); ?>

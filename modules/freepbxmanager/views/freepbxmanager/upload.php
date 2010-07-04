@@ -6,7 +6,7 @@
 Select a package to upload
 </legend>
 <div>
-<p class="txt-left">Package names have the format &lt;package&gt;.package.tar.gz. For example, blockcaller.package.tar.gz would be a valid package recognized by FreePBX.
+<p class="txt-left">Package names have the format &lt;package&gt;.package.tar.gz. For example, blockcaller.package.tar.gz would be a valid package recognized by Bluebox.
 The package must have one directory only in the root which matches the package name exactly. All of the plugin folders much reside under that directory.</p>
 
 	

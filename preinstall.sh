@@ -2,8 +2,8 @@
 
 webuser='nobody'
 
-# FreePBX Startup
-echo "Prepping for a typical FreePBX install. Your mileage may vary. It\'s OK if some things fail..."
+# BlueBox Startup
+echo "Prepping for a typical BlueBox install. Your mileage may vary. It\'s OK if some things fail..."
 
 # SELinux
 echo '  Disabling SE Linux, if installed...'
@@ -11,14 +11,14 @@ selinuxenabled 0
 
 # Change permissions
 echo '  Changing folder permissions to allow read/write...'
-mkdir -p freepbx/logs
-chgrp -R $webuser freepbx/logs/
-chmod -R a+w freepbx/logs
-mkdir -p freepbx/cache
-chgrp -R $webuser freepbx/cache/
-chmod -R a+w freepbx/cache/
-chgrp -R $webuser freepbx/config/
-chmod -R a+w freepbx/config/
+mkdir -p bluebox/logs
+chgrp -R $webuser bluebox/logs/
+chmod -R a+w bluebox/logs
+mkdir -p bluebox/cache
+chgrp -R $webuser bluebox/cache/
+chmod -R a+w bluebox/cache/
+chgrp -R $webuser bluebox/config/
+chmod -R a+w bluebox/config/
 chgrp -R $webuser modules/freeswitch/config/
 chmod -R a+w modules/freeswitch/config/
 chgrp -R $webuser modules/asterisk/config/

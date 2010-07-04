@@ -6,10 +6,10 @@
  *
  * @author Darren Schreiber
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage FeatureCode
  */
-class FeatureCode_Controller extends FreePbx_Controller
+class FeatureCode_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'FeatureCode';
     protected $writable = array(

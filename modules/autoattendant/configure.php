@@ -5,20 +5,20 @@
  * Gives info about how to setup the Auto Attendant Manager
  *
  * @author Michael Phillips
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage AutoAttendant
  */
-class AutoAttendant_Configure extends FreePbx_Configure
+class AutoAttendant_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'autoattendant';
     public static $displayName = 'Auto Attendant';
     public static $author = 'Michael Phillips';
-    public static $vendor = 'FreePbx';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'Auto Attendant Management and builder';
     public static $default = true;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'file' => 0.1

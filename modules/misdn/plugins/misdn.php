@@ -1,7 +1,7 @@
 <?php
 
 
-class Misdn_Plugin extends FreePbx_Plugin
+class Misdn_Plugin extends Bluebox_Plugin
 {
     public function index()
     {

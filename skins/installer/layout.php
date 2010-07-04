@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title><?php echo __('FreePBX Setup Wizard'); ?></title>
+    <title><?php echo __('Bluebox Setup Wizard'); ?></title>
     <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/installer/assets/css/reset.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/installer/assets/css/layout.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/installer/assets/css/screen.css" media="screen" />
@@ -23,7 +23,7 @@
                 ?>
                 |
                 <?php
-                    echo html::anchor('http://freepbx.org/v3/wiki', __('Wiki'), array(
+                    echo html::anchor('http://bluebox.org/v3/wiki', __('Wiki'), array(
                         'title' => 'Find answers on the wiki for common problems.',
                         'target' => '_blank'
                     ));
@@ -37,14 +37,14 @@
             <div id="logo_container">
             <?php
                 echo html::image('skins/installer/assets/img/logo2.png', array(
-                    'alt' => 'FreePBX v3 Let freedom ring!',
+                    'alt' => 'Bluebox v3 Let freedom ring!',
                 ));
             ?>
             </div>
 
             <h2><?php echo __($title); ?></h2>
 
-            <div class="freepbx_desc">
+            <div class="bluebox_desc">
             <?php
                 echo __('Modular Telephony Software Framework and Application');
             ?>

@@ -1,5 +1,5 @@
 <?php
-class ExternalXfer extends FreePbx_Record
+class ExternalXfer extends Bluebox_Record
 {
     /**
      * Sets the table name, and defines the table columns.

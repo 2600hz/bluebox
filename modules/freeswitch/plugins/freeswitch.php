@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
- * FreePBX Modular Telephony Software Library / Application
+ * Bluebox Modular Telephony Software Library / Application
  *
  * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
  * you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -9,7 +9,7 @@
  * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
  * express or implied. See the License for the specific language governing rights and limitations under the License.
  *
- * The Original Code is FreePBX Telephony Configuration API and GUI Framework.
+ * The Original Code is Bluebox Telephony Configuration API and GUI Framework.
  * The Original Developer is the Initial Developer.
  * The Initial Developer of the Original Code is Darren Schreiber
  * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
@@ -23,10 +23,10 @@
  * freeswitch.php - Provides logic for the installer telephony configuration step
  * @author K Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  */
 
-class Freeswitch_Plugin extends FreePbx_Plugin
+class Freeswitch_Plugin extends Bluebox_Plugin
 {
     // A list of possible directories that may have the freeswitch.xml
     // file (denoting the FS directory.
@@ -78,7 +78,7 @@ class Freeswitch_Plugin extends FreePbx_Plugin
         // Get a list of existing sip_profiles and warn the user that these will be deleted
         $sipProfiles = glob(rtrim($subview->cfg_root, '/') . '/sip_profiles/*.xml', GLOB_MARK);
 
-        // See if any xml files that freepbx uses exist already and warn the user they will be deleted
+        // See if any xml files that bluebox uses exist already and warn the user they will be deleted
         $filemaps = Kohana::config('freeswitch.filemap');
 
         $oldXmlFiles = array();
@@ -91,7 +91,7 @@ class Freeswitch_Plugin extends FreePbx_Plugin
             }
         }
 
-        // Create one unique list of all freepbx xml and extra sip profiles
+        // Create one unique list of all bluebox xml and extra sip profiles
         $conflictXmlFiles = array_unique(array_merge($oldXmlFiles, $sipProfiles));
 
         $subview->conflictXmlFiles = $conflictXmlFiles;

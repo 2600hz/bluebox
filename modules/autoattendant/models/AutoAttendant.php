@@ -6,10 +6,10 @@
  * TODO: Change this class. It doesn't allow multi-key IVRs.
  *
  * @author Michael Phillips
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage AutoAttendant
  */
-class AutoAttendant extends FreePbx_Record
+class AutoAttendant extends Bluebox_Record
 {
 
     public function setTableDefinition()

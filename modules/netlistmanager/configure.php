@@ -5,21 +5,21 @@
  * Gives info about how to install this module
  *
  * @author K Anderson
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage NetList
  */
-class NetList_Configure extends FreePbx_Configure
+class NetList_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'netlistmanager';
     public static $displayName = 'Network List Manager';
     public static $author = 'K Anderson';
-    public static $vendor = 'FreePBX';
+    public static $vendor = 'Bluebox';
     public static $license = 'LGPL';
     public static $summary = 'Access Control List Support';
     public static $description = 'Access control lists are lists of domain names, IP addresses and IP address ranges that can be used to identify various network-related activities, such as inbound callers that can bypass authentication, local callers who are on NAT, etc.';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'freeswitch' => '0.1'

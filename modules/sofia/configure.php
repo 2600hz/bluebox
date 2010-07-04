@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
-* FreePBX Modular Telephony Software Library / Application
+* Bluebox Modular Telephony Software Library / Application
 *
 * Module:
 *
@@ -28,20 +28,20 @@
  *
  * @author Michael Phillips <michael.j.phillips@gmail.com>
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Sofia_Configured
  */
-class Sofia_Configure extends FreePbx_Configure
+class Sofia_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'sofia';
     public static $displayName = 'SIP Registration Viewer';
     public static $author = 'Michael Phillips';
-    public static $vendor = 'FreePbx';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'Allow end-users to view registrations and much more.';
     public static $default = true;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'freeswitch' => 0.1

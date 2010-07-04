@@ -4,10 +4,10 @@
  *
  * @author K Anderson
  * @license LGPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage PermissionManager
  */
-class Permission_Controller extends FreePbx_Controller
+class Permission_Controller extends Bluebox_Controller
 {
     public $writable = array();
     
@@ -149,7 +149,7 @@ class Permission_Controller extends FreePbx_Controller
 
     public function permissions() {
         // get a list of the packages
-        $packages = FreePbx_Installer::listPackages(FreePbx_Installer::TYPE_MODULE);
+        $packages = Bluebox_Installer::listPackages(Bluebox_Installer::TYPE_MODULE);
 
         // remove the packages that dont have a
         foreach ($packages as $name => $package) {
@@ -224,7 +224,7 @@ class Permission_Controller extends FreePbx_Controller
         $module = str_replace('_module_permissions_custom', '', $module);
 
         // get the package definition for this module
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         $package = $packages[$module];
 
         // no package, no love

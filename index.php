@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the main access point for the FreePbx application.
+ * This is the main access point for the BlueBox application.
  */
 
 if (!defined('CONTENT-TYPE')) {
@@ -22,7 +22,7 @@ define('IN_PRODUCTION', FALSE);
  *
  * This path can be absolute or relative to this file.
  */
-$kohana_application = 'freepbx';
+$kohana_application = 'bluebox';
 
 /**
  * Kohana modules directory. This directory should contain all the modules used

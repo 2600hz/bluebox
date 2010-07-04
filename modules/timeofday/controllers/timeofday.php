@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class TimeOfDay_Controller extends FreePbx_Controller
+class TimeOfDay_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'TimeOfDay';
     protected $writable = array(

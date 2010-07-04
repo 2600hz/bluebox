@@ -2,9 +2,9 @@
 /**
  * @author K Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  */
-class RingGroup_Plugin extends FreePbx_Plugin
+class RingGroup_Plugin extends Bluebox_Plugin
 {
     /*private $updateNumbers = FALSE;*/
 

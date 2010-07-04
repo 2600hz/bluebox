@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
- * FreePBX Modular Telephony Software Library / Application
+ * Bluebox Modular Telephony Software Library / Application
  *
  * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
  * you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -9,7 +9,7 @@
  * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
  * express or implied. See the License for the specific language governing rights and limitations under the License.
  *
- * The Original Code is FreePBX Telephony Configuration API and GUI Framework.
+ * The Original Code is Bluebox Telephony Configuration API and GUI Framework.
  * The Original Developer is the Initial Developer.
  * The Initial Developer of the Original Code is Darren Schreiber
  * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
@@ -19,11 +19,11 @@
  * Michael Phillips
  *
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage VoicemailToEmail
  */
 
-class Voicemail_Plugin extends FreePbx_Plugin
+class Voicemail_Plugin extends Bluebox_Plugin
 {
     protected $preloadModels = array('VoicemailPrefs', 'DeviceVoicemail', 'UserVoicemail');
 
@@ -120,7 +120,7 @@ class Voicemail_Plugin extends FreePbx_Plugin
             $primaryKeyCol = $obj->_table->getIdentifier(); //get the column name, like confernce_id
             $foreign_id = $obj->$primaryKeyCol; //get the keuy value
 
-            if (get_parent_class($obj) == 'FreePbx_Record') $class_type = get_class($obj) . 'Number'; //transform to class name
+            if (get_parent_class($obj) == 'Bluebox_Record') $class_type = get_class($obj) . 'Number'; //transform to class name
             else $class_type = get_parent_class($obj) . 'Number'; //transform to original parent's class name
 
             $results = Doctrine_Query::create()

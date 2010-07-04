@@ -1,5 +1,5 @@
 <?php
-class Odbc_Controller extends FreePbx_Controller
+class Odbc_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'Odbc';
     public $writable = array(
@@ -117,7 +117,7 @@ class Odbc_Controller extends FreePbx_Controller
         $dsnString.= "odbcname\t= MyODBC 3.51 Driver DSN\n\n";
         $dsnString.= sprintf("[%s]\n", $odbc->dsn_name);
         $dsnString.= "Driver\t\t= /usr/lib/odbc/libmyodbc.so\n";
-        $dsnString.= "Description\t= FreePBX ODBC Connection\n";
+        $dsnString.= "Description\t= Bluebox ODBC Connection\n";
         $dsnString.= sprintf("SERVER\t\t= %s\n", $odbc->host);
         $dsnString.= sprintf("PORT\t\t= %d\n", $odbc->port);
         $dsnString.= sprintf("USER\t\t= %s\n", $odbc->user);

@@ -1,16 +1,16 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class Odbc_Configure extends FreePbx_Configure
+class Odbc_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'odbc';
     public static $displayName = 'ODBC';
     public static $author = 'Michael Phillips';
-    public static $vendor = 'FreePbx';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'ODBC Connection Manager';
     public static $description = 'Provides access to a variety of databases via obdc';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );
@@ -49,7 +49,7 @@ class Odbc_Configure extends FreePbx_Configure
         if (empty($installSamples)) return TRUE;
 
         $odbc = new Odbc();
-        $odbc->dsn_name = 'FreePBX';
+        $odbc->dsn_name = 'Bluebox';
         $odbc->database = $_SESSION['installer.dbName'];
         $odbc->user = $_SESSION['installer.dbUserName'];
         $odbc->pass = $_SESSION['installer.dbUserPwd'];

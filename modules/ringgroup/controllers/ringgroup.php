@@ -4,10 +4,10 @@
  *
  * @author K Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage RingGroup
  */
-class RingGroup_Controller extends FreePbx_Controller
+class RingGroup_Controller extends Bluebox_Controller
 {
     public $writable = array(
         'name',

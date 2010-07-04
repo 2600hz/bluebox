@@ -9,10 +9,10 @@
  *
  * @author K Anderson
  * @license LGPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage NetList
  */
-class NetListManager_Controller extends FreePbx_Controller
+class NetListManager_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'NetList';
     protected $writable = array(

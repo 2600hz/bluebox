@@ -3,11 +3,11 @@
 /**
  * @author K Anderson
  * @license LGPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage NetListManager
  */
 
-class TrunkManager_Plugin extends FreePbx_Plugin
+class TrunkManager_Plugin extends Bluebox_Plugin
 {
     public function delete() {
         $base = Event::$data;

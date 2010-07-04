@@ -14,7 +14,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
     public $validActions = array( 'downgrade', 'install', 'upgrade', 'enable', 'disable', 'uninstall', 'repair', 'verify' );
    
 	/**
-	 * Tests the FreePbx_Installer::listPackages() function, and its return
+	 * Tests the Bluebox_Installer::listPackages() function, and its return
      * NOTE: BY DESIGN THIS FAILS IF THERE IS AN IMPROPER CONFIGURE.PHP IN THE MODULES!
      *
 	 * @group core.libraries.installer.listPackages
@@ -22,7 +22,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
 	 */
     public function testListPackages()
     {
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         
         foreach ($packages as $package)
         {
@@ -80,58 +80,58 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
 
         // This ensures that a second loop is equal (because we are using include_once the second time
         // relies entirely on the static var already being valid)
-        $secondPackages = FreePbx_Installer::listPackages();
+        $secondPackages = Bluebox_Installer::listPackages();
         $this->assertEquals($packages, $secondPackages);
 
         // Determine from our base line what we would expect if we filtered by modules
         $expected = array();
         foreach ($packages as $name => $package)
         {
-            if (in_array(FreePbx_Installer::TYPE_MODULE, $package['type']))
+            if (in_array(Bluebox_Installer::TYPE_MODULE, $package['type']))
             {
                 $expected[$name] = $package;
             }
         }
 
         // Check the single include filter
-        $filteredPackages = FreePbx_Installer::listPackages(FreePbx_Installer::TYPE_MODULE);
+        $filteredPackages = Bluebox_Installer::listPackages(Bluebox_Installer::TYPE_MODULE);
         $this->assertEquals($expected, $filteredPackages);
 
         // Check the lazy version of the same filter
-        $filteredPackages = FreePbx_Installer::listPackages(array(FreePbx_Installer::TYPE_MODULE));
+        $filteredPackages = Bluebox_Installer::listPackages(array(Bluebox_Installer::TYPE_MODULE));
         $this->assertEquals($expected, $filteredPackages);
 
         // Check the explicit version of the same filter
-        $filteredPackages = FreePbx_Installer::listPackages(array('include' => FreePbx_Installer::TYPE_MODULE));
+        $filteredPackages = Bluebox_Installer::listPackages(array('include' => Bluebox_Installer::TYPE_MODULE));
         $this->assertEquals($expected, $filteredPackages);
 
         // Determine from our base line what we would expect if we excluded modules
         $expected = array();
         foreach ($packages as $name => $package)
         {
-            if (!in_array(FreePbx_Installer::TYPE_MODULE, $package['type']))
+            if (!in_array(Bluebox_Installer::TYPE_MODULE, $package['type']))
             {
                 $expected[$name] = $package;
             }
         }
 
         // This filter can only be set explicitly
-        $filteredPackages = FreePbx_Installer::listPackages(array('exclude' => FreePbx_Installer::TYPE_MODULE));
+        $filteredPackages = Bluebox_Installer::listPackages(array('exclude' => Bluebox_Installer::TYPE_MODULE));
         $this->assertEquals($expected, $filteredPackages);
 
         // Determine from our base line what we would expect if we included both modules and drivers
         $expected = array();
         foreach ($packages as $name => $package)
         {
-            if (in_array(FreePbx_Installer::TYPE_DRIVER, $package['type']) || in_array(FreePbx_Installer::TYPE_MODULE, $package['type']))
+            if (in_array(Bluebox_Installer::TYPE_DRIVER, $package['type']) || in_array(Bluebox_Installer::TYPE_MODULE, $package['type']))
             {
                 $expected[$name] = $package;
             }
         }
 
         // This filter can only be set explicitly
-        $filteredPackages = FreePbx_Installer::listPackages(array(
-            'include' => array(FreePbx_Installer::CATEGORY_MODULE, FreePbx_Installer::TYPE_DRIVER)
+        $filteredPackages = Bluebox_Installer::listPackages(array(
+            'include' => array(Bluebox_Installer::CATEGORY_MODULE, Bluebox_Installer::TYPE_DRIVER)
         ));
         $this->assertEquals($expected, $filteredPackages);
 
@@ -139,26 +139,26 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         $expected = array();
         foreach ($packages as $name => $package)
         {
-            if (!in_array(FreePbx_Installer::TYPE_DRIVER, $package['type']) && !in_array(FreePbx_Installer::TYPE_MODULE, $package['type']))
+            if (!in_array(Bluebox_Installer::TYPE_DRIVER, $package['type']) && !in_array(Bluebox_Installer::TYPE_MODULE, $package['type']))
             {
                 $expected[$name] = $package;
             }
         }
 
         // This filter can only be set explicitly
-        $filteredPackages = FreePbx_Installer::listPackages(array(
-            'exclude' => array(FreePbx_Installer::TYPE_MODULE, FreePbx_Installer::TYPE_DRIVER)
+        $filteredPackages = Bluebox_Installer::listPackages(array(
+            'exclude' => array(Bluebox_Installer::TYPE_MODULE, Bluebox_Installer::TYPE_DRIVER)
         ));
         $this->assertEquals($expected, $filteredPackages);
 
         // Ensure that if the DB check is disabled everything returns with installedAs == false
-        $noDbPackages = FreePbx_Installer::listPackages(array(), true);
+        $noDbPackages = Bluebox_Installer::listPackages(array(), true);
         foreach ($noDbPackages as $noDbPackage)
             $this->assertEquals(false, $noDbPackage['installedAs']);
     }
 
 	/**
-	 * Tests the FreePbx_Installer::relationTree() function
+	 * Tests the Bluebox_Installer::relationTree() function
 	 * @group core.libraries.installer.relationTree
 	 * @test
 	 */
@@ -171,13 +171,13 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         $package4 = $this->numberedPackage(4);
 
         // Set up known relationships
-        $package1['sample1']['required'] = array( 'core' => FreePbx_Controller::$version, 'sample2' => 0.1, 'not' => array('missing' => 0.1) );
-        $package2['sample2']['required'] = array( 'core' => FreePbx_Controller::$version );
-        $package3['sample3']['required'] = array( 'core' => FreePbx_Controller::$version, 'sample1' => 0.1,  'sample2' => 0.1);
+        $package1['sample1']['required'] = array( 'core' => Bluebox_Controller::$version, 'sample2' => 0.1, 'not' => array('missing' => 0.1) );
+        $package2['sample2']['required'] = array( 'core' => Bluebox_Controller::$version );
+        $package3['sample3']['required'] = array( 'core' => Bluebox_Controller::$version, 'sample1' => 0.1,  'sample2' => 0.1);
         $packages = array_merge($package1, $package2, $package3, $package4);
 
         // Ask the installer to work out the relationships
-        $relationTree = FreePbx_Installer::relationTree($packages);
+        $relationTree = Bluebox_Installer::relationTree($packages);
 
         // This is what we should get back
         $expected = array(
@@ -204,7 +204,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
     }
 
 	/**
-	 * Tests the FreePbx_Installer::checkDependencies() function
+	 * Tests the Bluebox_Installer::checkDependencies() function
 	 * @group core.libraries.installer.checkDependencies
 	 * @test
 	 */
@@ -216,9 +216,9 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
 
         // Ensure that _checks on packages with no action are ignored
         $package1['sample1']['action'] = false;
-        FreePbx_Installer::checkDependencies($package1);
-        $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-        $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+        Bluebox_Installer::checkDependencies($package1);
+        $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+        $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
 
         // Set up for the next test
         $expectedErrors = array (
@@ -243,25 +243,25 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package1['sample1']['action'] = $validAction;
-            FreePbx_Installer::checkDependencies($package1, 'sample1');
+            Bluebox_Installer::checkDependencies($package1, 'sample1');
 
             if (in_array($validAction, $runForActions))
             {
-                $this->assertEquals($expectedErrors, FreePbx_Installer::$errors);
-                $this->assertEquals($expectedWarnings, FreePbx_Installer::$warnings);        
+                $this->assertEquals($expectedErrors, Bluebox_Installer::$errors);
+                $this->assertEquals($expectedWarnings, Bluebox_Installer::$warnings);        
             } else {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));                     
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));                     
             }
         }
 
         // Setup for the next test
         $package1['sample1']['configureClass'] = 'Empty_Configure';
-        $package1['sample1']['required'] = array( 'core' => FreePbx_Controller::$version + 1);
+        $package1['sample1']['required'] = array( 'core' => Bluebox_Controller::$version + 1);
 
         $expectedErrors = array (
             'sample1' => array (
-                'This module is incompatable with FreePbx version ' .number_format(FreePbx_Controller::$version, 1)
+                'This module is incompatable with Bluebox version ' .number_format(Bluebox_Controller::$version, 1)
             )
         );
 
@@ -270,15 +270,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package1['sample1']['action'] = $validAction;
-            FreePbx_Installer::checkDependencies($package1, 'sample1');
+            Bluebox_Installer::checkDependencies($package1, 'sample1');
 
             if (in_array($validAction, $runForActions))
             {
-                $this->assertEquals($expectedErrors, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedErrors, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -296,15 +296,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package1['sample1']['action'] = $validAction;
-            FreePbx_Installer::checkDependencies($package1, 'sample1');
+            Bluebox_Installer::checkDependencies($package1, 'sample1');
 
             if (in_array($validAction, $runForActions))
             {
-                $this->assertEquals($expectedErrors, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedErrors, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -327,15 +327,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package1['sample1']['action'] = $validAction;
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if (in_array($validAction, $runForActions))
             {
-                $this->assertEquals($expectedErrors, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedErrors, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -353,15 +353,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package1['sample1']['action'] = $validAction;
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if (in_array($validAction, $runForActions))
             {
-                $this->assertEquals($expectedErrors, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedErrors, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -380,14 +380,14 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package1['sample1']['action'] = $validAction;
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if (in_array($validAction, $runForActions)) {
-                $this->assertEquals($expectedErrors, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedErrors, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -411,18 +411,18 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package1['sample1']['action'] = $validAction;
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if ($validAction == 'enable')
             {
-                $this->assertEquals($expectedErrors, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedErrors, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else if (in_array($validAction, $runForActions)) {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals($expectedWarnings, FreePbx_Installer::$warnings);
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals($expectedWarnings, Bluebox_Installer::$warnings);
             } else {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -440,14 +440,14 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package1['sample1']['action'] = $validAction;
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if (in_array($validAction, $runForActions)) {
-                $this->assertEquals($expectedErrors, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedErrors, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -455,9 +455,9 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         $package2['sample2']['action'] = 'install';
 
         // If the db version is invalid but the action will upgrade ensure the new version is used
-        FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
-        $this->assertEquals(true, empty(FreePbx_Installer::$errors));
-        $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+        Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+        $this->assertEquals(true, empty(Bluebox_Installer::$errors));
+        $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
 
         // On to the complex requirements!
         
@@ -488,15 +488,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($validOperators as $validOperator)
         {
             $package1['sample1']['required'] = array('sample2' => $validOperator .' 0.5');
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if (in_array($validOperator, $failingOperators))
             {
-                $this->assertEquals($expectedMissing, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedMissing, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals($expectedError, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedError, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -508,15 +508,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($validOperators as $validOperator)
         {
             $package1['sample1']['required'] = array('sample2' => $validOperator .' 0.5');
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if (in_array($validOperator, $failingOperators))
             {
-                $this->assertEquals($expectedMissing, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedMissing, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals($expectedError, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedError, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -528,15 +528,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($validOperators as $validOperator)
         {
             $package1['sample1']['required'] = array('sample2' => $validOperator .' 0.5');
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if (in_array($validOperator, $failingOperators))
             {
-                $this->assertEquals($expectedMissing, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedMissing, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals($expectedError, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedError, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -547,15 +547,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         for ($i = 4; $i < 8; $i +=1)
         {
             $package2['sample2']['version'] = $i;
-            FreePbx_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
+            Bluebox_Installer::checkDependencies(array_merge($package1, $package2), 'sample1');
 
             if ($i > 0.5 && $i < 0.7)
             {
-                $this->assertEquals($expectedError, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedError, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             } else {
-                $this->assertEquals($expectedMissing, FreePbx_Installer::$errors);
-                $this->assertEquals(true, empty(FreePbx_Installer::$warnings));
+                $this->assertEquals($expectedMissing, Bluebox_Installer::$errors);
+                $this->assertEquals(true, empty(Bluebox_Installer::$warnings));
             }
         }
 
@@ -574,12 +574,12 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         );
 
         // Make sure you can not disable or unistall a module that is required by an active module
-        FreePbx_Installer::checkDependencies(array_merge($package1, $package2));
-        $this->assertEquals($expectedError, FreePbx_Installer::$errors);
+        Bluebox_Installer::checkDependencies(array_merge($package1, $package2));
+        $this->assertEquals($expectedError, Bluebox_Installer::$errors);
 
         $package1['sample1']['action'] = 'uninstall';
-        FreePbx_Installer::checkDependencies(array_merge($package1, $package2));
-        $this->assertEquals($expectedError, FreePbx_Installer::$errors);
+        Bluebox_Installer::checkDependencies(array_merge($package1, $package2));
+        $this->assertEquals($expectedError, Bluebox_Installer::$errors);
 
 
         $package1['sample1']['action'] = false;
@@ -598,12 +598,12 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         );
 
         // Test a 'not' module
-        FreePbx_Installer::checkDependencies(array_merge($package1, $package2));
-        $this->assertEquals($expectedError, FreePbx_Installer::$errors);
+        Bluebox_Installer::checkDependencies(array_merge($package1, $package2));
+        $this->assertEquals($expectedError, Bluebox_Installer::$errors);
     }
     
 	/**
-	 * Tests the FreePbx_Installer::determineActions() function
+	 * Tests the Bluebox_Installer::determineActions() function
 	 * @group core.libraries.installer.determineActions
 	 * @test
 	 */
@@ -613,15 +613,15 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         $package = $this->singlePackage();
 
         // With no install list the package should be unchanged
-        $testResult = FreePbx_Installer::determineActions($package);
+        $testResult = Bluebox_Installer::determineActions($package);
         $this->assertEquals($package, $testResult);
 
         // With the wrong package install list the package should be unchanged
-        $testResult = FreePbx_Installer::determineActions($package, 'nonexistant');
+        $testResult = Bluebox_Installer::determineActions($package, 'nonexistant');
         $this->assertEquals($package, $testResult);
 
         // When versions are identical we expect install
-        $testResult = FreePbx_Installer::determineActions($package, 'sample');
+        $testResult = Bluebox_Installer::determineActions($package, 'sample');
         $this->assertEquals('install', $testResult['sample']['action']);
 
         // When the installed version is larger we expect downgrade
@@ -634,12 +634,12 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
             {
                 $package['sample']['installedAs']['module_version'] = $rand1;
                 $package['sample']['version'] = $rand2;
-                $testResult = FreePbx_Installer::determineActions($package, 'sample');
+                $testResult = Bluebox_Installer::determineActions($package, 'sample');
                 $this->assertEquals('downgrade', $testResult['sample']['action']);
             } else if ($rand1 < $rand2) {
                 $package['sample']['installedAs']['module_version'] = $rand2;
                 $package['sample']['version'] = $rand1;
-                $testResult = FreePbx_Installer::determineActions($package, 'sample');
+                $testResult = Bluebox_Installer::determineActions($package, 'sample');
                 $this->assertEquals('downgrade', $testResult['sample']['action']);
             } else {
                 $i -= 1;
@@ -656,12 +656,12 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
             {
                 $package['sample']['installedAs']['module_version'] = $rand1;
                 $package['sample']['version'] = $rand2;
-                $testResult = FreePbx_Installer::determineActions($package, 'sample');
+                $testResult = Bluebox_Installer::determineActions($package, 'sample');
                 $this->assertEquals('upgrade', $testResult['sample']['action']);
             } else if ($rand1 > $rand2) {
                 $package['sample']['installedAs']['module_version'] = $rand2;
                 $package['sample']['version'] = $rand1;
-                $testResult = FreePbx_Installer::determineActions($package, 'sample');
+                $testResult = Bluebox_Installer::determineActions($package, 'sample');
                 $this->assertEquals('upgrade', $testResult['sample']['action']);
             } else {
                 $i -= 1;
@@ -670,7 +670,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
 
         // When there is no installedAs data we expect install
         $package['sample']['installedAs'] = false;
-        $testResult = FreePbx_Installer::determineActions($package, 'sample');
+        $testResult = Bluebox_Installer::determineActions($package, 'sample');
         $this->assertEquals('install', $testResult['sample']['action']);
 
         // Get fresh data to work with
@@ -678,18 +678,18 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
 
         // If we process with a invalid action then make sure it gets cleared
         $package['sample']['action'] = 'this is not a valid action';
-        $testResult = FreePbx_Installer::determineActions($package);
+        $testResult = Bluebox_Installer::determineActions($package);
         $this->assertEquals(false, $testResult['sample']['action']);
 
         // If we process with a invalid action but we are scheduled for install, then it should be overridden
-        $testResult = FreePbx_Installer::determineActions($package, 'sample');
+        $testResult = Bluebox_Installer::determineActions($package, 'sample');
         $this->assertEquals('install', $testResult['sample']['action']);
 
         // If we process with a valid action it should not be changed
         foreach ($this->validActions as $validAction)
         {
             $package['sample']['action'] = $validAction;
-            $testResult = FreePbx_Installer::determineActions($package);
+            $testResult = Bluebox_Installer::determineActions($package);
             $this->assertEquals($package, $testResult);
         }
 
@@ -697,13 +697,13 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package['sample']['action'] = $validAction;
-            $testResult = FreePbx_Installer::determineActions($package, 'sample');
+            $testResult = Bluebox_Installer::determineActions($package, 'sample');
             $this->assertEquals($package, $testResult);
         }
     }
 
 	/**
-	 * Tests the FreePbx_Installer::packageAvailable() function
+	 * Tests the Bluebox_Installer::packageAvailable() function
 	 * @group core.libraries.installer.packageAvailable
 	 * @test
 	 */
@@ -715,14 +715,14 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
 
         // If the module is not in the list then it is considered -1 (missing)
         $package['sample']['installedAs'] = false;
-        $testResult = FreePbx_Installer::packageAvailable(array(), 'sample');
+        $testResult = Bluebox_Installer::packageAvailable(array(), 'sample');
         $this->assertEquals(-1, $testResult);
 
         // Run all actions on a uninstalled package that is in the list
         foreach ($this->validActions as $validAction)
         {
             $package['sample']['action'] = $validAction;
-            $testResult = FreePbx_Installer::packageAvailable($package, 'sample');
+            $testResult = Bluebox_Installer::packageAvailable($package, 'sample');
 
             if ($validAction == 'downgrade' || $validAction == 'install' || $validAction == 'upgrade')
             {
@@ -745,7 +745,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package['sample']['action'] = $validAction;
-            $testResult = FreePbx_Installer::packageAvailable($package, 'sample');
+            $testResult = Bluebox_Installer::packageAvailable($package, 'sample');
 
             if ($validAction == 'uninstall')
             {
@@ -778,7 +778,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package['sample']['action'] = $validAction;
-            $testResult = FreePbx_Installer::packageAvailable($package, 'sample');
+            $testResult = Bluebox_Installer::packageAvailable($package, 'sample');
 
             if ($validAction == 'uninstall')
             {
@@ -805,7 +805,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
 
         // We are going to re-run all the tests but with errors which should void all actions
 
-        FreePbx_Installer::$errors['sample'] = 'THIS WILL CHANGE EXPECTED RESULTS';
+        Bluebox_Installer::$errors['sample'] = 'THIS WILL CHANGE EXPECTED RESULTS';
 
         // Get fresh data to work with
         $package = $this->singlePackage();
@@ -813,14 +813,14 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
 
         // If the module is not in the list then it is considered -1 (missing)
         $package['sample']['installedAs'] = false;
-        $testResult = FreePbx_Installer::packageAvailable(array(), 'sample');
+        $testResult = Bluebox_Installer::packageAvailable(array(), 'sample');
         $this->assertEquals(-1, $testResult);
 
         // Run all actions on a uninstalled package that is in the list
         foreach ($this->validActions as $validAction)
         {
             $package['sample']['action'] = $validAction;
-            $testResult = FreePbx_Installer::packageAvailable($package, 'sample');
+            $testResult = Bluebox_Installer::packageAvailable($package, 'sample');
 
             // If the package is uninstalled and has errors we expect 0
             $this->assertEquals(0, $testResult);
@@ -834,7 +834,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package['sample']['action'] = $validAction;
-            $testResult = FreePbx_Installer::packageAvailable($package, 'sample');
+            $testResult = Bluebox_Installer::packageAvailable($package, 'sample');
 
             // If the package is installed but disabled and has errors we expect 1
             $this->assertEquals(1, $testResult);
@@ -848,7 +848,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         foreach ($this->validActions as $validAction)
         {
             $package['sample']['action'] = $validAction;
-            $testResult = FreePbx_Installer::packageAvailable($package, 'sample');
+            $testResult = Bluebox_Installer::packageAvailable($package, 'sample');
 
             // If the package is installed and has errors we expect 2
             $this->assertEquals(2, $testResult);
@@ -856,7 +856,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
     }
 
 	/**
-	 * Tests the FreePbx_Installer::dependencySort() function
+	 * Tests the Bluebox_Installer::dependencySort() function
 	 * @group core.libraries.installer.dependencySort
 	 * @test
 	 */
@@ -874,9 +874,9 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         $package3['sample3']['action'] = 'install';
 
         // Set up known relationships
-        $package1['sample1']['required'] = array( 'core' => FreePbx_Controller::$version, 'sample2' => 0.1 );
-        $package2['sample2']['required'] = array( 'core' => FreePbx_Controller::$version );
-        $package3['sample3']['required'] = array( 'core' => FreePbx_Controller::$version, 'sample1' => 0.1,  'sample2' => 0.1);
+        $package1['sample1']['required'] = array( 'core' => Bluebox_Controller::$version, 'sample2' => 0.1 );
+        $package2['sample2']['required'] = array( 'core' => Bluebox_Controller::$version );
+        $package3['sample3']['required'] = array( 'core' => Bluebox_Controller::$version, 'sample1' => 0.1,  'sample2' => 0.1);
 
         // The expected order
         $expected = array (
@@ -886,19 +886,19 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
         );
 
         $packages = array_merge($package1, $package2, $package3);
-        FreePbx_Installer::_dependencySort($packages);
+        Bluebox_Installer::_dependencySort($packages);
         $this->assertEquals($expected, array_keys($packages));
 
         $packages = array_merge($package3, $package2, $package1);
-        FreePbx_Installer::_dependencySort($packages);
+        Bluebox_Installer::_dependencySort($packages);
         $this->assertEquals($expected, array_keys($packages));
 
         $packages = array_merge($package3, $package1, $package2);
-        FreePbx_Installer::_dependencySort($packages);
+        Bluebox_Installer::_dependencySort($packages);
         $this->assertEquals($expected, array_keys($packages));
 
         $packages = array_merge($package2, $package1, $package3);
-        FreePbx_Installer::_dependencySort($packages);
+        Bluebox_Installer::_dependencySort($packages);
         $this->assertEquals($expected, array_keys($packages));
     }
 
@@ -924,8 +924,8 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
                 'summary' => 'summary',
                 'description' => 'description',
                 'default' => true,
-                'categories' => FreePbx_Installer::TYPE_PLUGIN,
-                'required' => array ( 'core' => FreePbx_Controller::$version ),
+                'categories' => Bluebox_Installer::TYPE_PLUGIN,
+                'required' => array ( 'core' => Bluebox_Controller::$version ),
                 'displayName' => 'displayName',
                 'canBeDisabled' => true,
                 'canBeRemoved' => true,
@@ -970,8 +970,8 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
                 'summary' => 'summary'.$num,
                 'description' => 'description'.$num,
                 'default' => true,
-                'categories' => FreePbx_Installer::TYPE_PLUGIN,
-                'required' => array ( 'core' => FreePbx_Controller::$version ),
+                'categories' => Bluebox_Installer::TYPE_PLUGIN,
+                'required' => array ( 'core' => Bluebox_Controller::$version ),
                 'displayName' => 'displayName'.$num,
                 'canBeDisabled' => true,
                 'canBeRemoved' => true,
@@ -1001,7 +1001,7 @@ class Library_Installer_Test extends PHPUnit_Framework_TestCase
     }
 }
 
-class Issue_Configure extends FreePbx_Configure
+class Issue_Configure extends Bluebox_Configure
 {
     public static function _checkIgnored()
     {
@@ -1044,7 +1044,7 @@ class Issue_Configure extends FreePbx_Configure
     }
 }
 
-class Empty_Configure extends FreePbx_Configure
+class Empty_Configure extends Bluebox_Configure
 {
 
 

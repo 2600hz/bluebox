@@ -1,5 +1,5 @@
 <?php
-class File extends FreePbx_Record
+class File extends Bluebox_Record
 {
     /**
      * Sets the table name, and defines the table columns.

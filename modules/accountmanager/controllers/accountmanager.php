@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
-* FreePBX Modular Telephony Software Library / Application
+* Bluebox Modular Telephony Software Library / Application
 *
 * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
 * you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -9,7 +9,7 @@
 * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
 * express or implied. See the License for the specific language governing rights and limitations under the License.
 *
-* The Original Code is FreePBX Telephony Configuration API and GUI Framework.
+* The Original Code is Bluebox Telephony Configuration API and GUI Framework.
 * The Original Developer is the Initial Developer.
 * The Initial Developer of the Original Code is Darren Schreiber
 * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
@@ -21,10 +21,10 @@
  *
  * @author Darren Schreiber <d@d-man.org>
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage AccountManager
  */
-class AccountManager_Controller extends FreePbx_Controller
+class AccountManager_Controller extends Bluebox_Controller
 {
     public $writable = array(
         'name',
@@ -136,7 +136,7 @@ class AccountManager_Controller extends FreePbx_Controller
                     $options['account'] = $this->account->toArray();
                     $options['location'] = array('name' => 'New Location', 'domain' => $domain);
                     $options['user'] = array('username' => $username, 'password' => $password);
-                    FreePbx_Tenant::initializeTenant($options);
+                    Bluebox_Tenant::initializeTenant($options);
                     // TODO: Create a site based on URL...
 
                     // Success - display a custom save message, or a generalized one using the class name
@@ -149,9 +149,9 @@ class AccountManager_Controller extends FreePbx_Controller
                 catch(Doctrine_Connection_Exception $e) {
                     message::set('Doctrine error: ' . $e->getMessage());
                 }
-                catch(FreePbx_Exception $e) {
+                catch(Bluebox_Exception $e) {
                     kohana::log('alert', $e->getMessage());
-                    // Note that $this->view->errors is automatically populated by FreePbx_Record
+                    // Note that $this->view->errors is automatically populated by Bluebox_Record
                     message::set('Please correct the errors listed below.');
                 }
                 catch (Exception $e) {

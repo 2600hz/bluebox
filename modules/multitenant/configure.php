@@ -1,14 +1,14 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * MultiTenant - Add multi-tenancy support to all of FreePBX v3
+ * MultiTenant - Add multi-tenancy support to all of Bluebox v3
  *
  * Gives info about how to install this module
  *
  * @author Darren Schreiber
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage NetList
  */
-class MultiTenant_Configure extends FreePbx_Configure
+class MultiTenant_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'multitenant';
@@ -16,10 +16,10 @@ class MultiTenant_Configure extends FreePbx_Configure
     public static $author = 'Darren Schreiber';
     public static $vendor = 'SwitchFreedom';
     public static $license = 'Closed / Copyright 2010 SwitchFreedom.';
-    public static $summary = 'Adds multi-tenancy support to all of FreePBX v3.';
+    public static $summary = 'Adds multi-tenancy support to all of Bluebox v3.';
     public static $description = 'Adds appropriate columns, hooks and query checks to allow for multiple tenants to exist on the same system and database schema.';
     public static $default = TRUE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'freeswitch' => '0.1'

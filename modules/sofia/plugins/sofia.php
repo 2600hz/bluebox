@@ -4,10 +4,10 @@
  * Sofia_Plugin.php - puts the phones registration status into device manager grid
  * @author K Anderson
  * @license LGPL
- * @package FreePBX3
+ * @package Bluebox
  */
 
-class Sofia_Plugin extends FreePbx_Plugin
+class Sofia_Plugin extends Bluebox_Plugin
 {
     public function index()
     {

@@ -1,0 +1,937 @@
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
+abstract class Bluebox_Controller extends Template_Controller
+{
+    const SUBMIT_CONFIRM = 'confirm';
+
+    const SUBMIT_DENY = 'deny';
+
+    /**
+     * @var float The bluebox core version
+     */
+    public static $version = '3.0';
+
+    /*************************
+    * DATA RELATED SETTINGS *
+    *************************/
+    /**
+     * The name of the base model that this class is likely to reference. For example, if you are making a devicemanager module,
+     * your base model is probably 'Device'. Must be capitalized in Doctrine form and match an existing model.
+     *
+     * This is used to figure out how to automatically parse and save your data in the doSave() method.
+     * @var string
+     */
+    protected $baseModel;
+
+    /**
+     *
+     * @var Validation A validator object for validating form data. This is global to this controller and can be used by plugins.
+     */
+    public static $validation;
+
+    /**
+     * TODO: This is part of the silliest hack I have ever had to do,
+     * see function post_template
+     */
+    public static $onPageAssets = array('js' => array(), 'css' => array());
+    
+    /**
+     * Our constructor. Here, we setup our template controller, including the general layout, any skins we're using, and so on.
+     * We also load the current logged in user, setup CSS and JavaScript includes, and add a few hooks for generating our page.
+     * Last modified by K Anderson 06-07-09
+     *
+     */
+    /*******************
+    * PUBLIC METHODS *
+    ******************/
+    public function __construct()
+    {        
+        /*****************
+        * GENERAL SETUP *
+        *****************/
+        // Guess at the baseModel name if none has been set. Use the controller's basename as the guess
+        if (!$this->baseModel)
+        {
+            $this->baseModel = ucfirst(str_replace('_Controller', '', get_class()));
+        }
+        
+        // Instantiate sessions
+        $this->session = Session::instance();
+
+        if (!request::is_ajax())
+        {
+            $this->session->set('ajax.base_controller', strtolower(Router::$controller));
+
+            $this->session->set('ajax.base_method', strtolower(Router::$method));
+        }
+
+        // Create a static validator, if one does not already exist. By default we populate it with post variables
+        // This will hold all errors that occur within Doctrine and provides easy access for the controller to grab those errors
+        // Note carefully that this is intentionally a singleton - Doctrine does not otherwise know which controller is associated
+        // with which record. This implies that your errors will get stacked up on top of each other, but since it's one controller
+        // per run of Kohana, we should be OK here. You can also use Kohana's validation class methods here, too.
+        // FIXME: This should be moved!!!
+        self::$validation = new Validation($_POST);
+
+        //$this->freshInstall();
+        //die();
+
+        // Setup anything related to this website's pages rendering
+        Event::run('bluebox.setup', $this);
+
+        // Setup anything related to authenticating the user
+        Event::run('bluebox.authenticate', $this);
+
+        // Setup anything related to authorizing the user
+        Event::run('bluebox.authorize', $this);
+
+        /*******************
+        * RENDERING SETUP *
+        *******************/
+        // For safety, fail back to HTML if this is not set
+        if (!defined('CONTENT_TYPE'))
+        {
+            // take all the URL elements used for routing and explode on /
+            $pathParts = explode('/', Router::$current_uri);
+
+            $content_type = 'html';
+
+            foreach ($pathParts as $part)
+            {
+                // see if there is an extension on each part
+                $extension = pathinfo($part, PATHINFO_EXTENSION);
+
+                // if we find a html, json, xml extension then save it, keeping the last found extension
+                if (!empty($extension) && in_array(strtolower($extension), array('html', 'json', 'xml')))
+                {
+                    $content_type = strtolower($extension);
+                }
+            }
+
+            define('CONTENT_TYPE', $content_type);
+        }
+                
+        // Set the default template, viewName and failback view to use, based on the content type.
+        // NOTE: It's perfectly fine to override this in the template setup hooks
+        switch (CONTENT_TYPE)
+        {
+            case 'json':
+                $this->viewParams['template'] = 'json/layout';
+
+                $this->viewParams['name'] = Router::$controller . '/json/' . Router::$method;
+
+                $this->viewParams['fallback'] = 'NO CONTENT';
+
+                break;
+
+            case 'xml':
+                $this->viewParams['template'] = 'xml/layout';
+
+                $this->viewParams['name'] = Router::$controller . '/xml/' . Router::$method;
+
+                $this->viewParams['fallback'] = '<xml><error>No Content</error></xml>';
+
+                break;
+
+            default:
+                if (request::is_ajax())
+                {
+                    $this->viewParams['template'] = 'ajax';
+                } 
+                else
+                {
+                    $this->viewParams['template'] = 'layout';
+                }
+
+                $this->viewParams['name'] = Router::$controller . '/' . Router::$method;
+
+                $this->viewParams['fallback'] = 'ERROR: There is no viewable content for this page';
+
+                break;
+                
+        };
+        
+        // NOTE: You can optionally set $viewFolder here to try an alternate folder for all views.
+        // If the view doesn't exist, $viewFolder is ignored
+        $this->viewParams['folder'] = '';
+
+        // Call all setup hooks related to content type.
+        Event::run('bluebox.createtemplate.' .CONTENT_TYPE, $this);
+
+        /********************
+        * PREPARE TEMPLATE *
+        ********************/
+        $this->template = $this->viewParams['folder'] . $this->viewParams['template'];
+        
+        // Call our parent controller's constructor
+        // NOTE: This prepares our view and converts $this->template into an object.
+        // Changes to $this->viewParams['template'] are ignored past this point
+        parent::__construct();
+
+        /*******************
+        * PREPARE CONTENT *
+        *******************/
+        if (CONTENT_TYPE == 'html')
+        {
+            // Initialize default HTML content
+            $this->template->css = '';
+
+            $this->template->js = '';
+
+            $this->template->meta = '';
+
+            $this->template->header = '';
+
+            $this->template->footer = '';
+            
+            // Set the page title
+            $this->template->title = ucfirst(Router::$controller);
+
+            if (Router::$method != 'index')
+            {
+                // Index is always a boring name, don't use it (but use everything else)
+                $this->template->title .= ' -> ' . ucfirst(Router::$method);
+            }
+        }
+
+        try
+        {
+            $this->template->content = new View($this->viewParams['folder'] . $this->viewParams['name']);
+        } 
+        catch(Exception $e)
+        {
+            try
+            {
+                $this->template->content = new View($this->viewParams['name']);
+            } 
+            catch(Exception $e)
+            {
+                $this->template->content = new View();
+
+                $this->template->body = $this->viewParams['fallback'];
+            }
+        }
+
+        /********************
+        * FINALIZE CONTENT *
+        ********************/
+        // Make it easier to get to and remember how to access the core view by setting up a reference to the template, called view
+        $this->view = & $this->template->content;
+
+        // Call the constructor's for all plugins registered
+        plugins::construct();
+
+        // Setup anything related to authorizing the user
+        Event::run('bluebox.ready', $this);
+    }
+
+    /**
+     * This generic create function will add new entries of $baseModel
+     */
+    public function create()
+    {
+        $base = strtolower($this->baseModel);
+        
+        $this->createView();
+
+        $this->loadBaseModel();
+
+        $this->updateOnSubmit($this->$base);
+
+        $this->prepareUpdateView();
+    }
+
+    /**
+     * This generic edit function will update entries of $baseModel
+     */
+    public function edit($id = NULL)
+    {
+        $base = strtolower($this->baseModel);
+
+        $this->createView();
+
+        $this->loadBaseModel($id);
+
+        $this->updateOnSubmit($this->$base);
+        
+        $this->prepareUpdateView();
+    }
+
+    /**
+     * This generic delete function will remove entries of $baseModel
+     */
+    public function delete($id = NULL)
+    {
+        $base = strtolower($this->baseModel);
+
+        $this->createView();
+
+        $this->loadBaseModel($id);
+
+        $this->deleteOnSubmit($this->$base);
+
+        $this->prepareDeleteView();
+    }
+
+    /**
+     * Return the baseModel
+     *
+     * @return sting
+     */
+    public function getBaseModel()
+    {
+        return $this->baseModel;
+    }
+
+    /**
+     * Checks for the existance of speciall vars in the post to determine
+     * if the page has been submitted and if so weither the action was cancle or
+     * confirm.
+     *
+     * @param array A list of the parameters to controll the vars it checks for
+     * @return mixed
+     */
+    public function submitted($options = array())
+    {
+        // if options is not provided as an array assume it is a
+        // requestVar
+        if (!is_array($options))
+        {
+            $options = array('requestVar' => $options);
+        }
+
+        // load the defaults into the options array
+        $options += array (
+            'submitString' => 'save',
+            'cancelString' => 'cancel',
+            'requestVar' => 'submit'
+        );
+
+        // if the requestVar is empty then we will only check for the
+        // existance of any post vars
+        if (!empty($options['requestVar']))
+        {
+            // if the requestVar is not in the post then this is not
+            // submitted
+            if (empty($_REQUEST[$options['requestVar']]))
+            {
+                return FALSE;
+            } 
+            else
+            {
+                $requestVar = $_REQUEST[$options['requestVar']];
+            }
+
+            // if the requestVar matches the cancel string then we where
+            // canceled
+            if (strcasecmp($requestVar, $options['cancelString']) == 0)
+            {
+                return self::SUBMIT_DENY;
+            }
+
+            // if the requestVar matches the cancel string then we where
+            // submitted
+            if (strcasecmp($requestVar, $options['submitString']) == 0)
+            {
+                return self::SUBMIT_CONFIRM;
+            }
+
+            // no match for the cancel or submit but the requestVar was
+            // present, leave it up to the controller
+            return FALSE;
+        }
+
+        // if we got here it is because we only want to know if there are any
+        // post vars at all
+        if (sizeof($this->input->post()) != 0)
+        {
+            return TRUE;
+        }
+        
+        return FALSE;
+    }
+    
+    /**
+     * This function process the render, catching the output
+     * and adding any jquery assets where necessary
+     *
+     * @return void
+     */
+    public function _render()
+    {
+        if ($this->auto_render == TRUE)
+        {        
+            // If XML, render it
+            if (CONTENT_TYPE == 'xml')
+            {
+                echo $this->renderXml();
+            } 
+            elseif (CONTENT_TYPE == 'json')
+            {
+                // Render the template when the class is destroyed
+                //$output = $this->template->render(false);
+                echo $this->renderJson();
+            } 
+            else
+            {
+                // Add some makers so we now where to place jquery assets
+                $this->template->js .= "\n{js}";
+                $this->template->css .= "\n{css}";
+
+                // Render the template when the class is destroyed
+                $output = $this->template->render(false);
+
+                // Initialize a default jquery assets array so the implodes dont explode :)
+                $assets = array(
+                    'js' => array(),
+                    'css' => array()
+                );        
+                
+                $this->post_template($assets);
+
+                $_SESSION['session.test'] = 'test';
+
+                // Put the new assets into the output where we mark before
+                $output = str_replace(array(
+                    '{js}',
+                    '{css}'
+                ) , array(
+                    implode($assets['js'], "\n"),
+                    implode($assets['css'], "\n")
+                ) , $output);
+
+                // Echo the output, this is the original behavor of _render()
+                echo $output;
+            }
+        }
+    }
+
+    /**
+     * This function will close a qtipAjaxForm with a message and action
+     *
+     * @param Doctrine_Record The newly created doctrine record
+     * @param bool If true this it will force the reply even if no qtipAjaxForm is present
+     */
+    public function returnQtipAjaxForm($object = NULL, $force = FALSE)
+    {
+        if (!empty($_REQUEST['qtipAjaxForm']) || $force)
+        {
+            if (headers_sent())
+            {
+                kohana::log('error', 'Unable to reply to modal because headers are already sent');
+
+                die();
+            }
+
+            $this->template->content = new View('generic/blank');
+
+            header("X-AjaxForm-Status: complete");
+            
+            if(method_exists($this, 'qtipAjaxReturn'))
+            {
+                $this->qtipAjaxReturn($object);
+            }
+
+            message::render(array(), array('growl' => TRUE, 'html' => FALSE));
+            
+            $this->_render();
+
+            flush();
+
+            die();
+        }
+    }
+
+    /**
+     * This will inform a qtipAjaxForm request that there is not more
+     * context, and therefore it will hide.  Usefull for 'success' actions
+     *
+     * @param bool If true this it will force the reply even if no qtipAjaxForm is present
+     */
+    public function exitQtipAjaxForm($force = FALSE)
+    {
+        if (!empty($_REQUEST['qtipAjaxForm']) || $force)
+        {
+            if (headers_sent())
+            {
+                kohana::log('error', 'Unable to reply to modal because headers are already sent');
+
+                die();
+            }
+
+            header('HTTP/1.0 204 No Content');
+
+            header("X-AjaxForm-Status: cancel");
+
+            header('Content-Length: 0',true);
+
+            header('Content-Type: text/html',true);
+
+            flush();
+
+            die();
+        }
+    }
+
+    public function qtipAjaxReturn($data)
+    {
+        javascript::codeBlock('$(\'.jqgrid_instance\').trigger("reloadGrid");');
+    }
+    
+    /**
+     * Performs de-population of model :)
+     *
+     * @param object The base object to save
+     * @param string The message to display if successful
+     * @return bool
+     */
+    protected function formDelete(&$object, $deleteMessage = NULL, $deleteEvents = array())
+    {
+        // Delete data and all relations
+        try
+        {
+            // Bring out the Gimp.
+            $conn = Doctrine_Manager::connection();
+
+            $conn->beginTransaction();
+
+            $this->delete_prepare($object);
+
+            // Allow plugins to process any data related to this object prior to deletion
+            if(!plugins::delete($this, $deleteEvents))
+            {
+                throw new Bluebox_Exception('Plugins failed to delete');
+            }
+
+            $this->pre_delete($object);
+
+            // Delete this base record
+            $object->delete();
+
+            $conn->commit();
+
+            $this->post_delete($object);
+
+            // Success - optionally set a delete message
+            if (is_null($deleteMessage))
+            {
+                message::set(get_class($object) . ' removed!', array(
+                    'type' => 'success'
+                ));
+            } 
+            else if (!empty($deleteMessage))
+            {
+                message::set($deleteMessage, array(
+                    'type' => 'success'
+                ));
+            }
+
+            $this->delete_succeeded($object);
+
+            return TRUE;
+        } 
+        catch(Doctrine_Connection_Exception $e)
+        {
+            message::set('Doctrine error: ' . $e->getMessage());
+        } 
+        catch(Bluebox_Exception $e)
+        {
+            message::set('Please correct the errors listed below.');
+
+            kohana::log('alert', $e->getMessage());
+        } 
+        catch (Exception $e)
+        {
+            message::set($e->getMessage());
+        }
+
+        if ($conn)
+        {
+            $conn->rollback();
+        }
+
+        $this->delete_failed($object);
+
+        return FALSE;
+    }
+
+    /**
+     * Performs population of model
+     *
+     * @param object The base object to save
+     * @param string The message to display if successful
+     * @return bool
+     */
+    protected function formSave(&$object, $saveMessage = NULL, $saveEvents = array())
+    {
+        // Determine name of the base model for the object being saved
+        if (get_parent_class($object) == 'Bluebox_Record')
+        {
+            $baseClass = get_class($object);
+        } 
+        else
+        {
+            $baseClass = get_parent_class($object);
+        }
+
+        // Import any post vars with the key of this model into the object
+        $object->fromArray($this->input->post(strtolower($baseClass), array()));
+
+        // Save data and all relations
+        try
+        {
+            $this->save_prepare($object);
+
+            // Allow plugins to process any form-related data we just got back and attach to our data object
+            if(!plugins::save($this, $saveEvents))
+            {
+                throw new Bluebox_Exception('Plugins failed to save');
+            }
+
+            $this->pre_save($object);
+
+            // Save this base record
+            $object->save();
+
+            $this->post_save($object);
+
+            // Success - optionally set a save message
+            if (is_null($saveMessage))
+            {
+                message::set(get_class($object) . ' saved!', array(
+                    'type' => 'success'
+                ));
+            } 
+            else if (!empty($saveMessage))
+            {
+                message::set($saveMessage, array(
+                    'type' => 'success'
+                ));
+            }
+
+            $this->save_succeeded($object);
+
+            return TRUE;
+            
+        } 
+        catch(Doctrine_Connection_Exception $e)
+        {
+            message::set('Doctrine error: ' . $e->getMessage());
+        } 
+        catch (Bluebox_Validation_Exception $e)
+        {
+            message::set('Please correct the errors listed below.');
+            
+            kohana::log('alert', $e->getMessage());
+        } 
+        catch(Bluebox_Exception $e)
+        {
+            message::set('Please correct the errors listed below.');
+
+            kohana::log('alert', $e->getMessage());
+        } 
+        catch (Exception $e)
+        {
+            message::set($e->getMessage());   
+        }
+
+        $this->save_failed($object);
+
+        return FALSE;
+    }
+
+    protected function updateOnSubmit($base)
+    {
+        if ($action = $this->submitted())
+        {
+            if (($action == self::SUBMIT_CONFIRM) AND ($this->formSave($base)))
+            {
+                $this->returnQtipAjaxForm($base);
+
+                url::redirect(Router_Core::$controller);
+            } 
+            else if ($action == self::SUBMIT_DENY)
+            {
+                $this->exitQtipAjaxForm();
+
+                url::redirect(Router_Core::$controller);
+            }
+        }
+    }
+
+    protected function deleteOnSubmit($base)
+    {
+        if ($action = $this->submitted(array('submitString' => 'delete')))
+        {
+            if (($action == self::SUBMIT_CONFIRM) AND ($this->formDelete($base)))
+            {
+                $this->returnQtipAjaxForm(NULL);
+
+                url::redirect(Router_Core::$controller);   
+            } 
+            else if ($action == self::SUBMIT_DENY)
+            {    
+                $this->exitQtipAjaxForm();
+
+                url::redirect(Router_Core::$controller);
+            }
+        }
+    }
+
+    protected function createView()
+    {
+        // Overload the update view
+        if (strcasecmp(Router::$method, 'delete') == 0)
+        {
+            $this->template->content = new View('generic/delete');
+        }
+        else
+        {
+            $this->template->content = new View(Router::$controller . '/update');
+        }
+
+        $this->view->title = ucfirst(Router::$method) .' ' .ucfirst($this->baseModel);
+
+        Event::run('bluebox.create_view', $this->view);
+    }
+
+    protected function loadBaseModel($id = NULL)
+    {
+        // Short hand for the baseModel
+        $base = strtolower($this->baseModel);
+
+        if (is_null($id))
+        {
+            $this->$base = new $this->baseModel();
+        }
+        else
+        {
+            $this->$base = Doctrine::getTable($this->baseModel)->find($id);
+
+            // Was anything retrieved? If no, this may be an invalid request
+            if (!$this->$base)
+            {
+                // Send any errors back to the index
+                message::set('Unable to locate ' .ucfirst($this->baseModel) .' id ' .$id .'!');
+
+                $this->returnQtipAjaxForm(NULL);
+
+                url::redirect(Router_Core::$controller);
+            }
+        }
+
+        $this->view->base = $base;
+
+        Event::run('bluebox.load_base_model', $this->$base);
+    }
+
+    protected function prepareUpdateView()
+    {
+        $base = strtolower($this->baseModel);
+
+        // Allow our location object to be seen by the view
+        $this->view->$base = $this->$base;
+
+        Event::run('bluebox.prepare_update_view', $this->view);
+
+        // Execute plugin hooks here, after we've loaded the core data sets
+        plugins::views($this);
+    }
+
+    protected function prepareDeleteView()
+    {
+        $base = strtolower($this->baseModel);
+        
+        // Set the vars that the generic delete will be expecting
+        $this->view->baseModel = strtolower($this->baseModel);
+
+        if (isset($this->{$base}['name']))
+        {
+            $this->view->name = '\'' . $this->{$base}['name'] .'\'';
+        }
+        else if (isset($this->{$base}['number']))
+        {
+            $this->view->name = '\'' . $this->{$base}['number'] .'\'';
+        }
+        else
+        {
+            $this->view->name = ' id ' .$id;
+        }
+
+        Event::run('bluebox.prepare_delete_view', $this->view);
+
+        // Execute plugin hooks here, after we've loaded the core data sets
+        plugins::views($this);
+    }
+
+    protected function post_template(&$assets)
+    {
+        // Run an event calling jquery helper and updating the $jqueryAssets with assets
+        Event::run('system.post_template', $assets);
+
+        /**
+         * TODO: This is part of the silliest hack I have ever had to do, but
+         * setting this session var in the event during an ajax call segfaults
+         * 0xb7b6474a in gc_remove_zval_from_buffer () from /etc/httpd/modules/libphp5.so
+         */
+        $session = Session::instance();
+
+        $session->set('javascript.onPageAssets', self::$onPageAssets['js']);
+
+        $session->set('stylesheet.onPageAssets', self::$onPageAssets['css']);
+    }
+
+    protected function delete_prepare(&$object)
+    {
+        // Let things know we are about to delete
+        Event::run('bluebox.delete_prepare', $object);
+    }
+
+    protected function pre_delete(&$object)
+    {
+        // Let things mess with our object
+        Event::run('bluebox.pre_delete', $object);
+    }
+
+    protected function post_delete(&$object)
+    {
+        // Let things respond to the delete
+        Event::run('bluebox.post_delete', $object);
+    }
+
+    protected function delete_succeeded(&$object)
+    {
+        // Let things respond to a failed save
+        Event::run('bluebox.delete_succeeded', $object);
+    }
+
+    protected function delete_failed(&$object)
+    {
+        // Let things respond to a failed save
+        Event::run('bluebox.delete_failed', $object);
+    }
+
+    protected function save_prepare(&$object)
+    {
+        // Let things know we are about to save
+        Event::run('bluebox.save_prepare', $object);
+    }
+
+    protected function pre_save(&$object)
+    {
+        // Let things mess with our object
+        Event::run('bluebox.pre_save', $object);
+    }
+
+    protected function post_save(&$object)
+    {
+        // Let things respond to the save
+        Event::run('bluebox.post_save', $object);
+    }
+
+    protected function save_succeeded(&$object)
+    {
+        // Let things respond to a failed save
+        Event::run('bluebox.save_succeeded', $object);
+    }
+
+    protected function save_failed(&$object)
+    {
+        // Let things respond to a failed save
+        Event::run('bluebox.save_failed', $object);
+    }
+
+    
+    public function freshInstall()
+    {
+        // Get the doctrine overlord
+        $manager = Doctrine_Manager::getInstance();
+        $conn = $manager->getCurrentConnection();
+        try {
+            // See if we can connect to the DB
+            $conn->connect();
+        } catch(Doctrine_Connection_Exception $e) {
+            // We could connect earlier, hmmm....
+            try {
+                Doctrine::createDatabases();
+            } catch(Exception $e) {
+                // We cant resolve this issue without the user
+                message::set('Unable to establish a connection to '
+                    .$this->session->get('installer.dbName')
+                    .'! <div class="error_details">' . $e->getMessage() . '</div>'
+                );
+                return false;
+            }
+        }
+
+        // See if the DB has any tables in it
+        $tables = $conn->import->listTables();
+
+        if (!empty($tables)) {
+            // Yup, there are tables in our soon to be fresh install db, remove them
+            try {
+                $dsn = $conn->getOption('dsn');
+                $dsn = $manager->parsePdoDsn($dsn);
+                $tmpConn = $conn->getTmpConnection($dsn);
+                $conn->close();
+                $tmpConn->export->dropDatabase($dsn['dbname']);
+                $tmpConn->export->createDatabase($dsn['dbname']);
+                $manager->closeConnection($tmpConn);
+                $conn->connect();
+            } catch(Exception $e) {
+                // We cant resolve this issue without the user
+                message::set('Unable to recreate database '
+                    .$this->session->get('installer.dbName')
+                    .'! <div class="error_details">' . $e->getMessage() . '</div>'
+                );
+                return false;
+            }
+        }
+
+        // Add in the core tables (only core!)
+        try {
+            $models = Doctrine::loadModels(APPPATH . 'models/', Doctrine::MODEL_LOADING_CONSERVATIVE);
+            Doctrine::createTablesFromModels();
+           // foreach($models as $model) Kohana::log('debug', 'INSTALLER::Create core table ' . $model);
+        } catch(Exception $e) {
+            message::set('Unable to create core tables!'
+                .'<div class="error_details">' . $e->getMessage() . '</div>'
+            );
+            return false;
+        }
+
+        // For each core table see if there is an initialization routine and run it
+        $initMethods = get_class_methods('Bluebox_Initialize');
+        $initMethods = array_filter($initMethods, array(
+            $this,
+            '_filterInitMethods'
+        ));
+
+        // For each method found run it and build a results array with the result
+        foreach($initMethods as $initMethod) {
+            try {
+                call_user_func(array(
+                    'Bluebox_Initialize',
+                    $initMethod
+                ));
+                Kohana::log('debug', 'Core table ' .$initMethod . ' complete');
+                } catch(Exception $e) {
+                    Kohana::log('error', 'Core table ' .$initMethod . ' failed! ' . $e->getMessage());
+                    message::set('Unable to initialize core table!'
+                        .'<div class="error_details">' . $e->getMessage() . '</div>'
+                    );
+                    return false;
+                }
+        }
+    }
+
+    private function _filterInitMethods($var)
+    {
+        return strstr($var, 'initialize');
+    }
+    
+}
+
+function __($text) {
+    return $text;
+}

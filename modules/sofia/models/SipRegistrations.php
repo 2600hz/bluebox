@@ -28,7 +28,7 @@
  * @author     ##NAME## <##EMAIL##>
  * @version    SVN: $Id: Builder.php 5925 2009-06-22 21:27:17Z jwage $
  */
-class SipRegistrations extends FreePbx_Record
+class SipRegistrations extends Bluebox_Record
 {
     public function setTableDefinition()
     {

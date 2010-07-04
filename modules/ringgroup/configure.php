@@ -1,15 +1,15 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class Ringgroup_Configure extends FreePbx_Configure
+class Ringgroup_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'ringgroup';
     public static $displayName = 'Ring Group';
     public static $author = 'K Anderson';
-    public static $vendor = 'FreePBX';
+    public static $vendor = 'Bluebox';
     public static $license = 'LGPL';
     public static $summary = 'Ring Group Plugin';
     public static $default = true;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

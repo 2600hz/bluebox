@@ -24,7 +24,7 @@ class VoicemailManager
 {
 	private static $instance 	= null; 	// Singleton instance
 	private static $username 	= null; 	// Username part of the sip address
-	private static $domain 		= null; 	// Domain of the sip address, i.e. freepbx.org
+	private static $domain 		= null; 	// Domain of the sip address, i.e. bluebox.org
 	private static $device_id 	= null; 	// Device id.
 	private $esl 	= null; 	// Device id.
 	

@@ -1,23 +1,23 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * FreePbxManager_Controller.php - The one to rule them all....
+ * BlueboxManager_Controller.php - The one to rule them all....
  * Created on Jun 2, 2009
  *
  * @author Karl Anderson
  * @license LGPL
- * @package FreePBX3
- * @subpackage FreePBX_Manager
+ * @package Bluebox
+ * @subpackage Bluebox_Manager
  */
-class FreePbxManager_Controller extends FreePbx_Controller
+class BlueboxManager_Controller extends Bluebox_Controller
 {
     protected $writable = array();
     protected $baseModel = 'Modules';
     private $tempPackagePath = '';
     public function index()
     {
-        stylesheet::add('freepbxmanager', 40);
+        stylesheet::add('blueboxmanager', 40);
         // Get a list of the current packages
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         $posts = $this->input->post();
         if (!empty($posts['submit'])) {
             // Run through each of the submitted post vars
@@ -34,13 +34,13 @@ class FreePbxManager_Controller extends FreePbx_Controller
                 }
             }
             // Make sure these new actions arent going to end in tears
-            $packages = FreePbx_Installer::checkDependencies($packages);
+            $packages = Bluebox_Installer::checkDependencies($packages);
             // If we are cleared to process these selections
-            if (empty(FreePbx_Installer::$errors)) {
+            if (empty(Bluebox_Installer::$errors)) {
                 // Process the selections
-                if (FreePbx_Installer::processActions($packages)) {
+                if (Bluebox_Installer::processActions($packages)) {
                     // Get the bootstrap to call all the hooks again
-                    FreePbxHook::bootstrapFreePbx();
+                    BlueboxHook::bootstrapBluebox();
                     // Let the user know we did it!
                     message::set('You changes have been saved', 'success');
                 } else {
@@ -52,18 +52,18 @@ class FreePbxManager_Controller extends FreePbx_Controller
             }
         }
         // Pass all the warnings and errors onto the view
-        $packageErrors = FreePbx_Installer::$errors;
-        $packageWarnings = FreePbx_Installer::$warnings;
+        $packageErrors = Bluebox_Installer::$errors;
+        $packageWarnings = Bluebox_Installer::$warnings;
         // We need a new list reflect the changes
-        $packages = FreePbx_Installer::listPackages();
-        FreePbx_Installer::installCore($packages);
+        $packages = Bluebox_Installer::listPackages();
+        Bluebox_Installer::installCore($packages);
         if (Kohana::config('core.repositories')) foreach (Kohana::config('core.repositories') as $repository) {
-            FreePbx_Installer::checkForUpdates($packages, $repository);
+            Bluebox_Installer::checkForUpdates($packages, $repository);
         }
         // This is going to loop through and test if a package has a setting view
         // Little nasty, but in the intrest of time...it does work
         foreach($packages as $packageName => $package) {
-            $eventName = 'freepbxmanager.' . $package['packageName'] . '.view';
+            $eventName = 'blueboxmanager.' . $package['packageName'] . '.view';
             $events = Event::get($eventName);
             $packages[$package['packageName']]['hasSettings'] = !empty($events);
         }
@@ -71,12 +71,12 @@ class FreePbxManager_Controller extends FreePbx_Controller
     }
     public function settings($packageName)
     {
-        $eventName = 'freepbxmanager.' . $packageName . '.view';
+        $eventName = 'blueboxmanager.' . $packageName . '.view';
         $this->views = array();
         // Returns of the callbacks for system.post_controller
         $events = Event::get($eventName);
         // Loop through each event, instantiate the event object, and call the event.
-        // NOTE: We do this because we rely on __get/__set methods in freepbx plugins and they must be able to use $object->
+        // NOTE: We do this because we rely on __get/__set methods in bluebox plugins and they must be able to use $object->
         // to reference the current controller
         foreach($events as $event) {
             // Share our current controller w/ the event system
@@ -97,33 +97,33 @@ class FreePbxManager_Controller extends FreePbx_Controller
     public function repair($packageName)
     {
         $this->template->content = new View('blank');
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         $packages[$packageName]['action'] = 'repair';
-        if (FreePbx_Installer::processActions($packages)) message::set('Repair of ' . $packages[$packageName]['displayName'] .' complete!', 'success');
-        if (!empty(FreePbx_Installer::$warnings)) message::set($packages[$packageName]['displayName'] . ' Warning: '. arr::arrayToUL(FreePbx_Installer::$warnings[$packageName]), 'alert');
-        if (!empty(FreePbx_Installer::$errors)) message::set($packages[$packageName]['displayName'] . ' Error: '. arr::arrayToUL(FreePbx_Installer::$errors[$packageName]), 'error');
+        if (Bluebox_Installer::processActions($packages)) message::set('Repair of ' . $packages[$packageName]['displayName'] .' complete!', 'success');
+        if (!empty(Bluebox_Installer::$warnings)) message::set($packages[$packageName]['displayName'] . ' Warning: '. arr::arrayToUL(Bluebox_Installer::$warnings[$packageName]), 'alert');
+        if (!empty(Bluebox_Installer::$errors)) message::set($packages[$packageName]['displayName'] . ' Error: '. arr::arrayToUL(Bluebox_Installer::$errors[$packageName]), 'error');
         message::render(array(), array('growl' => TRUE, 'html' => FALSE));
     }
     public function uninstall($packageName)
     {
         $this->template->content = new View('blank');
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         $packages[$packageName]['action'] = 'uninstall';
-        if (FreePbx_Installer::processActions($packages)) {
+        if (Bluebox_Installer::processActions($packages)) {
             message::set($packages[$packageName]['displayName'] . ' removed!', 'success');
             jquery::addQuery('#legend_' . $packageName)->parent()->slideUp();
         } else {
-            if (!empty(FreePbx_Installer::$warnings)) message::set($packages[$packageName]['displayName'] . ' Warning: '.arr::arrayToUL(FreePbx_Installer::$warnings[$packageName]), 'alert');
-            if (!empty(FreePbx_Installer::$errors)) message::set($packages[$packageName]['displayName'] . ' Error: '.arr::arrayToUL(FreePbx_Installer::$errors[$packageName]));
+            if (!empty(Bluebox_Installer::$warnings)) message::set($packages[$packageName]['displayName'] . ' Warning: '.arr::arrayToUL(Bluebox_Installer::$warnings[$packageName]), 'alert');
+            if (!empty(Bluebox_Installer::$errors)) message::set($packages[$packageName]['displayName'] . ' Error: '.arr::arrayToUL(Bluebox_Installer::$errors[$packageName]));
         }
         message::render(array(), array('growl' => TRUE, 'html' => FALSE));
     }
     public function packages()
     {
-        stylesheet::add('freepbxmanager', 40);
-        $this->template->content = new View('freepbxmanager/index');
+        stylesheet::add('blueboxmanager', 40);
+        $this->template->content = new View('blueboxmanager/index');
         // Get a list of the current packages
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         $posts = $this->input->post();
         if (!empty($posts['submit'])) {
             $install = array();
@@ -134,13 +134,13 @@ class FreePbxManager_Controller extends FreePbx_Controller
                 // Get the package based on the name of the submittion
                 $install[] = $post;
             }
-            $packages = FreePbx_Installer::checkDependencies($packages, $install);
+            $packages = Bluebox_Installer::checkDependencies($packages, $install);
             // If we are cleared to process these selections
-            if (empty(FreePbx_Installer::$errors)) {
+            if (empty(Bluebox_Installer::$errors)) {
                 // Process the selections
-                if (FreePbx_Installer::processActions($packages, $install)) {
+                if (Bluebox_Installer::processActions($packages, $install)) {
                     // Get the bootstrap to call all the hooks again
-                    FreePbxHook::bootstrapFreePbx();
+                    BlueboxHook::bootstrapBluebox();
                     // Let the user know we did it!
                     message::set('The selected package(s) have been installed.', 'success');
                 } else {
@@ -152,32 +152,32 @@ class FreePbxManager_Controller extends FreePbx_Controller
             }
         }
         // Pass all the warnings and errors onto the view
-        $packageErrors = FreePbx_Installer::$errors;
-        $packageWarnings = FreePbx_Installer::$warnings;
+        $packageErrors = Bluebox_Installer::$errors;
+        $packageWarnings = Bluebox_Installer::$warnings;
         // We need a new list reflect the changes
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         $this->createPackageList($packages, FALSE, $packageErrors, $packageWarnings);
     }
     public function verify($packageName)
     {
         $this->template->content = new View('blank');
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         $packages[$packageName]['action'] = 'verify';
-        if (FreePbx_Installer::processActions($packages)) message::set($packages[$packageName]['displayName'] .' passed verification!', 'success');
-        if (!empty(FreePbx_Installer::$warnings)) message::set($packages[$packageName]['displayName'] . ' Warning: '.arr::arrayToUL(FreePbx_Installer::$warnings[$packageName]), 'alert');
-        if (!empty(FreePbx_Installer::$errors)) message::set($packages[$packageName]['displayName'] . ' Error: '.arr::arrayToUL(FreePbx_Installer::$errors[$packageName]), 'error');
+        if (Bluebox_Installer::processActions($packages)) message::set($packages[$packageName]['displayName'] .' passed verification!', 'success');
+        if (!empty(Bluebox_Installer::$warnings)) message::set($packages[$packageName]['displayName'] . ' Warning: '.arr::arrayToUL(Bluebox_Installer::$warnings[$packageName]), 'alert');
+        if (!empty(Bluebox_Installer::$errors)) message::set($packages[$packageName]['displayName'] . ' Error: '.arr::arrayToUL(Bluebox_Installer::$errors[$packageName]), 'error');
         message::render(array(), array('growl' => TRUE, 'html' => FALSE));
     }
     public function repair_all(){
         $this->template->content = new View('blank');
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         foreach($packages as $name => $package) {
             if ($package['installedAs'] == FALSE) continue;
             $packages[$name]['action'] = 'repair';
         }
-        if (FreePbx_Installer::processActions($packages)) message::set('Repair of all installed packages complete!', 'success');
-        if (!empty(FreePbx_Installer::$warnings)) message::set($packages[$packageName]['displayName'] . ' Warning: '. arr::arrayToUL(FreePbx_Installer::$warnings), 'alert');
-        if (!empty(FreePbx_Installer::$errors)) message::set($packages[$packageName]['displayName'] . ' Error: '. arr::arrayToUL(FreePbx_Installer::$errors), 'error');
+        if (Bluebox_Installer::processActions($packages)) message::set('Repair of all installed packages complete!', 'success');
+        if (!empty(Bluebox_Installer::$warnings)) message::set($packages[$packageName]['displayName'] . ' Warning: '. arr::arrayToUL(Bluebox_Installer::$warnings), 'alert');
+        if (!empty(Bluebox_Installer::$errors)) message::set($packages[$packageName]['displayName'] . ' Error: '. arr::arrayToUL(Bluebox_Installer::$errors), 'error');
         message::render(array(), array('growl' => TRUE, 'html' => FALSE));
     }
     /**
@@ -195,8 +195,8 @@ class FreePbxManager_Controller extends FreePbx_Controller
         $this->template->content = new View('blank');
 
         // Get a list of packages on this system
-        $packages = FreePbx_Installer::listPackages(array(), TRUE);
-        FreePbx_Installer::installCore($packages);
+        $packages = Bluebox_Installer::listPackages(array(), TRUE);
+        Bluebox_Installer::installCore($packages);
         // sanity check that we are working with a valid package
         if (empty($packages[$packageName])) {
             message::set('No such package ' .$packageName);
@@ -207,7 +207,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
         // scan each configured repository for updates
         foreach (kohana::config('core.repositories') as $repository) {
             kohana::log('debug', 'Check repo ' .$repository);
-            FreePbx_Installer::checkForUpdates($packages, $repository);
+            Bluebox_Installer::checkForUpdates($packages, $repository);
         }
         $package = $packages[$packageName];
 
@@ -271,7 +271,7 @@ class FreePbxManager_Controller extends FreePbx_Controller
         fclose($destination);
 
         // open the zip archive (our update)
-        set_error_handler(array('FreePbxManager_Controller', 'exception_handler'));
+        set_error_handler(array('BlueboxManager_Controller', 'exception_handler'));
         try {
             $zip = new ZipArchive;
             if ($zip->open($cacheDir .$updateName) === FALSE) {
@@ -332,9 +332,9 @@ class FreePbxManager_Controller extends FreePbx_Controller
 
         $isCurrentlyEnabled = $package['installedAs']['enabled'];
 
-        $configureFile = FreePbx_Installer::$configurations[$package['configureClass']];
+        $configureFile = Bluebox_Installer::$configurations[$package['configureClass']];
 
-        unset(FreePbx_Installer::$configurations[$package['configureClass']]);
+        unset(Bluebox_Installer::$configurations[$package['configureClass']]);
 
         $declaredBefore = get_declared_classes();
         require($configureFile);
@@ -343,14 +343,14 @@ class FreePbxManager_Controller extends FreePbx_Controller
         if (count($declaredBefore) != count($declaredAfter)) {
             $foundClass = end($declaredAfter);
 
-            FreePbx_Installer::$configurations[$foundClass] = $configureFile;
+            Bluebox_Installer::$configurations[$foundClass] = $configureFile;
         }
 
-        $packages = FreePbx_Installer::listPackages();
+        $packages = Bluebox_Installer::listPackages();
         $packages[$packageName]['action'] = 'upgrade';
         $packages[$packageName]['default'] = $isCurrentlyEnabled;
 
-        FreePbx_Installer::processActions($packages);
+        Bluebox_Installer::processActions($packages);
 
         message::set('Update of ' .$packages[$packageName]['displayName'] .' complete!', 'success');
 
@@ -421,21 +421,21 @@ class FreePbxManager_Controller extends FreePbx_Controller
         if ($this->input->post('submit') == 'Regenerate Now') {
             $devices = Doctrine::getTable('SipDevice')->findAll();
             foreach ($devices as $device) {
-                FreePbx_Record::setBaseSaveObject($device);
+                Bluebox_Record::setBaseSaveObject($device);
 
                 foreach ($device->getReferences() as $reference) {
                     echo get_class($reference);
                     Telephony::set($reference);
                 }
             }
-            FreePbx_Record::setBaseSaveObject(NULL);
+            Bluebox_Record::setBaseSaveObject(NULL);
 
             $numbers = Doctrine::getTable('Number')->findAll();
             foreach ($numbers as $number) {
-                FreePbx_Record::setBaseSaveObject($number);
+                Bluebox_Record::setBaseSaveObject($number);
                 Telephony::set($number);
             }
-            FreePbx_Record::setBaseSaveObject(NULL);
+            Bluebox_Record::setBaseSaveObject(NULL);
 
             if (class_exists('Trunk')) {
                 $trunks = Doctrine::getTable('Trunk')->findAll();

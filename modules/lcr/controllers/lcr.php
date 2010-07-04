@@ -17,7 +17,7 @@
  * override this functionality. The view file rendered, by default, is
  * /views/controllername/methodname
  * Using the above example, the view for
- * http://myserver/freepbx/voicemail/send would live in
+ * http://myserver/bluebox/voicemail/send would live in
  * /views/voicemail/send
  *
  * To set variables that will be accessible in the view, use the format:
@@ -31,10 +31,10 @@
  *
  * @author Raymond Chandler <intralanman@gmail.com>
  * @license BSD
- * @package FreePBX
+ * @package Bluebox
  * @subpackage LCR
  */
-class Lcr_Controller extends FreePbx_Controller
+class Lcr_Controller extends Bluebox_Controller
 {
     /**
      * Base model for this controller

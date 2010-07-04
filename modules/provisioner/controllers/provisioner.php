@@ -7,7 +7,7 @@
  * @license MPL
  * @package Provisioner
  */
-class Provisioner_Controller extends FreePbx_Controller
+class Provisioner_Controller extends Bluebox_Controller
 {
     public $writable = array(
         'mac',

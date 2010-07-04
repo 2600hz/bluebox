@@ -5,11 +5,11 @@
  *
  * @author reto.haile <reto.haile@selmoni.ch>
  * @license CPAL-1.0
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage MisdnManager
  *
  */
-class MisdnPort extends FreePbx_Record
+class MisdnPort extends Bluebox_Record
 {
     public static $errors = array(
       'description' => array(

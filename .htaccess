@@ -9,7 +9,7 @@
     RewriteRule ^modules/.*/assets/.*$ - [L]
 
     # Protect application and system files from being viewed
-    RewriteRule ^(freepbx|modules|system|upload)/ - [F,L]
+    RewriteRule ^(bluebox|modules|system|upload)/ - [F,L]
 
     # Catch requests for XML or JSON and send them through an alternate entry point
     RewriteRule ^(.+)\.json$ json.php/$1 [T=application/json,L]

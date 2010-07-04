@@ -5,10 +5,10 @@
  * Handles AutoAttendant creation, editing and management
  *
  * @author Michael Phillips
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage AutoAttendant
  */
-class AutoAttendant_Controller extends FreePbx_Controller
+class AutoAttendant_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'AutoAttendant';
     protected $writable = array(

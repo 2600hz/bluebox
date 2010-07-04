@@ -1,8 +1,8 @@
-<div id="freepbxmanager_modules_header" class="modules freepbxmanager module_header">
+<div id="blueboxmanager_modules_header" class="modules blueboxmanager module_header">
     <h2><?php echo __('Package Manager'); ?></h2>
 </div>
 
-<div id="freepbxmanager_modules_form" class="modules freepbxmanager">
+<div id="blueboxmanager_modules_form" class="modules blueboxmanager">
     <?php echo form::open(); ?>
 
     <?php echo form::open_section('Modules'); ?>
@@ -11,42 +11,42 @@
     
         <?php echo form::open_fieldset(); ?>
 
-        <legend id="legend_<?php echo $name; ?>" class="legend freepbxmanager index module">
+        <legend id="legend_<?php echo $name; ?>" class="legend blueboxmanager index module">
 
             <span class="module_actions">
                 <?php if (!empty($parameters['updateAvaliable'])): ?>
                     <span class="field settings">
-                        <?php echo html::anchor('freepbxmanager/update/' .$name, __('Update to ') .$parameters['updateAvaliable'], array('class' => 'plsWait')); ?>
+                        <?php echo html::anchor('blueboxmanager/update/' .$name, __('Update to ') .$parameters['updateAvaliable'], array('class' => 'plsWait')); ?>
                     </span>
                 <?php endif; ?>
 
                 <?php if (!empty($parameters['hasSettings'])): ?>
                     <span class="field settings">
-                        <?php echo html::anchor('freepbxmanager/settings/' .$name, __('Settings')); ?>
+                        <?php echo html::anchor('blueboxmanager/settings/' .$name, __('Settings')); ?>
                     </span>
                 <?php endif; ?>
 
                 <?php if (!empty($parameters['allowRepair'])): ?>
                     <span class="field repair">
-                        <?php echo html::anchor('freepbxmanager/repair/' .$name, __('Repair'), array('class' => 'ajaxLink')); ?>
+                        <?php echo html::anchor('blueboxmanager/repair/' .$name, __('Repair'), array('class' => 'ajaxLink')); ?>
                     </span>
                 <?php endif; ?>
 
                 <?php if (!empty($parameters['allowUninstall'])): ?>
                     <span class="field uninstall">
-                        <?php echo html::anchor('freepbxmanager/uninstall/' .$name, __('Uninstall'), array('class' => 'confirmAjaxLink')); ?>
+                        <?php echo html::anchor('blueboxmanager/uninstall/' .$name, __('Uninstall'), array('class' => 'confirmAjaxLink')); ?>
                     </span>
                 <?php endif; ?>
 
                 <?php if (!empty($parameters['allowVerify'])): ?>
                     <span class="field verify">
-                        <?php echo html::anchor('freepbxmanager/verify/' .$name, __('Verify'), array('class' => 'ajaxLink')); ?>
+                        <?php echo html::anchor('blueboxmanager/verify/' .$name, __('Verify'), array('class' => 'ajaxLink')); ?>
                     </span>
                 <?php endif; ?>
 
                 <?php if (!empty($parameters['allowDelete'])): ?>
                     <span class="field delete">
-                        <?php echo html::anchor('freepbxmanager/delete/' .$name, __('Delete'), array('class' => 'confirmAjaxLink')); ?>
+                        <?php echo html::anchor('blueboxmanager/delete/' .$name, __('Delete'), array('class' => 'confirmAjaxLink')); ?>
                     </span>
                 <?php endif; ?>
 
@@ -109,7 +109,7 @@
     <?php echo form::close_section(); ?>
 
     <div class="buttons form_bottom">
-        <?php echo html::anchor('freepbxmanager/repair_all', __('Repair All'), array('class' => 'ajaxLink repair_all')); ?>
+        <?php echo html::anchor('blueboxmanager/repair_all', __('Repair All'), array('class' => 'ajaxLink repair_all')); ?>
         <span style="padding:5px">&nbsp;</span>
         <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Update'); ?>
     </div>

@@ -7,7 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @author K Anderson
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage SimpleRoute
  */
 class Asterisk_SimpleRouteContext_Driver extends Asterisk_Base_Driver
@@ -126,7 +126,7 @@ class Asterisk_SimpleRouteContext_Driver extends Asterisk_Base_Driver
     {
         $doc = Telephony::getDriver()->doc;
         
-        $base = FreePbx_Record::getBaseTransactionObject();
+        $base = Bluebox_Record::getBaseTransactionObject();
 
         if (empty($base->trunk_id)) {
                 return FALSE;

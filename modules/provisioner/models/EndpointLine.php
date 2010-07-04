@@ -1,10 +1,10 @@
 <?php
 /**
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Provisioner
  *
  */
-class EndpointLine extends FreePbx_Record
+class EndpointLine extends Bluebox_Record
 {
     public function setTableDefinition()
     {

@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
- * FreePBX Modular Telephony Software Library / Application
+ * Bluebox Modular Telephony Software Library / Application
  *
  * Module:
  * 
@@ -28,10 +28,10 @@
  *
  * @author Michael Phillips <michael.j.phillips@gmail.com>
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Rosetta
  */
-class Rosetta_Controller extends FreePbx_Controller
+class Rosetta_Controller extends Bluebox_Controller
 {
 	protected $noAuth = array('index');
 	public function index()
@@ -39,7 +39,7 @@ class Rosetta_Controller extends FreePbx_Controller
 		
 		//Doctrine::createTablesFromArray(array('Rosetta'));
 		$r = RosettaManager::instance();
-		$this->view->output = $r->setTo('ru')->translate('FreePBX now supports Freeswitch!');
+		$this->view->output = $r->setTo('ru')->translate('Bluebox now supports Freeswitch!');
 		$this->view->moreoutput = $r->translate('Now with more features!');
 	}
 	

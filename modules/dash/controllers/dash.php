@@ -1,6 +1,6 @@
 <?php
 
-class Dash_Controller extends FreePbx_Controller
+class Dash_Controller extends Bluebox_Controller
 {
 	
 	public function index()

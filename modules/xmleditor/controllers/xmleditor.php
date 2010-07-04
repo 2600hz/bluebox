@@ -4,7 +4,7 @@
  *
  * @author Darren Schreiber
  */
-class XmlEditor_Controller extends FreePbx_Controller {
+class XmlEditor_Controller extends Bluebox_Controller {
     public function __construct() {
         // Turn off XSS checks because they interfere with XML submits.
         if (Router::$method == 'save') {

@@ -1,7 +1,7 @@
 <?php
 defined('SYSPATH') or die('No direct access allowed.');
 /*
-* FreePBX Modular Telephony Software Library / Application
+* Bluebox Modular Telephony Software Library / Application
 *
  * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
  * you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
 * express or implied. See the License for the specific language governing rights and limitations under the License.
 *
-* The Original Code is FreePBX Telephony Configuration API and GUI Framework.
+* The Original Code is Bluebox Telephony Configuration API and GUI Framework.
 * The Original Developer is the Initial Developer.
 * The Initial Developer of the Original Code is Darren Schreiber
 * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
@@ -24,10 +24,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @author Darren Schreiber <d@d-man.org>
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage UserManager
  */
-class UserManager_Controller extends FreePbx_Controller
+class UserManager_Controller extends Bluebox_Controller
 {
     protected $writable = array(
         'first_name',
@@ -104,7 +104,7 @@ class UserManager_Controller extends FreePbx_Controller
             } else {
                 $this->password = $_POST['user']['password'];
                 $this->confirm_password = $_POST['user']['confirm_password'];
-                $rules = FreePbx_Controller::$validation;
+                $rules = Bluebox_Controller::$validation;
                 $rules->add_callbacks('password', array(
                     $this,
                     '_strong_pwd'
@@ -141,7 +141,7 @@ class UserManager_Controller extends FreePbx_Controller
             $this->confirm_password = $_POST['user']['confirm_password'];
             // Username is not visible in the view yet but is required. Set to email_address for now.
             $this->user->username = $_POST['user']['email_address'];
-            $rules = FreePbx_Controller::$validation;
+            $rules = Bluebox_Controller::$validation;
             $rules->add_callbacks('password', array(
                 $this,
                 '_strong_pwd'

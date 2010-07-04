@@ -9,7 +9,7 @@
     <?php echo form::open_section('Bulk Add'); ?>
 
         <p>
-            <?php echo __('Adding unmapped numbers makes them available for assignment to FreePBX Applications. You can add up to 10,000 numbers at a time.'); ?>
+            <?php echo __('Adding unmapped numbers makes them available for assignment to Bluebox Applications. You can add up to 10,000 numbers at a time.'); ?>
         </p>
 
         <div class="field">

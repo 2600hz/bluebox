@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*
-* FreePBX Modular Telephony Software Library / Application
+* Bluebox Modular Telephony Software Library / Application
 *
 * Module:
 *
@@ -28,20 +28,20 @@
  *
  * @author Michael Phillips <michael.j.phillips@gmail.com>
  * @license MPL
- * @package FreePBX3
+ * @package Bluebox
  * @subpackage Voicemail
  */
-class VoicemailViewer_Configure extends FreePbx_Configure
+class VoicemailViewer_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
     public static $packageName = 'voicemailviewer';
     public static $displayName = 'Voicemail Viewer';
     public static $author = 'Michael Phillips';
-    public static $vendor = 'FreePbx';
+    public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'Provides voicemail mailbox content viewing and management.';
     public static $default = FALSE;
-    public static $type = FreePbx_Installer::TYPE_MODULE;
+    public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'esl' => 0.1

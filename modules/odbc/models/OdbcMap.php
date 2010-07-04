@@ -1,5 +1,5 @@
 <?php
-class OdbcMap extends FreePbx_Record {
+class OdbcMap extends Bluebox_Record {
     public function setTableDefinition()
     {
         $this->hasColumn('odbcmap_id', 'integer', 11, array('primary' => true, 'autoincrement' => true));

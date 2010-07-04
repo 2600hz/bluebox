@@ -5,7 +5,7 @@
  * @author K Anderson
  */
 
-class PdnsRecord extends FreePbx_Record {
+class PdnsRecord extends Bluebox_Record {
 
     function setTableDefinition(){
         $this->hasColumn('id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
