@@ -6,6 +6,8 @@ class Permissions
 
         if (!empty($userID->user_id)) {
             $userID = $userID->user_id;
+        } else {
+            $userID = NULL;
         }
 
         $permission = Doctrine_Query::create()
