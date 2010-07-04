@@ -394,8 +394,9 @@ class navigation
     public static function parseURI($uri = '', $component = NULL)
     {
         // Remove the site from the uri and then explode on '/'
-        $uri = str_replace(url::site() , '', $uri);
-
+        if (substr($uri,0,strlen(url::site()))==url::site()) {
+                $uri=substr($uri,strlen(url::site()));
+	}
         $result['parts'] = explode('/', $uri);
 
         // Remove any empty values
