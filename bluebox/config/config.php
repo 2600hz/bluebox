@@ -2,7 +2,7 @@
 /**
  * Allow the installer to be run.  This should be set to false after installation
  */
-$config['installer_enabled'] = FALSE;
+$config['installer_enabled'] = TRUE;
 
 /**
  * Base path of the web site. If this includes a domain, eg: localhost/kohana/
@@ -101,6 +101,7 @@ $config['extension_prefix'] = 'Bluebox_';
 $config['modules'] = array
 (
 	MODPATH.'auth',      // Authentication
+        MODPATH.'packagemanager'
 	// MODPATH.'forge',     // Form generation
 	// MODPATH.'kodoc',     // Self-generating documentation
 	// MODPATH.'media',     // Media caching and compression

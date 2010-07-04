@@ -1,12 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * stylesheet helper
- *
- * @author Karl Anderson
- * @license LGPL
- * @access public
- */
-class stylesheet {
+
+class stylesheet
+{
     public static $cache = FALSE;
     
     protected static $csstags = array(
@@ -347,8 +342,10 @@ class stylesheet {
             }
         }
 
-        // Track what assest we added to this page
-        $session->set('stylesheet.onPageAssets', $onPageAssets);
+        // NOTICE: setting $session here causes segfault during ajax
+        // made a hack to move this set outside the event .....
+        Bluebox_Controller::$onPageAssets['css'] = $onPageAssets;
+        //$session->set('stylesheet.onPageAssets', $onPageAssets);
 
         // run through everything that needs to be on the page and
         // make in conditional where apropriate then convert them into css links

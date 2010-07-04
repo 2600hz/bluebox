@@ -55,9 +55,7 @@
         // Ask the relevant JS to update it's friendly name for the given selection
         $(document).trigger(destinationType + '_submit');
 
-        $('#<?php echo $dom_id; ?>').qtip("hide");
-
-        friendlyName = $('form#destination_selector input[name="friendly_name"]').val();
+        var friendlyName = $('form#destination_selector input[name="friendly_name"]').val();
         if (friendlyName.length > 0) {
             $('.<?php echo $dom_id; ?>').html(friendlyName + ' ');
         }
@@ -67,7 +65,8 @@
         } else {
             $('#<?php echo $dom_id; ?>').after('<input type="hidden" id="destination[<?php echo $dom_id; ?>]" name="destination[<?php echo $dom_id; ?>]" value="' + $(subForm).serialize() + '" />');
         }
-
+        
+        $('#<?php echo $dom_id; ?>').qtip("hide");
     });
 
 <?php javascript::blockEnd(); ?>

@@ -2,7 +2,7 @@
 /**
  * @author K Anderson
  * @license MPL
- * @package Bluebox
+ * @package Bluebox3
  */
 class MediaManager_Plugin extends Bluebox_Plugin
 {
@@ -20,7 +20,6 @@ class MediaManager_Plugin extends Bluebox_Plugin
         // successfully deleted;
         kohana::log('alert', 'Unlinking file ' . $base->path . $base->name);
         unlink($base->path . $base->name);
-
     }
 
 }

@@ -10,7 +10,8 @@
  * @subpackage Core
  */
 
-interface Telephony_Driver_Interface {
+interface Telephony_Driver_Interface
+{
     public static function getInstance();
 
     public function load($options);
@@ -24,7 +25,8 @@ interface Telephony_Driver_Interface {
     public function commit();
 }
 
-abstract class Telephony_Driver implements Telephony_Driver_Interface {
+abstract class Telephony_Driver implements Telephony_Driver_Interface
+{
     /**
      * Instance of this class.
      * @var Telephony_Driver
@@ -67,20 +69,24 @@ abstract class Telephony_Driver implements Telephony_Driver_Interface {
     private function runGlobalEvents($context, $section, $obj)
     {
         // Mark where we are
-        Kohana::log('debug', 'Global dialplan hooks: Creating extensions for ' . $section);
-        if ($context !== FALSE) {
+        if ($context !== FALSE)
+        {
             $this->currentContext = $context;
         }
+
         $this->currentSection = $section;
 
         // Run the events
         Event::run('_telephony.' . $section, $obj);
 
         // Clear where we are
-        Kohana::log('debug', 'Global dialplan hooks: Done creating extensions for ' . $section);
-        if ($context !== FALSE) {
+        Kohana::log('debug', 'Telephony -> Global dialplan hooks: Done creating extensions for ' . $section);
+
+        if ($context !== FALSE)
+        {
             $this->currentContext = NULL;
         }
+        
         $this->currentSection = NULL;
     }
 

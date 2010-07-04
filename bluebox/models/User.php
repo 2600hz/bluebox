@@ -1,35 +1,15 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/*
- * Bluebox Modular Telephony Software Library / Application
- *
- * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
- * you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/.
- *
- * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
- * express or implied. See the License for the specific language governing rights and limitations under the License.
- *
- * The Original Code is Bluebox Telephony Configuration API and GUI Framework.
- * The Original Developer is the Initial Developer.
- * The Initial Developer of the Original Code is Darren Schreiber
- * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
- *
- * Contributor(s):
- *
- *
- */
-
-/**
- * User.php - User model, for tracking logins/users/etc. Most items relate to users (or locations/accounts)
- *
- * @author Darren Schreiber <d@d-man.org>
- * @license MPL
- * @package Bluebox
- * @subpackage Core
- */
 
 class User extends Bluebox_Record
 {
+    const TYPE_GUEST = 0;
+    const TYPE_RESTRICTED_USER = 40;
+    const TYPE_NORMAL_USER = 50;
+    const TYPE_POWER_USER = 60;
+    const TYPE_RESTRICTED_ADMIN = 70;
+    const TYPE_ACCOUNT_ADMIN = 80;
+    const TYPE_SYSTEM_ADMIN = 101;
+
     /**
      * @var string this holds an un-hashed copy of the password during a save cycle (for validation to run against)
      */
@@ -37,47 +17,23 @@ class User extends Bluebox_Record
 
     public static $errors = array (
         'first_name' => array (
-            'required' => 'First name is required.',
-            'alpha' => 'Only letters are allowed.',
-            'length' => 'Must be 3-40 characters.',
-            'default' => 'Invalid First Name.',
+            'required' => 'First name is required'
         ),
         'last_name' => array(
-            'required' => 'Last name is required.',
-            'alpha' => 'Only letters are allowed.',
-            'length' => 'Must be 3-40 characters.',
-            'default' => 'Invalid Last Name.',
+            'required' => 'Last name is required'
         ),
         'username' => array(
-            'required' => 'Username is required.',
-            'unique' => 'Username is not unique',
-            'default' => 'Invalid username',
+            'required' => 'Username is required',
+            'duplicate' => 'Username is already in use'
         ),
         'email_address' => array (
-            'required' => 'Email is required.',
-            'duplicate' => 'Email is already in use.',
-            'email' => 'Email is invalid.',
-            'unknown' => 'Email address is not recognized.',
-            'default' => 'Invalid Email Address.',
+            'required' => 'Email is required',
+            'duplicate' => 'Email is already in use'
         ),
         'password' => array (
-            'required' => 'Password is required.',
-            'nodigits' => 'Letters & digits required',
-            'noalpha' => 'Letters & digits required',
-            'length' => 'Must be 5-20 characters',
-        ),
-        'company_name' => array (
-            'required' => 'Company name is required.',
-            'alpha' => 'Only letters are allowed.',
-            'length' => 'Must be 3-50 characters.',
-            'default' => 'Invalid Company Name.',
-        ),
-        'password2' => array (
-            'nomatch' => 'Passwords do not match.'
-        ),
-        'confirm_password' => array (
-            'nomatch' => 'Passwords do not match',
-        ),
+            'required' => 'Password is required',
+            'length' => 'Must be 8-20 characters',
+        )
     );
 
     /**
@@ -90,13 +46,17 @@ class User extends Bluebox_Record
         $this->hasColumn('location_id', 'integer', 11, array('unsigned' => true));
         $this->hasColumn('first_name', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('last_name', 'string', 100, array('notnull' => true, 'notblank' => true));
-        $this->hasColumn('username', 'string', 100, array('notnull' => true, 'notblank' => true));
-        $this->hasColumn('email_address', 'string', 100, array('notnull' => true, 'notblank' => true));
+        $this->hasColumn('username', 'string', 100, array('notnull' => true, 'notblank' => true, 'unique' => true));
+        $this->hasColumn('email_address', 'string', 100, array('notnull' => true, 'notblank' => true, 'unique' => true));
         $this->hasColumn('password', 'string', 64, array('notnull' => true, 'notblank' => true, 'minlength' => 8));
-        $this->hasColumn('logins', 'integer', 11, array('unsigned' => true));
-        $this->hasColumn('last_login', 'timestamp', null, array('past' => true));
-        $this->hasColumn('password_reset_token', 'string', '64');
+        $this->hasColumn('debug_level', 'integer', 11, array('unsigned' => true, 'default' => 0));
         $this->hasColumn('user_type', 'integer', NULL, array('notnull' => true, 'unsigned' => true, 'default' => 0));
+        $this->hasColumn('logins', 'integer', 11, array('unsigned' => true));
+        $this->hasColumn('last_login', 'timestamp', NULL);
+        $this->hasColumn('last_logged_ip', 'string', 40);
+        $this->hasColumn('password_reset_token', 'string', '64');
+        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
+        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -104,15 +64,12 @@ class User extends Bluebox_Record
      */
     public function setUp()
     {
-    // RELATIONSHIPS
+        // RELATIONSHIPS
         $this->hasMany('Device', array('local' => 'user_id', 'foreign' => 'user_id'));
         $this->hasOne('Location', array('local' => 'location_id', 'foreign' => 'location_id'));
-        // File is not loaded yet during this phase of the install.
-        //$this->hasMany('File', array('local' => 'user_id', 'foreign' => 'user_id'));
 
         // BEHAVIORS
         $this->actAs('Timestampable');
-        $this->actAs('LogIpAddress');
         $this->actAs('MultiTenant');
    }
 

@@ -20,7 +20,7 @@ class FileManager
             {
                 $data = array('name' => $data);
             }
-            arr::update($data, 'class', ' file_dropdown');
+            $data = arr::update($data, 'class', ' file_dropdown');
 
             return form::dropdown($data, $options, $selected, $extra);
         }

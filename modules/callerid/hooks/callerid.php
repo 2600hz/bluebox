@@ -1,15 +1,17 @@
-<?php
-// Add caller ID support to device management application
-plugins::register('devicemanager/add', 'view', array('CallerId_Plugin', 'update'));
-plugins::register('devicemanager/edit', 'view', array('CallerId_Plugin', 'update'));
-plugins::register('devicemanager/index', 'view', array('CallerId_Plugin', 'index'));
-plugins::register('devicemanager', 'save', array('CallerId_Plugin', 'save')); // All pages
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
-// Add caller ID support to user management application
-//plugins::register('usermanager/add', 'view', array('CallerId_Plugin', 'update'));
-//plugins::register('usermanager/edit', 'view', array('CallerId_Plugin', 'update'));
-//plugins::register('usermanager/index', 'view', array('CallerId_Plugin', 'index'));
-//plugins::register('usermanager', 'save', array('CallerId_Plugin', 'save')); // All pages
+    dialplan::register('CallerId', 'conditioning');
+    
 
-// Add XML for caller ID to global telephony hooks
-dialplan::register('CallerId', 'conditioning');
+    plugins::register('devicemanager/create', 'view', array('CallerId_Plugin', 'update'));
+
+    plugins::register('devicemanager/edit', 'view', array('CallerId_Plugin', 'update'));
+
+    plugins::register('devicemanager', 'save', array('CallerId_Plugin', 'save'));
+
+
+    plugins::register('contextmanager/create', 'view', array('CallerId_Plugin', 'update'));
+
+    plugins::register('contextmanager/edit', 'view', array('CallerId_Plugin', 'update'));
+
+    plugins::register('contextmanager', 'save', array('CallerId_Plugin', 'save'));

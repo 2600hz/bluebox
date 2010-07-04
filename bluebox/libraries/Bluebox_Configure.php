@@ -1,13 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * Bluebox_Configure.php - Base class for module configuration classes, used in Bluebox Plugins and Bluebox Applications
- * Created on Jun 2, 2009
- *
- * @author Karl Anderson
- * @license MPL
- * @package Bluebox
- * @subpackage Core
- */
+
 abstract class Bluebox_Configure
 {
     /**
@@ -15,12 +7,6 @@ abstract class Bluebox_Configure
      * @var float
      */
     public static $version = 0.0;
-
-    /**
-     * The name of this module
-     * @var string
-     */
-    public static $packageName = NULL;
 
     /**
      * The display name of this module
@@ -44,7 +30,7 @@ abstract class Bluebox_Configure
      * The string to display as the type of license
      * @var string
      */
-    public static $license = 'Unknown License';
+    public static $license = 'MPL';
 
     /**
      * A breif description of the module, should to be under 150 charaters
@@ -69,33 +55,25 @@ abstract class Bluebox_Configure
      * If false this module can not be disabled
      * @var bool
      */
-    public static $canBeDisabled = TRUE;
+    public static $denyDisable = FALSE;
     
     /**
      * If false this module can not be uninstalled
      * @var bool
      */
-    public static $canBeRemoved = TRUE;
+    public static $denyRemoval = FALSE;
 
     /**
-     * This is a list of catagories constants as defined in Bluebox_Installer
+     * This is a list of catagories constants as defined in Core_PackageManager
      * @var string
      */
-    public static $type = Bluebox_Installer::TYPE_DEFAULT;
+    public static $type = Bluebox_PackageManager::TYPE_DEFAULT;
 
     /**
      * This variable is useful for making sure the user has other modules installed that may be required
      * @var array Key/value pair of modules and dependencies
      */
-    public static $required = array(
-        'core' => 0.1
-    );
-
-    /**
-     * This is the placeholder for a icon definition
-     * @var string
-     */
-    public static $navIcon = '';
+    public static $required = array();
 
     /**
      *
@@ -135,18 +113,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    /**
-     * This function is expected to return a license in the langauge
-     * specified.  If there is no license or the system wide licenses applies
-     * then this function should return false.
-     *
-     * @return string|bool
-     * @param string $language The language to retrieve the license in
-     */
-    public function getLicense($language)
-    {
-        return false;
-    }
+
     /**
      * Verify module is intact.
      *
@@ -161,6 +128,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+    
     /*************************
     * INSTALLATION ROUTINES *
     *************************/
@@ -179,6 +147,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+    
     /**
      * Do the actual installation.
      *
@@ -191,22 +160,31 @@ abstract class Bluebox_Configure
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function install($package)
+    public function install($package = NULL)
     {
         // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)
         // Note that we do this because Postgers & Doctrine don't like our polymorphic class extensions and try to create the same
         // tables twice.
         $models = array();
-        if (!empty($package['models'])) {
-            foreach($package['models'] as $className) {
-                if ((get_parent_class($className) == 'Bluebox_Record') or (get_parent_class($className) == 'Doctrine_Record')) $models[] = $className;
+
+        if (!empty($package['models']))
+        {
+            foreach($package['models'] as $className)
+            {
+                if ((get_parent_class($className) == 'Bluebox_Record') or (get_parent_class($className) == 'Doctrine_Record'))
+                {
+                    $models[] = $className;
+                }
             }
         }
+        
         // If this package has any models of it's own (not extensions) then create the tables!
-        if (!empty($models)) {
+        if (!empty($models))
+        {
             Doctrine::createTablesFromArray($models);
         }
     }
+    
     /**
      * Post-install routine for this module.
      *
@@ -221,10 +199,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    public function completedInstall()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+    
     /********************
     * UPGRADE ROUTINES *
     ********************/
@@ -243,6 +218,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+    
     /**
      * Perform an upgrade of this module.
      *
@@ -261,6 +237,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+    
     /**
      * Post-upgrade routine for this module.
      *
@@ -275,10 +252,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    public function completedUpgrade()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+    
     /**********************
     * DOWNGRADE ROUTINES *
     **********************/
@@ -297,6 +271,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+    
     /**
      * Perform a downgrade of this module.
      *
@@ -315,6 +290,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+    
     /**
      * Post-downgrade routine for this module.
      *
@@ -329,114 +305,165 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    public function completedDowngrade()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+    
     /**********************
     * UNINSTALL ROUTINES *
     **********************/
-    public function preUninstall($package)
+    public function preUninstall()
     {
-        if ($package['installedAs']['enabled']) return 'The module must be disabled before you can uninstall it!';
+        $this->noMethodMethod(__FUNCTION__);
     }
     /**
      * Removes your module.
      *
      * This method MUST WORK as a last-resort rollback method on a botched install.
      *
-     * By default, Bluebox_Installer will remove any models associated with this module and then remove all files
+     * By default, Core_PackageManager will remove any models associated with this module and then remove all files
      * in the module's directory. It will also remove the module entry from the Modules and ModuleUser tables.
      *
      * You do not need to override this class if you are not adding additional functionality to it.
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function uninstall($package)
+    public function uninstall($package = NULL)
     {
         $tables = array();
+        
         // Get the doctrine overlord
-        try {
+        try
+        {
             $conn = Doctrine_Manager::connection();
         }
-        catch(Exception $e) {
+        catch(Exception $e)
+        {
             Kohana::log('error', 'Uninstall unable to get the overlord!');
+            
             return 'Unable to connect to the database!';
         }
+
         // For each of this modules models loop through all of their rows and delete them
         // This will ensure any relationships are broken safely, but is a brute force approach...
         $models = $package['models'];
-        foreach($models as $model) {
-            try {
+
+        foreach($models as $model)
+        {
+            try
+            {
                 $table = Doctrine::getTable($model);
+
                 $tableName = $table->getOption('tableName');
+                
                 $declaringClass = $table->getOption('declaringClass');
             }
-            catch(Exception $e) {
+            catch(Exception $e)
+            {
                 Kohana::log('debug', 'Uninstall skipping model ' . $model . ', doesnt seem to have a doctrine table.');
+                
                 continue;
             }
-            if (!$conn->import->tableExists($tableName)) {
+
+            if (!$conn->import->tableExists($tableName))
+            {
                 continue;
             }
-            if (!in_array($declaringClass->name, $models)) {
+            
+            if (!in_array($declaringClass->name, $models))
+            {
                 Kohana::log('alert', 'UNINSTALL REMOVING ' . $package['packageName'] . ' FROM TABLE ' . $model);
-                $q = Doctrine_Query::create()->from($model . ' t');
-                $rows = $q->execute();
-                foreach($rows as $row) {
+
+                $rows = Doctrine_Query::create()->from($model . ' t')->execute();
+
+                foreach($rows as $row)
+                {
                     $row->class_type = null;
+
                     $row->foreign_id = null;
+                    
                     $row->save();
                 }
+
                 continue;
-            } else {
+            } 
+            else
+            {
                 Kohana::log('alert', 'UNINSTALL TRUNCATING TABLE: ' . $tableName);
+
                 $rows = $table->findAll();
-                foreach($rows as $row) $row->delete();
+
+                foreach($rows as $row) 
+                {
+                    $row->delete();
+                }
+
                 $tables[] = $tableName;
             }
+
             $relations = array_keys($table->getRelations());
-            foreach($relations as $relation) {
+
+            foreach($relations as $relation)
+            {
                 $related = Doctrine::getTable($relation);
+
                 $relatedTable = $related->getOption('tableName');
+
                 $relatedClass = $related->getOption('declaringClass');
-                if (empty($relatedClass) || in_array($relatedClass, $models)) $tables[] = $relatedTable;
+
+                if (empty($relatedClass) || in_array($relatedClass, $models))
+                {
+                    $tables[] = $relatedTable;
+                }
             }
         }
-        if (!empty($tables)) {
+
+        if (!empty($tables))
+        {
             $tables = array_unique($tables);
+
             $removeCount = count($tables);
+
             $errorCount = ($removeCount * $removeCount) + $removeCount;
-            while (!empty($tables)) {
-                foreach($tables as $key => $drop) {
-                    if (!$conn->import->tableExists($drop)) {
+
+            while (!empty($tables))
+            {
+                foreach($tables as $key => $drop)
+                {
+                    if (!$conn->import->tableExists($drop))
+                    {
                         unset($tables[$key]);
+                        
                         continue;
                     }
-                    try {
+
+                    try
+                    {
                         $conn->export->dropTable($drop);
+
                         Kohana::log('alert', 'UNINSTALL DROPING TABLE: ' . $drop);
+
                         unset($tables[$key]);
                     }
-                    catch(Exception $e) {
+                    catch(Exception $e)
+                    {
                     }
                 }
+
                 $errorCount = $errorCount - 1;
-                if ($errorCount < 0) {
+
+                if ($errorCount < 0)
+                {
                     Kohana::log('error', 'Uninstall unable to resolve drop table order!');
+
                     return 'Unable to resolve drop table order!';
                 }
             }
         }
     }
+
     public function postUninstall()
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    public function completedUninstall()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+    
     /**********************
     * ENABLE ROUTINES *
     **********************/
@@ -444,6 +471,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+    
     /**********************
     * DISABLE ROUTINES *
     **********************/
@@ -451,6 +479,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+    
     /************************
     * MAINTENANCE ROUTINES *
     ************************/
@@ -459,30 +488,13 @@ abstract class Bluebox_Configure
      */
     public function repair()
     {
-        // Ensure table exists
-        // Check table relations
-        // Dump cache
-        // Can (is it usefull) to check the doctrine definition against the raw table?
-        // Ensure installed assets are valid
-        // Check that all required depends are still met
         $this->noMethodMethod(__FUNCTION__);
     }
-    /**
-     * Sanity check.
-     *
-     * Makes sure all your tables are created, that foreign key constraints match, and that all required files
-     * exist.
-     */
-    public function sanityCheck()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-    public function newTenant() {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+    
     private function noMethodMethod($method)
     {
         $class = str_replace('_Configure', '', get_class($this));
+
         Kohana::log('debug', "$class doesn't have a $method method");
     }
 }

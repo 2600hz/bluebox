@@ -34,18 +34,47 @@ class Auth_Doctrine_Driver extends Auth_Driver {
 	 */
 	public function login($username, $password, $remember)
 	{
-        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
-        $user = Doctrine::getTable('User')->findOneByEmailAddress($username);
-		
-		if (($user) AND ($user->password === $password))
-		{
-			// Complete the login
-			$_SESSION['user_id'] = $user->user_id;
-			return $this->complete_login($username);
-		}
+            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+            $user = Doctrine::getTable('User')->findOneByEmailAddress($username);
 
-		// Login failed
-		return FALSE;
+            if (($user) AND ($user->password === $password))
+            {
+                if ($user->user_type != User::TYPE_SYSTEM_ADMIN) {
+                    if ($user->account_id == NULL) {
+                        kohana::log('error', 'User ' .$username . ' tried to login but has no account id');
+                        return FALSE;
+                    }
+
+                    if ($user->location_id == NULL) {
+                        kohana::log('error', 'User ' .$username . ' tried to login but has no location id');
+                        return FALSE;
+                    }
+
+                    $account = Doctrine::getTable('Account')->findOneByAccountId($user->account_id);
+
+                    if (!$account) {
+                        kohana::log('error', 'User ' .$username . ' tried to login but has an invalid account id ' .$user->account_id);
+                        return FALSE;
+                    }
+                }
+
+                $user->logins += 1;
+                $user->last_login = date('Y-m-d H:i:s', time());
+                $user->last_logged_ip = $this->getRealIpAddr();
+                $user->save();
+
+                if (!empty($user->debug_level) AND ($user->debug_level <= 4) AND ($user->debug_level >= 0)) {
+                    Kohana::config_set('core.log_threshold', $user->debug_level);
+
+                }
+
+                // Complete the login
+                $_SESSION['user_id'] = $user->user_id;
+                return $this->complete_login($username);
+            }
+
+            // Login failed
+            return FALSE;
 	}
 
 	/**
@@ -122,6 +151,23 @@ class Auth_Doctrine_Driver extends Auth_Driver {
         }
         
         return TRUE;
+    }
+
+    public function getRealIpAddr()
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
+        {
+          $ip=$_SERVER['HTTP_CLIENT_IP'];
+        }
+        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   //to check ip is pass from proxy
+        {
+          $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+        }
+        else
+        {
+          $ip=$_SERVER['REMOTE_ADDR'];
+        }
+        return $ip;
     }
 
 } // End Auth_File_Driver

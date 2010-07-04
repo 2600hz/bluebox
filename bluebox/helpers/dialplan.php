@@ -1,39 +1,55 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * dialplan.php - dialplan helper class.
- *
- * Provides the ability to hook into various parts of dialplan generation on a global level. This helper provides assistance in registering
- * for dialplan related events that are used when generating telephony events for both config generation realtime and to disk.
- *
- * Created on Aug 19, 2009
- *
- * @author Karl Anderson
- */
+
 class dialplan
 {
+    protected static $dialplanSections = array();
+
     public static function register($driver, $hook)
     {
         $driverName = Telephony::getDriverName();
-        if ((!$driverName) or ($driverName == 'none')) {
-            return true;
-        } elseif (!class_exists($driverName))
+
+        if ((!$driverName) or ($driverName == 'none'))
         {
-            Kohana::log('error', 'Unable to register the dialplan driver \'' . Telephony::getDriverName() .'\'');
+            return true;
+        }
+        elseif (!class_exists($driverName))
+        {
+            Kohana::log('error', 'Telephony -> Unable to register the dialplan driver \'' .$driverName .'\'');
+            
             return false;
         }
 
-        $driver = Telephony::getDriverName() . '_' . $driver . '_Driver';
-        kohana::log('debug', 'EVAL ' . Telephony::getDriverName() . '::getDialplanSections();');
-        $sections = eval('return ' . Telephony::getDriverName() . '::getDialplanSections();');
+        $hookClass = $driverName .'_' .$driver .'_Driver';
 
-        if (!in_array($hook, $sections)) {
+        if (!class_exists($hookClass))
+        {
+            Kohana::log('error', 'Telephony -> Unable to register the dialplan hook \'' .$driver .'\'(' .$hookClass .')');
+
+            return false;
+        }
+
+        if (empty(self::$dialplanSections))
+        {
+            kohana::log('debug', 'Telephony -> EVAL ' .$driverName .'::getDialplanSections();');
+
+            $sections = eval('return ' .$driverName .'::getDialplanSections();');
+
+            if (is_array($sections))
+            {
+                self::$dialplanSections = $sections;
+            }
+        }
+
+        if (!in_array($hook, self::$dialplanSections))
+        {
             //Logger::ExceptionByCaller();
-            throw new Exception('The hook ' . $hook . ' is not a recognized telephony global hook. (While trying to register callback ' . $driver . ')');
+            throw new Exception('The hook ' .$hook .' is not a recognized telephony global hook. (While trying to register callback ' .$driver . ')');
         }
 
         // Register event as _telephony.action with the callback array as the callback
-        Event::add('_telephony.' . $hook, array($driver, $hook));
-        Kohana::log('debug', 'Added hook for _telephony.' . $hook . ' to call ' . $driver . '::' . $hook);
+        Event::add('_telephony.' .$hook, array($hookClass, $hook));
+
+        Kohana::log('debug', 'Telephony -> Added hook for _telephony.' .$hook .' to call ' .$hookClass .'::' .$hook);
 
         return TRUE;
     }
@@ -91,33 +107,5 @@ class dialplan
 
         // 7. Any final things to do? Play a goodbye message? A survey? Write a special log? etc.
         $driver->postExecute($context);
-    }
-
-    // TODO: What is this doing here? This doesn't belong here.
-    public static function getTransfer($number_id, $lang = 'XML')
-    {
-        $numberParts = explode('_', $number_id);
-        if (count($numberParts) > 1) {
-            $number_id = $numberParts[0];
-            $context = 'context_' .$numberParts[1];
-        } else {
-            $context = self::getContext($number_id);
-        }
-
-        $n = Doctrine::getTable('Number')->find($number_id);
-        if(!$n)
-            return false;
-
-        return sprintf("transfer %s XML %s", $n->number, $context);
-    }
-
-    // TODO: What is this doing here? This doesn't belong here.
-    public static function getContext($number_id)
-    {
-        $nv = Doctrine::getTable('NumberContext')->findOneByNumberId($number_id);
-        if(!$nv)
-            return false;
-
-        return 'context_' . $nv->Context->context_id;
     }
 }

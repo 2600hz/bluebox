@@ -872,12 +872,12 @@ class Bluebox_Installer
                         // If we coulnt get the current row then we will make a new one
                         if (!$dbModule) {
                             Kohana::log('alert', 'Failed to find ' . $package['packageName'] . ' in Module, adding new module');
-                            $dbModule = new Module;
+                            $dbModule = new Package;
                         }
                     } else {
                         Kohana::log('debug', 'Adding ' . $package['packageName'] . ' to Module');
                         // Get a new row for the module
-                        $dbModule = new Module;
+                        $dbModule = new Package;
                     }
                     // Insert or update (see above) the new modules info!
                     $dbModule->name = $package['packageName'];
@@ -913,12 +913,12 @@ class Bluebox_Installer
                         // If we coulnt get the current row then we will make a new one
                         if (!$dbModule) {
                             Kohana::log('alert', 'Failed to find ' . $package['packageName'] . ' in Module, adding new module');
-                            $dbModule = new Module;
+                            $dbModule = new Package;
                         }
                     } else {
                         Kohana::log('debug', 'Adding ' . $package['packageName'] . ' to Module');
                         // Get a new row for the module
-                        $dbModule = new Module;
+                        $dbModule = new Package;
                     }
                     // Insert or update (see above) the new modules info!
                     $dbModule->name = $package['packageName'];

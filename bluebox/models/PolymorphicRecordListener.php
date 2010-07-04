@@ -1,16 +1,11 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * @author K Anderson
- * @license MPL
- * @package Bluebox
- * @subpackage Core
- */
 
 class PolymorphicRecordListener extends Doctrine_Record_Listener
 {
     protected $parent = NULL;
 
     public function  __construct($parent) {
+
         $this->parent = $parent;
     }
 

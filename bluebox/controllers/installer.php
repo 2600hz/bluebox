@@ -67,7 +67,7 @@ class Installer_Controller extends Bluebox_Controller
         if (!Kohana::config('config.installer_enabled')) {
             throw new Exception('The installer has been administratively disabled. (You can re-enable it in bluebox/config/config.php)');
         }
-        $siteDomain = str_replace('installer', '', url::guess_site_domain());
+        $siteDomain = str_replace('installer', '', Kohana::config('core.site_domain'));
         Kohana::config_set('core.site_domain', '/' . trim($siteDomain, '/') . '/');
         skins::setSkin($this->template);
         parent::__construct();
@@ -820,7 +820,7 @@ class Installer_Controller extends Bluebox_Controller
         Bluebox_Installer::checkDependencies($packages, $install);
         // Ensure there are no new warnings
         $old_warnings = $this->session->get('installer.warnings', array());
-        if (!arr::array_compare_recursive(Bluebox_Installer::$warnings, $old_warnings)) return FALSE;
+        //if (!arr::array_compare_recursive(Bluebox_Installer::$warnings, $old_warnings)) return FALSE;
         // If all the dependencies are met let the user continue
         return empty(Bluebox_Installer::$errors);
     }
@@ -855,7 +855,7 @@ class Installer_Controller extends Bluebox_Controller
             if (empty($this->template->error)) {
                 message::set('Install failed with errors!'
                     .'<div>'
-                    .arr::arrayToUL(Bluebox_Installer::$errors, array(), array('class' => 'error_details', 'style' => 'text-align:left;'))
+                    .implode('<br>', Bluebox_Installer::$errors)
                     .'</div>'
                 );                
                 
@@ -1200,10 +1200,10 @@ class Installer_Controller extends Bluebox_Controller
             $display['displayParameters'] = array_intersect_key($parameters, array_flip($displayParameters));
 
             if (!empty($packageErrors[$name])) {
-               $display['errors'] = arr::arrayToUL($packageErrors[$name]);
+               $display['errors'] = implode('<br>', $packageErrors[$name]);
             }
             if (!empty($packageWarnings[$name])) {
-               $display['warnings'] = arr::arrayToUL($packageWarnings[$name]);
+               $display['warnings'] = implode('<br>', $packageWarnings[$name]);
             }
         }
         return $packageList;

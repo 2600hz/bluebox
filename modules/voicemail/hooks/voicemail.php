@@ -1,17 +1,11 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
-// Add Voicemail view to the page where usermanager are added
-plugins::register('devicemanager/add', 'view', array('Voicemail_Plugin', 'listVoicemailBoxes'));
+    Event::add('numbermanager.collectNumberOptions', array('Voicemails', 'provideNumberOptions'));
 
-// Add Voicemail view to the page where usermanager are edited
-plugins::register('devicemanager/edit', 'view', array('Voicemail_Plugin', 'listVoicemailBoxes'));
+    Event::add('numbermanager.collectNumberTargets', array('Voicemails', 'provideNumberTargets'));
 
-// Generic catcher for saves
-plugins::register('devicemanager', 'save', array('Voicemail_Plugin', 'save'));
+    Event::add('numbermanager.collectNumberTerminators', array('Voicemails', 'provideNumberTerminators'));
 
-// Add voicemail selections to destinations
-plugins::register('destinations/selector', 'view', array('Voicemail_Plugin', 'selector'));
-
-// We need to add timeouts at the beginning of bridge commands and voicemail transfers at the end of bridge commands for devices & other items
-dialplan::register('Voicemail', 'prenumber');
-dialplan::register('Voicemail', 'postnumber');
+    //dialplan::register('Voicemail', 'prenumber');
+    
+    //dialplan::register('Voicemail', 'postnumber');

@@ -1,13 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * AccountManager_Configure - Configuration metadata / class
- *
- * Gives info about how to install this module
- *
- * @author Darren Schreiber
- * @package Bluebox
- * @subpackage Account_Manager
- */
+
 class AccountManager_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
@@ -18,16 +10,15 @@ class AccountManager_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Provides Account Management Tools';
     public static $default = true;
-    public static $type = Bluebox_Installer::TYPE_MODULE;
+    public static $type = Bluebox_PackageManager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );
-    public static $navIcon = 'assets/img/icons/mainSettingsX.png';
-    public static $navBranch = '/Organization/';
+    public static $navBranch = '/System/';
     public static $navURL = 'accountmanager/index';
     public static $navSubmenu = array(
         'Search Accounts' => '/accountmanager/index',
-        'Add Account' => '/accountmanager/add',
+        'Add Account' => '/accountmanager/create',
         'Edit Account' => array(
             'url' => '/accountmanager/edit',
             'disabled' => TRUE

@@ -1,48 +1,62 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/*
- * Bluebox Modular Telephony Software Library / Application
- *
- * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
- * you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/.
- *
- * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
- * express or implied. See the License for the specific language governing rights and limitations under the License.
- *
- * The Original Code is Bluebox Telephony Configuration API and GUI Framework.
- * The Original Developer is the Initial Developer.
- * The Initial Developer of the Original Code is Darren Schreiber
- * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
- *
- * Contributor(s):
- *
- *
- */
 
-/**
- * conference.php - Conference creation, management and administration controller.
- *
- * @author Darren Schreiber <d@d-man.org>
- * @license MPL
- * @package Bluebox
- * @subpackage Conference
- */
+class Conference extends Bluebox_Record
+{    
+    const TYPE_MEMBER = 0;
+    const TYPE_MODERATOR = 1;
 
-class Conference extends Bluebox_Record {
-    /**
-     * Silence music on hold, even when nobody is in the conference
-     */
-    const MOH_NONE = 0;
+    public static $default_keymap = array(
+      'vol talk dn' => '1',
+      'vol talk zero' => '2',
+      'vol talk up' => '3',
+      'vol listen dn' => '4',
+      'vol listen zero' => '5',
+      'vol listen up' => '6',
+      'energy dn' => '7',
+      'energy equ' => '8',
+      'energy up' => '9',
+      'deaf mute' => '*',
+      'mute' => '0',
+      'hangup' => '#'
+    );
 
-    /**
-     * Inherit music on hold from the active channel, or global setting
-     */
-    const MOH_INHERIT = 1;
-
-    /**
-     * Use a specific MOH stream for this conference
-     */
-    const MOH_SPECIFIC = 2;
+    public static $default_profile = array(
+        'rate' => 8000,
+        'interval' => 20,
+        'energy-level' => 250,
+        'sound-prefix' => '/usr/local/freeswitch/sounds/en/us/callie/',
+        //'ack-sound' => 'beep.wav',
+        //'nack-sound' => 'beeperr.wav',
+        'caller-controls' => 'default',
+        'tts-engine' => 'tts-engine',
+        'tts-voice' => 'Allison-8kHz',
+        'muted-sound' => 'conference/conf-muted.wav',
+        'mute-detect-sound' => '',
+        'max-members' => '',
+        'max-members-sound' => '',
+        'comfort-noise' => '1420',
+        //'announce-count' => '',
+        'suppress-events' => '',
+        'verbose-events' => '',
+        'unmuted-sound' => 'conference/conf-unmuted.wav',
+        'alone-sound' => 'conference/conf-alone.wav',
+        'perpetual-sound' => 'perpetual.wav',
+        'moh-sound' => 'silence',
+        'enter-sound ' => 'tone_stream://%(200,0,500,600,700)',
+        'exit-sound' => 'tone_stream://%(500,0,300,200,100,50,25)',
+        'kicked-sound' => 'conference/conf-kicked.wav',
+        'locked-sound' => 'conference/conf-locked.wav',
+        'is-locked-sound' => 'conference/conf-is-locked.wav',
+        'is-unlocked-sound' => 'conference/conf-is-unlocked.wav',
+        'pin-sound' => 'conference/conf-pin.wav',
+        'bad-pin-sound' => 'conference/conf-bad-pin.wav',
+        //'pin' => '',
+        //'caller-id-name' => '',
+        //'caller-id-number' => '',
+        //'suppress-events' => '',
+        'comfort-noise' => 'true',
+        //'auto-record' => ''
+    );
 
     public static $errors = array(
         'name' => array(
@@ -50,25 +64,31 @@ class Conference extends Bluebox_Record {
         )
     );
 
-    function setTableDefinition(){
+    function setTableDefinition()
+    {
         $this->hasColumn('conference_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
+
         $this->hasColumn('name', 'string', 100, array('notnull' => true, 'notblank' => true));
-        $this->hasColumn('room_pin', 'string', 20, array('default' => NULL));
-        $this->hasColumn('record', 'boolean', NULL, array('default' => false));
-        $this->hasColumn('record_location', 'string', 100);
-        $this->hasColumn('comfort_noise', 'boolean', NULL, array('notnull' => true, 'default' => true));
-        $this->hasColumn('moh_type', 'integer', 11, array('notnull' => true, 'default' => 1));
-        $this->hasColumn('moh_file', 'string', 100);
-        $this->hasColumn('conference_soundmap_id', 'integer', 11, array('unsigned' => true, 'default' => 1));
+
+        $this->hasColumn('controlls', 'array', 10000, array('default' => array()));
+
+        $this->hasColumn('profile', 'array', 10000, array('default' => array()));
+
+        $this->hasColumn('pins', 'array', 10000, array('default' => array()));
+
+        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
+
+        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
-    function setUp() {
-        $this->hasOne('ConferenceNumber as Number', array('local' => 'conference_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
-        $this->hasOne('ConferenceSoundmap', array('local' => 'conference_soundmap_id', 'foreign' => 'conference_soundmap_id'));
-        $this->hasMany('ConferencePins', array('local' => 'conference_id', 'foreign' => 'conference_id'));
+    function setUp()
+    {
+        $this->hasMany('ConferenceNumber as Number', array('local' => 'conference_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
 
         $this->actAs('Timestampable');
+
         $this->actAs('TelephonyEnabled');
+        
         $this->actAs('MultiTenant');
     }
 }

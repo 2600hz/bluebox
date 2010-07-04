@@ -1,3 +1,3 @@
-<?php
-    plugins::register('timeofday.edit', 'save', array('TimeOfDay_Plugin', 'checkChanges'));
-    plugins::register('timeofday.success', 'save', array('TimeOfDay_Plugin', 'dirtyNumbers'));
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
+    Event::add('numbermanager.collectNumberTargets', array('TimeRoutes', 'provideNumberTargets'));

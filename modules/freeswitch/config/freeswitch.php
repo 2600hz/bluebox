@@ -10,7 +10,6 @@ $config['ESLAuth'] = 'ClueCon';
 $config['cfg_root'] = '/usr/local/freeswitch/conf';
 
 // WARNING: If you duplicate sections in the filemap, you may end up with empty files!
-
 $config['filemap'][] = array (
     // Where do the files go for this feature? Note, if you end with a / and set the id key
     // you imply each individual id goes into it's own file in a subdirectory
@@ -60,3 +59,4 @@ $config['filemap'][] = array (
     'filename' => $config['cfg_root'] .'/freeswitch.xml',
     'query' => '//document',
 );*/
+

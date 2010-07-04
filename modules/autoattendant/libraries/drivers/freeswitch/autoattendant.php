@@ -1,63 +1,85 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver {
-    /**
-     * Indicate we support FreeSWITCH with this Auto Attendant
-     */
-    public static function set($obj)
+class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver
+{
+    public static function set($autoattendant)
     {
-
-	$xml = Telephony::getDriver()->xml;
-
-        $xml->setXmlRoot('//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]/menus');
+        $xml = FreeSwitch::setSection('autoattendant', $autoattendant['auto_attendant_id']);
         
-        $greeting = ($obj->type == 'audio') ? str_replace('/', '\/', FileManager::getFilePath($obj->file_id)) : 'say: ' . $obj->tts_string;
+        switch($autoattendant['registry']['type'])
+        {
+            case 'audio':
 
-        $node = sprintf('/menu[@name="%s"]{@timeout="%d"}{@inter-digit-timeout="%s"}{@greet-long="%s"}{@greet-short="%s"}',
-					'auto_attendant_' . $obj->auto_attendant_id,
-					$obj->timeout * 1000,
-                                        $obj->digit_timeout * 1000,
-					$greeting,
-					$greeting);
-                                    
-       if (!empty($obj->extension_context_id)) {
-           $node .= '{@digit-len="' .$obj->extension_digits .'"}';
-       }
+                break;
 
-       $xml->update($node); // work from this location
+            default:
+                if (empty($autoattendant['registry']['tts_string']))
+                {
+                    $tts_string = 'Thank you for calling, your call is important to us.';
+                }
+                else
+                {
+                    $tts_string = $autoattendant['registry']['tts_string'];
+                }
 
-       $xml->setXmlRoot(sprintf('//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]/menus/menu[@name="%s"]', 'auto_attendant_' . $obj->auto_attendant_id));
-       $xml->deleteChildren();
+                $tts_string = preg_replace('/[^A-Za-z0-9.,!? ]/', '', $tts_string);
 
-       if (!empty($obj->extension_context_id)) {
-           $xml->update(sprintf('/entry[@action="menu-exec-app"][@name="catch_all"][@digits="\/^([0-9]{%s})$\/"][@param="execute_extension $1 XML context_%s"]', $obj->extension_digits, $obj->extension_context_id));
-       }
+                $xml->setAttributeValue('', 'tts-engine', 'cepstral');
+
+                $xml->setAttributeValue('', 'tts-voice', 'Allison-8kHz');
+
+                $xml->setAttributeValue('', 'greet-long', $tts_string);
+
+                $xml->setAttributeValue('', 'greet-short', $tts_string);
+        }
+
+        if (!empty($autoattendant['extension_context_id']))
+        {
+            $xml->setAttributeValue('', 'digit-len', $autoattendant['extension_digits']);
+        }
+
+        $xml->deleteChildren();
+
+        if (!empty($autoattendant['extension_context_id']))
+        {
+           $xml->update(sprintf('/entry[@action="menu-exec-app"][@name="catch_all"][@digits="\/^([0-9]{%s})$\/"][@param="execute_extension $1 XML context_%s"]', $autoattendant['extension_digits'], $autoattendant['extension_context_id']));
+        }
+
+        foreach ($autoattendant['keys'] as $key)
+        {
+            if (empty($key['digits']))
+            {
+                continue;
+            }
+
+            if(!($transferString = fs::getTransferToNumber($key['number_id'])))
+            {
+                continue;
+            }
+
+            $xml->update(sprintf('/entry[@action="menu-exec-app"][@digits="%s"][@param="transfer %s"]', $key['digits'], $transferString));
+        }
     }
 
-    public static function delete($obj)
+    public static function delete($autoattendant)
     {
-        $xml = Telephony::getDriver()->xml;
-
-        $xml->setXmlRoot(sprintf('//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]/menus/menu[@name="%s"]', 'auto_attendant_' . $obj->auto_attendant_id));
-
-        $xml->deleteNode();
+        FreeSwitch::setSection('autoattendant', $autoattendant['auto_attendant_id'])->deleteNode();
     }
 
-    /**
-     * Add Auto Attendant to the dialplan
-     * @param Bluebox_Record $obj
-     *
-     * @author Dale Hege
-     */
-    public static function dialplan($obj)
+    public static function dialplan($number)
     {
         $xml = Telephony::getDriver()->xml;
-
-        $ringtype = ($obj->options['ringtype'] == 'Ringing' ? "us-ring" : 'moh');
         
-        $xml->update('/action[@application="set"][@bluebox="ring"]{@data="ringback=${' . $ringtype . '}"}');
-        $xml->update('/action[@application="set"][@bluebox="xfer-ring"]{@data="transfer_ringback=${' . $ringtype . '}"}');
+        $destination = $number['Destination'];
+
+//        $ringtype = ($number->options['ringtype'] == 'Ringing' ? "us-ring" : 'moh');
+//
+//        $xml->update('/action[@application="set"][@bluebox="ring"]{@data="ringback=${' . $ringtype . '}"}');
+//
+//        $xml->update('/action[@application="set"][@bluebox="xfer-ring"]{@data="transfer_ringback=${' . $ringtype . '}"}');
+
         $xml->update('/action[@application="answer"]');
-        $xml->update('/action[@application="ivr"]{@data="auto_attendant_' . $obj->AutoAttendant->auto_attendant_id .'"}');
+
+        $xml->update('/action[@application="ivr"]{@data="auto_attendant_' .$destination['auto_attendant_id'] .'"}');
     }
 }

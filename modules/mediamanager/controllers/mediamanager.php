@@ -153,6 +153,13 @@ class Mediamanager_Controller extends Bluebox_Controller
                     }
                     if ($this->upload($replace, $description)) {
                         message::set('Uploaded file', 'success');
+
+
+
+
+
+
+
                     }
                     break;
 
@@ -288,6 +295,7 @@ class Mediamanager_Controller extends Bluebox_Controller
                 }
             }
             $filename = upload::save('upload', $_FILES['upload']['name'], $this->uploadPath); //moves tmp file
+            
             return true;
         } else {
             Kohana::log('info', 'Failed Kohana validation rules during upload');
@@ -325,5 +333,9 @@ class Mediamanager_Controller extends Bluebox_Controller
     private function bytesToMb($byte)
     {
         return $byte / 1048576 . 'Mb';
+    }
+
+    public function qtipAjaxReturn($data) {
+        javascript::codeBlock('$(\'.jqgrid_instance\').trigger("reloadGrid");');
     }
 }

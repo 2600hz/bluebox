@@ -26,7 +26,8 @@
  * @package TCAPI
  * @subpackage FreeSWITCH_Driver
  */
-interface FreeSwitch_Base_Driver_Interface {
+interface FreeSwitch_Base_Driver_Interface
+{
     public static function set($obj);
         // Must be defined by implementor!
 
@@ -35,7 +36,8 @@ interface FreeSwitch_Base_Driver_Interface {
 
 }
 
-abstract class FreeSwitch_Base_Driver implements FreeSwitch_Base_Driver_Interface {
+abstract class FreeSwitch_Base_Driver implements FreeSwitch_Base_Driver_Interface
+{
     public static function dialplan($obj)
     {
         return FALSE;   // Not supported if not overridden

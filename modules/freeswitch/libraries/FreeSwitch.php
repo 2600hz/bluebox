@@ -63,7 +63,9 @@ class FreeSwitch extends Telephony_Driver
     private static $trunksDirty = FALSE;
 
     protected static $sectionPaths = array(
-        'user' => 	'//document/section[@name="directory"]/domain[@name="%s"]/groups/group[@name="default"]/users/user[@id="%s"]',
+        'user' => 	'//document/section[@name="directory"]/domain[@name="%s"]/groups/group[@name="default"]/users/user[@blubox_id="%s"]',
+        'autoattendants' => '//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]/menus',
+        'autoattendant' => '//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]/menus/menu[@name="auto_attendant_%s"]',
         'ringgroup' => '//document/section[@name="directory"]/domain[@name="%s"]/groups/group[@name="%s"]',
         'location' => '//document/section[@name="locations"]',
         'directory' => '//document/section[@name="directory"]',
@@ -83,12 +85,15 @@ class FreeSwitch extends Telephony_Driver
         // This will keep this driver from loading before we know
         // if we can extend the domdocument (such as during install)
         if (!class_exists('DOMDocument'))
+        {
             return NULL;
+        }
 
-        if (!isset(self::$instance)) {
+        if (!isset(self::$instance))
+        {
             self::$instance = new self();
 
-            Kohana::log('debug', 'New instance of FreeSwitch telephony driver created.');
+            Kohana::log('debug', 'FreeSWITCH -> New instance of FreeSwitch telephony driver created.');
 
             self::reset();
         }
@@ -104,7 +109,9 @@ class FreeSwitch extends Telephony_Driver
     public function load($fileOptions)
     {
         self::$dirty = FALSE;
-        if (!isset($fileOptions['filename'])) {
+
+        if (!isset($fileOptions['filename']))
+        {
             return FALSE;
         }
 
@@ -112,20 +119,29 @@ class FreeSwitch extends Telephony_Driver
         /*if (array_search($fileOptions['filename'], $this->loaded))
             return TRUE;*/
 
-        if (file_exists($fileOptions['filename'])) {
-            //$this->loaded[] = $fileOptions['filename'];
-
+        if (file_exists($fileOptions['filename']))
+        {
             $savedRoot = $this->xml->getXmlRoot();
+
             $this->xml->setXmlRoot('');
 
             // Read from disk and prep the old config
             $oldConfig = new DOMDocument();
-            $oldConfig->preserveWhiteSpace = false;	// don't mess with whitespace in the file
-            $oldConfig->formatOutput = true;			// format the output in a "pretty" style, per PHP's built-in formatting
-            try {
+
+            // don't mess with whitespace in the file
+            $oldConfig->preserveWhiteSpace = false;
+
+            // format the output in a "pretty" style, per PHP's built-in formatting
+            $oldConfig->formatOutput = true;
+
+            try
+            {
                 $oldConfig->load($fileOptions['filename']);
-            } catch (Exception $e) {
-                Kohana::log('error', 'Unable to load XML from ' . $fileOptions['filename'] . '! Error: ' . $e->getMessage());
+            } 
+            catch (Exception $e)
+            {
+                Kohana::log('error', 'FreeSWITCH -> Unable to load XML from ' . $fileOptions['filename'] . '! Error: ' . $e->getMessage());
+                
                 return FALSE;
             }
 
@@ -133,23 +149,34 @@ class FreeSwitch extends Telephony_Driver
             // the place holder does NOT include the last element in the query! Otherwise we will cause issues if there are attributes
             // on the core tag used in the query
             $query = substr($fileOptions['query'], 0, strrpos($fileOptions['query'], '/'));
+
             $this->xml->set($query);
+
             $xp = new DOMXPath($this->xml);
+
             $base = $xp->query($query);
 
             // Deal with the fact that root include tags are stripped out by FS, but not every file has an include! How annoying...
-            if ($oldConfig->documentElement->tagName == 'include') {
+            if ($oldConfig->documentElement->tagName == 'include')
+            {
                 // Because there could be multiple items inside an <include>, but we want to ignore the include, we must import all childnodes
                 $oldConfigRoot = $oldConfig->documentElement->childNodes;
-                foreach ($oldConfigRoot as $oldConfigNode) {
+
+                foreach ($oldConfigRoot as $oldConfigNode)
+                {
                     $oldConfigNode = $this->xml->importNode($oldConfigNode, TRUE);
+
                     $base->item(0)->appendChild($oldConfigNode);
                 }
-            } else {
+            } 
+            else
+            {
                 // Import everything - including the root (we are sure there's only one, per XML spec)
                 // NOTE: This will "fix" the jenky include issue listed above and ensure every file starts with an include in it's root
                 $oldConfigRoot = $oldConfig->documentElement;
+
                 $oldConfigNode = $this->xml->importNode($oldConfigRoot, TRUE);
+
                 $base->item(0)->appendChild($oldConfigNode);
             }
 
@@ -162,32 +189,44 @@ class FreeSwitch extends Telephony_Driver
     public function saveSection($fileOptions)
     {
         // Go load the requested XML info
-        if ($fileOptions == NULL) {
+        if ($fileOptions == NULL)
+        {
             return;
         }
 
-        if ($fileOptions['query'] == '//document') {
+        if ($fileOptions['query'] == '//document')
+        {
             // TODO: Save the base file
             return FALSE;
         }
 
         $configDoc = $this->xml;
+
         $xp = new DOMXPath($configDoc);
 
         // First, see if the section requested exists in the config
         $elements = $xp->query($fileOptions['query']);
-        if (!is_null($elements)) {
+
+        if (!is_null($elements))
+        {
             $file = $fileOptions['filename'];
 
             // Prep the destination doc
             $includeDoc = new DOMDocument();
-            $includeDoc->preserveWhiteSpace = false;	// don't mess with whitespace in the file
-            $includeDoc->formatOutput = true;			// format the output in a "pretty" style, per PHP's built-in formatting
+
+            // don't mess with whitespace in the file
+            $includeDoc->preserveWhiteSpace = false;
+
+            // format the output in a "pretty" style, per PHP's built-in formatting
+            $includeDoc->formatOutput = true;
+
             $includeRoot = $includeDoc->createElement('include');
 
             // Cycle through everything to save, and save it!
-            if ($elements) {
-                foreach ($elements as $element) {
+            if ($elements)
+            {
+                foreach ($elements as $element)
+                {
                     /*if (isset($fileOptions['id'])) {
                         $ids = $xp->query($fileOptions['id'], $element);
                         if ($ids)
@@ -198,38 +237,46 @@ class FreeSwitch extends Telephony_Driver
 
                     // Remove the elements we just grabbed from the master document and replace with an include
                     $parent = $element->parentNode;
+
                     $parent->removeChild($element);
                 }
 
                 // Now add an 'include' statement in place of the element we removed
                 $includeNode = $configDoc->createElement('X-PRE-PROCESS');
+
                 $includeNode->setAttribute('cmd', 'include');
+
                 $includeNode->setAttribute('data', $file);
+
                 if (isset($parent))
                 {
                     $parent->appendChild($includeNode);
-                } else {
+                } 
+                else
+                {
                     $configDoc->appendChild($includeNode);
                 }
             }
             
             $includeDoc->appendChild($includeRoot);
 
-            // Save our include file here
-            Kohana::log('debug', 'Saving config data to ' . $file);
-
-            if((!file_exists($file)) or is_writable($file)) /* upgrades, system migration or just playing with chmod might result in not being able to write to the file */
+            /* upgrades, system migration or just playing with chmod might result in not being able to write to the file */
+            if((!file_exists($file)) or is_writable($file)) 
             {
                 $fp = fopen($file, 'w');
+
                 fputs ($fp, $includeDoc->saveXML());
+
                 fclose($fp);
-            } else {
-                Kohana::log('debug', 'File ' . $file . ' is not writable');
+            } 
+            else
+            {
+                Kohana::log('debug', 'FreeSWITCH -> File ' . $file . ' is not writable');
+                
                 throw new Exception(__("File $file is not writable.  Please correct this issue before saving."));
             }
 
-            Kohana::log('debug', 'Done saving config file ' . $file);
-
+            Kohana::log('debug', 'FreeSWITCH -> Done saving config file ' . $file);
         }
 
         // Replace the stripped out document with an include
@@ -240,18 +287,28 @@ class FreeSwitch extends Telephony_Driver
 
     public function save($sections = NULL)
     {
-        if (!$sections) {
+        if (!$sections)
+        {
             $sections = array_keys($this->sectionsUsed);
         }
 
         $filemap = Kohana::config('freeswitch.filemap');
 
         // Cycle through everything that was presumed loaded/created and assume it needs to be written to disk/updated
-        foreach ($sections as $key) if (isset($filemap[$key]['filename'])) {
-            $fileOptions = $filemap[$key];
-            Kohana::log('debug', 'Requesting save of section ' . $fileOptions['filename'] . '...');
-            $this->saveSection($fileOptions);
-            unset($this->sectionsUsed[$key]);
+        foreach ($sections as $key)
+        {
+            if (isset($filemap[$key]['filename']))
+            {
+                $fileOptions = $filemap[$key];
+
+                Kohana::log('debug', 'FreeSWITCH -> Requesting save of section ' . $fileOptions['filename'] . '...');
+
+                $this->saveSection($fileOptions);
+
+                Telephony::$filesUpdated[] = $fileOptions['filename'];
+                
+                unset($this->sectionsUsed[$key]);
+            }
         }
     }
 
@@ -285,11 +342,17 @@ class FreeSwitch extends Telephony_Driver
         // Use the "renderPartial" function if you only want a subsection of the HTML for, say, returning XML Curl
         //$this->xml = new SimpleXMLElement('<?xml version="1.0"? ><document type="freeswitch/xml"/>');
         $xml = new FsDomDocument();
-        $xml->preserveWhiteSpace = false;	// don't mess with whitespace in the file
-        $xml->formatOutput = true;			// format the output in a "pretty" style, per PHP's built-in formatting
+
+        // don't mess with whitespace in the file
+        $xml->preserveWhiteSpace = false;	
+        
+        // format the output in a "pretty" style, per PHP's built-in formatting
+        $xml->formatOutput = true;			
 
         $baseElement = $xml->createElement('document');
+
         $baseElement->setAttribute('type', 'freeswitch/xml');
+
         $xml->appendChild($baseElement);
 
         self::$instance->xml = $xml;
@@ -298,26 +361,30 @@ class FreeSwitch extends Telephony_Driver
     public function commit()
     {
         // Activate any changed settings on the switch, live
-        if (!Bluebox_Core::is_installing()) {
-            if (class_exists('EslManager', TRUE) && (self::$dirty or self::$aclDirty or self::$sofiaDirty)) {
-                $esl = new EslManager();
-                if (self::$dirty) {
-                    $esl->reloadxml();
-                }
+//        if (!Bluebox_Core::is_installing()) {
+//            if (class_exists('EslManager', TRUE) && (self::$dirty or self::$aclDirty or self::$sofiaDirty)) {
+//                $esl = new EslManager();
+//                if (self::$dirty) {
+//                    $esl->reloadxml();
+//                }
+//
+//                if (self::$aclDirty) {
+//                    $esl->reloadacl();
+//                }
+//
+//                // NOTE: Sofia reload must come after reloadxml, and also note that sofia reload implies trunk reload so this is an elseif
+//                if (self::$sofiaDirty) {
+//                    $esl->reload('mod_sofia');
+//                }
+//            }
+//        }
 
-                if (self::$aclDirty) {
-                    $esl->reloadacl();
-                }
-
-                // NOTE: Sofia reload must come after reloadxml, and also note that sofia reload implies trunk reload so this is an elseif
-                if (self::$sofiaDirty) {
-                    $esl->reload('mod_sofia');
-                }
-            }
-        }
         self::$dirty = FALSE;
+
         self::$aclDirty = FALSE;
+
         self::$sofiaDirty = FALSE;
+
         self::$trunksDirty = FALSE;
     }
 
@@ -335,10 +402,15 @@ class FreeSwitch extends Telephony_Driver
     public static function getSectionPath($sectionName)
     {
         $args = func_get_args();
+
         array_shift($args);
+
         $tmp = self::$sectionPaths[$sectionName];
+
         if ($args)
+        {
             $tmp = vsprintf($tmp, $args);
+        }
 
         return $tmp;
     }
@@ -366,39 +438,55 @@ class FreeSwitch extends Telephony_Driver
     public static function setSection($sectionName)
     {
         $args = func_get_args();
+
         array_shift($args);
-        if ($args) {
+
+        if ($args)
+        {
             self::$instance->xml->setXmlRoot(vsprintf(self::$sectionPaths[$sectionName], $args));
-        } else {
+        } 
+        else
+        {
             self::$instance->xml->setXmlRoot(self::$sectionPaths[$sectionName]);
         }
 
-        if ($sectionName == 'netlist') {
+        if ($sectionName == 'netlist')
+        {
             self::$aclDirty = TRUE;
         }
 
-        if (($sectionName == 'sofia') or ($sectionName == 'gateway')) {
+        if (($sectionName == 'sofia') or ($sectionName == 'gateway'))
+        {
             self::$sofiaDirty = TRUE;
         }
 
-        return self::$instance->xml; // This probably isn't necessary. Could just return nothing.
+        // This probably isn't necessary. Could just return nothing.
+        return self::$instance->xml; 
     }
 
     public static function createExtension($extensionName, $section = NULL, $context = NULL, array $options = array())
     {
-        if (!$context) {
-            if (self::getCurrentContext()) {
+        if (!$context)
+        {
+            if (self::getCurrentContext())
+            {
                 $context = self::getCurrentContext();
-            } else {
+            } 
+            else
+            {
                 // Context is required - fail here.
                 return FALSE;
             }
         }
 
-        if (!$section) {
-            if (self::getCurrentSection()) {
+        if (!$section)
+        {
+            if (self::getCurrentSection())
+            {
                 $section = self::getCurrentSection();
-            } else {
+            } 
+            else
+            {
                 $section = 'main';  // For regular desinations, add main_ to them by default
             }
         }
@@ -416,6 +504,7 @@ class FreeSwitch extends Telephony_Driver
 
         // Get a reference to the root context node, for use wherever
         $elements = $xp->query('//document/section[@name="dialplan"]/context[@name="' . $context . '"]');
+
         $contextRootNode = $elements->item(0);
 
         // Next, see if the extension exists. If not, create it but respect the insert before/after parameters so things
@@ -423,38 +512,54 @@ class FreeSwitch extends Telephony_Driver
         // NOTE: This will NOT fix people who have manually screwed up the order of their dialplan
         $elements = $xp->query('//document/section[@name="dialplan"]/context[@name="' . $context . '"]/extension[@name="' . $section . '_' . $extensionName . '"]');
 
-        if ($elements->length == 0) {
+        if ($elements->length == 0)
+        {
             $sections = self::getDialplanSections();
+
             // This is a new extension we are creating - search for where to put it by finding the last item above it
             $insert_position = array_search($section, $sections);
 
             // Keep going up the document from the bottom until we find the right section
-            while ($insert_position > 0 and ($elements->length == 0)) {
+            while ($insert_position > 0 and ($elements->length == 0))
+            {
                 $insert_position--;
+                
                 $elements = $xp->query('//document/section[@name="dialplan"]/context[@name="' . $context . '"]/extension[starts-with(@name,"' . $sections[$insert_position] . '_")]');
             }
 
             $newNode = self::$instance->xml->createElement('extension');
+
             $newNode->setAttribute('name', $section . '_' . $extensionName);
+
             $newNode->setAttribute('continue', 'true');
+
             // Did we fail at finding the right place to insert? If so, just insert at the top
-            if ($insert_position == 0) {
-                Kohana::log('debug', 'Adding ' . $section . '_' . $extensionName . ' at top of context ' . $context);
+            if ($insert_position == 0)
+            {
+                Kohana::log('debug', 'FreeSWITCH -> Adding ' . $section . '_' . $extensionName . ' at top of context ' . $context);
+                
                 $contextRootNode->insertBefore($newNode, $contextRootNode->firstChild);
-            } else {
+            } 
+            else
+            {
                 // Otherwise, we found where to insert. Append away!
 
                 // Get the last element from the search, we will insert immediately after it
                 $element = $elements->item($elements->length - 1);
-                Kohana::log('debug', 'Adding ' . $section . '_' . $extensionName . ' after ' . $element->nodeName . ' in context ' . $context);
+
+                Kohana::log('debug', 'FreeSWITCH -> Adding ' . $section . '_' . $extensionName . ' after ' . $element->nodeName . ' in context ' . $context);
+
                 self::$instance->xml->appendSibling($newNode, $element);
             }
-        } else {
-            Kohana::log('debug', 'Extension ' . $section . '_' . $extensionName . ' already exists in context ' . $context . '. Not adding anything.');
+        } 
+        else
+        {
+            Kohana::log('debug', 'FreeSWITCH ->  Extension ' . $section . '_' . $extensionName . ' already exists in context ' . $context . '. Not adding anything.');
         }
 
         // Set our XML Root automatically to be inside this extension, presuming the next commands will add/modify stuff to it
         self::$instance->xml->setXmlRoot('//document/section[@name="dialplan"]/context[@name="' . $context . '"]/extension[@name="' . $section . '_' . $extensionName . '"]');
+
         self::$instance->xml->setExtensionRoot('//document/section[@name="dialplan"]/context[@name="' . $context . '"]/extension[@name="' . $section . '_' . $extensionName . '"]');
         
         return self::$instance->xml;
@@ -480,13 +585,19 @@ class FreeSwitch extends Telephony_Driver
         // otherwise we are wasting cycles and string comparisons
         $paths = (array)$path;
 
-        foreach ($paths as $path) {
-            foreach (Kohana::config('freeswitch.filemap') as $key => $options) if (isset($options['filename'])) {
-                if (strpos($path, $options['query']) !== FALSE) {
+        foreach ($paths as $path)
+        {
+            foreach (Kohana::config('freeswitch.filemap') as $key => $options) if (isset($options['filename']))
+            {
+                if (strpos($path, $options['query']) !== FALSE)
+                {
                     // See if this is already in memory
-                    if (!isset($this->sectionsUsed[$key])) {
+                    if (!isset($this->sectionsUsed[$key]))
+                    {
                         $this->sectionsUsed[$key] = TRUE;
-                        Kohana::log('debug', 'For query ' . $path . ' we\'re loading ' . $options['filename']);
+
+                        Kohana::log('debug', 'FreeSWITCH -> For query ' . $path . ' we\'re loading ' . $options['filename']);
+
                         Telephony::load($options);
                     }
                 }
@@ -494,62 +605,3 @@ class FreeSwitch extends Telephony_Driver
         }
     }
 }
-
-/*
- *     function callCreate() {
-		$this->output = <<<XML
-<action application="ivr" data="1=extA;2=extB;3=extC"/>
-XML;
-
-    }
-
-    function callTransfer() {
-
-    }
-
-    function callHold() {
-
-    }
-
-    function callProgress($current) {
-
-    }
-
-    function setMOH() {
-
-    }
-
-    function parkPush($lot = 'default') {
-        $this->xml .= "";
-    }
-
-    function parkPop($destination) {
-
-    }
-
-    function get($variable, $value) {
-
-    }
-
-    function ifThenElse($condition, $action, $antiaction) {
-
-    }
-
-    function set($variable, $value) {
-
-    }
-
-    function queuePush() {
-
-    }
-
-    function queuePop() {
-
-    }
-
-    function queueDrop() {
-
-    }
-
-
- */

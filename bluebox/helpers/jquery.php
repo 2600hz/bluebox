@@ -10,7 +10,7 @@
  * @package  jquery
  * @version  0.8
  */
-class jquery_Core
+class jquery
 {
     /**
      * static var for singlton
@@ -44,6 +44,12 @@ class jquery_Core
      * @var array
      */
     public $extraCss = array();
+
+    public static $jqCore = array(
+        'jquery/jquery-1.4.2.min.js',
+        'jquery/jquery.helper.js'
+    );
+
     /**
      * a collection of dependencies mappings fo jquery plugins (loaded in order)
      *
@@ -205,6 +211,14 @@ class jquery_Core
         ),
         'destinations' => array(
             'js' => '/destinations.js'
+        ),
+        'spinner' => array(
+            'js' => array(
+                'jquery.mousewheel.js',
+                'ui.core.js',
+                'ui.spinner.js'
+            ) ,
+            'css' => 'jquery/spinner.css'
         )
     );
     /**
@@ -479,8 +493,9 @@ class jquery_Core
         $jqPlugins = jquery::$jqPlugins;
 
         // Ensure our core assest are on the page
-        javascript::add('jquery/jquery-1.3.2.min.js', 20);
-        javascript::add('jquery/jquery.helper.js', 20);
+        foreach (self::$jqCore as $jqCore) {
+            javascript::add($jqCore, 20);
+        }
 
         // Load any additional jquery plugins
         foreach(jquery::$jquery->plugins as $plugin) {

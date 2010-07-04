@@ -1,8 +1,11 @@
 <div id="usermanager_update_header" class="update usermanager module_header">
+
     <h2><?php echo __($title); ?></h2>
+
 </div>
 
 <div id="usermanager_update_form" class="update usermanager">
+
     <?php echo form::open(); ?>
 
     <?php echo form::open_section('User Information'); ?>
@@ -23,28 +26,8 @@
 
         <div class="field">
         <?php
-            if (Router::$method == 'add')
-            {
-                $pwdAttr = array('for' => 'user[password]');
-            } else {
-                $pwdAttr = array('for' => 'user[password]', 'hint' => 'Leave blank to keep');
-            }
-            echo form::label($pwdAttr, 'Password:');
-            echo form::password('user[password]', $password);
-        ?>
-        </div>
-
-        <div class="field">
-        <?php
-            echo form::label('user[confirm_password]', 'Confirm Password:');
-            echo form::password('user[confirm_password]', $confirm_password);
-        ?>
-        </div>
-
-        <div class="field">
-        <?php
-            echo form::label('user[email_address]', 'Email:');
-            echo form::input('user[email_address]');
+            echo form::label('user[user_type]', 'User Type:');
+            echo usermanager::dropdownUserType('user[user_type]');
         ?>
         </div>
 
@@ -57,21 +40,74 @@
 
     <?php echo form::close_section(); ?>
 
-    <?php
-        if (isset($views)) {
-            echo subview::render($views, 'general');
-        }
+    <?php echo form::open_section('Credentials'); ?>
 
-        $order = array('identification' ,'membership', 'routing', 'notification', 'features', 'other');
-        if (isset($views)) {
-            echo subview::renderAsSections($views, $order);
+        <div class="field">
+        <?php
+            echo form::label('user[email_address]', 'Email:');
+            echo form::input('user[email_address]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            if (Router::$method == 'create')
+            {
+                $pwdAttr = array('for' => 'user[create_password]');
+            } else {
+                $pwdAttr = array('for' => 'user[create_password]', 'hint' => 'Leave blank to keep');
+            }
+            echo form::label($pwdAttr, 'Password:');
+            echo form::input('user[create_password]',
+                isset($password) ? $password : NULL
+            );
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label('user[confirm_password]', 'Confirm Password:');
+            echo form::input('user[confirm_password]',
+                isset($confirm_password) ? $confirm_password : NULL
+            );
+        ?>
+        </div>
+
+    <?php echo form::close_section(); ?>
+
+    <?php
+        if (isset($views))
+        {
+            echo subview::render($views);
         }
     ?>
 
+    <?php if (users::$user->user_type == User::TYPE_SYSTEM_ADMIN) : ?>
+
+        <?php jquery::addPlugin('spinner'); ?>
+    
+        <?php echo form::open_section('Debug'); ?>
+
+            <div class="field">
+            <?php
+                echo form::label('user[debug_level]', 'UI Level:');
+                echo form::input('user[debug_level]');
+                javascript::codeBlock('$("#user_debug_level").spinner({max: 4, min: 0});');
+            ?>
+            </div>
+
+        <?php echo form::close_section(); ?>
+
+    <?php endif; ?>
+
     <div class="buttons form_bottom">
+
         <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
+
         <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
+
     </div>
 
     <?php echo form::close(); ?>
 </div>
+

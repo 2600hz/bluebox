@@ -1,20 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * Bluebox_arr.php - Bluebox array helper extension
- *
- * @author Karl Anderson
- * @license LGPL
- * @package Bluebox
- * @subpackage Core
- */
 
-class form extends form_Core {
-
-    /**
-     * @var bool When true the form helper methods echo the result instead of returning it
-     */
-    public static $inline = false;
-
+class form extends form_Core
+{
     /**
      * This var allows users to add classes to any or all form elements.  Array
      * keys can the name of a form method or the word 'all'.  The value can
@@ -26,12 +13,6 @@ class form extends form_Core {
      * @var array
      */
     public static $customClasses = array();
-
-    /**
-     * This is used to track the open form request its method
-     * @var array
-     */
-    private static $formCount = array();
 
     /**
      * This is a cache of repopulate values so we dont have to look them up
@@ -55,9 +36,8 @@ class form extends form_Core {
 
         // Call the parent
         $result = parent::open($action, $attr, $hidden);
-
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        
+        return $result;
     }
 
     /**
@@ -76,8 +56,7 @@ class form extends form_Core {
         // Call the parent
         $result = parent::open_multipart($action, $attr, $hidden);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -95,8 +74,7 @@ class form extends form_Core {
         // Call the parent
         $result = parent::open_fieldset($data, $extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -109,8 +87,7 @@ class form extends form_Core {
         // Call the parent
         $result = parent::close_fieldset();
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -127,10 +104,9 @@ class form extends form_Core {
         list($text, $data, $extra) = self::_addDefaults(__FUNCTION__, $text, $data, $extra);
 
         // Call the parent
-        $result = parent::legend('<span>' . $text . '</span>', $data, $extra);
-
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        $result = '<span>' . $text . '</span>';
+        
+        return '<div'.form::attributes((array) $data).' '.$extra.'>'.$result.'</div>'."\n";
     }
 
     /**
@@ -151,7 +127,8 @@ class form extends form_Core {
             );
         }
 
-        $input = parent::open_fieldset(array('class' => 'hidden_inputs'), '');
+        $result = parent::open_fieldset(array('class' => 'hidden_inputs'), '');
+
         foreach ($data as $name => $value)
         {
             // This is a special case, we will get the classes back as well as
@@ -167,12 +144,12 @@ class form extends form_Core {
                 'class' => $classes
             );
 
-            $input .= parent::input($attr)."\n";
+            $result .= parent::input($attr)."\n";
         }
-        $input .= self::close_fieldset();
+
+        $result .= self::close_fieldset();
         
-        // Either return or echo depending on self::$inline
-        return self::_output($input);
+        return $result;
     }
 
     /**
@@ -188,7 +165,8 @@ class form extends form_Core {
      */
     public static function input($data, $value = NULL, $extra = '', $double_encode = TRUE )
     {
-        if (empty($data['type']) || $data['type'] != 'hidden') {
+        if (empty($data['type']) || $data['type'] != 'hidden')
+        {
             // Add the Bluebox defaults (such as css classes)
             list($data, $value, $extra) = self::_addDefaults(__FUNCTION__, $data, $value, $extra);
         }
@@ -200,8 +178,7 @@ class form extends form_Core {
             'value' => $value
         );
 
-        // Either return or echo depending on self::$inline
-        return self::_output('<input'.form::attributes($data).' '.$extra.' />');
+        return '<input'.form::attributes($data).' '.$extra.' />';
     }
 
     /**
@@ -220,8 +197,7 @@ class form extends form_Core {
         // Call the parent
         $result = parent::password($data, $value, $extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -240,8 +216,7 @@ class form extends form_Core {
         // Call the parent
         $result = parent::upload($data, $value, $extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -261,8 +236,7 @@ class form extends form_Core {
         // Call the parent
         $result = parent::textarea($data, $value, $extra, $double_encode);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -279,19 +253,23 @@ class form extends form_Core {
         // Add the Bluebox defaults (such as css classes)
         list($data, $options, $selected, $extra) = self::_addDefaults(__FUNCTION__, $data, $options, $selected, $extra);
 
-        if (!empty($data['translate'])) {
-            foreach ($options as $key => $value) {
+        if (!empty($data['translate']))
+        {
+            foreach ($options as $key => $value)
+            {
                 $options[$key] = self::_i18n($value);
             }
         }
-        if (isset($data['translate'])) {
+        
+        if (isset($data['translate']))
+        {
             unset($data['translate']);
         }
+        
         // Call the parent
         $result = parent::dropdown($data, $options, $selected, $extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -310,12 +288,13 @@ class form extends form_Core {
 
         // Call the parent
         $result = self::hidden('__' .$data['name'], $data['unchecked']);
+        
         unset($data['unchecked']);
+        
         // Call the parent
         $result .= parent::checkbox($data, $value, $checked, $extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -335,8 +314,8 @@ class form extends form_Core {
         // Call the parent
         $result = parent::radio($data, $value, $checked, $extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        
+        return $result;
     }
 
     /**
@@ -355,8 +334,7 @@ class form extends form_Core {
         // Call the parent
         $result = parent::submit($data, $value, $extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -374,9 +352,8 @@ class form extends form_Core {
 
         // Call the parent
         $result = parent::button($data, $value, $extra);
-
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        
+        return $result;
     }
 
     /**
@@ -392,8 +369,7 @@ class form extends form_Core {
         // Call the parent
         $result = parent::close($extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     /**
@@ -416,17 +392,23 @@ class form extends form_Core {
         // Add the Bluebox defaults (such as css classes)
         list($data, $text, $extra) = self::_addDefaults(__FUNCTION__, $data, $text, $extra);
         
-        if (!empty($data['class'])) {
+        if (!empty($data['class']))
+        {
             $baseClasses = $data['class'];
-        } else {
+        } 
+        else
+        {
             $baseClasses = '';
         }
 
 
-        if (!empty($data['help'])) {
+        if (!empty($data['help']))
+        {
             // If only provided with a hint string make it into an array
             if (!is_array($data['help']))
+            {
                 $data['help'] = array('value' => $data['help']);
+            }
 
             // Load ID and class attributes if they are not already populated
             $data['help'] += array
@@ -439,17 +421,21 @@ class form extends form_Core {
             $value = self::_i18n($data['help']['value']);
 
             unset($data['help']['value']);
+            
             unset($data['help']['url']);
 
             // Create the help element
             $text .= '<span'.html::attributes($data['help']).' tooltip="'.$value.'">&nbsp;</span>';
 
-            arr::update($data, 'class', ' has_help');
+            $data = arr::update($data, 'class', ' has_help');
         }
 
-        if (!isset($data['issue']) || (isset($data['issue']) && $data['issue'] !== false)) {
+        if (!isset($data['issue']) || (isset($data['issue']) && $data['issue'] !== false))
+        {
             if (empty($data['issue']['value']))
+            {
                 $data['issue']['value'] = self::_getError($data['for']);
+            }
 
             if (!empty($data['issue']['value']))
             {
@@ -461,6 +447,7 @@ class form extends form_Core {
                 );
 
                 $value = self::_i18n($data['issue']['value']);
+                
                 unset($data['issue']['value']);
 
                 // Create the error element
@@ -470,10 +457,13 @@ class form extends form_Core {
             }
         } 
         
-        if (empty($has_error) && !empty($data['hint'])) {
+        if (empty($has_error) && !empty($data['hint']))
+        {
             // If only provided with a hint string make it into an array
             if (!is_array($data['hint']))
+            {
                 $data['hint'] = array('value' => $data['hint']);
+            }
 
             // Load ID and class attributes if they are not already populated
             $data['hint'] += array
@@ -484,101 +474,58 @@ class form extends form_Core {
 
             // Pass the hint text to i18n()
             $value = self::_i18n($data['hint']['value']);
+            
             unset($data['hint']['value']);
 
             // Create the hint element
             $text .= '<span'.html::attributes($data['hint']).' >'.$value.'</span>';
 
-            arr::update($data, 'class', ' has_hint');
+            $data = arr::update($data, 'class', ' has_hint');
         }
 
         // Remove this element from the lable attributes
         if(isset($data['issue']))
+        {
             unset($data['issue']);
+        }
 
         // Remove this element from the lable attributes
         if(isset($data['hint']))
+        {
             unset($data['hint']);
+        }
 
         // Remove this element from the lable attributes
         if(isset($data['help']))
+        {
             unset($data['help']);
+        }
 
         $data['for'] = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['for']), '_');
 
         // Call the parent
         $result = parent::label($data, $text, $extra);
 
-        // Either return or echo depending on self::$inline
-        return self::_output($result);
+        return $result;
     }
 
     public function open_section($title)
     {
-        // Either return or echo depending on self::$inline
-        return self::_output(self::open_fieldset() . self::legend($title));
+        return self::open_fieldset() . self::legend($title);
     }
 
     public function close_section()
     {
-        return self::_output(self::close_fieldset());
+        return self::close_fieldset();
     }
-
-    public static function hourmin($hid = "hour", $mid = "minute", $pid = "pm", $hval = NULL, $mval = NULL, $pval = NULL)
-    {
-		if(is_null($hval)) $hval = date("g");
-		if(is_null($mval)) $mval = date("i");
-		if(is_null($pval)) $pval = date("a");
-
-		$mval = ceil(intval($mval)/5) * 5;
-		
-		
-		$hours = array("12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11");
-		$out = "<select name='$hid' id='$hid'>";
-		
-		foreach($hours as $hour)
-		{
-			
-			if(intval($hval) == intval($hour))
-			{ 
-				$out .= "<option value='$hour' selected>$hour</option>";
-			} else {
-				$out .= "<option value='$hour'>$hour</option>";
-			}
-		
-		}
-				
-		$out .= "</select>";
-	
-		$minutes = array("00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55");
-		$out .= "<select name='$mid' id='$mid'>";
-		
-		foreach($minutes as $minute)
-		{
-			
-			if(intval($mval) == intval($minute))
-			{ 
-				$out .= "<option value='$minute' selected>$minute</option>";
-			} else {
-				$out .= "<option value='$minute'>$minute</option>";
-			}
-		}
-		$out .= "</select>";
-		
-		$out .= "<select name='$pid' id='$pid'>";
-		$out .= "<option value='am'>am</option>";
-		if($pval == "pm") $out .= "<option value='pm' selected>pm</option>";
-		else $out .= "<option value='pm'>pm</option>";
-		$out .= "</select>";
-		
-		return $out;
-	}
-
+    
     /**
     * Creates an HTML form select tag with all avaliable timezones
     * Mash-up of kohana dropdowns and code retrieved from:
     * http://usphp.com/manual/en/function.timezone-identifiers-list.php on 7/23/2009
     * Modified by K Anderson
+    *
+    * TODO: This needs to be refactored to use the kohana html helpers
     *
     * @param   string|array  input name or an array of HTML attributes
     * @param   string        option key that should be selected by default
@@ -590,7 +537,9 @@ class form extends form_Core {
         if ( ! is_array($data))
         {
             $data = array('name' => $data);
-        } else {
+        } 
+        else
+        {
             if (isset($data['options']))
             {
                 // Use data options
@@ -611,50 +560,78 @@ class form extends form_Core {
             $all = timezone_identifiers_list();
 
             $i = 0;
-            foreach($all AS $zone) {
+
+            foreach($all AS $zone)
+            {
                 $zone = explode('/',$zone);
+
                 $zonen[$i]['continent'] = isset($zone[0]) ? $zone[0] : '';
+
                 $zonen[$i]['city'] = isset($zone[1]) ? $zone[1] : '';
+
                 $zonen[$i]['subcity'] = isset($zone[2]) ? $zone[2] : '';
+
                 $i++;
             }
 
             asort($zonen);
+
             $structure = '';
-            foreach($zonen AS $zone) {
+
+            foreach($zonen AS $zone)
+            {
                 extract($zone);
-                if($continent == 'Africa' || $continent == 'America' || $continent == 'Antarctica' || $continent == 'Arctic' || $continent == 'Asia' || $continent == 'Atlantic' || $continent == 'Australia' || $continent == 'Europe' || $continent == 'Indian' || $continent == 'Pacific') {
-                    if(!isset($selectcontinent)) {
-                        $structure .= '<optgroup label="'.$continent.'">'; // continent
-                    } elseif($selectcontinent != $continent) {
-                        $structure .= '</optgroup><optgroup label="'.$continent.'">'; // continent
+
+                if($continent == 'Africa' || $continent == 'America' || $continent == 'Antarctica' || $continent == 'Arctic' || $continent == 'Asia' || $continent == 'Atlantic' || $continent == 'Australia' || $continent == 'Europe' || $continent == 'Indian' || $continent == 'Pacific')
+                {
+                    if(!isset($selectcontinent))
+                    {
+                        $structure .= '<optgroup label="'.$continent.'">'; 
+                    } 
+                    elseif($selectcontinent != $continent)
+                    {
+                        $structure .= '</optgroup><optgroup label="'.$continent.'">';
                     }
 
-                    if(isset($city) != ''){
-                        if (!empty($subcity) != ''){
+                    if(isset($city) != '')
+                    {
+                        if (!empty($subcity) != '')
+                        {
                             $city = $city . '/'. $subcity;
                         }
-                        $structure .= "<option ".((($continent.'/'.$city)==$selectedzone)?'selected="selected "':'')." value=\"".($continent.'/'.$city)."\">".str_replace('_',' ',$city)."</option>"; //Timezone
-                    } else {
-                        if (!empty($subcity) != ''){
+                        
+                        $structure .= "<option ".((($continent.'/'.$city)==$selectedzone)?'selected="selected "':'')." value=\"".($continent.'/'.$city)."\">".str_replace('_',' ',$city)."</option>";
+                    } 
+                    else
+                    {
+                        if (!empty($subcity) != '')
+                        {
                             $city = $city . '/'. $subcity;
                         }
-                        $structure .= "<option ".(($continent==$selectedzone)?'selected="selected "':'')." value=\"".$continent."\">".$continent."</option>"; //Timezone
+                        
+                        $structure .= "<option ".(($continent==$selectedzone)?'selected="selected "':'')." value=\"".$continent."\">".$continent."</option>";
                     }
 
                     $selectcontinent = $continent;
                 }
             }
+
             $structure .= '</optgroup>';
+
             return $structure;
         }
 
         if (empty($selected))
+        {
             $selectedzone = date_default_timezone_get();
+        }
         else
+        {
             $selectedzone = $selected;
+        }
 
         $input .= timezonechoice($selectedzone);
+        
         $input .= '</select>';
 
         return $input;
@@ -665,26 +642,31 @@ class form extends form_Core {
         $args = func_get_args();
 
         $formElement = array_shift($args);
-
-        // Generate the appropriate classes from the view data
-        $viewMethod = str_replace('*.', '', View::$method);
-        $viewMethod = str_replace('.', ' ', $viewMethod);
-        $viewController = View::$controller;
-
+        
         // create a string of all default classes, with special cases
-        if ($formElement == 'open_fieldset') {
-            $defaultClasses = "fieldset $viewController $viewMethod";
-        } else {
-            $defaultClasses = "$formElement $viewController $viewMethod";
+        if ($formElement == 'open_fieldset')
+        {
+            $defaultClasses = "fieldset";
+        } 
+        else
+        {
+            $defaultClasses = "$formElement";
         }
+        
         // all skins and other things to append custom classes
-        if (array_key_exists($formElement, self::$customClasses)) {
+        if (array_key_exists($formElement, self::$customClasses))
+        {
             $custom = (array)self::$customClasses[$formElement];
+            
             $defaultClasses .= ' ' . implode(' ', $custom);
-        } else if(array_key_exists('all', self::$customClasses)) {
+        } 
+        else if(array_key_exists('all', self::$customClasses))
+        {
             $custom = (array)self::$customClasses['all'];
+            
             $defaultClasses .= ' ' . implode(' ', $custom);
         }
+        
         $defaultClasses = ' ' . strtolower($defaultClasses);
 
         // run the appopriate logic based on the form element
@@ -694,65 +676,70 @@ class form extends form_Core {
             case 'open_multipart':
                 // create pointers to the parameters
                 $action = &$args[0];
+
                 $attr = &$args[1];
+
                 $hidden = &$args[2];
 
                 // if attr is not an array then make it one!
-		if ( ! is_array($attr) || empty($attr))
-		{
+                if ( ! is_array($attr) || empty($attr))
+                {
                     // this may confuse people who are loosing the stuff so log
-                    if (is_string($attr)) {
+                    if (is_string($attr))
+                    {
                         kohana::log('error', 'The second argument to form::' . $formElement . ' must be an array! OVERWRITING!');
                     }
+                    
                     $attr = array();
                 }
 
                 if (empty($attr['id']))
-                    $attr['id'] = trim(preg_replace('/[^a-zA-Z_]+/imx', '_', url::current()), '_');
+                {
+                    $attr['id'] = trim(preg_replace('/[^a-zA-Z_{}]+/imx', '_', url::current()), '_');
+                }
 
                 // set a default hidden field with the forms name
-                if (!is_array($hidden)) {
+                if (!is_array($hidden))
+                {
                     $hidden = array();
                 }
+                
                 $hidden += array(
                     'bluebox_form_name' => $attr['id']
                 );
 
-                // track the open forms
-                self::$formCount[] = $attr['id'];
-
                 // special cases for the forms
-                if ($formElement == 'open') {
-                    $defaultClasses = " form form_" . count(self::$formCount) . " $viewController $viewMethod";
-                } else if ($formElement == 'open_multipart') {
-                    $defaultClasses = " form form_" . count(self::$formCount) . " multipart $viewController $viewMethod";
+                if ($formElement == 'open')
+                {
+                    $defaultClasses = " form";
+                } 
+                else if ($formElement == 'open_multipart')
+                {
+                    $defaultClasses = " form multipart";
                 }
 
-                // If the form does not have an id then generate one for it
-
-
                 // Append the classes
-                arr::update($attr, 'class', $defaultClasses);
+                $attr = arr::update($attr, 'class', $defaultClasses);
+                
                 break;
 
             case 'close':
                 // create pointers to the parameters
                 $extra = &$args[0];
 
-                // track the closing of forms
-                $formID = array_pop(self::$formCount);
-
                 break;
 
             case 'label':
                 // create pointers to the parameters
                 $data = &$args[0];
+
                 $text = &$args[1];
+
                 $extra = &$args[2];
 
                 // standardize the $data var
-		if ( ! is_array($data))
-		{
+                if ( ! is_array($data))
+                {
                     if (is_string($data))
                     {
                         // Specify the input this label is for
@@ -763,31 +750,39 @@ class form extends form_Core {
                         // No input specified
                         $data = array();
                     }
-		}
+                }
                 
-                if (!isset($data['for'])) {
+                if (!isset($data['for']))
+                {
                     break;
                 }
 
                 // If the element does not have an id then generate one for it
                 if (!empty($data['for']) && empty($data['id']))
-                    $data['id'] = 'label_' . trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['for']), '_');
+                {
+                    $data['id'] = 'label_' . trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['for']), '_');
+                }
 
                 // If the element this label belongs to has an error append a
                 // has_error class to it
                 if (!empty($data['for']) && self::_getError($data['for']))
+                {
                     $defaultClasses .= ' has_error';
+                }
 
                 $text = self::_i18n($text);
 
                 // Append the classes
-                arr::update($data, 'class', $defaultClasses);
+                $data = arr::update($data, 'class', $defaultClasses);
+                
                 break;
 
             case 'legend':
                 // create pointers to the parameters
                 $text = &$args[0];
+
                 $data = &$args[1];
+
                 $extra = &$args[2];
 
                 // standardize the $data var
@@ -795,24 +790,29 @@ class form extends form_Core {
 
                 // if we have enough info to make an id and there is none do so
                 if (!empty($text) && empty($data['id']))
-                    $data['id'] = 'legend_' . trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', strtolower($text)), '_');
+                {
+                    $data['id'] = 'legend_' . trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', strtolower($text)), '_');
+                }
 
                 $text = self::_i18n($text);
 
                 // Append the classes
-                arr::update($data, 'class', $defaultClasses);
+                $data = arr::update($data, 'class', $defaultClasses);
+                
                 break;
 
             case 'open_fieldset':
                 // create pointers to the parameters
                 $data = &$args[0];
+            
                 $extra = &$args[1];
 
                 // standardize the $data var
                 $data = (array)$data;
 
                 // Append the classes
-                arr::update($data, 'class', $defaultClasses);
+                $data = arr::update($data, 'class', $defaultClasses);
+                
                 break;
 
             case 'close_fieldset':
@@ -821,6 +821,7 @@ class form extends form_Core {
             case 'hidden':
                 // create pointers to the parameters
                 $name = &$args[0];
+
                 $value = &$args[1];
 
                 // check if we should attempt to fill the value
@@ -828,6 +829,7 @@ class form extends form_Core {
 
                 // hidden fields dont have classes coming in, but expect them
                 array_push($args, $defaultClasses);
+                
                 break;
 
             case 'input':
@@ -836,98 +838,127 @@ class form extends form_Core {
             case 'textarea':
                 // create pointers to the parameters
                 $data = &$args[0];
+
                 $value = &$args[1];
+
                 $extra = &$args[2];
 
                 // standardize the $data var
-		if ( ! is_array($data))
-		{
+                if ( ! is_array($data))
+                {
                     $data = array('name' => $data);
-		}
+                }
 
-                if (!isset($data['name'])) {
+                if (!isset($data['name']))
+                {
                     break;
                 }
 
                 // If the element does not have an id then generate one for it
                 if (empty($data['id']))
+                {
                     $data['id'] = $data['name'];
+                }
+                
+                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['id']), '_');
 
-                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['id']), '_');
-
-                if ($formElement != 'button' && $formElement != 'submit') {
+                if ($formElement != 'button' && $formElement != 'submit')
+                {
                     // check if we should attempt to fill the value
                     $value = self::_attemptRePopulate($data['name'], $value);
 
                     // If this field has an error append the has_error class...
                     if(self::_getError($data['name']))
+                    {
                         $defaultClasses .= ' has_error';
+                    }
                 }
 
-                if ($formElement == 'textarea') {
+                if ($formElement == 'textarea') 
+                {
                     if (empty($data['rows']))
+                    {
                         $data['rows'] = '2';
+                    }
+
                     if (empty($data['cols']))
+                    {
                         $data['cols'] = '20';
+                    }
                 }
 
                 // Some elements reuses form::input(), so dont re-append a new set of classes
                 if (!empty($data['class']) && strstr($data['class'], $defaultClasses))
+                {
                     break;
+                }
 
                 // Append the classes
-                arr::update($data, 'class', $defaultClasses);
+                $data = arr::update($data, 'class', $defaultClasses);
+                
                 break;
 
             case 'submit':
             case 'button':
                 // create pointers to the parameters
                 $data = &$args[0];
+
                 $value = &$args[1];
+
                 $extra = &$args[2];
 
                 // standardize the $data var
-		if ( ! is_array($data))
-		{
+                if ( ! is_array($data))
+                {
                     $data = array('name' => $data);
-		}
+                }
                 
-                if (!isset($data['name'])) {
+                if (!isset($data['name']))
+                {
                     break;
                 }
                 
                 // If the element does not have an id then generate one for it
-                if (empty($data['id'])) 
+                if (empty($data['id']))
+                {
                      $data['id'] = $data['name'] . '_' . $value;
+                }
 
-                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['id']), '_');
+                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['id']), '_');
 
-                if ($formElement == 'button' && empty($data['value'])) {
+                if ($formElement == 'button' && empty($data['value']))
+                {
                     $data['value'] = strtolower($value);
                 }
                 
-                if ($formElement == 'button' || $formElement == 'submit') {
+                if ($formElement == 'button' || $formElement == 'submit')
+                {
                     $value = self::_i18n($value);
                 }
 
                 // Append the classes
-                arr::update($data, 'class', $defaultClasses);
+                $data = arr::update($data, 'class', $defaultClasses);
+                
                 break;
 
             case 'dropdown':
                 // create pointers to the parameters
                 $data = &$args[0];
+
                 $options = &$args[1];
+
                 $selected = &$args[2];
+                
                 $extra = &$args[3];
 
                 // standardize the $data var
-		if ( ! is_array($data))
-		{
+                if ( ! is_array($data))
+                {
                     $data = array('name' => $data);
-		}
+                }
                 
-                if (!isset($data['name'])) {
+                if (!isset($data['name']))
+                {
                     break;
                 }
 
@@ -936,118 +967,130 @@ class form extends form_Core {
 
                 // If the element does not have an id then generate one for it
                 if (empty($data['id']))
+                {
                     $data['id'] = $data['name'];
+                }
 
-                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['id']), '_');
+                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['id']), '_');
 
                 // Append the classes
-                arr::update($data, 'class', $defaultClasses);
+                $data = arr::update($data, 'class', $defaultClasses);
+                
                 break;
 
             // data, value, checked, extra
             case 'checkbox':
                 // create pointers to the parameters
                 $data = &$args[0];
+
                 $value = &$args[1];
+
                 $checked = &$args[2];
+
                 $extra = &$args[3];
 
                 // if there is no default value then use bool true
-                if (is_null($value)) {
+                if (is_null($value))
+                {
                     $value = TRUE;
                 }
 
                 // standardize the $data var
-		if ( ! is_array($data))
-		{
+                if ( ! is_array($data))
+                {
                     $data = array('name' => $data);
-		}
+                }
 
-                if (!isset($data['name'])) {
+                if (!isset($data['name']))
+                {
                     break;
                 }
 
                 // check if we should attempt to fill checked
-                $checked = self::_attemptRePopulate($data['name'], $checked);
+                $checked = self::_attemptRePopulate($data['name'], $checked, $value);
                 
                 // see if we have a unchecked value or can quess it
                 if (!isset($data['unchecked']))
                 {
-                    if (is_bool($value)) {
-                        if ($value) {
+                    if (is_bool($value))
+                    {
+                        if ($value)
+                        {
                             $data['unchecked'] = 0;
-                        } else {
+                        }
+                        else
+                        {
                             $data['unchecked'] = 1;
                         }
-                    } else {
+                    } 
+                    else
+                    {
                         $data['unchecked'] = 0;
                     }
                 }
 
                 // If the element does not have an id then generate one for it
                 if (empty($data['id']))
+                {
                     $data['id'] = $data['name'];
-
-                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['id']), '_');
+                }
+                
+                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['id']), '_');
                 
                 // Append the classes
-                arr::update($data, 'class', $defaultClasses);
+                $data = arr::update($data, 'class', $defaultClasses);
+
                 break;
 
             case 'radio':
                 // create pointers to the parameters
                 $data = &$args[0];
+
                 $value = &$args[1];
+
                 $checked = &$args[2];
+
                 $extra = &$args[3];
 
                 // standardize the $data var
-		if ( ! is_array($data))
-		{
+                if ( ! is_array($data))
+                {
                     $data = array('name' => $data);
-		}
+                }
 
-                if (!isset($data['name'])) {
+                if (!isset($data['name']))
+                {
                     break;
                 }
 
-                if (is_null($checked)) {
+                if (is_null($checked))
+                {
                     // check if we should attempt to fill checked
-                    $repopulate = self::_attemptRePopulate($data['name'], $checked);
+                    $repopulate = self::_attemptRePopulate($data['name'], $checked, $value);
 
                     $checked = FALSE;
-                    if ($repopulate == $value) {
+
+                    if ($repopulate == $value)
+                    {
                         $checked = TRUE;
                     }
                 }
 
                 // If the element does not have an id then generate one for it
                 if (empty($data['id']))
+                {
                     $data['id'] = $data['name'];
+                }
 
-                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['id']), '_');
+                $data['id'] = trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['id']), '_');
 
                 // Append the classes
-                arr::update($data, 'class', $defaultClasses);
+                $data = arr::update($data, 'class', $defaultClasses);
+
                 break;
         }
+        
         return $args;
-    }
-
-    /**
-     * This is a simple wrapper to enforce the inline option, where if true the result of
-     * any form helper is either returned or echo.
-     *
-     * @param string $result
-     * @return string|void
-     */
-    protected static function _output($result = null)
-    {
-        // If we should be displaying inline echo, otherwise return
-        if (self::$inline)
-            echo $result;
-        else
-            return $result;
     }
 
     /**
@@ -1058,61 +1101,119 @@ class form extends form_Core {
      * @param string $value The current elements value, this is set if it is currently empty
      * @return void
      */
-    protected static function _attemptRePopulate($name, $value)
+    protected function _attemptRePopulate($name, $value, $returnValue = NULL)
     {
-        // if the value is already set or we have no name return value as is
-        if (is_null($value) && !empty($name) && is_string($name) && substr($name, 0, 2) != '__') {
+        if (!is_null($value))
+        {
+            return $value;
+        }
 
-            // see if we have a repopulate value in our cache for this name
-            if (array_key_exists(strtolower($name), self::$repopulateValues)) {
-                return self::$repopulateValues[strtolower($name)];
-            }
-            if (array_key_exists($name, self::$repopulateValues)) {
-                return self::$repopulateValues[$name];
-            }
+        if (empty($name) || !is_string($name))
+        {
+            return $value;
+        }
 
-            // if we dont already know the value sanity check the view
-            // so we can detemine if we should attempt to retrieve it
-            if (is_object (View::$instance)) {
+        if (substr($name, 0, 2) == '__')
+        {
+            return $value;
+        }
 
-                // get the first part of the name (up to the first [)
-                list($baseName) = explode('[', $name);
+        if ((!is_null($returnValue)) AND ($pos = strpos($name, '[]')))
+        {
+            $parentArray = substr($name, 0, $pos);
 
-                // if the view doesnt have this var then we dont know what it
-                // should be
-                if (!isset(View::$instance->$baseName)) {
-                    return $value;
-                } else {
-                    // setup a pointer to the views variable (ie View::$instanace->Devices)
-                    $record = &View::$instance->$baseName;
+            $subArray = substr($name, $pos + 2);
 
-                    // see if this has a toArray method
-                    if (is_object($record) && method_exists($record, 'toArray')) {
-                        $record = $record->toArray();
-                    } else if (!is_array($record)) {
-                        return $record;
-                    }
+            foreach (self::$repopulateValues as $key => $repopulateValue)
+            {
+                if (!strstr($key, $parentArray))
+                {
+                    continue;
+                }
 
-                    // merge the values we just found into our cache (after
-                    // flattening the array)
-                    $repopulateValues = array($baseName => $record);
-                    self::$repopulateValues = arr::array_merge_recursive_distinct(
-                        self::$repopulateValues,
-                        arr::flatten($repopulateValues)
-                    );
+                if (!strstr($key, $subArray))
+                {
+                    continue;
+                }
 
-                    self::$repopulateValues = array_change_key_case(self::$repopulateValues);
-
-                    // see if our name exists to be repopluated now
-                    if (array_key_exists(strtolower($name), self::$repopulateValues)) {
-                        return self::$repopulateValues[strtolower($name)];
-                    }
-                    if (array_key_exists($name, self::$repopulateValues)) {
-                        return self::$repopulateValues[$name];
-                    }
+                if ($returnValue == $repopulateValue)
+                {
+                    return TRUE;
                 }
             }
         }
+
+        // see if we have a repopulate value in our cache for this name
+        if (array_key_exists($name, self::$repopulateValues))
+        {
+            return self::$repopulateValues[$name];
+        }
+
+        if (!is_object (View::$instance))
+        {
+            return $value;
+        }
+
+        // get the first part of the name (up to the first [)
+        list($baseName) = explode('[', $name);
+
+        if (!isset(View::$instance->$baseName))
+        {
+            return $value;
+        }
+
+        // setup a pointer to the views variable (ie View::$instanace->Devices)
+        $document = &View::$instance->$baseName;
+
+        if ($document instanceof Bluebox_Record)
+        {
+            $document = $document->toArray();
+        }
+
+        if (!is_array($document))
+        {
+            return $document;
+        }
+
+        // merge the values we just found into our cache (after
+        // flattening the array)
+        $repopulateValues = array($baseName => $document);
+        
+        self::$repopulateValues = arr::merge_recursive_distinct(
+            self::$repopulateValues,
+            arr::flatten($repopulateValues)
+        );
+
+        if ((!is_null($returnValue)) AND ($pos = strpos($name, '[]')))
+        {
+            $parentArray = substr($name, 0, $pos);
+
+            $subArray = substr($name, $pos + 2);
+
+            foreach (self::$repopulateValues as $key => $repopulateValue)
+            {
+                if (!strstr($key, $parentArray))
+                {
+                    continue;
+                }
+
+                if (!strstr($key, $subArray))
+                {
+                    continue;
+                }
+
+                if ($returnValue == $repopulateValue)
+                {
+                    return TRUE;
+                }
+            }
+        }
+
+        if (array_key_exists($name, self::$repopulateValues))
+        {
+            return self::$repopulateValues[$name];
+        }
+
         return $value;
     }
 
@@ -1122,15 +1223,18 @@ class form extends form_Core {
      * @param string $field This is the field name that we want to find an error for
      * @return string|false This will either return an error string or bool false if non found
      */
-    protected static function _getError($field)
+    protected function _getError($field)
     {
         // No point in processing an empty $field
         if (empty($field))
+        {
             return FALSE;
-
+        }
+        
         $errors = Bluebox_Controller::$validation->errors();
-
-        if (array_key_exists($field, $errors)) {
+        
+        if (array_key_exists($field, $errors))
+        {
             return $errors[$field];
         }
 
@@ -1145,8 +1249,8 @@ class form extends form_Core {
      * @param string $value This is the current value of the element
      * @return bool This will return true if i18n was sucessfull, otherwise false
      */
-    protected static function _i18n($value)
+    protected function _i18n($value)
     {
-        return __($value);
+        return $value;
     }
 }

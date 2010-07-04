@@ -23,7 +23,7 @@
  * freeswitch.php - Provides logic for the installer telephony configuration step
  * @author K Anderson
  * @license MPL
- * @package Bluebox
+ * @package Bluebox3
  */
 
 class Freeswitch_Plugin extends Bluebox_Plugin

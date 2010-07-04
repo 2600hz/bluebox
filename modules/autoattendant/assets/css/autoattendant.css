@@ -4,11 +4,11 @@
     Description:
         Auto-Attendant CSS layout sheet
 */
-.auto_attendant_keymap .keymap_header {
+#auto_attendant_keymap .keymap_header {
     border-bottom: 1px solid black;
     clear:both;
 }
-.auto_attendant_keymap .keymap_header_text {
+#auto_attendant_keymap .keymap_header_text {
     font-size:12px;
     font-weight:bold;
     height:18px;
@@ -20,25 +20,22 @@
     text-align: center;
 }
 
-.auto_attendant_keymap .key {
+#auto_attendant_keymap .autoattendant_key {
     margin:0 25px;
     padding-bottom:10px;
     padding-top:10px;
     clear: both;
     text-align: center;
 }
-.auto_attendant_keymap .key.alternate {
-    background:#EEEEEE;
-}
-.auto_attendant_keymap .key input {
+#auto_attendant_keymap .autoattendant_key input {
     width: 40px !important;
     min-width: 0 !important;
     text-align: center;
 }
-.auto_attendant_keymap .key .pools_dropdown {
+#auto_attendant_keymap .autoattendant_key .pools_dropdown {
     margin-right:5px;
 }
-.auto_attendant_keymap .remove_key {
+#auto_attendant_keymap .remove_key {
     display:inline-block;
     width: 16px;
     height: 16px;

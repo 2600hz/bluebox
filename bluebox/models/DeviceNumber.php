@@ -29,7 +29,7 @@
  *
  * @author Darren Schreiber <d@d-man.org>
  * @license MPL
- * @package Bluebox
+ * @package Bluebox3
  * @subpackage Core
  */
 class DeviceNumber extends Number {
@@ -40,14 +40,17 @@ class DeviceNumber extends Number {
         parent::setUp();
 
         $this->setAttribute(Doctrine::ATTR_EXPORT, Doctrine::EXPORT_ALL ^ Doctrine::EXPORT_CONSTRAINTS);
-        
+
         /*
          * Relationships
          */
         // Relate the device (device_id) with a generic number identifier (foreign_id) in the Number class.
         // Note carefully that this only works because this model is related to Number
         // The Number class has some "magic" that auto relates the class
-        $this->hasOne('Device', array('local'   => 'foreign_id',
+//        $this->hasOne('Device', array('local'   => 'foreign_id',
+//                                      'foreign' => 'device_id'));
+
+        $this->hasOne('Device as Destination', array('local'   => 'foreign_id',
                                       'foreign' => 'device_id'));
 
         // Add relation on the other side, too, including all extended models that may have already loaded

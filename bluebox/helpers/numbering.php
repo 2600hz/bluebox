@@ -1,15 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * numbering.php - Phone number reservation helper
- *
- * This class assists in displaying what numbers are available, or reserved, in a consistent manner (look & feel)
- *
- *
- * @author K Anderson
- * @license LGPL
- * @package Bluebox
- * @subpackage Core
- */
+
 class numbering extends form
 {
     protected static $fieldCount = 1;
@@ -78,7 +68,7 @@ class numbering extends form
         }
 
         // append or insert the class
-        arr::update($data, 'class', ' numbers_dropdown');
+        $data = arr::update($data, 'class', ' numbers_dropdown');
 
         // get any numbers already assigned to the is dropdown
         $options['Assigned'] = self::getAssignedNumbers($data['classType'], $selected);
@@ -173,7 +163,7 @@ class numbering extends form
         }
 
         // append or insert the class
-        arr::update($data, 'class', ' destination_dropdown');
+        $data = arr::update($data, 'class', ' destination_dropdown');
 
         // render a null option if its been set in data
         if (!empty($data['nullOption'])) {
@@ -191,6 +181,9 @@ class numbering extends form
             // skip this we have a list of number types to include and not this
             if (is_array($data['classType']) && !in_array($type, $data['classType'])) continue;
 
+            // make a user friendly name for the pool name
+            $poolName = str_replace('Number', '', $type);
+
             if (isset(self::$numbersCache[$type])) {
                 $assignedInPool = self::$numbersCache[$type];
                 if (isset($assignedInPool[$selected .'" class="' .$type])) {
@@ -202,9 +195,6 @@ class numbering extends form
 
                 // if there are no assigned numbers then skip this pool
                 if (empty($assignedInPool)) continue;
-
-                // make a user friendly name for the pool name
-                $poolName = str_replace('Number', '', $type);
 
                 // TODO: This is a hack to handle numbers that exist in multiple contexts
                 if ($data['contextAware']) {
@@ -320,7 +310,7 @@ class numbering extends form
         }
 
         // append or insert the class
-        arr::update($data, 'class', ' destination_dropdown');
+        $data = arr::update($data, 'class', ' destination_dropdown');
 
         // render a null option if its been set in data
         if (!empty($data['nullOption'])) {
@@ -416,7 +406,7 @@ class numbering extends form
         }
 
         // append or insert the class
-        arr::update($data, 'class', ' pools_dropdown');
+        $data = arr::update($data, 'class', ' pools_dropdown');
 
         // render a null option if its been set in data
         if (!empty($data['nullOption'])) {
@@ -475,7 +465,7 @@ class numbering extends form
         );
 
         // ensure we have our distint class
-        arr::update($attributes, 'class', ' nxt_aval_link');
+        $attributes = arr::update($attributes, 'class', ' nxt_aval_link');
 
         // if there is no title then use the default
         if (empty($title)) {
@@ -885,8 +875,6 @@ class numbering extends form
     public static function chooseDestination($inputField, $currentDestination = NULL, $allowedTypes = NULL)
     {
         jquery::addPlugin('dialog');
-
-        
     }
 
     public static function getContextsByNumber($number_id) {

@@ -2,60 +2,93 @@
 
 class FreeSwitch_TimeOfDay_Driver extends FreeSwitch_Base_Driver {
 
-    public static function set($obj)
+    public static function set($timeOfDay)
     {
 
     }
 
-    public static function delete($obj)
+    public static function delete($timeOfDay)
     {
 
     }
 
-    public static function dialplan($obj)
+    public static function dialplan($number)
     {
         $xml = Telephony::getDriver()->xml;
 
-        if (!empty($obj->TimeOfDay->time)) {
-            $parts = explode(';', $obj->TimeOfDay->time);
-            if (count($parts) != 2) {
+        $destination = $number['Destination'];
+
+        if (!empty($destination['time']))
+        {
+            $parts = explode(';', $destination['time']);
+
+            if (count($parts) != 2)
+            {
                 kohana::log('error', 'Time was not comprised of two parts');
+
                 return FALSE;
             }
-            
-            if ($parts[0] == $parts[1]) {
+
+            if ($parts[0] == $parts[1])
+            {
                 $time = $parts;
-            } else {
+            }
+            else
+            {
                 $time = $parts[0] .'-' .$parts[1];
             }
-        } else {
-            kohana::log('error', 'Time was not empty');
+        }
+        else
+        {
+            kohana::log('error', 'Time of day route had no time');
+            
             return FALSE;
         }
 
-        $action = dialplan::getTransfer($obj->TimeOfDay->during_number_id);
-        $action = str_replace('transfer ', '', $action);
-
-        $antiAction = dialplan::getTransfer($obj->TimeOfDay->outside_number_id);
-        $antiAction = str_replace('transfer ', '', $antiAction);
-
-
         $weekDayColumns = array('sun', 'mon', 'tue', 'wen', 'thur', 'fri', 'sat');
+
         $wday = '';
-        foreach($weekDayColumns as $pos => $weekDayColumn) {
-            if (!empty($obj->TimeOfDay->$weekDayColumn)) {
-                $wday .= $pos+1 .',';
+
+        foreach($weekDayColumns as $pos => $weekDayColumn)
+        {
+            if (!empty($destination[$weekDayColumn]))
+            {
+                $wday .= $pos + 1 .',';
             }
         }
+
         $wday = rtrim($wday, ',');
 
-        if (empty($wday)) {
+        // TODO: This makes no sense....
+        if (empty($wday))
+        {
             $wday = '1-7';
         }
 
         $xml->setXmlRoot($xml->getExtensionRoot());
+
         $xml->update('/condition[@wday="' .$wday .'"]{@minute-of-day="' .$time .'"}');
-        $xml->update('/condition[@wday="' .$wday .'"]/action[@application="transfer"]{@data="' .$action .'"}');
-        $xml->update('/condition[@wday="' .$wday .'"]/anti-action[@application="transfer"]{@data="' .$antiAction .'"}');
+
+        if($action = fs::getTransfer($destination['during_number_id']))
+        {
+            $action = str_replace('transfer ', '', $action);
+
+            $xml->update('/condition[@wday="' .$wday .'"]/action[@application="transfer"]{@data="' .$action .'"}');
+        }
+        else
+        {
+            $xml->update('/condition[@wday="' .$wday .'"]/action[@application="hangup"]');
+        }
+
+        if ($antiAction = fs::getTransfer($destination['outside_number_id']))
+        {
+            $antiAction = str_replace('transfer ', '', $antiAction);
+            
+            $xml->update('/condition[@wday="' .$wday .'"]/anti-action[@application="transfer"]{@data="' .$antiAction .'"}');
+        }
+        else
+        {
+            $xml->update('/condition[@wday="' .$wday .'"]/action[@application="hangup"]');
+        }
     }
 }

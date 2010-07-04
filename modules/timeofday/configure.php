@@ -5,20 +5,20 @@ class TimeOfDay_Configure extends Bluebox_Configure
     public static $version = 0.1;
     public static $packageName = 'timeofday';
     public static $displayName = 'Time Based Routes';
-    public static $author = 'K Anderson';
+    public static $author = 'Karl Anderson';
     public static $vendor = 'BitBashing';
     public static $license = 'MPL';
     public static $default = true;
-    public static $type = Bluebox_Installer::TYPE_MODULE;
+    public static $type = Bluebox_PackageManager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );
     public static $navLabel = 'Time Based Routes';
-    public static $navBranch = '/Destinations/';
+    public static $navBranch = '/Applications/';
     public static $navURL = 'timeofday/index';
     public static $navSubmenu = array(
         'Search Time Based Routes' => 'timeofday/index',
-        'Add Time Based Route' => 'timeofday/add',
+        'Add Time Based Route' => 'timeofday/create',
         'Edit Time Based Route' => array(
             'url' => 'timeofday/edit',
             'disabled' => true

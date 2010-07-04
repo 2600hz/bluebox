@@ -1,13 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * jgrid.php - Classe to create and populate jqgrids
- * Created on Jun 2, 2009
- *
- * @author Karl Anderson
- * @license MPL
- * @package Bluebox
- * @subpackge Core
- */
+
 define('DELIM', '/'); //put this someplace else?
 class jgrid
 {
@@ -606,7 +598,7 @@ class jgrid
         // If the user has not supplied an id then we will gen one for the table
         if (empty($attributes['table']['id'])) $attributes['table']['id'] = $this->gridName;
         // We need to add a default class to the table
-        $attributes['table']['class'] = empty($attributes['table']['class']) ? 'scroll' : $attributes['table']['class'] . ' scroll';
+        $attributes['table']['class'] = empty($attributes['table']['class']) ? 'scroll jqgrid_instance' : $attributes['table']['class'] . ' scroll jqgrid_instance';
         // This gets any extra attributes and unsets it so the form helper will not parse it
         if (!empty($attributes['table']['extra'])) {
             $extra = $attributes['table']['extra'];
@@ -775,7 +767,9 @@ class jgrid
                 // Load a new cell with the value from the query, or blank if empty
                 $cell = & $ptEncodeArray['cell'][];
                 $cell = empty($result[$hydrateName]) ? '' : $result[$hydrateName];
-                $cell = htmlspecialchars($cell);
+                if (is_string($cell)) {
+                    $cell = htmlspecialchars($cell);
+                }
                 // Check if this field has a callback...
                 if (!empty($this->query['callbacks'][$hydrateName])) $cell = self::_cellCallback($cell, $this->query['callbacks'][$hydrateName], $result);
                 // Check if this field should be displayed as a link...

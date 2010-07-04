@@ -14,117 +14,107 @@
 
 class MultiTenantRecordListener extends Doctrine_Record_Listener
 {
-/*    protected $_options;
-
-    public function __construct(array $options)
-    {
-        $this->_options = $options;
-    }*/
-
     /** Handle object references **/
     public function preSave(Doctrine_Event $event)
     {
-        $record =& $event->getInvoker();
-        if (!$record->account_id) {         // This is dangerous - should we be more strict?
-            if ((users::$user) and (users::$user->account_id)) {
-                $record->account_id = users::$user->account_id;
-            } else {
-                Kohana::log('debug', 'Throwing exception - preSave');
-                throw new Exception('Invalid user - can\'t save', 1);
-            }
+        $record = &$event->getInvoker();
+
+        if (!isset($record['account_id'])) {
+            Kohana::log('debug', 'Throwing exception due to unset account_id - preSave');
+            throw new Exception('Unable to assign this record to your account', 1);
         }
-        Kohana::log('debug', 'Got here - would have done stuff to save.');
+
+        if (!empty(users::$user['account_id'])) {
+            $record['account_id'] = users::$user['account_id'];
+        } else {
+            Kohana::log('debug', 'Throwing exception due to empty user account_id - preSave');
+            throw new Exception('Unable to determine your authorization to add this record', 1);
+        }
     }
 
     public function preUpdate(Doctrine_Event $event)
     {
-        $record =& $event->getInvoker();
-        if (!$record->account_id) {         // This is dangerous - should we be more strict?
-            Kohana::log('debug', 'Throwing exception - preUpdate');
-            throw new Exception('Invalid user - can\'t save', 1);
+        $record = &$event->getInvoker();
+
+        if (!isset($record['account_id'])) {
+            Kohana::log('debug', 'Throwing exception due to unset account_id - preUpdate');
+            throw new Exception('Unable to assign this record to your account', 1);
         }
-        
-        if ($record->account_id != users::$user->account_id) {
-            Kohana::log('debug', 'Throwing exception - preUpdate');
-            throw new Exception('Can\'t update other peoples records', 1);
+
+        if (empty(users::$user['account_id'])) {
+            Kohana::log('debug', 'Throwing exception due to empty user account_id - preUpdate');
+            throw new Exception('Unable to determine your authorization to update this record', 1);
+        } else if ($record['account_id'] != users::$user['account_id']) {
+            Kohana::log('debug', 'Throwing exception account_id mismatch - preUpdate');
+            throw new Exception('You do not have authorization to update this record', 1);
         }
-        Kohana::log('debug', 'Got here - would have done stuff to update.');
     }
 
     public function preInsert(Doctrine_Event $event)
     {
-        $record = $event->getInvoker();
-        if (!$record->account_id) {         // This is dangerous - should we be more strict?
-            if ((users::$user) and (users::$user->account_id)) {
-                $record->account_id = users::$user->account_id;
-            } else {
-                Kohana::log('debug', 'Throwing exception - preInsert');
-                throw new Exception('Invalid user - can\'t save', 1);
-            }
+        $record = &$event->getInvoker();
+
+        if (!isset($record['account_id'])) {
+            Kohana::log('debug', 'Throwing exception due to unset account_id - preInsert');
+            throw new Exception('Unable to assign this record to your account', 1);
         }
-        Kohana::log('debug', 'Got here - would have done stuff to insert.');
 
-    /*foreach ($this->_options['relations'] as $relation => $options)
-    {
-      $table = Doctrine::getTable($options['className']);
-      $relation = $table->getRelation($options['foreignAlias']);
-
-      $table
-        ->createQuery()
-        ->update()
-        ->set($options['columnName'], $options['columnName'].' + 1')
-        ->where($relation['local'].' = ?', $invoker->$relation['foreign'])
-        ->execute();
-    }*/
-
+        if (!empty(users::$user['account_id'])) {
+            $record['account_id'] = users::$user['account_id'];
+        } else {
+            Kohana::log('debug', 'Throwing exception due to empty user account_id - preInsert');
+            throw new Exception('Unable to determine your authorization to add this record', 1);
+        }
     }
 
     public function preDelete(Doctrine_Event $event)
     {
-        $record =& $event->getInvoker();
-        if ((users::$user) and (users::$user->account_id)) {
-            if ($record->account_id != users::$user->account_id)
-                throw new Exception('Can\'t delete other peoples records', 1);
-        } else {
-            throw new Exception('Invalid user - can\'t save', 1);
+        $record = &$event->getInvoker();
+
+        // This is dangerous - should we be more strict?
+        if (empty($record['account_id'])) {
+            Kohana::log('debug', 'Throwing exception due to unset account_id - preInsert');
+            throw new Exception('Unable to determine the account owner of this record', 1);
         }
-        Kohana::log('debug', 'Got here - would have done stuff to delete.');
+
+        if (empty(users::$user['account_id'])) {
+            Kohana::log('debug', 'Throwing exception due to empty user account_id - preDelete');
+            throw new Exception('Unable to determine your authorization to delete this record', 1);
+        }
+
+        if ($record['account_id'] != users::$user['account_id']) {
+            Kohana::log('debug', 'Throwing exception account_id mismatch - preDelete');
+            throw new Exception('You do not have authorization to delete this record', 1);
+        }
     }
-
-
-    
 
     /** Handle DQL **/
     public function preDqlUpdate($event)
     {
         $q = $event->getQuery();
-        $q->andWhere('account_id = ?', users::$user->account_id);
-        Kohana::log('debug', 'Got here - would have done stuff to DQL update.');
+        $q->andWhere('account_id = ' .users::$user['account_id']);
     }
 
     public function preDqlSelect($event)
     {
-        $q = $event->getQuery();
         // HACK! TODO: Fix this
         // For now, if there's no authenticated user, don't filter on any user for selects
-        if ((!users::$user) or (!users::$user->account_id)) {
+        if ((!users::$user) or (!users::$user['account_id'])) {
             return;
         }
-        //Kohana::log('debug', 'Current user info' . print_r(users::$user->account_id, TRUE));
-        $q->andWhere('account_id = ?', users::$user->account_id);
-        Kohana::log('debug', 'Got here - would have done stuff to DQL select.' . get_class($q));
+
+        $q = &$event->getQuery();
+        $q->andWhere('account_id = ' .users::$user['account_id']);
     }
 
     public function preDqlDelete($event)
     {
-        $q = $event->getQuery();
-        $q->andWhere('account_id = ?', users::$user->account_id);
-        Kohana::log('debug', 'Got here - would have done stuff to DQL delete.');
+        $q = &$event->getQuery();
+        $q->andWhere('account_id = ' .users::$user['account_id']);
     }
 
     public function preValidate($event)
     {
-        
-        Kohana::log('debug', 'Got here - would have done stuff to validate.');
+
     }
 }

@@ -32,7 +32,7 @@
  *
  * @author Darren Schreiber <d@d-man.org>
  * @license MPL
- * @package Bluebox
+ * @package Bluebox3
  * @subpackage Core
  */
 class NumberDestination extends Doctrine_Record_Generator {
@@ -74,7 +74,7 @@ class NumberDestination extends Doctrine_Record_Generator {
 /*    public function setTableDefinition()
     {
         $rootTable = Doctrine::getTable($this->baseModelName);      // Numbers model
-        
+
         // Get information about what's plugging into the base
         $pluginModel = $this->_table->getOption('name');        // Current model name
 

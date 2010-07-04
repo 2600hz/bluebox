@@ -1,154 +1,173 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * ringgroup.php - Ring Group Controller
- *
- * @author K Anderson
- * @license MPL
- * @package Bluebox
- * @subpackage RingGroup
- */
+
 class RingGroup_Controller extends Bluebox_Controller
 {
-    public $writable = array(
-        'name',
-        'location_id'
-    ); // update this to match inputs from forms
-
     protected $baseModel = 'RingGroup';
+
+    public function __construct()
+    {
+        parent::__construct();
+        
+        javascript::add('mustache');
+    }
 
     public function index()
     {
         $this->template->content = new View('generic/grid');
-        // Build a grid with a hidden device_id, class_type, and add an option for the user to select the display columns
-        $this->grid = jgrid::grid($this->baseModel, array(
-            'caption' => 'My Ring Groups',
-            'multiselect' => true
-        ))->add('ring_group_id', 'ID', array(
-            'hidden' => true,
-            'key' => true
-        ))->add('name', 'Name')->navButtonAdd('Columns', array(
-            'onClickButton' => 'function () {  $(\'#{table_id}\').setColumns(); }',
-            'buttonimg' => url::base() . 'assets/css/jqGrid/table_insert_column.png',
-            'title' => 'Show/Hide Columns',
-            'noCaption' => true,
-            'position' => 'first'
-        ))->add('memberCount', 'Members', array(
-            'search' => false,
-            'align' => 'center',
-            'callback' => array(
-                'function' => array($this, 'countMembers'),
-                'arguments' => array('ring_group_id')
+
+        // Setup the base grid object
+        $grid = jgrid::grid($this->baseModel, array(
+                'caption' => ' Ring Groups'
             )
-        ))->addAction('ringgroup/edit', 'Edit', array(
-            'arguments' => 'ring_group_id',
-            'width' => '120'
-        ))->addAction('ringgroup/delete', 'Delete', array(
-            'arguments' => 'ring_group_id',
-            'width' => '20'
-        ))->navGrid(array('del' => true));
-        // dont foget to let the plugins add to the grid!
+        );
+
+        // Add the base model columns to the grid
+        $grid->add('ring_group_id', 'ID', array(
+                'hidden' => true,
+                'key' => true
+            )
+        );
+        $grid->add('name', 'Ring Group Name');
+        $grid->add('strategy', 'Strategy', array(
+                'align' => 'center',
+                'callback' => array($this, '_showStrategy')
+            )
+        );
+        $grid->add('memberCount', 'Members', array(
+                'search' => false,
+                'align' => 'center',
+                'callback' => array(
+                    'function' => array($this, '_countMembers'),
+                    'arguments' => array('ring_group_id')
+                )
+            )
+        );
+
+        // Add the actions to the grid
+        $grid->addAction('ringgroup/edit', 'Edit', array(
+                'arguments' => 'ring_group_id',
+                'width' => '120'
+            )
+        );
+        $grid->addAction('ringgroup/delete', 'Delete', array(
+                'arguments' => 'ring_group_id',
+                'width' => '20'
+            )
+        );
+
+        // Let plugins populate the grid as well
+        $this->grid = $grid;
         plugins::views($this);
-        // Produces the grid markup or JSON, respectively
+
+        // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
     }
-    public function countMembers($cell, $ring_group_id) {
-        $row = Doctrine::getTable('RingGroupMember')->findByRingGroupId($ring_group_id);
-        return count($row->toArray());
-    }
 
-    public function edit($id)
-    {
-        // Overload the update view
-        $this->template->content = new View(Router::$controller . '/update');
-        $this->view->title = 'Edit Ring Group';
-        $this->ringgroup = Doctrine::getTable('RingGroup')->find($id);
-        
-        // Was anything retrieved? If no, this may be an invalid request
-        if (!$this->ringgroup) {
-            // Send any errors back to the index
-            $error = i18n('Unable to locate ring group id %1$d!', $id)->sprintf()->s();
-            message::set($error, array(
-                'translate' => false,
-                'redirect' => Router::$controller . '/index'
-            ));
-            return true;
-        }
+    public function _countMembers($cell, $ring_group_id) {
+        return 0;
+        $rows = Doctrine::getTable('RingGroupMember')->findByRingGroupId($ring_group_id);
 
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
-            // get the list of group members
-            $ringGroupMembers = $this->input->post('_members', array());
-            if (!empty($ringGroupMembers)) {
-                // make each value a subarray with device_id and delay_ring keys
-                array_walk($ringGroupMembers, create_function('&$v,$k', '$v = array("device_id" => $v, "delay_ring" => 0);'));
-            }
-            
-            // sync the group members with the group
-            $ringGroupMembers = array('RingGroupMember' => $ringGroupMembers);
-            $this->ringgroup->synchronizeWithArray($ringGroupMembers);
-
-            // check the fallback number and avoid constraint issue by setting it to NULL
-            // instead of 0 if there is no fallback selected
-            /*$fallbackNumber = $_POST['ringgroup']['fallback_number_id'];
-            if (empty($fallbackNumber)) {
-                $this->ringgroup->fallback_number_id = NULL;
-                $_POST['ringgroup']['fallback_number_id'] = NULL;
-            }*/
-
-            if($this->ringgroup->RingGroupMember->isModified()) {
-                // this forces the directory xml to be generated even if only
-                // the members change
-                $this->ringgroup->markModified('name');
-            }
-
-            //TelephonyListener::$changedModels[] = array('action' => 'update', 'record' => &$this->ringgroup);
-            // save the ringgroup
-            if ($this->formSave($this->ringgroup)) {
-                url::redirect(Router_Core::$controller);
+        $members = '';
+        foreach($rows as $row)
+        {
+            $device = Doctrine::getTable('Device')->findOneByDeviceId($row['device_id']);
+            if ($device)
+            {
+                $members .= '<p>' .$device->name .' (Device)</p>';
             }
         }
-        
-        // Allow our device object to be seen by the view
-        $this->view->ringgroup = $this->ringgroup;
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
-    }
-    public function add()
-    {
-        // Overload the update view
-        $this->template->content = new View(Router::$controller . '/update');
-        $this->view->title = 'Add Ring Group';
-        $this->ringgroup = new RingGroup();
-        $this->ringgroup['timeout'] = 30;
-        
-        if ($this->submitted()) {
-            // get the list of group members
-            $ringGroupMembers = $this->input->post('_members', array());
-            if (!empty($ringGroupMembers)) {
-                // make each value a subarray with device_id and delay_ring keys
-                array_walk($ringGroupMembers, create_function('&$v,$k', '$v = array("device_id" => $v, "delay_ring" => 0);'));
-            }
 
-            // sync the group members with the group
-            $ringGroupMembers = array('RingGroupMember' => $ringGroupMembers);
-            $this->ringgroup->synchronizeWithArray($ringGroupMembers);
-
-            // check the fallback number and avoid constraint issue by setting it to NULL
-            // instead of 0 if there is no fallback selected
-            /*$fallbackNumber = $_POST['ringgroup']['fallback_number_id'];
-            if (empty($fallbackNumber)) {
-                $_POST['ringgroup']['fallback_number_id'] = NULL;
-            } */
-
-            if ($this->formSave($this->ringgroup)) {
-                url::redirect(Router_Core::$controller);
-            }
+        if (empty($members))
+        {
+            return count($rows->toArray());
+        } else {
+            return "<a title='Ring Group Members' tooltip='" .$members ."' class='addInfo' href='#'>" .count($rows->toArray()) .'</a>';
         }
-        $this->view->ringgroup = $this->ringgroup;
-        plugins::views($this);
     }
-    public function delete($id = NULL)
+
+    public function _showStrategy($cell)
     {
-        $this->stdDelete($id);
+        switch($cell)
+        {
+            case 2:
+                return 'Ring In Order';
+            default:
+                return 'Ring All';
+        }
+    }
+
+    public function qtipAjaxReturn($data)
+    {
+        if (!empty($data['ring_group_id']))
+        {
+            $object['numbermanager'] = array(
+                'object_name' => $data['name'],
+                'object_description' => 'Ring Group',
+                'object_number_type' => 'RingGroupNumber',
+                'object_id' =>  $data['ring_group_id'],
+                'short_name' => 'ringgroup'
+            );
+
+            Event::run('ajax.updateobject', $object);
+        }
+
+        parent::qtipAjaxReturn($data);
+    }
+
+    protected function prepareUpdateView()
+    {
+        $avaliableMemebers = array();
+
+        Event::run('ringgroup.avaliablemembers', $avaliableMemebers);
+
+        $this->view->members = json_encode(array_reverse($this->ringgroup['members']));
+
+        $this->view->avaliableMembers = json_encode($avaliableMemebers);
+
+        parent::prepareUpdateView();
+    }
+
+    protected function save_prepare(&$object)
+    {
+        $avaliableMemebers = array();
+
+        Event::run('ringgroup.avaliablemembers', $avaliableMemebers);
+
+        $members = array();
+
+        foreach ($object['members'] as $key => $member)
+        {
+            if (empty($member['id']))
+            {
+                continue;
+            }
+
+            $idFilter = create_function('$array', 'return ( $array[\'id\'] == ' .$member['id'] .');');
+
+            $memberDetails = array_filter($avaliableMemebers, $idFilter);
+
+            $memberDetails = reset($memberDetails);
+
+            if (empty($memberDetails['bridge']))
+            {
+                continue;
+            }
+
+            $members[] = array(
+                'bridge' => $memberDetails['bridge'],
+                'id' => $memberDetails['id'],
+                'type' => $memberDetails['type'],
+                'options' => array(
+                    //'group_confirm_file' => '/path/to/prompt.wav',
+                    //'group_confirm_key' => 4,
+                    //'leg_timeout' => 60,
+                    'ignore_early_media' => 'true'
+                )
+            );
+        }
+
+        $object['members'] = $members;
+
+        parent::save_prepare($object);
     }
 }

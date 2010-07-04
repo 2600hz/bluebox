@@ -1,32 +1,4 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/*
- * Bluebox Modular Telephony Software Library / Application
- *
- * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
- * you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/.
- *
- * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
- * express or implied. See the License for the specific language governing rights and limitations under the License.
- *
- * The Original Code is Bluebox Telephony Configuration API and GUI Framework.
- * The Original Developer is the Initial Developer.
- * The Initial Developer of the Original Code is Darren Schreiber
- * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
- *
- * Contributor(s):
- *
- *
- */
-
-/**
- * Number.php - Track numbers (extensions, phone numbers, etc.) used in the system in one table with polymorphic relations
- *
- * @author Darren Schreiber <d@d-man.org>
- * @license MPL
- * @package Bluebox
- * @subpackage Core
- */
 
 class Number extends Bluebox_Record
 {
@@ -36,6 +8,13 @@ class Number extends Bluebox_Record
     const STATUS_NORMAL = 0;
     const STATUS_SYSTEM = 1;
     const STATUS_LOCKED = 2;
+    const STATUS_RESERVED = 4;
+
+    /**
+     * Constants for number type
+     */
+    const TYPE_INTERNAL = 0;
+    const TYPE_EXTERNAL = 1;
 
     public static $description = __CLASS__;
     
@@ -46,17 +25,48 @@ class Number extends Bluebox_Record
             'default' => 'Number must be letters and numbers only'
         )
     );
+
+    public static function statusName($status) {
+        switch ($type) {
+            case self::STATUS_NORMAL:
+                return 'Normal';
+            case self::STATUS_SYSTEM:
+                return 'System';
+            case self::STATUS_LOCKED:
+                return 'Locked';
+            case self::STATUS_RESERVED:
+                return 'Reserved';
+            default:
+                return 'Unknown';
+        }
+    }
+
+    public static function typeName($type) {
+        switch ($type) {
+            case self::TYPE_INTERNAL:
+                return 'Internal';
+            case self::TYPE_EXTERNAL:
+                return 'External';
+            default:
+                return 'Unknown';
+        }
+    }
+
     /**
      * Sets the table name, and defines table columns.
      */
-	public function setTableDefinition()
+    public function setTableDefinition()
     {
         // COLUMN DEFINITIONS
         $this->hasColumn('number_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('location_id', 'integer', 11, array('unsigned' => true));
+        $this->hasColumn('user_id', 'integer', 11, array('unsigned' => true, 'default' => 0));
         $this->hasColumn('number', 'string', 200, array('notnull' => true, 'notblank' => true));
-        $this->hasColumn('status', 'integer', 1, array('unsigned' => true, 'notnull' => true, 'default' => 0));     // 0 = none, 1 = locked
-        $this->hasColumn('options', 'array');
+        $this->hasColumn('status', 'integer', 1, array('unsigned' => true, 'notnull' => true, 'default' => self::STATUS_NORMAL));
+        $this->hasColumn('type', 'integer', 1, array('unsigned' => true, 'notnull' => true, 'default' => self::TYPE_INTERNAL));
+        $this->hasColumn('dialplan', 'array', 10000, array('default' => array()));
+        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
+        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**

@@ -1,21 +1,17 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * bluebox.php - Bluebox plugin base class
- *
- * This class provides supporting functionality for Bluebox plug-ins. One of it's most important roles is allowing
- * a plug-in, when called from a Bluebox application, to have access to the same controller and other environment
- * variables via $this-> as are available within the controller itself, and to pass all changes back to the controller.
- *
- * This means that if a main application sets something via $this->somevar, it will be accessible as $this->somevar in a plugin.
- *
- * @author Karl Anderson
- * @license MPL
- * @package Bluebox
- * @subpackage Core
- */
 
 abstract class Bluebox_Plugin
 {
+    protected $name = NULL;
+
+    protected $subview = NULL;
+
+    protected $base = NULL;
+
+    protected $formData = array();
+
+    protected $pluginData = array();
+
     protected $preloadModels = NULL;
 
     /**
@@ -53,18 +49,21 @@ abstract class Bluebox_Plugin
      */
     protected $writable;
 
-	public function __construct()
+    public function __construct()
     {
         // Take a guess at the core model name, and initialize that model. This is important! It will build relationships properly
         // prior to anything being loaded in a core application page while preventing initialization of models that are unlikely to be used.
         //
         // TODO: Change this to initialize all models within this plugin's models/ directory
-        if (is_array($this->preloadModels)) foreach ($this->preloadModels as $modelName) {
+        if (is_array($this->preloadModels)) foreach ($this->preloadModels as $modelName)
+        {
             Doctrine::initializeModels($modelName);
         }
         
         $modelName = str_replace('_Plugin', '', get_class($this));
+
         Doctrine::initializeModels($modelName);
+
     }
 
   /**
@@ -75,10 +74,12 @@ abstract class Bluebox_Plugin
     public function &__get($name)
     {
         $class = Event::$data;
+
         # we have an event
         if(is_object ($class))
         {
-            if(property_exists($class, $name)) {
+            if(property_exists($class, $name))
+            {
                 return $class->$name;
             }
         }
@@ -95,11 +96,13 @@ abstract class Bluebox_Plugin
     public function  __isset($name)
     {
         $class = Event::$data;
+
         # we have an event
         if(is_object ($class))
         {
             //if (property_exists($class, $name)) {
-            if (isset($class->$name)) {
+            if (isset($class->$name))
+            {
                 return TRUE;
             }
         }
@@ -117,11 +120,13 @@ abstract class Bluebox_Plugin
     public function __set($name, $value)
     {
         $class = Event::$data;
+
         # this gets called for every unknown.
         # lets make sure we are from an event
         if(is_object ($class))
         {
-            if (property_exists($class, $name)) {
+            if (property_exists($class, $name))
+            {
                 $class->$name = $value;
             }
         }
@@ -136,14 +141,18 @@ abstract class Bluebox_Plugin
     public function __call($name, $arguments)
     {
         $class = Event::$data;
+
         # we have an event
         if(is_object ($class))
         {
             # call the function if it exists in the event class
-            if(method_exists($class, $name)) {
+            if(method_exists($class, $name))
+            {
                 return call_user_func_array(array($class, $name), $arguments);
             }
+
         }
+
         # if it didnt exist in the main class or the Event class then throw an error
         throw new Exception( " Method " . $name . " not exist in this class " . get_class( $class ) . "." );
     }
@@ -158,8 +167,10 @@ abstract class Bluebox_Plugin
         if (!isset(self::$instance))
         {
             $class = __CLASS__;
+
             self::$instance = new $class;
         }
+
         return self::$instance;
     }
 
@@ -170,26 +181,170 @@ abstract class Bluebox_Plugin
      *
      * @return Bluebox_Record Returns a Doctrine/Bluebox record referring to the base model object
      */
-    public function getBaseModelObject() {
+    public function getBaseModelObject()
+    {
         // Can't always assume we're a controller here...
-        if (method_exists(Event::$data, 'getBaseModel')) {
+        if (method_exists(Event::$data, 'getBaseModel'))
+        {
             $baseObjectName = $this->getBaseModel();
-            $baseObjectName[0] = strtolower($baseObjectName[0]);
-        } else {
+
+            //$baseObjectName[0] = strtolower($baseObjectName[0]);
+            $baseObjectName = strtolower($baseObjectName);
+        } 
+        else
+        {
             return NULL;
         }
 
-        if ($this->__isset($baseObjectName)) {
+        if ($this->__isset($baseObjectName))
+        {
             $model =& $this->__get($baseObjectName);
 
             // Only return real database objects, otherwise assume NULL. For safety.
-            if (!($model instanceof Doctrine_Record)) {
+            if (!($model instanceof Doctrine_Record))
+            {
                 $model = NULL;
             }
-        } else
+
+        } 
+        else
+        {
             $model = NULL;
+        }
 
         return $model;
     }
-}
+    
+    public function save()
+    {
+        if (!$this->saveSetup())
+        {
+            return TRUE;
+        }
 
+        if (!$this->loadFormData())
+        {
+            return TRUE;
+        }
+
+        if (!$this->addPluginData())
+        {
+            return TRUE;
+        }
+    }
+
+    public function update()
+    {
+        if (!$this->viewSetup())
+        {
+            return FALSE;
+        }
+
+        if (!$this->loadViewData())
+        {
+            return FALSE;
+        }
+
+        if (!$this->addSubView())
+        {
+            return FALSE;
+        }
+    }
+
+    protected function viewSetup()
+    {
+        // Determine the name of this plugin
+        if (empty($this->name))
+        {
+            kohana::log('error', 'Plugin name unknown, ignoring');
+
+            return FALSE;
+        }
+        
+        $this->subview = new View($this->name .'/update');
+
+        $this->subview->tab = 'main';
+
+        $this->subview->section = 'general';
+
+        return TRUE;
+    }
+
+    protected function loadViewData()
+    {
+        $this->base = $this->getBaseModelObject();
+
+        if (!isset($this->base['plugins']))
+        {
+            return FALSE;
+        }
+
+        if (!empty($this->base['plugins'][$this->name]))
+        {
+            $this->subview->{$this->name} = $this->base['plugins'][$this->name];
+        }
+
+        return TRUE;
+    }
+
+    protected function addSubView()
+    {
+        $this->views[] = $this->subview;
+
+        return TRUE;
+    }
+
+    protected function saveSetup()
+    {
+        // Determine the name of this plugin
+        if (empty($this->name))
+        {
+            kohana::log('error', 'Plugin name unknown, ignoring');
+
+            return FALSE;
+        }
+
+        // Get the base object
+        $this->base = $this->getBaseModelObject();
+
+        // If the base object doesnt have a place for plugins we are done
+        if (!isset($this->base['plugins']))
+        {
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    protected function loadFormData()
+    {
+        // Get any data coming from the form for this plugin
+        $this->formData = $this->input->post($this->name, array());
+
+        // If the plugin already has data merge what came from the form
+        if (!empty($this->base['plugins'][$this->name]))
+        {
+            $this->pluginData = arr::merge($this->base['plugins'][$this->name], $this->formData);
+        }
+        else
+        {
+            $this->pluginData = $this->formData;
+        }
+
+        return TRUE;
+    }
+
+    protected function addPluginData()
+    {
+        // Remove any empty keys, no need to store them
+        $this->pluginData = array_filter($this->pluginData);
+
+        // Destroy the existing plugin key for this plugin using the new data
+        $this->base['plugins'] = array_merge(
+            (array)$this->base['plugins'],
+            array($this->name => $this->pluginData)
+        );
+        
+        return TRUE;
+    }
+}

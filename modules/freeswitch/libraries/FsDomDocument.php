@@ -48,6 +48,7 @@ class FsDomDocument extends DOMDocument
      * @var string
      */
     protected $xmlRoot = NULL;
+
     protected $xmlExtenRoot = NULL;
     
     /**
@@ -58,13 +59,7 @@ class FsDomDocument extends DOMDocument
     {
         return $this->xmlRoot;
     }
-    public function getExtensionRoot() {
-        return $this->xmlExtenRoot;
-    }
 
-    public function setExtensionRoot($xmlExtenRoot) {
-        $this->xmlExtenRoot = $xmlExtenRoot;
-    }
     /**
      * Set the prefix to be appended to all set() and update() XPath calls
      * @param string $prefix XPath prefix to append before paths passed to set() and update(). Set to NULL to clear.
@@ -72,23 +67,40 @@ class FsDomDocument extends DOMDocument
      */
     public function setXmlRoot($xmlRoot)
     {
-        Kohana::log('debug', 'Setting XML root to ' . $xmlRoot);
+        if (!empty($xmlRoot))
+        {
+            Kohana::log('debug', 'Setting XML root to ' . $xmlRoot);
+        }
+
         $this->xmlRoot = $xmlRoot;
+    }
+
+    public function getExtensionRoot()
+    {
+        return $this->xmlExtenRoot;
+    }
+    
+    public function setExtensionRoot($xmlExtenRoot)
+    {
+        $this->xmlExtenRoot = $xmlExtenRoot;
     }
 
     public function preUpdate($xpaths)
     {
         // Tack on the XmlRoot to all xpaths
-        if (is_string($xpaths)) {
+        if (is_string($xpaths))
+        {
             $xpaths = $this->xmlRoot . $xpaths;
-        } elseif (is_array($xpaths)) {
-            foreach ($xpaths as $k => $xpath) {
+        } 
+        elseif (is_array($xpaths))
+        {
+            foreach ($xpaths as $k => $xpath)
+            {
                 $xpaths[$k] = $this->xmlRoot . $xpath;
             }
         }
 
         // TODO: Add validation here. This would help everyone out and allow for unified errors to be shown
-
 
         // TODO: Make this into a hook that drivers can attach to.
         Telephony::getDriver()->autoloadXml($xpaths);
@@ -113,16 +125,24 @@ class FsDomDocument extends DOMDocument
      */
     public function arrayToAttr(&$element, $data, $keymap)
     {
-        foreach ($keymap as $newkey => $origkey) {
-        // Was a key mapping given in the array? If origkey is an integer, assume not
-            if (is_int ($newkey)) {
+        foreach ($keymap as $newkey => $origkey)
+        {
+            // Was a key mapping given in the array? If origkey is an integer, assume not
+            if (is_int ($newkey))
+            {
                 // We get here if both the name of the new key and the old key are identical
                 if (isset ($data[$origkey]))
+                {
                     $element->setAttribute ( $origkey, $data[$origkey] );
-            } else {
+                }
+            } 
+            else
+            {
                 // We get here if there is some mapping of keys from old array to new element to do
                 if (isset ($data[$origkey]))
+                {
                     $element->setAttribute( $newkey, $data[$origkey] );
+                }
             }
         }
     }
@@ -141,15 +161,23 @@ class FsDomDocument extends DOMDocument
 
         $xp = new DOMXPath($this);
 
-        if (defined('XPATH_DEBUG')) {
+        if (defined('XPATH_DEBUG'))
+        {
             Kohana::log('debug', "Search Query Is: $xpath");
         }
+
         $elements = $xp->query($xpath);
-        if ($elements->length > 0) {
+
+        if ($elements->length > 0)
+        {
             Kohana::log('debug', 'returning attribute');
+
             return $elements->item(0)->getAttribute($attributename);
-        } else {
+        } 
+        else
+        {
             Kohana::log('debug', 'returning false');
+            
             return false;
         }
     }
@@ -168,17 +196,34 @@ class FsDomDocument extends DOMDocument
         $xpath = $this->preUpdate($xpath);
 
         $xp = new DOMXPath($this);
-        if (defined('XPATH_DEBUG')) {
+
+        if (defined('XPATH_DEBUG'))
+        {
             Kohana::log('debug', "Search Query Is: $xpath");
         }
 
         $elements = $xp->query($xpath);
-        if ($elements->length > 0) {
+
+        if ($elements->length > 0)
+        {
             Kohana::log('debug', 'setting attribute');
+
             return $elements->item(0)->setAttribute($attributename, $value);
-        } else {
-            Kohana::log('debug', 'returning false');
-            return false;
+        } 
+        else
+        {
+            if (defined('XPATH_DEBUG'))
+            {
+                Kohana::log('debug', "We did not find $xpath. Creating it instead.");
+            }
+
+            $create = preg_replace ('/\{@(.*?)=\"(.*?)\"\}/', '[@$1="$2"]', $xpath);
+
+            $this->set($create);
+
+            $elements = $xp->query($xpath);
+            
+            return $elements->item(0)->setAttribute($attributename, $value);
         }
     }
 
@@ -188,8 +233,11 @@ class FsDomDocument extends DOMDocument
     public function _setAttr($variables)
     {
         $variables[1] = str_replace ('"', '', $variables[1]);
+
         $variables[2] = str_replace ('"', '', $variables[2]);
-        if ($variables[1]) {
+
+        if ($variables[1])
+        {
             $this->newAttrs[$variables[1]] = $variables[2];
         }
 
@@ -225,27 +273,36 @@ class FsDomDocument extends DOMDocument
         $currentnode = $this;
 
         // Traverse $path, adding elements that don't exist
-        foreach ($elements as $element) if ($element != "") {
+        foreach ($elements as $element) if ($element != "")
+        {
             // Put slashes back
             $element = str_replace('__SLASH__', '/', $element);
 
             $this->newAttrs = array();
+
             $elements = $xp->query($element, $currentnode);
+
             // Does path not exist (0 elements)?
-            if ($elements->length == 0) {
+            if ($elements->length == 0)
+            {
                 // Add any attributes in XPath to element
                 // I checked for non quoted params, and didnt find any...
                 // grep -R -P '\[@(.*?)=[^"](.*?)[^"]\]' ./* | grep -v .svn
                 $elementname = preg_replace_callback ('/\[@(.*?)="(.*?)"\]/', array (&$this, "_setAttr"), $element);
+
                 $new_element = $this->createElement($elementname);
-                foreach ($this->newAttrs as $key => $value) {
+
+                foreach ($this->newAttrs as $key => $value)
+                {
                     $new_element->setAttribute($key, $value);
                 }
 
                 $currentnode->appendChild($new_element);
 
                 $currentnode = $new_element;
-            } else {
+            } 
+            else
+            {
                 // Path already exists so far, traverse existing path
                 // NOTE: We assume only one possible entry is returned. This may be a mistake...?
                 $currentnode = $elements->item(0);
@@ -283,13 +340,19 @@ class FsDomDocument extends DOMDocument
         // Replace any attribute fields containing %s or other sprintf modifiers, and hang on to the attribute name for use later
         // NOTE: We only allow one attribute at this point in time.
         preg_match_all ("/\{@(.*?)=\"(.*?)\"\}/", $query, $results);
+
         // Take all matches (if any) and put them in hash key/value form
-        if (is_array($results)) {
+        if (is_array($results))
+        {
             $newAttributes = array();
-            for ($i = 0; $i < count($results[0]); $i++) {
+
+            for ($i = 0; $i < count($results[0]); $i++)
+            {
                 $newAttributes[$results[1][$i]] = $results[2][$i];
             }
-        } else {
+        } 
+        else
+        {
             $newAttributes = NULL;
         }
         
@@ -300,12 +363,15 @@ class FsDomDocument extends DOMDocument
         $search = $this->preUpdate($search);
 
         // Now, run the query and save the results
-        if (defined('XPATH_DEBUG')) {
+        if (defined('XPATH_DEBUG'))
+        {
             Kohana::log('debug', "Searching for $search...");
         }
 
         $xpath = new DOMXPath ($this);
-        if (defined('XPATH_DEBUG')) {
+
+        if (defined('XPATH_DEBUG'))
+        {
             Kohana::log('debug', "search query is: $search");
         }
 
@@ -315,34 +381,53 @@ class FsDomDocument extends DOMDocument
         // Now figure out where we're storing the results, and store them accordingly
 
         // DOES THE BASE ELEMENT EXIST?
-        if ($elements->length > 0) {
-            if (defined('XPATH_DEBUG')) {
+        if ($elements->length > 0)
+        {
+            if (defined('XPATH_DEBUG'))
+            {
                 Kohana::log('debug', "We found an exact match for $search! Easy replace for attributes...");
             }
+
             // Is this an attribute? If so, delete any like-named attribute and replace with new value
-            foreach ($newAttributes as $name => $value) {
-                if (defined('XPATH_DEBUG')) {
+            foreach ($newAttributes as $name => $value)
+            {
+                if (defined('XPATH_DEBUG'))
+                {
                     Kohana::log('debug', "Adding/updating attribute on this element.\n");
                 }
+
                 $value = str_replace('\/', '/', $value);
-                if ($value == '') {
-                // How do we delete attributes? We need to fix this...
+
+                if ($value == '')
+                {
+                    // How do we delete attributes? We need to fix this...
                     $elements->item(0)->setAttribute($name, $value);
-                } else {
+                } 
+                else
+                {
                     $elements->item(0)->setAttribute($name, $value);
                 }
-            //                        $elements->item(0)->nodeValue = $formData[$fieldName];
-            //                        echo "Replaced element value.\n";
+
+//                $elements->item(0)->nodeValue = $formData[$fieldName];
+//
+//                echo "Replaced element value.\n";
             }
-            if (defined('XPATH_DEBUG')) {
+
+            if (defined('XPATH_DEBUG'))
+            {
                 Kohana::log('debug', "Replace success.");
             }
-        } else {
-        // NO BASE ELEMENT EXISTS
-            if (defined('XPATH_DEBUG')) {
+        } 
+        else
+        {
+            // NO BASE ELEMENT EXISTS
+            if (defined('XPATH_DEBUG'))
+            {
                 Kohana::log('debug', "We did not find $query. Creating it instead.");
             }
+
             $create = preg_replace ('/\{@(.*?)=\"(.*?)\"\}/', '[@$1="$2"]', $query);
+
             $this->set($create);
         }
 
@@ -365,8 +450,9 @@ class FsDomDocument extends DOMDocument
     {
         $paths = $this->preUpdate($paths);
 
-        foreach ((array) $paths as $path) {
-        // Break path into parts (divided by slahses)
+        foreach ((array) $paths as $path)
+        {
+            // Break path into parts (divided by slahses)
             $elements = explode("/",$path);
 
             // Create XPath search object
@@ -376,22 +462,29 @@ class FsDomDocument extends DOMDocument
             $currentnode = $this;
 
             // Traverse $path, adding elements that don't exist
-            foreach ($elements as $element) if ($element != "") {
-                    $entries = $xp->query($element, $currentnode);
-                    // Does path not exist (0 elements)?
-                    if ($entries->length == 0) {
-                    // Remove attributes from XPath in element
-                        $elementname = preg_replace ('/\[@.*?\]/', '', $element);
-                        $new_element = $this->createElement($elementname);
-                        $currentnode->appendChild($new_element);
+            foreach ($elements as $element) if ($element != "")
+            {
+                $entries = $xp->query($element, $currentnode);
 
-                        $currentnode = $new_element;
-                    } else {
+                // Does path not exist (0 elements)?
+                if ($entries->length == 0)
+                {
+                    // Remove attributes from XPath in element
+                    $elementname = preg_replace ('/\[@.*?\]/', '', $element);
+
+                    $new_element = $this->createElement($elementname);
+
+                    $currentnode->appendChild($new_element);
+
+                    $currentnode = $new_element;
+                }
+                else
+                {
                     // Path already exists so far, traverse existing path
                     // NOTE: We assume only one possible entry is returned. This may be a mistake...?
-                        $currentnode = $entries->item(0);
-                    }
+                    $currentnode = $entries->item(0);
                 }
+            }
         }
 
         // Return the last-most node we created (assuming someone is about to add to that node)
@@ -413,13 +506,21 @@ class FsDomDocument extends DOMDocument
     {
         $success = true;
 
-        if (is_array($paths)) {
+        if (is_array($paths))
+        {
             foreach ($paths as $path)
-            // Were we successful in creating the path? If not, flag it
+            {
+                // Were we successful in creating the path? If not, flag it
                 if (!$this->createPath ($path))
+                {
                     $success = false;
-        } else
+                }
+            }
+        } 
+        else
+        {
             $success = $this->createPath ($paths);
+        }
 
         return $success;
     }
@@ -430,17 +531,22 @@ class FsDomDocument extends DOMDocument
         $query = $this->preUpdate($query);
         
         $this->set($query);
+
         $this->deleteChildren($query);
 
         // Grab an XPath pointer to the query we just ran
         $xp = new DOMXPath($this);
+
         $base = $xp->query($query);
 
         // Create a new XML fragment and append it to wherever $query pointed to
         $newXmlFragment = $xmlDoc->createDocumentFragment();
+
         $newXmlFragment->appendXML($newXml);
+
         $base->item(0)->appendChild($newXmlFragment);
     }
+
 
     public function deleteNode($query = '')
     {
@@ -448,9 +554,11 @@ class FsDomDocument extends DOMDocument
 
         // Create XPath search object
         $xp = new DOMXPath($this);
+
         $elements = $xp->query($query);
 
-        foreach ($elements as $node) {
+        foreach ($elements as $node)
+        {
             $node->parentNode->removeChild($node);
         }
     }
@@ -461,10 +569,13 @@ class FsDomDocument extends DOMDocument
         
         // Create XPath search object
         $xp = new DOMXPath($this);
+
         $nodeList = $xp->query($query);
 
-        foreach ($nodeList as $node) {
-            while (isset($node->firstChild)) {
+        foreach ($nodeList as $node)
+        {
+            while (isset($node->firstChild))
+            {
                 $node->removeChild($node->firstChild);
             }
         }
@@ -478,13 +589,15 @@ class FsDomDocument extends DOMDocument
      */
     function appendSibling(DOMNode $newnode, DOMNode $ref)
     {
-        if ($ref->nextSibling) {
-        // $ref has an immediate brother : insert newnode before this one
+        if ($ref->nextSibling)
+        {
+            // $ref has an immediate brother : insert newnode before this one
             return $ref->parentNode->insertBefore($newnode, $ref->nextSibling);
-        } else {
-        // $ref has no brother next to him : insert newnode as last child of his parent
+        } 
+        else
+        {
+            // $ref has no brother next to him : insert newnode as last child of his parent
             return $ref->parentNode->appendChild($newnode);
         }
     }
-
 }

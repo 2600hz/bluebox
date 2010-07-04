@@ -1,44 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/*
- * Bluebox Modular Telephony Software Library / Application
- *
- * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
- * you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/.
- *
- * Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
- * express or implied. See the License for the specific language governing rights and limitations under the License.
- *
- * The Original Code is Bluebox Telephony Configuration API and GUI Framework.
- * The Original Developer is the Initial Developer.
- * The Initial Developer of the Original Code is Darren Schreiber
- * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
- *
- * Contributor(s):
- *
- *
- */
 
-/**
- * Polymorphic.php - Polymorphic support class
- *
- * This behavior, when applied to a class that extends Bluebox_Record, results in an automatic setting of all Doctrine subclasses for
- * any class that extends the base class that applied this behavior.
- *
- * This behavior, when applied to a class that extends another model, results in an automatic attaching of the two named models in the
- * extended classes name. For example, if there is a base class named 'Number' and an extended class named 'DeviceNumber', an automatic
- * relation using column aggregation inheritance is established between the Device and Number models. Number is presumed to contain a
- * class_type and foreign_id field which track whether or not a record in the Number table is of type DeviceNumber and
- * inherently attached to devices.
- *
- * Created on Jul 25, 2009
- *
- * @author Darren Schreiber <d@d-man.org>
- * @license MPL
- * @package Bluebox
- * @subpackage Core
- */
 class Polymorphic extends Doctrine_Template {
+    const DEBUG = FALSE;
+    
     protected $relationType = Doctrine_Relation::ONE;
 
     public function setTableDefinition()
@@ -62,7 +26,7 @@ class Polymorphic extends Doctrine_Template {
             $thisClass->setAttribute(Doctrine::ATTR_EXPORT, Doctrine::EXPORT_ALL ^ Doctrine::EXPORT_CONSTRAINTS);
 
             $SubClasses = array();
-            //echo 'We are defining subclasses for ' . $thisClassName . '...<BR>';
+            if (self::DEBUG) kohana::log('debug', 'We are defining subclasses for ' . $thisClassName . '...');
             foreach (Doctrine::getLoadedModelFiles() as $model => $dir) if (substr($model, strlen($model) - strlen($thisClassName), strlen($thisClassName)) == $thisClassName)
             {
                 if (is_subclass_of($model, $thisClassName))
@@ -86,12 +50,20 @@ class Polymorphic extends Doctrine_Template {
         $thisClass = $this->getInvoker();
         $thisClassName = $thisClass->getTable()->getComponentName();
 
+        if (!empty($thisClass->relationType)) {
+            $this->relationType = $thisClass->relationType;
+            $mode = ' hasMany ';
+        } else {
+            $mode = ' hasOne ';
+        }
+
+
         // If this class is extending Bluebox_Class directly, then load any possibly related models and setup our subclasses
         if (get_parent_class($thisClass) == 'Bluebox_Record') {
             // Go through every model and figure out if it is an extension of this model. If so, relate it via subclasses
             // Note that for efficiency, we assume that we only need to inspect classes that end in the same name as our base class
             // i.e. if the base class is named 'Device' we would only look at other models named things like 'SipDevice' or 'IaxDevice'
-            //echo '*** We are setting up the base class ' . $thisClassName . '...<BR>';
+            //kohana::log('debug', '*** We are setting up the base class ' . $thisClassName . '...');
             foreach (Doctrine::getLoadedModelFiles() as $model => $dir) if (substr($model, strlen($model) - strlen($thisClassName), strlen($thisClassName)) == $thisClassName)
             {
                 if (is_subclass_of($model, $thisClassName)) {
@@ -103,16 +75,20 @@ class Polymorphic extends Doctrine_Template {
             $baseClassName = get_parent_class($thisClass);
             $relatesTo = substr($thisClassName, 0, strlen($thisClassName) - strlen($baseClassName));
             
-            //echo '*** We are setting up the extended version of ' . $baseClassName . ' (' . $thisClassName . ' hasOne => ' . $relatesTo . ")<BR>\n";
+            if (self::DEBUG) kohana::log('debug', '*** Setting up extended version of ' . $baseClassName . ' (' . $thisClassName .")");
             if (class_exists($relatesTo, TRUE)) {
                 $relatedPrimaryKey = Doctrine::getTable($relatesTo)->getIdentifier();
 
+                if (self::DEBUG) kohana::log('debug', $thisClassName . $mode . $relatesTo);
                 // Relate this class to the foreign model. So if this was DeviceNumber, this would relate us to Device
-                //echo $thisClassName . ' hasOne ' . $relatesTo . "<BR>\n";
-                $thisClass->hasOne($relatesTo, array('local' => 'foreign_id', 'foreign' => $relatedPrimaryKey), $this->relationType);
-
+                if ($this->relationType == Doctrine_Relation::MANY) {
+                    $thisClass->hasMany($relatesTo, array('local' => 'foreign_id', 'foreign' => $relatedPrimaryKey), $this->relationType);
+                } else {
+                    $thisClass->hasOne($relatesTo, array('local' => 'foreign_id', 'foreign' => $relatedPrimaryKey), $this->relationType);
+                }
+                
                 // Also relate the base class to the foreign model.
-                //echo $baseClassName . ' hasOne ' . $relatesTo . "<BR>\n";
+                if (self::DEBUG) kohana::log('debug', $baseClassName . $mode . $relatesTo);
                 $foreignTable = Doctrine::getTable($baseClassName);
                 $foreignTable->bind(array($relatesTo, array('local' => 'foreign_id', 'foreign' => $relatedPrimaryKey)), $this->relationType);
                 
@@ -124,7 +100,7 @@ class Polymorphic extends Doctrine_Template {
                 $foreignTable->setAttribute(Doctrine::ATTR_EXPORT, Doctrine::EXPORT_ALL ^ Doctrine::EXPORT_CONSTRAINTS);
 
                 // Create the relation on the other side, too
-                //echo $relatesTo . ' hasOne ' . $thisClassName . " (as $baseClassName)<BR>\n";
+                if (self::DEBUG) kohana::log('debug', $relatesTo . $mode . $thisClassName . " (as $baseClassName)");
                 $foreignTable = Doctrine::getTable($relatesTo);
                 $foreignTable->bind(array($thisClassName . ' as ' . $baseClassName, array('local' => $relatedPrimaryKey, 'foreign' => 'foreign_id')), $this->relationType);
 
@@ -132,7 +108,7 @@ class Polymorphic extends Doctrine_Template {
                 foreach (Doctrine::getLoadedModelFiles() as $model => $dir) if (substr($model, strlen($model) - strlen($relatesTo), strlen($relatesTo)) == $relatesTo)
                 {
                     if (is_subclass_of($model, $relatesTo)) {
-                        //echo $model . ' hasOne ' . $thisClassName . " (searched for instances of $relatesTo)<BR>\n";
+                        if (self::DEBUG) kohana::log('debug', $model . $mode . $thisClassName . " (searched for instances of $relatesTo)\n");
                         Doctrine::getTable($thisClassName)->addRecordListener(new PolymorphicRecordListener($model));
                         $foreignTable = Doctrine::getTable($model);
                         $foreignTable->bind(array($thisClassName . ' as ' . $baseClassName, array('local' => $relatedPrimaryKey, 'foreign' => 'foreign_id')), $this->relationType);

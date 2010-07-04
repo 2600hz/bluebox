@@ -1,12 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * filesystem.php - Bluebox helper for manipulating the filesystem
- *
- * @author Karl Anderson
- * @license LGPL
- * @package Bluebox
- * @subpackage Core
- */
+
 class filesystem
 {
     /**
@@ -24,6 +17,7 @@ class filesystem
         if (!self::createDirectory(dirname($dir) , $mode)) return FALSE;
         return @mkdir($dir, $mode, TRUE);
     }
+
     /**
      * Copy a file, or recursively copy a folder and its contents
      *
@@ -81,6 +75,7 @@ class filesystem
         $dir->close();
         return true;
     }
+
     public static function directoryToArray($directory, $recursive = TRUE, $options = array())
     {
         $options+= array(
@@ -136,6 +131,7 @@ class filesystem
         }
         return $array_items;
     }
+
     public static function is_binary($file, $blk = NULL)
     {
         if (!is_null($blk)) {

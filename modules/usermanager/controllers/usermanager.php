@@ -1,196 +1,136 @@
-<?php
-defined('SYSPATH') or die('No direct access allowed.');
-/*
-* Bluebox Modular Telephony Software Library / Application
-*
- * The contents of this file are subject to the Mozilla Public License Version 1.1 (the 'License');
- * you may not use this file except in compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/.
-*
-* Software distributed under the License is distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, either
-* express or implied. See the License for the specific language governing rights and limitations under the License.
-*
-* The Original Code is Bluebox Telephony Configuration API and GUI Framework.
-* The Original Developer is the Initial Developer.
-* The Initial Developer of the Original Code is Darren Schreiber
-* All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
-*
-* Contributor(s):
-*
-*
-*/
-/**
- * usermanager.php - User Management Controller Class
- *
- * @author Darren Schreiber <d@d-man.org>
- * @license MPL
- * @package Bluebox
- * @subpackage UserManager
- */
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
 class UserManager_Controller extends Bluebox_Controller
 {
-    protected $writable = array(
-        'first_name',
-        'last_name',
-        'location_id',
-        'email_address',
-        'password'
-    );
-
-    protected $readable = array(
-        'user_id',
-        'first_name',
-        'location_id',
-        'last_name',
-        'email_address'
-    ); // No reading passwords
     protected $baseModel = 'User';
 
     public function index()
     {
         $this->template->content = new View('generic/grid');
-        $this->grid = jgrid::grid($this->baseModel, array(
-            'caption' => 'Users',
-            'multiselect' => true
-        ))->add('user_id', 'ID', array(
-            'hidden' => true,
-            'key' => true
-        ))->add('email_address', 'Email Address')->add('first_name', 'First Name', array(
-            'width' => '100',
-            'search' => true,
-        ))->add('last_name', 'Last Name', array(
-            'width' => '100',
-            'search' => true,
-        ))->add('Location/name', 'Location', array(
-            'width' => '100',
-            'search' => true,
-            'sortable' => true
-        ))->add('account_type', 'Account Type')->addAction('usermanager/login', 'Login', array(
-            'arguments' => 'user_id'
-        ))->addAction('usermanager/edit', 'Edit', array(
-            'arguments' => 'user_id'
-        ))->addAction('usermanager/delete', 'Delete', array(
-            'arguments' => 'user_id'
-        ))->navGrid(array(
-            'del' => true
-        ));
-        // Let the plugins add to the grid!
+        
+        // Setup the base grid object
+        $grid = jgrid::grid($this->baseModel, array(
+                'caption' => 'Users'
+            )
+        );
+
+        // Add the base model columns to the grid
+        $grid->add('user_id', 'ID', array(
+                'hidden' => TRUE,
+                'key' => TRUE
+            )
+        );
+        $grid->add('email_address', 'Email Address');
+        $grid->add('first_name', 'First Name', array(
+                'width' => '100',
+                'search' => TRUE
+            )
+        );
+        $grid->add('last_name', 'Last Name', array(
+                'width' => '100',
+                'search' => TRUE
+            )
+        );
+        $grid->add('Location/name', 'Location', array(
+                'width' => '100',
+                'search' => TRUE,
+                'sortable' => TRUE
+            )
+        );
+        $grid->add('user_type', 'User Type', array(
+                'callback' => array(
+                    'function' => array($this, 'userType'),
+                    'arguments' => array('user_type')
+                )
+            )
+        );
+        $grid->add('logins', 'Logins', array('hidden' => TRUE));
+        $grid->add('last_login', 'Last Login', array('hidden' => TRUE));
+        $grid->add('last_logged_ip', 'Last Logged IP', array('hidden' => TRUE));
+        $grid->add('debug_level', 'Debug Level', array('hidden' => TRUE));
+        
+        // Add the actions to the grid
+        $grid->addAction('usermanager/edit', 'Edit', array(
+                'arguments' => 'user_id'
+            )
+        );
+        $grid->addAction('usermanager/delete', 'Delete', array(
+                'arguments' => 'user_id'
+            )
+        );
+        if (users::$user['user_type'] == User::TYPE_SYSTEM_ADMIN) {
+            $grid->addAction('usermanager/login', 'Login', array(
+                'arguments' => 'user_id'
+            ));
+        }
+        
+        // Let plugins populate the grid as well
+        $this->grid = $grid;
         plugins::views($this);
-        // Produces the grid markup or JSON
+
+        // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
     }
-    public function edit($id = NULL)
-    {
-        // Overload the update view
-        $this->template->content = new View(Router::$controller . '/update');
-        $this->view->title = 'Edit User';
 
-        $this->user = Doctrine::getTable('User')->find($id);
-        $this->password = $this->confirm_password = '';
-        // Was anything retrieved? If no, this may be an invalid request
-        if (!$this->user) {
-            // Send any errors back to the index
-            $error = i18n('Unable to locate user id %1$d!', $id)->sprintf()->s();
-            message::set($error, array(
-                'translate' => false,
-                'redirect' => Router::$controller . '/index'
-            ));
-            return true;
-        }
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
-            if (empty($_POST['user']['password'])) {
-                unset($_POST['user']['password']);
-            } else {
-                $this->password = $_POST['user']['password'];
-                $this->confirm_password = $_POST['user']['confirm_password'];
-                $rules = Bluebox_Controller::$validation;
-                $rules->add_callbacks('password', array(
-                    $this,
-                    '_strong_pwd'
-                ));
-                $rules->add_callbacks('password', array(
-                    $this,
-                    '_match_pwd'
-                ));
-            }
-            if ($this->formSave($this->user)) {
-                url::redirect(Router_Core::$controller);
-            }
-        }
-        // Since the confirm_password doesnt exist in the table handle it specially
-        $this->view->confirm_password = $this->confirm_password;
-        // The password will returned hashed and we need plain text....
-        $this->view->password = $this->password;
-        // Set our own view variables from the DB records.
-        $this->view->user = $this->user;
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
-    }
-    public function add()
-    {
-        // Overload the update view
-        $this->template->content = new View(Router::$controller . '/update');
-        $this->view->title = 'Add User';
-
-        $this->password = $this->confirm_password = '';
-        $this->user = new User();
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
-            $this->password = $_POST['user']['password'];
-            $this->confirm_password = $_POST['user']['confirm_password'];
-            // Username is not visible in the view yet but is required. Set to email_address for now.
-            $this->user->username = $_POST['user']['email_address'];
-            $rules = Bluebox_Controller::$validation;
-            $rules->add_callbacks('password', array(
-                $this,
-                '_strong_pwd'
-            ));
-            $rules->add_callbacks('password', array(
-                $this,
-                '_match_pwd'
-            ));
-            if ($this->formSave($this->user)) {
-                url::redirect(Router_Core::$controller);
-            }
-        }
-        // Since the confirm_password doesnt exist in the table handle it specially
-        $this->view->confirm_password = $this->confirm_password;
-        // The password will returned hashed and we need plain text....
-        $this->view->password = $this->password;
-        // Set our own view variables from the DB records.
-        $this->view->user = $this->user;
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
-    }
-    public function delete($id = NULL)
-    {
-       $this->stdDelete($id);
-    }
-    public function _match_pwd(Validation $array, $field)
-    {
-        if ($_POST['user']['password'] != $_POST['user']['confirm_password']) {
-            $array->add_error('user[confirm_password]', 'nomatch');
-        }
-    }
-    public function _strong_pwd(Validation $array, $field)
-    {
-        $enforce = Kohana::config('core.pwd_complexity');
-        if (empty($enforce)) return true;
-        if (!preg_match('/[0-9]{1,}/', $_POST['user']['password'])) { // at least one digit
-            $array->add_error('user[password]', 'nodigits');
-        }
-        if (!preg_match('/[A-Za-z]{1,}/', $_POST['user']['password'])) { // at least one character
-            $array->add_error('user[password]', 'noalpha');
-        }
-    }
     public function login($userId)
     {
-        $user = Doctrine::getTable('User')->findOneByUserId($userId, Doctrine::HYDRATE_ARRAY);
-        if (!$user) {
+        if (!empty(users::$user['user_type']) AND (users::$user['user_type'] == User::TYPE_SYSTEM_ADMIN))
+        {
+            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+            $user = Doctrine::getTable('User')->findOneByUserId($userId, Doctrine::HYDRATE_ARRAY);
+
+            if (!$user)
+            {
+                url::redirect('/');
+            }
+            
+            $session = Session::instance();
+            
+            if (!$session->get('user.sysadmin.user_type', FALSE))
+            {
+                $session->set('user.sysadmin.user_type', users::$user->user_type);
+            }
+
+            if (!$session->get('user.sysadmin.user_id', FALSE))
+            {
+                $session->set('user.sysadmin.user_id', users::$user->user_id);
+            }
+
+            Auth::instance()->force_login($user['email_address']);
+
             url::redirect('/');
+        } 
+        else
+        {
+            Event::run('system.404');
+
+            die();
         }
-        Auth::instance()->force_login($user['email_address']);
-        url::redirect('/');
+    }
+
+    public function userType($cell, $userType)
+    {
+        $userTypes = usermanager::getUserTypes();
+
+        if (array_key_exists($userType, $userTypes))
+        {
+            return $userTypes[$userType];
+        }
+
+        return 'Unknown';
+    }
+
+    public function qtipAjaxReturn($data)
+    {
+        if (!empty($data->user_id))
+        {
+
+            $fullName = $data->first_name .' ' .$data->last_name;
+
+            javascript::codeBlock('$(\'.users_dropdown\').append(\'<option value="' .$data->user_id .'" selected="selected">' .$fullName  .'</option>\');');
+        }
+        
+        parent::qtipAjaxReturn($data);
     }
 }

@@ -32,7 +32,7 @@
                     <!-- Logo for the page -->
                     <div id="logo_container">
                     <?php
-                        $logoImg = html::image('assets/img/logo.png','Bluebox v3 Let freedom ring!');
+                        $logoImg = html::image('assets/img/logo.png','the Bluebox Project!');
                         echo html::anchor('/welcome',  $logoImg, array(
                             'id' => 'logo'
                         ));

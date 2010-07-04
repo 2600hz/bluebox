@@ -11,15 +11,12 @@
  */
 
 class MultiTenant extends Doctrine_Template {
-    //public $unrestricted = FALSE;
-
+    
     public function setTableDefinition()
     {
 	$this->hasColumn('account_id', 'integer', 11, array('unsigned' => true, 'default' => NULL));
 
-        //if ($this->unrestricted != TRUE) {
         $this->addListener(new MultiTenantRecordListener(), 'MultiTenant');
-        //}
     }
 
     public function setUp()

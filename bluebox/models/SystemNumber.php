@@ -29,7 +29,7 @@
  *
  * @author Darren Schreiber <d@d-man.org>
  * @license MPL
- * @package Bluebox
+ * @package Bluebox3
  * @subpackage Core
  */
 class SystemNumber extends Number {
@@ -40,14 +40,14 @@ class SystemNumber extends Number {
         parent::setUp();
 
         $this->setAttribute(Doctrine::ATTR_EXPORT, Doctrine::EXPORT_ALL ^ Doctrine::EXPORT_CONSTRAINTS);
-        
+
         /*
          * Relationships
          */
         // Relate the conference (conference_id) with a generic number identifier (foreign_id) in the Number class.
         // Note carefully that this only works because this model is related to Number
         // The Number class has some "magic" that auto relates the class
-        $this->hasOne('System', array('local'   => 'foreign_id',
+        $this->hasOne('System as Destination', array('local'   => 'foreign_id',
                                       'foreign' => 'system_id',
                                       'owningSide' => TRUE));
     }

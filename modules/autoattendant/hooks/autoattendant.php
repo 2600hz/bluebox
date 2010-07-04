@@ -1,3 +1,3 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
-plugins::register('destinations/selector', 'view', array('AutoAttendant_Plugin', 'selector'));
+    Event::add('numbermanager.collectNumberTargets', array('AutoAttendants', 'provideNumberTargets'));

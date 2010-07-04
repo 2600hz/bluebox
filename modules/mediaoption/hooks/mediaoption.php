@@ -1,14 +1,15 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
-// Add SIP device fields to the page where devices are added
-plugins::register('devicemanager/add', 'view', array('MediaOption_Plugin', 'view'));
+    // Add SIP device fields to the page where devices are added
+    plugins::register('devicemanager/create', 'view', array('MediaOption_Plugin', 'update'));
+    
+    plugins::register('devicemanager/edit', 'view', array('MediaOption_Plugin', 'update'));
 
-// Add SIP device fields to the edit page where devices are edited
-plugins::register('devicemanager/edit', 'view', array('MediaOption_Plugin', 'view'));
+    plugins::register('devicemanager', 'save', array('MediaOption_Plugin', 'save'));
 
-// Add SIP device fields to the page where devices are added
-plugins::register('devicemanager', 'save', array('MediaOption_Plugin', 'save'));
+    // Add SIP device fields to the page where devices are added
+    plugins::register('contextmanager/create', 'view', array('MediaOption_Plugin', 'update'));
 
-// Add SIP device fields to the edit page where devices are edited
-//plugins::register('mediaoption/index', 'view', array('MediaOption_Plugin', 'index'));
-//plugins::register('mediaoption/grid', 'view', array('MediaOption_Plugin', 'index'));
+    plugins::register('contextmanager/edit', 'view', array('MediaOption_Plugin', 'update'));
+
+    plugins::register('contextmanager', 'save', array('MediaOption_Plugin', 'save'));

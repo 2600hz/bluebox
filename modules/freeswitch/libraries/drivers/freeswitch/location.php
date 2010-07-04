@@ -29,20 +29,19 @@
  * @package TCAPI
  * @subpackage FreeSWITCH_Driver
  */
-class FreeSwitch_Location_Driver extends FreeSwitch_Base_Driver {
-    public static function set($obj)
+class FreeSwitch_Location_Driver extends FreeSwitch_Base_Driver
+{
+    public static function set($base)
     {
-        // Reference to our XML document & context
         $xml = FreeSwitch::setSection('location');
 
-        $xml->update('/X-PRE-PROCESS[@cmd="set"][@bluebox="location_' . $obj->location_id . '"]{@data="location_' . $obj->location_id . '=' . $obj->domain . '"}');
+        $xml->update('/X-PRE-PROCESS[@cmd="set"][@bluebox="location_' .$base['location_id'] . '"]{@data="location_' .$base['location_id'] .'=' .$base['location_id'] .'"}');
     }
 
-    public static function delete($obj)
+    public static function delete($base)
     {
-        // Reference to our XML document & context
         $xml = FreeSwitch::setSection('location');
 
-        $xml->deleteNode('/X-PRE-PROCSS[@cmd="set"][@bluebox="location_' . $obj->location_id . '"]');
+        $xml->deleteNode('/X-PRE-PROCSS[@cmd="set"][@bluebox="location_' .$base['location_id'] .'"]');
     }
 }

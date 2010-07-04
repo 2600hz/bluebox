@@ -2,8 +2,6 @@
 /*
 * Bluebox Modular Telephony Software Library / Application
 *
-* Module:
-*
 * The contents of this file are subject to the Mozilla Public License
 * Version 1.1 (the "License"); you may not use this file except in
 * compliance with the License. You may obtain a copy of the License at
@@ -14,7 +12,7 @@
 * License for the specific language governing rights and limitations
 * under the License.
 *
-* The Initial Developer of the Original Code is Michael Phillips <michael.j.phillips@gmail.com>.
+* The Initial Developer of the Original Code is Darren Schreiber <d@d-man.org> .
 *
 * Portions created by the Initial Developer are Copyright (C)
 * the Initial Developer. All Rights Reserved.
@@ -24,9 +22,9 @@
 *
 */
 /**
- * configure.php - Media Manager Hook
+ * configure.php - Media Management System
  *
- * @author Michael Phillips <michael.j.phillips@gmail.com>
+ * @author Darren Schreiber <d@d-man.org>
  * @license MPL
  * @package Bluebox
  * @subpackage MediaManager
@@ -34,38 +32,40 @@
 class MediaManager_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
-    public static $packageName = 'file';
-    public static $displayName = 'Media Management';
-    public static $author = 'Michael Phillips';
+    public static $packageName = 'mediamanager';
+    public static $displayName = 'Media Manager';
+    public static $author = 'Darren Schreiber';
     public static $vendor = 'Bluebox';
     public static $license = 'MPL';
-    public static $summary = 'Media Management';
+    public static $summary = 'Manage sound/media files on this computer. Provides upload/download facilities and allows for managing built-in system files.';
     public static $default = TRUE;
-    public static $type = Bluebox_Installer::TYPE_MODULE;
+    public static $type = Bluebox_PackageManager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );
-    public static $navIcon = 'assets/img/icons/mainSettingsX.png';
-    public static $navBranch = '/Media/';
-    public static $navURL = 'mediamanager/index';        
-    public static $navSubmenu = array(
-        'Search Media' => '/mediamanager/index',
-        'Upload Media' => '/mediamanager/add',
-        'Delete Media' => array(
-            'url' => '/mediamanager/delete',
-            'disabled' => TRUE
-        ) ,
-        'Edit Media' => array(
-            'url' => '/mediamanager/edit',
-            'disabled' => TRUE
-        ) ,
-        'Preview Media' => array(
-            'url' => '/mediamanager/preview',
-            'disabled' => TRUE
+
+    public static $navStructures = array(
+        array(
+            'navLabel' => 'Global Sounds',
+            'summary' => 'Modify and maintain global sound files',
+            'navIcon' => 'assets/img/icons/mainToolsX.png',
+            'navBranch' => '/Media/',
+            'navURL' => 'mediamanager/global'
+        ),
+
+        array (
+            'navLabel' => 'Custom Sounds',
+            'summary' => 'Modify and maintain account sound files',
+            'navIcon' => 'assets/img/icons/mainToolsX.png',
+            'navBranch' => '/Media/',
+            'navURL' => 'mediamanager/account',
+            'navSubmenu' => array(
+                'Rescan Sounds' => '/mediamanager/accountscan'
+            )
         )
     );
-    
-    public static function _checkDirectory()
+
+/*    public static function _checkDirectory()
     {
         $upload_dir = rtrim(Kohana::config('upload.directory') , '/') . '/';
         // Check if the upload.directory can be written to
@@ -82,28 +82,26 @@ class MediaManager_Configure extends Bluebox_Configure
     }
     public static function _checkUploadCapability()
     {
-        /**
+        **
          * These vars configure the error and warning (respectively) threashold
          * for file upload parameters.  Memory_limit, and post_max_size will
          * base their threasholds on these values as well.
-         */
+         *
         $min_upload_max_filesize = 2097152;
         $recommended_upload_max_filesize = 5242880;
-        /**
+        **
          * This is the min amount of memory that a script should need,
          * used in addtion with min_upload_max_filesize to determine if
          * there is enough memory per script
-         */
+         *
         $min_script_memory_limit = 5242880;
-        /**
+        **
          * These are the error and warnign threasholds for
          * max_execution_time (in seconds)
-         */
+         *
         $min_max_execution_time = 30;
         $recommended_max_execution_time = 60;
-        /*
-        * UPLOAD ENVIRONMENT TESTS
-        */
+
         $issues = array(
             'errors' => false,
             'warnings' => false
@@ -113,6 +111,7 @@ class MediaManager_Configure extends Bluebox_Configure
         if (empty($file_uploads) || $file_uploads === false) $issues['errors'][] = 'PHP setting ' . html::anchor('http://www.php.net/manual/en/ini.core.php', 'file_uploads', array(
             'target' => '_blank'
         )) . ' is disabled!';
+        
         // Check if we met the upload_max_filesize limit
         $upload_max_filesize = self::return_bytes(ini_get('upload_max_filesize'));
         if (empty($upload_max_filesize) || (int)$upload_max_filesize < $min_upload_max_filesize) $issues['errors'][] = 'PHP setting ' . html::anchor('http://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize', 'upload_max_filesize', array(
@@ -121,6 +120,7 @@ class MediaManager_Configure extends Bluebox_Configure
         else if ((int)$upload_max_filesize < $recommended_upload_max_filesize) $issues['warnings'][] = 'Recommend setting ' . html::anchor('http://www.php.net/manual/en/ini.core.php#ini.upload-max-filesize', 'upload_max_filesize', array(
             'target' => '_blank'
         )) . ' larger than ' . self::bytesToMb($recommended_upload_max_filesize);
+        
         // Check if post_max_size is equal to or larger than upload_max_filesize
         $post_max_size = self::return_bytes(ini_get('post_max_size'));
         if (empty($post_max_size) || (int)$post_max_size < $min_upload_max_filesize) $issues['errors'][] = 'PHP setting ' . html::anchor('http://www.php.net/manual/en/ini.core.php#ini.post-max-size', 'post_max_size ', array(
@@ -129,6 +129,7 @@ class MediaManager_Configure extends Bluebox_Configure
         else if ($post_max_size != '-1' && (int)$post_max_size < $upload_max_filesize) $issues['warnings'][] = 'Recommend setting ' . html::anchor('http://www.php.net/manual/en/ini.core.php#ini.post-max-size', 'post_max_size ', array(
             'target' => '_blank'
         )) . ' larger than ' . self::bytesToMb($upload_max_filesize);
+        
         // Check if memory limit is acceptable
         $memory_limit = self::return_bytes(ini_get('memory_limit'));
         if ((empty($memory_limit) || (int)$memory_limit < ($min_upload_max_filesize + $min_script_memory_limit)) && $memory_limit != - 1) $issues['errors'][] = 'PHP setting ' . html::anchor('http://www.php.net/manual/en/ini.core.php#ini.memory-limit', 'memory_limit ', array(
@@ -137,6 +138,7 @@ class MediaManager_Configure extends Bluebox_Configure
         else if ($memory_limit != - 1 && (int)$memory_limit < ($recommended_upload_max_filesize + $min_script_memory_limit)) $issues['warnings'][] = 'PHP setting ' . html::anchor('http://www.php.net/manual/en/ini.core.php#ini.memory-limit', 'memory_limit ', array(
             'target' => '_blank'
         )) . ' larger than ' . self::bytesToMb($recommended_upload_max_filesize + $min_script_memory_limit);
+        
         // Ensure max_execution_time is acceptable
         $max_execution_time = ini_get('max_execution_time');
         if (empty($max_execution_time) || (int)$max_execution_time < $min_max_execution_time) $issues['errors'][] = 'PHP setting ' . html::anchor('http://www.php.net/manual/en/info.configuration.php#ini.max-execution-time', 'max_execution_time ', array(
@@ -145,6 +147,7 @@ class MediaManager_Configure extends Bluebox_Configure
         else if ((int)$max_execution_time < $recommended_max_execution_time) $issues['warnings'][] = 'Recommend setting ' . html::anchor('http://www.php.net/manual/en/info.configuration.php#ini.max-execution-time', 'max_execution_time ', array(
             'target' => '_blank'
         )) . ' larger than ' . $recommended_max_execution_time . ' sec';
+
         // Ensure max_input_time is acceptable
         $max_input_time = ini_get('max_input_time');
         if (empty($max_input_time) || (int)$max_input_time < $min_max_execution_time * 2) $issues['errors'][] = 'PHP setting ' . html::anchor('http://www.php.net/manual/en/info.configuration.php#ini.max_input_time', 'max_input_time ', array(
@@ -153,6 +156,7 @@ class MediaManager_Configure extends Bluebox_Configure
         else if ((int)$max_input_time < ($recommended_max_execution_time * 2)) $issues['warnings'][] = 'Recommend setting ' . html::anchor('http://www.php.net/manual/en/info.configuration.php#ini.max_input_time', 'max_input_time ', array(
             'target' => '_blank'
         )) . ' larger than ' . $recommended_max_execution_time * 2 . ' sec';
+        
         return $issues;
     }
     private function return_bytes($val)
@@ -167,5 +171,5 @@ class MediaManager_Configure extends Bluebox_Configure
     private function bytesToMb($byte)
     {
         return $byte / 1048576 . 'Mb';
-    }
+    }*/
 }

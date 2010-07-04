@@ -1,205 +1,211 @@
 <div id="auto_attendant_update_header" class="update auto_attendant module_header">
-    <h2><span class="helptip"></span><?php echo __($title); ?></h2>
+
+    <h2><?php echo $title; ?></h2>
+
 </div>
 
 <div id="auto_attendant_add_form" class="txt-left form auto_attendant add">
+
     <?php echo form::open(); ?>
 
     <?php echo form::open_section('Auto Attendant Information'); ?>
 
         <div class="field">
             <?php echo form::label('autoattendant[name]', 'Name:'); ?>
-            <?php echo form::input(array('name' => 'autoattendant[name]')); ?>
-        </div>
-
-        <div class="field">
-            <?php echo form::label('autoattendant[description]', 'Description:'); ?>
-            <?php echo form::input(array('name' => 'autoattendant[description]')); ?>
+            <?php echo form::input('autoattendant[name]'); ?>
         </div>
 
     <?php echo form::close_section(); ?>
-
-
-    <?php echo form::open_section('Assign Auto Attendant Number(s)'); ?>
-
-        <div class="field assign_numbers">
-        <?php
-            echo form::label(array(
-                'for' => '_numbers[assign][]',
-                'hint' => 'Numbers that ring this destination directly',
-                'help' => 'Select which numbers, in which contexts, will ring this destination directly when they are called. This is a shortcut way of mapping numbers to destinations (versus using the number manager)'
-            ),'Select Number:');
-            echo numbering::dropdown('AutoAttendantNumber', $autoattendant['auto_attendant_id']);
-            echo numbering::nextAvaliableLink('assignAutoAttendantNumber', 'Next Avaliable Number');
-        ?>
-        </div>
-
-    <?php echo form::close_fieldset(); ?>
-
 
     <?php echo form::open_section('Prompt'); ?>
 
         <div class="field">
+
             <div id="prompt_type">
-                <?php echo form::label('autoattendant[type]', 'Prompt type:'); ?>
-                <?php echo form::dropdown(array('name' => 'autoattendant[type]', 'class' => 'type'), $promptArray); ?>
+                <?php echo form::label('autoattendant[registry][type]', 'Prompt type:'); ?>
+                <?php 
+                    echo form::dropdown(array(
+                            'name' => 'autoattendant[registry][type]',
+                            'class' => 'type'
+                        ), array(
+                            'audio' => 'Audio Recording',
+                            'tts' => 'Text to Speech'
+                        )
+                    );
+                ?>
             </div>
+
         </div>
 
         <div class="field">
+
             <div id="audio_prompt" class="prompt">
-                <?php echo form::label('autoattendant[file_id]', 'Select a file');?>
-                <!-- File dropdown widget -->
-                <?php echo FileManager::dropdown('autoattendant[file_id]', $autoattendant['file_id'], '', array('audio'));?>
-                <?php echo html::anchor('mediamanager/add', 'Upload a new recording', array('class' => 'button'));?>
+                <?php echo form::label('autoattendant[registry][file_id]', 'Select a file');?>
+                <?php //echo FileManager::dropdown('autoattendant[registry][file_id]', '', array('audio'));?>
+                <?php echo html::anchor('mediamanager/add', 'Upload a new recording', array('class' => 'button qtipAjaxForm'));?>
             </div>
+
         </div>
 
         <div class="field">
+
             <div id="tts_prompt" class="prompt">
-                <?php echo form::label('autoattendant[tts_string]', 'Text to Speech Dialog:');?>
-                <?php echo form::input('autoattendant[tts_string]');?>
+                <?php echo form::label('autoattendant[registry][tts_string]', 'Text to Speech Dialog:');?>
+                <?php echo form::textarea('autoattendant[registry][tts_string]');?>
             </div>
+
         </div>
-
+     
     <?php echo form::close_section(); ?>
-
 
     <?php echo form::open_section('General Behavior'); ?>
 
         <div class="field">
             <?php echo form::label('autoattendant[digit_timeout]', 'Inter-Digit Timeout:'); ?>
-            <?php echo form::input('autoattendant[digit_timeout]'); ?> seconds
+            <?php echo form::input('autoattendant[digit_timeout]'); ?>
+            <?php //javascript::codeBlock('$("#autoattendant_digit_timeout").spinner({max: 10, min: 1});'); ?>
         </div>
 
         <div class="field">
             <?php echo form::label('autoattendant[timeout]', 'No Entry Timeout:'); ?>
-            <?php echo form::input('autoattendant[timeout]'); ?> seconds
+            <?php echo form::input('autoattendant[timeout]'); ?>
+            <?php //javascript::codeBlock('$("#autoattendant_timeout").spinner({max: 10, min: 1});'); ?>
         </div>
 
     <?php echo form::close_section(); ?>
 
-
     <?php echo form::open_section('Dial by Extension'); ?>
 
         <div class="field">
-            <?php echo form::label(array(
-                    'for' => 'autoattendant[extension_context_id]',
-                    'hint' => 'Numbers that callers can directly dial into',
-                ),'Internal Extension Context:');
+            <?php
+                echo form::label(array(
+                        'for' => 'autoattendant[extension_context_id]',
+                        'hint' => 'Numbers that callers can directly dial into',
+                    ),
+                    'Internal Extension Context:'
+                );
             ?>
-            <?php echo numbering::selectContext(array(
-                    'name' => 'autoattendant[extension_context_id]',
-                    'nullOption' => 'None'
-                ));
+            <?php
+                echo numbering::selectContext(array(
+                        'name' => 'autoattendant[extension_context_id]',
+                        'nullOption' => 'Disabled'
+                    )
+                );
             ?>
         </div>
 
         <div class="field">
             <?php echo form::label('autoattendant[extension_digits]', 'Maximum Extension Length:'); ?>
-            <?php echo form::input('autoattendant[extension_digits]'); ?> digits
+            <?php echo form::input('autoattendant[extension_digits]'); ?>
+            <?php //javascript::codeBlock('$("#autoattendant_extension_digits").spinner({max: 9, min: 3});'); ?>
         </div>
 
     <?php echo form::close_section(); ?>
 
+    <?php
+        if (isset($views))
+        {
+            echo subview::renderAsSections($views);
+        }
+    ?>
 
     <?php echo form::open_section('Key Mapping'); ?>
 
-        <div id="auto_attendant_table" class="auto_attendant_keymap field">
-
-            <?php $iteration = 0; foreach($keys as $digits => $number_id): $iteration++; ?>
-
-                <div id="key_<?php echo $iteration; ?>" class="key">
-                    Option <?php echo form::input('keys[' .$iteration .'][digits]', $digits); ?> transfers to a
-
-                    <?php
-                        $selectedClass = numbering::getAssignedPoolByNumber($number_id);
-                        echo numbering::poolsDropdown('key_' .$iteration .'_class_type', $selectedClass);
-                        echo 'named ';
-                        echo numbering::numbersDropdown(array(
-                            'id' => 'key_' .$iteration .'_number',
-                            'name' => 'keys[' .$iteration .'][number_id]',
-                            'useNames' => TRUE,
-                            'optGroups' => FALSE,
-                            //'contextAware' => TRUE
-                        ), $number_id);
-                        jquery::addQuery('#key_' .$iteration .'_number')->dependent('{ parent: \'key_' .$iteration .'_class_type\', group: \'common_class\' }');
-                    ?>
-
-                    <span class="remove_key"></span>
-
-                </div>
-
-            <?php endforeach; ?>
-
-            <?php jquery::addQuery('#auto_attendant_table .remove_key')->click('function (e) { $(this).parent().slideUp(\'500\', function () { $(this).remove() });}'); ?>
-
-        </div>
+        <div id="auto_attendant_keymap">&nbsp;</div>
 
         <div class="new_option_container">
             <?php echo '<a href="' . url::current() .'" id="new_option" class="nxt_aval_link"><span>New Attendant Option</span></a>'; ?>
         </div>
 
-        <div id="key_template" class="key hide">
-            Option <?php echo form::input('key_digits'); ?> transfers to a
-
-            <?php
-                echo numbering::poolsDropdown('key_class_type');
-                echo 'named ';
-                echo numbering::numbersDropdown(array(
-                    'id' => 'key_number',
-                    'name' => 'keys[]',
-                    'useNames' => TRUE,
-                    'optGroups' => FALSE,
-                    //'contextAware' => TRUE
-                ));
-            ?>
-
-            <span class="remove_key"></span>
-        </div>
-
-        <?php javascript::codeBlock(); ?>
-            var divCount = $('.auto_attendant_keymap > div').length;
-
-            $('#new_option').click(function (e) {
-                e.preventDefault();
-                newKey = $('#key_template').clone().appendTo('#auto_attendant_table');
-
-                divCount++;
-
-                newKey.attr('id', 'key_' + divCount);
-                newKey.find('#key_class_type').attr('id', 'key_' + divCount + '_class_type');
-                newKey.find('#key_number').attr('id', 'key_' + divCount + '_number').attr('name', 'keys[' + divCount + '][number_id]');
-                newKey.find('#key_digits').attr('id', 'key_' + divCount + '_digits').attr('name', 'keys[' + divCount + '][digits]');
-
-                $('#key_' + divCount + '_number').dependent({ parent: 'key_' + divCount + '_class_type', group: 'common_class'});
-
-                newKey.find('.remove_key').click(function (e) {
-                    $(this).parent().slideUp('500', function () { $(this).remove() });
-                });
-
-                newKey.slideDown();
-            });
-        <?php javascript::blockEnd(); ?>
-
     <?php echo form::close_section(); ?>
 
     <div class="buttons form_bottom">
+
         <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
+
         <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
+
     </div>
 
     <?php echo form::close(); ?>
 </div>
 
-<?php
-    jquery::addQuery('.type')->bind('change', 'function(){
-        $(\'.prompt\').hide();
-        type = $(\'#autoattendant_type\').val();
-        if (type != \'\') {
-            $(\'#\' + type + \'_prompt\').slideDown();
-        }
-    }')->trigger('change');
+<?php jquery::addPlugin(array('dependent', 'spinner')); ?>
 
-    jquery::addPlugin('dependent');
-?>
+<?php javascript::codeBlock(NULL, array('scriptname' => 'update_autoattendant')); ?>
+
+    $('.type').bind('change', function () {
+
+        $('.prompt').hide();
+
+        var type = $('#autoattendant_registry_type').val();
+
+        if (type != '') {
+
+            $('#' + type + '_prompt').slideDown();
+
+        }
+
+    }).trigger('change');
+
+    var key_template = '<?php echo str_replace(array("\n", '  '), '', new View('autoattendant/keytemplate')); ?>';
+
+    var numbering_json = <?php echo $numberingJson; ?>;
+
+    var keys = <?php echo $keys; ?>;
+
+    numbering_json['key_number'] = 0;
+
+    $.each(keys, function(index, value){
+
+        numbering_json['key_number'] = index;
+
+        $('#auto_attendant_keymap').append(Mustache.to_html(key_template, $.extend(value, numbering_json)));
+
+        selectedDestination = $('#key_' + index + '_number option[value=' + value.number_id + ']');
+
+        selectedDestination.attr('selected', 'selected');
+
+        $('#key_' + index + '_class_type option[title=' + selectedDestination.attr('class') + ']').attr('selected', 'selected');
+
+        $('#key_' + index + '_number').dependent({ parent: 'key_' + index + '_class_type', group: 'common_class' });
+
+        $('#auto_attendant_keymap #remove_key_' + index).click(function (e) {
+
+            e.preventDefault();
+
+            $(this).parent().slideUp('500', function () {
+
+                $(this).remove()
+
+            });
+
+        });
+
+    });
+
+    $('.new_option_container #new_option').click(function (e) {
+
+        e.preventDefault();
+
+        numbering_json['key_number'] += 1;
+
+        $('#auto_attendant_keymap').append(Mustache.to_html(key_template, numbering_json));
+
+        $('#key_' + numbering_json['key_number'] + '_number').dependent({ parent: 'key_' + numbering_json['key_number'] + '_class_type', group: 'common_class' });
+
+        $('#auto_attendant_keymap #remove_key_' + numbering_json['key_number']).click(function (e) {
+
+            e.preventDefault();
+
+            $(this).parent().slideUp('500', function () {
+
+                $(this).remove()
+
+            });
+
+        });
+
+    });
+
+<?php javascript::blockEnd(); ?>
