@@ -302,7 +302,6 @@ class navigation
         if (substr($uri,0,strlen(url::site()))==url::site()) {
                 $uri=substr($uri,strlen(url::site()));
 	}
-        $uri = str_replace(url::site() , '', $uri);
         $result['parts'] = explode('/', $uri);
         // Remove any empty values
         $result['parts'] = array_filter($result['parts']);
