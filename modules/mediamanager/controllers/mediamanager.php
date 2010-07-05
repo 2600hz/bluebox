@@ -28,11 +28,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class MediaManager_Controller extends Bluebox_Controller
 {
-    protected $writable = array(
-        'path'
-    );
-    protected $baseModel = 'File';
+    protected $baseModel = 'MediaFile';
+
     protected $uploadPath;
+
     public function __construct()
     {
         parent::__construct();
