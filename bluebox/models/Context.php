@@ -17,8 +17,6 @@ class Context extends Bluebox_Record
         $this->hasColumn('context_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('name', 'string', 40, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('locked', 'boolean', NULL, array('default' => false));
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -30,6 +28,7 @@ class Context extends Bluebox_Record
         $this->hasMany('NumberContext', array('local' => 'context_id', 'foreign' => 'context_id', 'cascade' => array('delete')));
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
         $this->actAs('MultiTenant');
     }

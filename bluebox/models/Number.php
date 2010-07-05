@@ -65,8 +65,6 @@ class Number extends Bluebox_Record
         $this->hasColumn('status', 'integer', 1, array('unsigned' => true, 'notnull' => true, 'default' => self::STATUS_NORMAL));
         $this->hasColumn('type', 'integer', 1, array('unsigned' => true, 'notnull' => true, 'default' => self::TYPE_INTERNAL));
         $this->hasColumn('dialplan', 'array', 10000, array('default' => array()));
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -81,6 +79,7 @@ class Number extends Bluebox_Record
 
         // BEHAVIORS
         $this->actAs('Polymorphic');
+        $this->actAs('GenericStructure');
         $this->actAs('TelephonyEnabled');
         $this->actAs('Timestampable');
         $this->actAs('MultiTenant');

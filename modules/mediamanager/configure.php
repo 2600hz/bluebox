@@ -50,7 +50,10 @@ class MediaManager_Configure extends Bluebox_Configure
             'summary' => 'Modify and maintain global sound files',
             'navIcon' => 'assets/img/icons/mainToolsX.png',
             'navBranch' => '/Media/',
-            'navURL' => 'mediamanager/global'
+            'navURL' => 'mediamanager/global',
+            'navSubmenu' => array(
+                'Rescan Sounds' => '/mediamanager/'
+            )
         ),
 
         array (

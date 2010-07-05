@@ -10,8 +10,6 @@ class NumberPool extends Bluebox_Record
         // COLUMN DEFINITIONS
         $this->hasColumn('number_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true));
         $this->hasColumn('number_type_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true));
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -24,6 +22,7 @@ class NumberPool extends Bluebox_Record
         $this->hasOne('NumberType', array('local' => 'number_type_id', 'foreign' => 'number_type_id'));
         
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
     }
 }

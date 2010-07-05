@@ -18,8 +18,6 @@ class NumberType extends Bluebox_Record
         $this->hasColumn('package_id', 'integer', 11, array('unsigned' => true, 'notnull' => true));
         $this->hasColumn('class', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('type', 'integer', 11, array('default' => NumberType::TYPE_NORMAL));
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -31,6 +29,7 @@ class NumberType extends Bluebox_Record
         $this->hasOne('Package', array('local' => 'package_id', 'foreign' => 'package_id'));    // A number endpoint must belong to a module
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
     }
 }

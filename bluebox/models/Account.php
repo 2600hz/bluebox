@@ -72,16 +72,9 @@ class Account extends Bluebox_Record
     {
         // COLUMN DEFINITIONS
         $this->hasColumn('account_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
-
         $this->hasColumn('name', 'string', 100, array('notnull' => true, 'notblank' => true, 'unique' => true));
-
         $this->hasColumn('status', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'default' => 1));
-
         $this->hasColumn('type', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'default' => 0));
-
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -93,6 +86,7 @@ class Account extends Bluebox_Record
         $this->hasMany('Location', array('local' => 'account_id', 'foreign' => 'account_id', 'cascade' => array('delete')));
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
     }
 }

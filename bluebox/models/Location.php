@@ -22,8 +22,6 @@ class Location extends Bluebox_Record
         $this->hasColumn('account_id', 'integer', 11, array('unsigned' => true, 'notnull' => true));
         $this->hasColumn('name', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('domain', 'string', 100, array('unique' => true, 'notnull' => true, 'notblank' => true));
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -37,6 +35,7 @@ class Location extends Bluebox_Record
         $this->hasMany('User', array('local' => 'location_id', 'foreign' => 'location_id', 'cascade' => array('delete')));
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
         $this->actAs('TelephonyEnabled');
         $this->actAs('MultiTenant');

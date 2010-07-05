@@ -13,7 +13,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * The Original Code is Bluebox Telephony Configuration API and GUI Framework.
  * The Original Developer is the Initial Developer.
  * The Initial Developer of the Original Code is Darren Schreiber
- * All portions of the code written by the Initial Developer and Bandwidth, Inc. are Copyright © 2008-2009. All Rights Reserved.
+ * All portions of the code written by the Initial Developer are Copyright © 2008-2009. All Rights Reserved.
  *
  * Contributor(s):
  *

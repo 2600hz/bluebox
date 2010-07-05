@@ -14,8 +14,6 @@ class Site extends Bluebox_Record
         $this->hasColumn('wildcard', 'boolean', array('notnull' => true, 'default' => true));
         $this->hasColumn('skin_id', 'integer', 11, array('unsigned' => true));
         $this->hasColumn('default', 'boolean', array('notnull' => true, 'default' => false));
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -27,6 +25,7 @@ class Site extends Bluebox_Record
         $this->hasOne('Skin', array('local' => 'skin_id', 'foreign' => 'skin_id'));
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
     }
 }

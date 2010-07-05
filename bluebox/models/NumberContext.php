@@ -10,8 +10,6 @@ class NumberContext extends Bluebox_Record
         // COLUMN DEFINITIONS
         $this->hasColumn('number_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true));
         $this->hasColumn('context_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true));
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -24,6 +22,7 @@ class NumberContext extends Bluebox_Record
         $this->hasOne('Context', array('local' => 'context_id', 'foreign' => 'context_id'));
         
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
         $this->actAs('TelephonyEnabled');
     }

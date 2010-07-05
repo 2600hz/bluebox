@@ -12,8 +12,6 @@ class Skin extends Bluebox_Record
         $this->hasColumn('name', 'string', 200, array('notnull' => true, 'notblank' => true, 'minlength' => 3));
         $this->hasColumn('location', 'string', 200, array('notnull' => true, 'notblank' => true, 'minlength' => 3));
         $this->hasColumn('default', 'boolean', array('notnull' => true, 'default' => false));
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -25,6 +23,7 @@ class Skin extends Bluebox_Record
         $this->hasMany('Site', array('local' => 'skin_id', 'foreign' => 'skin_id'));
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
     }
 }

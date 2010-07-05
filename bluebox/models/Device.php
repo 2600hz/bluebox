@@ -15,16 +15,9 @@ class Device extends Bluebox_Record
     {
         // COLUMN DEFINITIONS
         $this->hasColumn('device_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
-
         $this->hasColumn('user_id', 'integer', 11, array('unsigned' => true));
-
         $this->hasColumn('name', 'string', 100, array('default' => '', 'notnull' => true, 'notblank' => true));
-
         $this->hasColumn('type', 'string', 50, array('default' => 'SipDevice'));
-
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -34,14 +27,12 @@ class Device extends Bluebox_Record
     {
         // RELATIONSHIPS
         $this->hasOne('User', array('local' => 'user_id', 'foreign' => 'user_id'));
-
         $this->hasMany('DeviceNumber as Number', array('local' => 'device_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
-
         $this->actAs('TelephonyEnabled');
-        
         $this->actAs('MultiTenant');
     }
 }

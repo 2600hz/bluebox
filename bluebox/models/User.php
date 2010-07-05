@@ -55,8 +55,6 @@ class User extends Bluebox_Record
         $this->hasColumn('last_login', 'timestamp', NULL);
         $this->hasColumn('last_logged_ip', 'string', 40);
         $this->hasColumn('password_reset_token', 'string', '64');
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     /**
@@ -69,6 +67,7 @@ class User extends Bluebox_Record
         $this->hasOne('Location', array('local' => 'location_id', 'foreign' => 'location_id'));
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
         $this->actAs('MultiTenant');
    }
