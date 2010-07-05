@@ -31,4 +31,21 @@ class MediaFile extends Bluebox_Record
         $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
     }
+
+    public static function getSize($registry) {
+        return (isset($registry['size']) ? $registry['size'] : 0);
+    }
+
+    public static function getType($registry) {
+        return (isset($registry['type']) ? $registry['type'] : 'Unknown');
+    }
+    
+    public static function getDuration($registry) {
+        return (isset($registry['duration']) ? $registry['duration'] : '');
+    }
+
+    public static function getSampleRate($registry) {
+        return (isset($registry['sample_rate']) ? $registry['sample_rate'] : 'Unknown');
+    }
+
 }

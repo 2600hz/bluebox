@@ -22,7 +22,7 @@
 *
 */
 /**
- * configure.php - Media Management System
+ * configure.php - Global Media Management System
  *
  * @author Darren Schreiber <d@d-man.org>
  * @license MPL
@@ -37,7 +37,7 @@ class MediaManager_Configure extends Bluebox_Configure
     public static $author = 'Darren Schreiber';
     public static $vendor = 'Bluebox';
     public static $license = 'MPL';
-    public static $summary = 'Manage sound/media files on this computer. Provides upload/download facilities and allows for managing built-in system files.';
+    public static $summary = 'Manage sound/media files on this system. Provides upload/download facilities and allows for managing built-in system files.';
     public static $default = TRUE;
     public static $type = Bluebox_PackageManager::TYPE_MODULE;
     public static $required = array(
@@ -46,24 +46,24 @@ class MediaManager_Configure extends Bluebox_Configure
 
     public static $navStructures = array(
         array(
-            'navLabel' => 'Global Sounds',
-            'summary' => 'Modify and maintain global sound files',
+            'navLabel' => 'Global Media',
+            'summary' => 'Modify and maintain media (sound) files for the entire system',
             'navIcon' => 'assets/img/icons/mainToolsX.png',
             'navBranch' => '/Media/',
-            'navURL' => 'mediamanager/global',
+            'navURL' => '/globalmedia/index',
             'navSubmenu' => array(
-                'Rescan Sounds' => '/mediamanager/'
+                'Rescan Sounds' => '/accountmedia/scan'
             )
         ),
 
         array (
-            'navLabel' => 'Custom Sounds',
-            'summary' => 'Modify and maintain account sound files',
+            'navLabel' => 'Custom Media',
+            'summary' => 'Modify and maintain media (sound) files for this account',
             'navIcon' => 'assets/img/icons/mainToolsX.png',
             'navBranch' => '/Media/',
-            'navURL' => 'mediamanager/account',
+            'navURL' => '/accountmedia/index',
             'navSubmenu' => array(
-                'Rescan Sounds' => '/mediamanager/accountscan'
+                'Rescan Sounds' => '/accountmedia/scan'
             )
         )
     );

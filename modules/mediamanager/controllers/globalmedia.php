@@ -26,44 +26,51 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license MPL
  * @package MediaManager
  */
-class MediaManager_Controller extends Bluebox_Controller
+class GlobalMedia_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'MediaFile';
 
-    protected $uploadPath;
+    protected $soundPath;
 
     public function __construct()
     {
         parent::__construct();
+        //$this->uploadPath = Kohana::config('upload.directory') . "/" . $this->session->get('user_id') . "/";
         $this->uploadPath = Kohana::config('upload.directory') . "/" . $this->session->get('user_id') . "/";
     }
+
     public function index()
     {
         $this->template->content = new View('generic/grid');
-        // Buidl a grid with a hidden device_id, device_type, and add an option for the user to select the display columns
+        // Build a grid with a hidden device_id, device_type, and add an option for the user to select the display columns
         $this->grid = jgrid::grid($this->baseModel, array(
             'caption' => 'Media'
-        ))->add('file_id', 'ID', array(
+        ))->add('mediafile_id', 'ID', array(
+            'width' => '80',
             'hidden' => true,
             'key' => true
-        ))->add('name', 'Filename', array(
-            'width' => '20',
+        ))->add('filename', 'Filename', array(
+            'width' => '40',
             'search' => true
         ))->add('size', 'File Size', array(
-            'width' => '12',
-            'search' => true
-        ))->add('type', 'File Type', array(
-            'width' => '12',
-            'search' => true
+            'width' => '40',
+            'align' => 'right',
+            'callback' => array(
+                'function' => array('MediaFile', 'getSize'),
+                'arguments' => 'registry'
+            )
         ))->add('duration', 'Duration', array(
-            'width' => '8',
-            'search' => true
-        ))->add('audio_sample_rate', 'Sample Rate', array(
-            'width' => '8',
-            'search' => true
-        ))->add('audio_bit_rate', 'Bit Rate', array(
-            'width' => '8',
-            'search' => true
+            'width' => '40',
+            'callback' => array(
+                'function' => array('MediaFile', 'getDuration'),
+                'arguments' => 'registry'
+            )
+        ))->add('sample_rate', 'Sample Rate', array(
+            'width' => '60',
+            'callback' => array(
+                'function' => array('MediaFile', 'getSampleRate'),
+                'arguments' => 'registry'
+            )
         ))->navButtonAdd('Columns', array(
             'onClickButton' => 'function () {  $(\'#{table_id}\').setColumns(); }',
             'buttonimg' => url::base() . 'assets/css/jqGrid/table_insert_column.png',
@@ -71,23 +78,21 @@ class MediaManager_Controller extends Bluebox_Controller
             'noCaption' => true,
             'position' => 'first'
         ))->addAction('mediamanager/delete', 'Delete', array(
-            'arguments' => 'file_id',
-            'width' => '20'
+            'width' => '60',
+            'arguments' => 'mediafile_id'
         ))->addAction('mediamanager/download', 'Download', array(
-            'arguments' => 'file_id',
-            'width' => '20'
+            'arguments' => 'mediafile_id'
         ))->addAction('mediamanager/edit', 'Edit', array(
-            'arguments' => 'file_id',
-            'width' => '20'
+            'arguments' => 'mediafile_id'
         ))->addAction('mediamanager/preview', 'Preview', array(
-            'arguments' => 'file_id',
-            'width' => '20'
+            'arguments' => 'mediafile_id'
         ));
         // dont foget to let the plugins add to the grid!
         plugins::views($this);
         // Produces the grid markup or JSON
         $this->view->grid = $this->grid->produce();
     }
+    
     public function add()
     {
         $this->view->title = 'Upload Media';
