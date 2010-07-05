@@ -67,28 +67,19 @@ class Conference extends Bluebox_Record
     function setTableDefinition()
     {
         $this->hasColumn('conference_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
-
         $this->hasColumn('name', 'string', 100, array('notnull' => true, 'notblank' => true));
-
         $this->hasColumn('controlls', 'array', 10000, array('default' => array()));
-
         $this->hasColumn('profile', 'array', 10000, array('default' => array()));
-
         $this->hasColumn('pins', 'array', 10000, array('default' => array()));
-
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     function setUp()
     {
         $this->hasMany('ConferenceNumber as Number', array('local' => 'conference_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
 
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
-
         $this->actAs('TelephonyEnabled');
-        
         $this->actAs('MultiTenant');
     }
 }

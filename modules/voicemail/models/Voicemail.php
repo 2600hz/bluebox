@@ -27,18 +27,10 @@ class Voicemail extends Bluebox_Record
     {
         // COLUMN DEFINITIONS
         $this->hasColumn('voicemail_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
-        
         $this->hasColumn('name', 'string', 64, array('notnull' => true, 'notblank' => true));
-
         $this->hasColumn('mailbox', 'string', 64, array('notnull' => true, 'unique' => true));
-
         $this->hasColumn('password', 'string', 64, array('notnull' => true));
-
         $this->hasColumn('audio_format', 'string', 4, array('default' => 'wav'));
-
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     public function setUp()
@@ -46,11 +38,9 @@ class Voicemail extends Bluebox_Record
         $this->hasMany('VoicemailNumber as Number', array('local' => 'voicemail_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
 
         $this->actAs('Timestampable');
-
+        $this->actAs('GenericStructure');
         $this->actAs('Polymorphic');
-        
         $this->actAs('TelephonyEnabled');
-
         $this->actAs('MultiTenant');
     }
 }

@@ -10,30 +10,20 @@ class RingGroup extends Bluebox_Record
     function setTableDefinition()
     {
         $this->hasColumn('ring_group_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
-
         $this->hasColumn('name', 'string', 100, array('notnull' => true, 'notblank' => true));
-
         $this->hasColumn('strategy', 'integer', 11, array('unsigned' => true));
-
         $this->hasColumn('location_id', 'integer', 11, array('unsigned' => true));
-
         $this->hasColumn('members', 'array', 10000, array('default' => array()));
-
-        $this->hasColumn('registry', 'array', 10000, array('default' => array()));
-
-        $this->hasColumn('plugins', 'array', 10000, array('default' => array()));
     }
 
     function setUp()
     {
         $this->hasOne('RingGroupNumber as Number', array('local' => 'ring_group_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
-
         $this->hasOne('Location', array('local' => 'location_id', 'foreign' => 'location_id'));
 
+        $this->actAs('GenericStructure');
         $this->actAs('MultiTenant');
-
         $this->actAs('Timestampable');
-
         $this->actAs('TelephonyEnabled');
     }
 }
