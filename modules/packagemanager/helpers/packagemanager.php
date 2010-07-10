@@ -3,12 +3,12 @@
 class packagemanager
 {
 
-    public static function dropdown($data, $package, $selected = NULL, $extra = '')
+    public static function dropdown($data, $packageStatus, $selected = NULL, $extra = '')
     {
 
         $options = array();
 
-        switch($package['packageStatus']) {
+        switch($packageStatus) {
 
             case Bluebox_PackageManager::STATUS_UNACCESSIBLE:
 
@@ -44,7 +44,7 @@ class packagemanager
 
         }
 
-        $nullOption = ucfirst(Bluebox_PackageManager::statusToString($package['packageStatus']));
+        $nullOption = ucfirst(Bluebox_PackageManager::statusToString($packageStatus));
 
         array_unshift($options, $nullOption);
 
