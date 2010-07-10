@@ -8,7 +8,7 @@ class InterfaceManager_Configure extends Bluebox_Configure
     public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'SIP Interface Management Controller Class (FreeSWITCH Specific)';
-    public static $default = true;
+    public static $default = false;
     public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
