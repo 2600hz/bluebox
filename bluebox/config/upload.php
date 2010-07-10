@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-$config['directory'] = '/Users/dman/NetBeansProjects/bluebox/upload';
+$config['directory'] = DOCROOT.'upload';
  
 $config['create_directories'] = TRUE;
  

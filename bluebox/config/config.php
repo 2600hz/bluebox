@@ -9,7 +9,7 @@ $config['installer_enabled'] = TRUE;
  * then a full URL will be used, eg: http://localhost/kohana/. If it only includes
  * the path, and a site_protocol is specified, the domain will be auto-detected.
  */
-$config['site_domain'] = '/bluebox/';
+$config['site_domain'] = '/';
 
 /**
  * Force a default protocol to be used by the site. If no site_protocol is
@@ -66,7 +66,7 @@ $config['enable_hooks'] = TRUE;     // Bluebox will fail miserably if you turn t
  *  3 - Notices
  *  4 - Debugging
  */
-$config['log_threshold'] = 2;
+$config['log_threshold'] = 0;
 
 /**
  * Message logging directory.
@@ -107,7 +107,7 @@ $config['modules'] = array
 	// MODPATH.'media',     // Media caching and compression
 	// MODPATH.'gmaps',     // Google Maps integration
 	// MODPATH.'archive',   // Archive utility
-	//MODPATH.'phpunit', // Unit testing
+	// MODPATH.'phpunit', // Unit testing
 	// MODPATH.'object_db', // New OOP Database library (testing only!)
 );
 
@@ -125,7 +125,7 @@ $config['anonymous_statistics'] = TRUE;
  * Is this an oxymoron? Well we need to be able to group
  * multiple responses, it is not used for any other reason. Promise :)
  */
-$config['anonymous_id'] = '8C56D3AEBA454B2A88A2C49617C7E747';
+$config['anonymous_id'] = '';
 
 /**
  * If true then a minimum password complexity is enforced
