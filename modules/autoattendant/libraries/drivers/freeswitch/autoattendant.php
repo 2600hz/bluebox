@@ -22,7 +22,7 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver
                     $tts_string = $autoattendant['registry']['tts_string'];
                 }
 
-                $tts_string = preg_replace('/[^A-Za-z0-9.,!? ]/', '', $tts_string);
+                $tts_string = 'say:' .preg_replace('/[^A-Za-z0-9.,!? ]/', '', $tts_string);
 
                 $xml->setAttributeValue('', 'tts-engine', 'cepstral');
 
