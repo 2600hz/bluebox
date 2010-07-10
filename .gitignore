@@ -1,0 +1,9 @@
+##
+## This ignores untracked files, to ingnore tracked
+## files see: git update-index --assume-unchanged
+##
+bluebox/logs/*
+bluebox/cache/*
+bluebox/config/*
+nbproject/*
+uploads/*
