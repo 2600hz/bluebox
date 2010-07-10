@@ -37,7 +37,7 @@ abstract class Telephony_Driver implements Telephony_Driver_Interface
      * List of sections that exist in the dialplan. Note that this array MUST be in the same order you want things to appear in the dialplan
      * @var array
      */
-    protected static $dialplanSections = array('network', 'conditioning', 'preroute', 'postroute', 'preanswer', 'postanswer', 'main', 'prenumber', 'postnumber', 'postexecute');
+    protected static $dialplanSections = array('network', 'conditioning', 'preroute', 'postroute', 'preanswer', 'postanswer', 'main', 'prenumber', 'postnumber', 'catchall', 'postexecute');
 
     /**
      * For dialplan, current context we are working in
@@ -171,6 +171,11 @@ abstract class Telephony_Driver implements Telephony_Driver_Interface
         // NOTE: $context is NULL here because pre & post number assumes the context is already set by the current macro/extension
 
         $this->runGlobalEvents(FALSE, 'postnumber', $obj);
+    }
+
+    public function catchAll($context, Bluebox_Record $obj = NULL)
+    {
+        $this->runGlobalEvents($context, 'catchall', $obj);
     }
 
     /**
