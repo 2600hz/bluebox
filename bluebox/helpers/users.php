@@ -22,7 +22,7 @@ class users
     public static function redirectInvalidUser()
     {
         // If the system is installing then there is no login required
-        if(Bluebox_Core::is_installing())
+        if(Bluebox_Installer::is_installing())
         {
             Kohana::config_set('core.require_login', FALSE);
             

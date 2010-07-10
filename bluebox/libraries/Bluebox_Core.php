@@ -5,7 +5,7 @@ class Bluebox_Core
     public static function bootstrapPackages()
     {
 
-        if (self::is_installing())
+        if (Bluebox_Installer::is_installing())
         {
             return TRUE;
         }
@@ -66,34 +66,6 @@ class Bluebox_Core
         }
 
         navigation::bootstrap($navigation);
-    }
-
-    /**
-     * Check if Bluebox is running the install wizard
-     *
-     * @return bool
-     */
-    public static function is_installing()
-    {
-        //return TRUE;
-        $URI = '';
-
-        if (!empty($_SERVER['PHP_SELF']))
-        {
-            $URI = $_SERVER['PHP_SELF'];
-        }
-
-        if (!empty($_SERVER['REQUEST_URI']))
-        {
-            $URI = $_SERVER['REQUEST_URI'];
-        }
-
-        if (stristr($URI, 'installer') || Router::$controller == 'installer')
-        {
-            return TRUE;
-        }
-
-        return FALSE;
     }
 
     /**

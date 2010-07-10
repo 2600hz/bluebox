@@ -76,7 +76,7 @@ class Installer_Controller extends Bluebox_Controller
             throw new Exception('The installer has been administratively disabled. (You can re-enable it in Bluebox/config/config.php)');
         }
 
-        Kohana::config_set('core.site_domain', '/' . self::guess_site_domain() . '/');
+        Kohana::config_set('core.site_domain', '/' . Bluebox_Installer::guess_site_domain() . '/');
 
         skins::setSkin($this->template);
 
@@ -262,7 +262,7 @@ class Installer_Controller extends Bluebox_Controller
      */
     public function fixModRewrite()
     {
-        Kohana::config_set('core.site_domain', '/' . self::guess_site_domain() . '/');
+        Kohana::config_set('core.site_domain', '/' . Bluebox_Installer::guess_site_domain() . '/');
 
         $indexPage = Kohana::config('core.index_page');
 
@@ -1351,105 +1351,6 @@ class Installer_Controller extends Bluebox_Controller
     /************************************************************************
     *				 INSTALL WIZARD SUPPORT METHODS							*
     *************************************************************************/
-    public static  function guess_site_domain()
-    {
-        if (PHP_SAPI === 'cli')
-        {
-            // Command line requires a bit of hacking
-            if (isset($_SERVER['argv'][1]))
-            {
-                $current_uri = $_SERVER['argv'][1];
-
-                // Remove GET string from segments
-                if (($query = strpos($current_uri, '?')) !== FALSE)
-                {
-                    list ($current_uri, $query) = explode('?', $current_uri, 2);
-
-                    // Parse the query string into $_GET
-                    parse_str($query, $_GET);
-
-                    // Convert $_GET to UTF-8
-                    $_GET = utf8::clean($_GET);
-                }
-            }
-        }
-        elseif (isset($_GET['kohana_uri']))
-        {
-            // Use the URI defined in the query string
-            $current_uri = $_GET['kohana_uri'];
-
-            // Remove the URI from $_GET
-            unset($_GET['kohana_uri']);
-
-            // Remove the URI from $_SERVER['QUERY_STRING']
-            $_SERVER['QUERY_STRING'] = preg_replace('~\bkohana_uri\b[^&]*+&?~', '', $_SERVER['QUERY_STRING']);
-        }
-        elseif (isset($_SERVER['REQUEST_URI']) AND $_SERVER['REQUEST_URI'])
-        {
-            $current_uri = $_SERVER['REQUEST_URI'];
-        }
-        elseif (isset($_SERVER['ORIG_PATH_INFO']) AND $_SERVER['ORIG_PATH_INFO'])
-        {
-            $current_uri = $_SERVER['ORIG_PATH_INFO'];
-        }
-        elseif (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF'])
-        {
-            $current_uri = $_SERVER['PHP_SELF'];
-        }
-        else
-        {
-            return '/';
-        }
-
-        // The front controller directory and filename
-        $fc = substr(realpath($_SERVER['SCRIPT_FILENAME']), strlen(DOCROOT));
-
-        if (($strpos_fc = strpos($current_uri, $fc)) !== FALSE)
-        {
-            // Remove the front controller from the current uri
-            $current_uri = substr($current_uri, 0, $strpos_fc + strlen($fc) + 1);
-        }
-
-        $fc = '/';
-        
-        if (!empty(Router::$controller))
-        {
-            $fc .= Router::$controller;
-        }
-
-        if (!empty(Router::$method) AND Router::$method != 'index')
-        {
-            $fc .= '/' .Router::$method;
-        }
-
-        $current_uri = str_replace($fc, '' , $current_uri);
-        
-        if ($current_uri !== '')
-        {
-            // remove the index page if it is in there
-            $indexPage = Kohana::config('core.index_page');
-
-            if (!empty($indexPage))
-            {
-                $current_uri = str_replace($indexPage, '', $current_uri);
-            } 
-            else
-            {
-                $current_uri = str_replace('index.php', '', $current_uri);
-            }
-
-            // Reduce multiple slashes into single slashes
-            $current_uri = preg_replace('#//+#', '/', $current_uri);
-
-            return trim($current_uri, '/');
-
-        }
-        else
-        {
-            return '/';
-        }
-    }
-
     private function _loadAllModules()
     {
         $loadList = glob(MODPATH .'*', GLOB_MARK);
