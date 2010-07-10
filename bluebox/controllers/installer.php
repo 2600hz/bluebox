@@ -76,7 +76,7 @@ class Installer_Controller extends Bluebox_Controller
             throw new Exception('The installer has been administratively disabled. (You can re-enable it in Bluebox/config/config.php)');
         }
 
-        Kohana::config_set('core.site_domain', '/' . Bluebox_Installer::guess_site_domain() . '/');
+        Kohana::config_set('core.site_domain', Bluebox_Installer::guess_site_domain());
 
         skins::setSkin($this->template);
 
@@ -262,7 +262,7 @@ class Installer_Controller extends Bluebox_Controller
      */
     public function fixModRewrite()
     {
-        Kohana::config_set('core.site_domain', '/' . Bluebox_Installer::guess_site_domain() . '/');
+        Kohana::config_set('core.site_domain', Bluebox_Installer::guess_site_domain());
 
         $indexPage = Kohana::config('core.index_page');
 

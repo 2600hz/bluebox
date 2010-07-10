@@ -148,28 +148,7 @@ class Bluebox_Installer
             return '/';
         }
 
-        // The front controller directory and filename
-        $fc = substr(realpath($_SERVER['SCRIPT_FILENAME']), strlen(DOCROOT));
-
-        if (($strpos_fc = strpos($current_uri, $fc)) !== FALSE)
-        {
-            // Remove the front controller from the current uri
-            $current_uri = substr($current_uri, 0, $strpos_fc + strlen($fc) + 1);
-        }
-
-        $fc = '/';
-
-        if (!empty(Router::$controller))
-        {
-            $fc .= Router::$controller;
-        }
-
-        if (!empty(Router::$method) AND Router::$method != 'index')
-        {
-            $fc .= '/' .Router::$method;
-        }
-
-        $current_uri = str_replace($fc, '' , $current_uri);
+        $current_uri = self::determineBaseURI($current_uri);
 
         if ($current_uri !== '')
         {
@@ -188,13 +167,49 @@ class Bluebox_Installer
             // Reduce multiple slashes into single slashes
             $current_uri = preg_replace('#//+#', '/', $current_uri);
 
-            return trim($current_uri, '/');
+            return '/' .trim($current_uri, '/') .'/';
 
         }
-        else
+
+        return '/';
+    }
+
+    public static function determineBaseURI($uri)
+    {
+        $uri = explode('/', $uri);
+
+        $uri = array_filter($uri);
+
+        if (empty($uri))
         {
-            return '/';
+            return '';
         }
+
+        $revUri = array_reverse($uri);
+
+        foreach($revUri as $key => $part)
+        {
+            if ($part == 'index.php')
+            {
+                $baseUri = array_slice($revUri, $key);
+            }
+
+            if (strcasecmp('installer', $part) == 0)
+            {
+                $baseUri = array_slice($revUri, $key + 1);
+
+                return implode('/', array_reverse($baseUri));
+            }
+
+            if (is_dir(MODPATH .$part))
+            {
+                $baseUri = array_slice($revUri, $key + 1);
+
+                return implode('/', array_reverse($baseUri));
+            }
+        }
+
+        return implode('/', $uri);
     }
 
     /**
