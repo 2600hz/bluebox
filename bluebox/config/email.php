@@ -19,9 +19,9 @@ $config['driver'] = 'smtp';
  * @param   string  sendmail: executable path, with -bs or equivalent attached
  * @param   array   smtp: hostname, (username), (password), (port), (auth), (encryption)
  */
-$config['options'] = array('hostname' => 'mail.bandwidth.com', 'port' => 25);
+$config['options'] = array('hostname' => 'localhost', 'port' => 25);
 
 /**
  * The system-wide email FROM field value.
  */
-$config['email_from'] = 'noreply@bandwidth.com';
+$config['email_from'] = 'noreply@localhost';
