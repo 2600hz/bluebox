@@ -1330,6 +1330,7 @@ class Bluebox_PackageManager
                 case self::OPERATION_ENABLE:
                 case self::OPERATION_VERIFY:
                 case self::OPERATION_REPAIR:
+
                     try {
                         $dependencies = $this->graphReliance($dependencyGraph, $packageName);
                         $dependencies = array_flip($dependencies);
@@ -1541,6 +1542,16 @@ class Bluebox_PackageManager
                 case self::OPERATION_ENABLE:
                 case self::OPERATION_VERIFY:
                 case self::OPERATION_REPAIR:
+
+
+                    // TODO: THIS IS A NASTY HACK UNTIL NOT, OR, XOR WORKS
+                    if (strcasecmp($packageName, 'asterisk'))
+                    {
+                        if(self::packageStatus('freeswitch') > 0)
+                        {
+                            $error[$packageName][] = 'This package can not be installed with FreeSwitch';
+                        }
+                    }
 
                     $checkMethods = get_class_methods($package['configureClass']);
                     $checkMethods = array_filter($checkMethods, array(
