@@ -2,10 +2,10 @@
 
     <?php
         $routeType = array('local', 'international', 'emergency');
-        $routeDisaply = kohana::config('simpleroute.route_disaply');
+        $routeDisplay = kohana::config('simpleroute.route_display');
         foreach ($routeType as $route) {
             echo '<div class="field">';
-            echo form::label('simpleroute[' . $route . ']', $routeDisaply[$route]);
+            echo form::label('simpleroute[' . $route . ']', $routeDisplay[$route]);
             echo form::checkbox('simpleroute[' . $route . ']');
             echo '&nbsp;&nbsp; Prepend calls with: ';
             //echo form::label('simpleroute[' . $route . '_prepend]', 'Prepend Calls With: ');

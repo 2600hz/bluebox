@@ -49,7 +49,7 @@
 
 // These are the local rules, allowing local dialing as well as to
 // information and city services
-$config['route_disaply']['local'] = '10-digit US dialing';
+$config['route_display']['local'] = '10-digit US dialing';
 $config['outbound_patterns']['local'][] = '1?(NPA NXX XXXX)';
 $config['outbound_patterns']['local'][] = '411';
 $config['outbound_patterns']['local'][] = '611';
@@ -58,11 +58,11 @@ $config['outbound_patterns']['local'][] = '611';
 $config['outbound_patterns']['short'] = '1?(NXX XXXX)';
 
 // this is the rule for dialing international
-$config['route_disaply']['international'] = 'International dialing (011+)';
+$config['route_display']['international'] = 'International dialing (011+)';
 $config['outbound_patterns']['international'] = '011(X.)';
 
 // this is the rule for dialing emergency services
-$config['route_disaply']['emergency'] = 'Emergency diailing (911)';
+$config['route_display']['emergency'] = 'Emergency diailing (911)';
 $config['outbound_patterns']['emergency'] = '911';
 
 
