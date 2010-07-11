@@ -15,7 +15,7 @@ class Sofia_Configure extends Bluebox_Configure
         'core' => 0.1,
         'freeswitch' => 0.1
     );
-    public static $navBranch = '/Reports/';
+    public static $navBranch = '/Status/';
     public static $navURL = 'sofia/index';    
     public static $navSubmenu = array(
         'Sip Registrations' => '/sofia/index',

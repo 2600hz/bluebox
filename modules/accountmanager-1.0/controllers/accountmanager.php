@@ -4,28 +4,6 @@ class AccountManager_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'Account';
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        if (users::$user['user_type'] <= User::TYPE_ACCOUNT_ADMIN)
-        {
-            message::set('You are not authorized to manage an account!');
-
-            $this->returnQtipAjaxForm(NULL);
-
-            url::redirect('/');
-        }
-        
-        if (users::$user['user_type'] > User::TYPE_ACCOUNT_ADMIN)
-        {
-            Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
-
-            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
-        }
-
-    }
-
     public function index()
     {
         $this->template->content = new View('generic/grid');
