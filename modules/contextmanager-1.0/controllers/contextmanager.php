@@ -4,20 +4,6 @@ class ContextManager_Controller extends Bluebox_Controller {
 
     public $baseModel = 'Context';
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        if (users::$user->user_type <= User::TYPE_ACCOUNT_ADMIN)
-        {
-            message::set('You are not authorized to manage a context!');
-
-            $this->returnQtipAjaxForm(NULL);
-
-            url::redirect('/');
-        }        
-    }
-
     public function index()
     {
         $this->template->content = new View('generic/grid');

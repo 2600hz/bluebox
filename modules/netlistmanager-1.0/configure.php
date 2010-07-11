@@ -4,7 +4,7 @@
  *
  * Gives info about how to install this module
  *
- * @author K Anderson
+ * @author Darren Schreiber
  * @package Bluebox
  * @subpackage NetList
  */
@@ -13,9 +13,9 @@ class NetList_Configure extends Bluebox_Configure
     public static $version = 0.1;
     public static $packageName = 'netlistmanager';
     public static $displayName = 'Network List Manager';
-    public static $author = 'K Anderson';
+    public static $author = 'Darren Schreiber';
     public static $vendor = 'Bluebox';
-    public static $license = 'LGPL';
+    public static $license = 'MPL';
     public static $summary = 'Access Control List Support';
     public static $description = 'Access control lists are lists of domain names, IP addresses and IP address ranges that can be used to identify various network-related activities, such as inbound callers that can bypass authentication, local callers who are on NAT, etc.';
     public static $default = TRUE;
@@ -39,4 +39,42 @@ class NetList_Configure extends Bluebox_Configure
             'disabled' => TRUE
         )
     );
+
+    public function createTenant() {
+        Bluebox_Installer::disableTelephony();
+
+        $netList = new NetList();
+        $netList->name = 'Private/Local Network (auto)';
+        $netList->system_list = 'rfc1918.auto';
+        $netList->save(TRUE);
+
+        $netList = new NetList();
+        $netList->name = 'Private Network (auto)';
+        $netList->system_list = 'nat.auto';
+        $netList->save(TRUE);
+
+        $netList = new NetList();
+        $netList->name = 'Local Network (auto)';
+        $netList->system_list = 'localnet.auto';
+        $netList->save(TRUE);
+
+        $netList = new NetList();
+        $netList->name = 'Loopback Network (auto)';
+        $netList->system_list = 'loopback.auto';
+        $netList->save(TRUE);
+
+
+        $netList = new NetList();
+        $netList->name = 'Public Internet';
+        $netList->allow = TRUE;
+        $netList->save(TRUE);
+
+        $netItem = new NetListItem();
+        $netItem->NetList = $netList;
+        $netItem->record = '0.0.0.0/0';
+        $netItem->allow = TRUE;
+        $netItem->save(TRUE);
+
+        Bluebox_Installer::restoreTelephony();
+    }
 }

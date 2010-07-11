@@ -2,8 +2,6 @@
 
     plugins::register('usermanager', 'save', array('UserManager_Plugin', 'validate'));
 
-    plugins::register('usermanager', 'delete', array('UserManager_Plugin', 'restrictRemoval'));
-
     // Add a hook for managing users within the device manager
     plugins::register('devicemanager/index', 'view', array('UserManager_Plugin', 'appendToGrid'));
 

@@ -148,50 +148,6 @@ class UserManager_Plugin extends Bluebox_Plugin
         $this->views[] = $subview;
     }
 
-    public function restrictRemoval()
-    {
-        $valid = TRUE;
-
-        if (users::$user['user_type'] > User::TYPE_ACCOUNT_ADMIN)
-        {
-            return TRUE;   
-        }
-
-        $base = $this->getBaseModelObject();
-
-        if (users::$user['user_type'] <= $base['user_type'])
-        {
-            message::set('You can not remove a user of that type');
-
-            $valid = FALSE;
-        }
-
-        if ($base['user_type'] == User::TYPE_ACCOUNT_ADMIN)
-        {
-            $users = Doctrine_Query::create()
-                ->select('u.user_type')
-                ->from('User u')
-                ->where('u.user_type = ' .User::TYPE_ACCOUNT_ADMIN)
-                ->execute(array(), Doctrine::HYDRATE_ARRAY);
-
-            if (count($users) <= 1)
-            {
-                message::set('You can not remove the only account admin');
-
-                $valid = FALSE;
-            }
-        }
-
-        if (!$valid)
-        {
-            $this->returnQtipAjaxForm(NULL);
-
-            url::redirect(Router_Core::$controller);
-        }
-        
-        return $valid;
-    }
-
     public function validate()
     {
         $valid = TRUE;

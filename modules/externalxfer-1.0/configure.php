@@ -17,7 +17,7 @@ class ExternalXfer_Configure extends Bluebox_Configure
     
     public static $navIcon = 'assets/img/icons/mainSettingsX.png';
     public static $navLabel = 'External Destination';
-    public static $navBranch = '/Destinations/';
+    public static $navBranch = '/Routing/';
     public static $navURL = 'externalxfer/index';
     public static $navSubmenu = array(
         'Search External Destination' => 'externalxfer/index',

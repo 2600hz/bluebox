@@ -26,8 +26,6 @@
     ?>
     </div>
 
-    <?php if (users::$user['user_type'] > User::TYPE_ACCOUNT_ADMIN): ?>
-
         <div class="field">
         <?php
             echo form::label(array(
@@ -53,7 +51,5 @@
             echo sip::dropdownInviteFormat('sip[sip_invite_format]');
         ?>
         </div>
-
-    <?php endif; ?>
 
 <?php echo form::close_section(); ?>

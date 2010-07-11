@@ -240,18 +240,6 @@ class Numbers
             }
         }
 
-        if (users::$user['user_type'] <= User::TYPE_ACCOUNT_ADMIN)
-        {
-            if (!empty($modified['number']) && strlen($modified['number']) > 7)
-            {
-                $validation->add_error('number[number]', 'Numbers must be shorter than 7 digits');
-
-                throw new Bluebox_Validation_Exception('User is not authorized to add numbers greater than 7 digits');
-            }
-
-            $base['number'] = preg_replace('/[^0-9\*#]/', '', $base['number']);
-        }
-
         if (empty($numberContexts))
         {
             throw new Exception('Please assign this number to at least one context');
