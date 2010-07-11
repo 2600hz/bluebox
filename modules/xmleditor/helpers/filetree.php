@@ -21,11 +21,11 @@ class filetree {
             // Generates a valid XHTML list of all directories, sub-directories, and files in $directory
             // Remove trailing slash
             if( substr($directory, -1) == "/" ) $directory = substr($directory, 0, strlen($directory) - 1);
-            $code = self::php_file_tree_dir($directory, $return_link, $extensions, $excludeRegEx);
+            $code = self::php_file_tree_dir($directory, $return_link, $extensions, $excludeRegEx, '/');
             return $code;
     }
 
-    public static function php_file_tree_dir($directory, $return_link, $extensions = array(), $excludeRegEx = NULL, $first_call = true) {
+    public static function php_file_tree_dir($directory, $return_link, $extensions = array(), $excludeRegEx = NULL, $first_call = true, $depthDir = '') {
             // Recursive function called by php_file_tree() to list directories/files
 
             // Get and sort directories/files
@@ -82,10 +82,10 @@ class filetree {
                                             $php_file_tree .= "<li class=\"pft-directory\">";
 
                                             // Scan for any subfolders/trees (recursive)
-                                            $subTree = self::php_file_tree_dir("$directory/$this_file", $return_link ,$extensions, $excludeRegEx, false);
+                                            $subTree = self::php_file_tree_dir("$directory/$this_file", $return_link ,$extensions, $excludeRegEx, false, $depthDir . $this_file . '/');
                                             if (!$subTree) {
                                                 $link = $return_link;
-                                                $link = str_replace("[link]", "$directory/" . urlencode($this_file), $return_link);
+                                                $link = str_replace("[link]", $depthDir . urlencode($this_file) . '/', $return_link);
                                             }
 
                                             // Add current element
