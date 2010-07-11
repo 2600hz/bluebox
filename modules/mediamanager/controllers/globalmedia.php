@@ -30,7 +30,9 @@ class GlobalMedia_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'MediaFile';
 
-    protected $soundPath;
+    protected $knownTypes = array('mp3', 'wav', 'ogg');
+
+    protected $soundPath = "/usr/local/freeswitch/sounds/";
 
     public function __construct()
     {
@@ -41,15 +43,23 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
     public function index()
     {
-        $this->template->content = new View('generic/grid');
+        $this->template->content = new View('globalmedia/index');
+        $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:$('#MediaGrid').setCaption('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
+        javascript::add('php_file_tree_jquery.js');
+        stylesheet::add('php_file_tree.css');
+
         // Build a grid with a hidden device_id, device_type, and add an option for the user to select the display columns
         $this->grid = jgrid::grid($this->baseModel, array(
-            'caption' => 'Media'
+            'caption' => '&nbsp;',
+            'gridName' => 'MediaGrid'
         ))->add('mediafile_id', 'ID', array(
             'width' => '80',
             'hidden' => true,
             'key' => true
         ))->add('filename', 'Filename', array(
+            'width' => '40',
+            'search' => true
+        ))->add('description', 'Description', array(
             'width' => '40',
             'search' => true
         ))->add('size', 'File Size', array(
@@ -59,14 +69,16 @@ class GlobalMedia_Controller extends Bluebox_Controller
                 'function' => array('MediaFile', 'getSize'),
                 'arguments' => 'registry'
             )
-        ))->add('duration', 'Duration', array(
+        ))->add('length', 'Length', array(
             'width' => '40',
+            'align' => 'right',
             'callback' => array(
-                'function' => array('MediaFile', 'getDuration'),
+                'function' => array('MediaFile', 'getLength'),
                 'arguments' => 'registry'
             )
         ))->add('sample_rate', 'Sample Rate', array(
             'width' => '60',
+            'align' => 'right',
             'callback' => array(
                 'function' => array('MediaFile', 'getSampleRate'),
                 'arguments' => 'registry'
@@ -91,6 +103,131 @@ class GlobalMedia_Controller extends Bluebox_Controller
         plugins::views($this);
         // Produces the grid markup or JSON
         $this->view->grid = $this->grid->produce();
+    }
+
+    private function NormalizeFSNames($filename) {
+        // NOTE: This is a FreeSWITCH-specific feature
+        // Trim the 8000/16000/32000/48000 from directory names
+        $filename = preg_replace('/\/8000\/|\/16000\/|\/32000\/|\/48000\//', '/', $filename);
+        return $filename;
+    }
+
+    public function scan()
+    {
+        set_time_limit(86400);
+        // TODO: Make this a queued event to scan all files. Only possible once.
+
+        /*
+         * Load everything into memory that we know about our existing sound files.
+         * This may seem expensive but it shouldn't be - the info is tiny and a full
+         * rescan will require all this data anyway.
+         */
+
+        // Get the list of known files already in the system
+        $results = Doctrine::getTable('MediaFile')->findAll(Doctrine::HYDRATE_ARRAY);
+        $knownFiles = array();
+        foreach ($results as $result) {
+            $knownFiles[$result['mediafile_id']] = $result['file'];
+        }
+
+        // Scan for "known" files on disk. This is FreeSWITCH specific atm.
+        // TODO: Fix this. Download it from the web?
+        $descriptions = $this->scanXml();
+
+        /*
+         * Now compare what we know with what we find on disk and add any new stuff
+         */
+        var_dump($knownFiles);
+        
+        // Initialize audio analysis routine
+        $audioFile = new AudioFile();
+
+        // Initialize iterator
+        $dir_iterator = new RecursiveDirectoryIterator($this->soundPath);
+        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+
+        // Read in a list of files already registered in the system
+        foreach ($iterator as $filename) if (preg_match('/^.+\.(' . implode('|', $this->knownTypes) . ')$/i', $filename) and ($filename->isFile())) {
+            $audioFile->loadFile($filename);
+            $shortname = str_replace($this->soundPath, '', $this->NormalizeFSNames($filename));
+
+            // Is this a new file or an existing one?
+            if ($mediafile_id = array_search($shortname, $knownFiles)) {
+                echo 'Updating ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ";flush();
+                // Yes, existing file! Just make sure the rate is in here. Good enough for now.
+                $mediaFile = Doctrine::getTable('MediaFile')->find($mediafile_id);
+                
+                // Note that this is a bit dangerous and could use improvement.
+                // We assume that all other properties in the file we just found match the file already uploaded.
+                // That means if someone uploads the wrong audio file, it kinda messes things up big time.
+                if (!in_array($audioFile->wave_framerate, (array)$mediaFile['registry']['rates'])) {
+                    $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], array('rates' => $audioFile->wave_framerate));;
+                    $mediaFile->save();
+                    echo "SUCCESS!<BR>\n";
+                } else {
+                    echo "SKIPPED - NOTHING TO UPDATE.<BR>\n";
+                }
+
+            } else {
+                // NEW FILE! Do lots of stuff
+                $mediaFile = new MediaFile();
+                $mediaFile['file'] = $shortname;
+                $mediaFile['path'] = dirname($mediaFile['file']);   // We track the path separately to ease searching
+                $mediaFile['account_id'] = 1;
+
+                // See if we know this filename, description & category from the XML info
+                if (isset($descriptions[$shortname])) {
+                    $mediaFile['description'] = $descriptions[$shortname];
+                } else {
+                    $mediaFile['description'] = 'Unknown';
+                }
+                echo 'Adding ' . $mediaFile['file'] . "... ";flush();
+
+                $audioInfo = array( 'type' => $audioFile->wave_type,
+                                    'compression' => $audioFile->wave_compression,
+                                    'channels' => $audioFile->wave_channels,
+                                    'rates' => $audioFile->wave_framerate,
+                                    'byterate' => $audioFile->wave_byterate,
+                                    'bits' => $audioFile->wave_bits,
+                                    'size' => $audioFile->wave_size,
+                                    'length' => $audioFile->wave_length);
+
+                $mediaFile['registry'] += $audioInfo;
+                
+                var_dump($mediaFile);
+                $mediaFile->save();
+
+                // Add to list of "known" files
+                $knownFiles[$mediaFile['mediafile_id']] = $mediaFile['file'];
+
+                echo "SUCCESS!<br>\n";
+            }
+        }
+        
+        echo 'Done scanning.';
+        flush();exit();
+    }
+
+    public function scanXml() {
+        $xml = simplexml_load_file('/usr/local/src/freeswitch/docs/phrase/phrase_en.xml');
+        $knownFiles = $this->processXml($xml, '/usr/local/freeswitch/sounds/');
+        // Need to write this out
+        return $knownFiles;
+        //echo serialize($knownFiles);
+    }
+
+    public function processXml($xml, $curdirectory) {
+        $knownFiles = array();
+        foreach ($xml as $dirname => $element) {
+            if ($element->getName() == 'prompt') {
+                $attr = $element->attributes();
+                $knownFiles['en/us/callie/' . $curdirectory . '/' . (string)$attr['filename']] = (string)$attr['phrase'];
+            } else {
+                $knownFiles += $this->processXml($element, $dirname);
+            }
+        }
+
+        return $knownFiles;
     }
     
     public function add()
@@ -190,10 +327,8 @@ class GlobalMedia_Controller extends Bluebox_Controller
             }
         }
         $this->view->mediamanager = array('description' => $file->description);
-    } 
-    public function systemsound()
-    {
     }
+
     public function download($id)
     {
         $file = Doctrine::getTable('File')->find($id);
@@ -205,6 +340,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
         readfile($fullPath);
         die();
     }
+
     public function preview($id)
     {
         stylesheet::add('mediamanager', 40);
@@ -222,16 +358,13 @@ class GlobalMedia_Controller extends Bluebox_Controller
         readfile($fullPath);
         die();
     }
+
     public function delete($id)
     {
         $this->stdDelete($id);
     }
-    /**
-     * @todo this needs to be cleaned up big time.
-     *
-     *
-     */
-    private function upload($replace = false, $description = '')
+
+    private function old_upload($replace = false, $description = '')
     {
         /* check if folder exists */
         if (!is_dir($this->uploadPath)) {
@@ -304,6 +437,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
             return false;
         }
     }
+
     private function fileExists($filename)
     {
         $q = Doctrine_Query::create()->select('f.file_id')->from('File f')->where('f.name = ? AND f.user_id = ? AND f.path = ?', array(
@@ -317,11 +451,13 @@ class GlobalMedia_Controller extends Bluebox_Controller
             return false;
         }
     }
+
     private function validate()
     {
         $files = Validation::factory($_FILES)->add_rules('upload', 'upload::valid', 'upload::required', 'upload::size[' . ini_get('upload_max_filesize') . ']');
         return $files->validate();
     }
+
     private function tobytes($val)
     {
         $val = trim($val);
@@ -331,6 +467,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
         if ($last == 'k') $val = $val * 1024;
         return $val;
     }
+    
     private function bytesToMb($byte)
     {
         return $byte / 1048576 . 'Mb';

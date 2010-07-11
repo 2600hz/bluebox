@@ -309,7 +309,7 @@ class AudioFile
 		$this->wave_length = $info["mpeg_playtime"];
 
 		// pick up length from id3v2 tag if necessary and available
-		if ($this->wave_length<1 && is_array($this->id3v2->TLEN) )
+		if ($this->wave_length<1 && isset($this->id3v2->TLEN) && is_array($this->id3v2->TLEN) )
 		{
 			$this->wave_length= (  $this->id3v2->TLEN['value'] / 1000 );
 		}
@@ -689,7 +689,7 @@ class AudioFile
 		print "<tr><td align=right>length</td>	<td>&nbsp;".number_format ($this->wave_length,"2")." sec.<br>&nbsp;".date("i:s", mktime(0,0,round($this->wave_length)))."</td></tr>";
 
 		// ID3V1
-		if ($this->id3_tag)
+		if (isset($this->id3_tag))
 		{
 			print "<tr><td align=right>id3v1-tags</td><td>";
 			print "<table width=100% border=1>";
@@ -708,7 +708,7 @@ class AudioFile
 		}
 
 		// ID3V2
-		if ($this->id3v2)
+		if (isset($this->id3v2))
 		{
 			print "<tr><td align=right>id3v2-tags</td><td>";
 			print "<table width=100% border=1>";
@@ -808,7 +808,7 @@ class AudioFile
 		$tagsize = $this->get32bitSynchsafe($fp) + $footer;
 
 		// extended header
-		if ($this->id3v2->extended==1)
+		if (isset($this->id3v2->extended) and ($this->id3v2->extended==1))
 		{
 			// get extended header size
 			$extended_header_size = $this->get32bitSynchsafe($fp) ;
