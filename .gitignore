@@ -1,5 +1,5 @@
 ##
-## This ignores untracked files, to ingnore tracked
+## This ignores untracked files, to ignore tracked
 ## files see: git update-index --assume-unchanged
 ##
 bluebox/logs/*
