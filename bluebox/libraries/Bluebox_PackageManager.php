@@ -163,8 +163,11 @@ class Bluebox_PackageManager
             // get the directory of the package
             $packageVars['directory'] = dirname($configureFile);
 
-            $packageVars['packageName'] = dirname(str_replace(MODPATH, '', $configureFile));
-
+            if (empty($packageVars['packageName']))
+            {
+                $packageVars['packageName'] = dirname(str_replace(MODPATH, '', $configureFile));
+            }
+            
             // If the moduleName is empty use the class name
             //if (empty($packageVars['packageName'])) $packageVars['packageName'] = str_replace('_Configure', '', $class);
             // moduleName is used in a lot of places, and I am lazy ;)
@@ -1331,6 +1334,26 @@ class Bluebox_PackageManager
                 case self::OPERATION_VERIFY:
                 case self::OPERATION_REPAIR:
 
+
+                    /**
+                     * TODO: This is a temporary nasty hack until I can make
+                     * the dependency xor, or, and not work correctly...
+                     */
+                    if ($packageName == 'asterisk')
+                    {
+                        if ($this->packageStatus('freeswitch') == self::STATUS_INSTALLED)
+                        {
+                            $error[$packageName][] = 'The Asterisk Driver can not be installed with the FreeSwitch Driver';
+                        }
+                    }
+                    else if ($packageName == 'freeswitch')
+                    {
+                        if ($this->packageStatus('asterisk') == self::STATUS_INSTALLED)
+                        {
+                            $error[$packageName][] = 'The FreeSwitch Driver can not be installed with the Asterisk Driver';
+                        }
+                    }
+                    
                     try {
                         $dependencies = $this->graphReliance($dependencyGraph, $packageName);
                         $dependencies = array_flip($dependencies);
