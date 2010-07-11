@@ -114,6 +114,16 @@ abstract class Bluebox_Configure
         $this->noMethodMethod(__FUNCTION__);
     }
 
+    public function sanityCheck()
+    {
+        $this->noMethodMethod(__FUNCTION__);
+    }
+
+    public function completedInstall()
+    {
+        $this->noMethodMethod(__FUNCTION__);
+    }
+
     /**
      * Verify module is intact.
      *

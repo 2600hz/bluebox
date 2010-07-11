@@ -1,5 +1,9 @@
 /* Changes to the default form styles
 -------------------------------------------------------------- */
+form.form fieldset {
+    margin: 0;
+    padding: 0;
+}
 form.form fieldset .package_wrapper {
     width: 90%;
     margin: 0 auto;
@@ -43,7 +47,7 @@ form.form fieldset fieldset .legend.module .module_actions span {
 }
 form.form fieldset fieldset .legend.module .module_actions {
     float:right;
-    border-top:1px solid #EEEED7;
+    /*border-top:1px solid #EEEED7;*/
 }
 form.form fieldset fieldset .legend.module .module_actions label {
     display:inline;

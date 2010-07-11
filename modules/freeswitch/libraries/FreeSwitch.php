@@ -361,7 +361,7 @@ class FreeSwitch extends Telephony_Driver
     public function commit()
     {
         // Activate any changed settings on the switch, live
-//        if (!Bluebox_Core::is_installing()) {
+//        if (!Bluebox_Installer::is_installing()) {
 //            if (class_exists('EslManager', TRUE) && (self::$dirty or self::$aclDirty or self::$sofiaDirty)) {
 //                $esl = new EslManager();
 //                if (self::$dirty) {
