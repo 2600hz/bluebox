@@ -10,13 +10,13 @@ div#filelist li {
 }
 
 div#xmleditor {
-    height:400px;
+    height:700px;
 }
 
 div#filelist {
      float:left;
      width:200px;
-     height:400px;
+     height:700px;
      overflow:auto;
 }
 

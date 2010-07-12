@@ -5,8 +5,8 @@ class ContextManager_Configure extends Bluebox_Configure
     public static $version = 0.1;
     public static $packageName = 'contextmanager';
     public static $displayName = 'Context Manager';
-    public static $author = 'Karl Anderson';
-    public static $vendor = 'BitBashing';
+    public static $author = 'The Collective Greater Good';
+    public static $vendor = 'Whoever';
     public static $license = 'MPL';
     public static $summary = 'Manage contexts for call routing';
     public static $description = 'Allows for management of contexts, allowing you to group together devices, SIP interfaces. These groupings determine what is accessible to inbound and outbound callers.';

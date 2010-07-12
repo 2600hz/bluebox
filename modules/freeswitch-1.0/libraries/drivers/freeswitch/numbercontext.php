@@ -38,12 +38,6 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
     {
         $xml = Telephony::getDriver()->xml;
 
-        // When an account is disabled we add this catch call extension but there isn't really a good place to remove it
-        // so we will simply do it everytime to ensure it is gone
-        $xml->setXmlRoot('//document/section[@name="dialplan"]/context[@name="context_' .$base['context_id'] . '"]/extension[@name="main_disabled_account"]');
-
-        $xml->deleteNode();
-        
         // Add any "global" hooks that come before the processing of any numbers (this is per context)
         dialplan::start('context_' .$base['context_id']);
 

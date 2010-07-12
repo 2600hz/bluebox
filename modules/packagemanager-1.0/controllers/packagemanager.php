@@ -13,20 +13,6 @@ class PackageManager_Controller extends Bluebox_Controller
         'description'
     );
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        if (users::$user['user_type'] <= User::TYPE_ACCOUNT_ADMIN)
-        {
-            message::set('You are not authorized to manage packages!');
-
-            $this->returnQtipAjaxForm(NULL);
-
-            url::redirect('/');
-        }
-    }
-
     public function index()
     {
         stylesheet::add('packagemanager');

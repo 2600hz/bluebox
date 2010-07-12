@@ -9,7 +9,7 @@
 
     <div id="fileedit">
         <B>Current File: </B><span id="filename">None</span>
-        <textarea id="textarea_1" cols="94" rows="20"></textarea>
+        <textarea id="textarea_1" cols="100" rows="45"></textarea>
     </div>
 </div>
 
