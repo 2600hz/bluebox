@@ -194,8 +194,6 @@ class Package_Catalog_Standardize extends Package_Catalog
             case Package_Manager::TYPE_CORE:
                 $metadata['default'] = TRUE;
 
-                $metadata['denyDisable'] = TRUE;
-
                 $metadata['denyRemoval'] = TRUE;
 
                 $metadata['status'] = Package_Manager::STATUS_INSTALLED;

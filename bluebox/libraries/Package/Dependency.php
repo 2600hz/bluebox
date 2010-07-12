@@ -24,6 +24,8 @@ class Package_Dependency
 
                         if (self::compareVersion($package['version'], $condition))
                         {
+                            kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' can not be installed with ' .$name .' version ' .$condition);
+                            
                             $failures['not'][$name] = $condition;
                         }
                     }
@@ -35,12 +37,12 @@ class Package_Dependency
 
                     foreach($conditions as $name => $condition)
                     {
-                        if (!$package = Package_Catalog::getInstalledPackage($name))
+                        if (!$required = Package_Catalog::getInstalledPackage($name))
                         {
                             continue;
                         }
 
-                        if (self::compareVersion($package['version'], $condition))
+                        if (self::compareVersion($required['version'], $condition))
                         {
                             continue 2;
                         }
@@ -48,20 +50,26 @@ class Package_Dependency
                         $failed[$name] = $condition;
                     }
 
+                    kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' requires one to be installed -> ' .implode(', ', $failed));
+
                     $failures['or'] += $failed;
                     
                     break;
 
                 default:
-                    if (!$package = Package_Catalog::getInstalledPackage($requirement))
+                    if (!$required = Package_Catalog::getInstalledPackage($requirement))
                     {
+                        kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions .' but it isnt installed');
+
                         $failures['missing'][$requirement] = $conditions;
 
                         continue;
                     }
 
-                    if (!self::compareVersion($package['version'], $conditions))
+                    if (!self::compareVersion($required['version'], $conditions))
                     {
+                        kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions);
+
                         $failures['incompatible'][$requirement] = $conditions;
                     }
             }
@@ -81,7 +89,37 @@ class Package_Dependency
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-        
+        $parentName = $package['packageName'];
+
+        if (!empty($package['denyRemoval']))
+        {
+            kohana::log('debug', 'Dependency error: ' .$parentName .' has the denyRemoval flag set');
+
+            throw new Package_Dependency_Exception('Package is not eligible for removal');
+        }
+
+        $dependents = Package_Dependency_Graph::getDependents($parentName);
+
+        $failures = array();
+
+        foreach($dependents as $name)
+        {
+            if ($package = Package_Catalog::getInstalledPackage($name))
+            {
+                kohana::log('debug', 'Dependency error: ' .$parentName .' is being used by ' .$name .' version ' . $package['version']);
+
+                $failures['indispensable'][$name] = $package['version'];
+            }
+        }
+
+        if (!empty($failures))
+        {
+            $dependencyException = new Package_Dependency_Exception('Package did not pass dependency validation');
+
+            $dependencyException->loadFailures($failures);
+
+            throw $dependencyException;
+        }
     }
 
     public static function compareVersion($avaliableVersion, $requiredVersion, $operator = '>=')
