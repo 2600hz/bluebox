@@ -224,22 +224,6 @@ class Numbers
 
         $matches = array();
 
-        if (preg_match('/^1?([2-9][0-8][0-9][2-9][0-9]{6})$/', $base['number'], $matches))
-        {
-            $base['number'] = $matches[1];
-
-            $base['type'] = Number::TYPE_EXTERNAL;
-
-            if (count($numberContexts) > 1)
-            {
-                throw new Exception('Inbound telephony numbers can only belong to one context');
-            } 
-            else if (!empty($base['NumberContext'][0]['Context']['registry']['outbound']))
-            {
-                throw new Exception('Inbound telephony numbers can not belong to contexts that can make outbound calls');
-            }
-        }
-
         if (empty($numberContexts))
         {
             throw new Exception('Please assign this number to at least one context');
