@@ -69,6 +69,10 @@ form.form fieldset fieldset .legend.module:hover .details {
     color:#888888;
 }
 
+form.form .module_actions .packageAction {
+    padding:0 10px;
+}
+
 /* Module Messages
 -------------------------------------------------------------- */
 .module_messages .error_message {

@@ -19,19 +19,21 @@
  */
 class Bluebox_Installer
 {
-    //class Bluebox_PackageManager?
+    //class Package_Manager?
 
     /**
      * These are a list of category name constants for use in
      * Bluebox_Configure $category
      */
-    const TYPE_DEFAULT = 'TYPE_DEFAULT';
-    const TYPE_MODULE = 'TYPE_MODULE';
-    const TYPE_PLUGIN = 'TYPE_PLUGIN';
-    const TYPE_DRIVER = 'TYPE_DRIVER';
-    const TYPE_SERVICE = 'TYPE_SERVICE';
-    const TYPE_DIALPLAN = 'TYPE_DIALPLAN';
-    const TYPE_ENDPOINT = 'TYPE_ENDPOINT';
+    const TYPE_DEFAULT = 'unknown';
+    const TYPE_CORE = 'core';
+    const TYPE_MODULE = 'module';
+    const TYPE_PLUGIN = 'plugin';
+    const TYPE_DRIVER = 'driver';
+    const TYPE_SERVICE = 'service';
+    const TYPE_DIALPLAN = 'dialplan';
+    const TYPE_ENDPOINT = 'endpoint';
+    const TYPE_SKIN = 'skin';
 
     /**
      * @var array This var tracks errors internally until the current operation is complete
@@ -337,10 +339,10 @@ class Bluebox_Installer
             $packageVars['directory'] = dirname(str_replace(DOCROOT, '', $configuration));
 
             // Standardize the type list
-            if (!defined('Bluebox_Installer::' . $packageVars['type']))
-            {
-                $packageVars['type'] = Bluebox_Installer::TYPE_DEFAULT;
-            }
+//            if (!defined('Bluebox_Installer::' . $packageVars['type']))
+//            {
+//                $packageVars['type'] = Bluebox_Installer::TYPE_DEFAULT;
+//            }
             
             if ($packageVars['type'] == Bluebox_Installer::TYPE_DEFAULT)
             {

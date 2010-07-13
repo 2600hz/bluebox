@@ -2,14 +2,15 @@
 
 class PackageManager_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
+    public static $packageName = 'packagemanager';
     public static $displayName = 'Package Manager';
     public static $author = 'K Anderson';
     public static $vendor = 'BitBashing';
     public static $license = 'MPL';
     public static $summary = 'Management module for the Bluebox package system.';
     public static $default = TRUE;
-    public static $type = Bluebox_PackageManager::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $denyDisable = TRUE;
     public static $denyRemoval = TRUE;
 

@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class ExternalXfer_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'externalxfer';
     public static $displayName = 'External Transfer Routing Support';
     public static $author = 'Darren Schreiber';

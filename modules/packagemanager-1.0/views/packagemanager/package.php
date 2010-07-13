@@ -4,9 +4,9 @@
 
         <span class="module_actions">
 
-            <?php echo html::anchor('packagemanager/verify/' .$packageName, __('Verify'), array('class' => 'ajaxLink')); ?>
-
-            <?php echo packagemanager::dropdown('operations[' .$packageName .']', $packageStatus, empty($_POST['operations'][$packageName]) ? NULL : $_POST['operations'][$packageName]); ?>
+            <?php
+                echo packagemanager::avaliableActions($identifier);
+            ?>
 
         </span>
 
@@ -71,8 +71,15 @@
 
                 <span class="parameter_label"><?php echo __(ucfirst($parameter)); ?></span>
 
-                <span class="parameter_value"><?php echo $$parameter; ?></span>
+                <?php if ($parameter == 'sourceURL'): ?>
 
+                    <span class="parameter_value"><?php echo html::anchor($$parameter); ?></span>
+
+                <?php else: ?>
+
+                    <span class="parameter_value"><?php echo $$parameter; ?></span>
+
+                <?php endif; ?>
             </div>
 
         <?php endforeach; ?>

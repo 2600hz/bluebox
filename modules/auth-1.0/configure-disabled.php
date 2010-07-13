@@ -9,7 +9,7 @@ class Auth_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Service used for authentication';
     public static $default = TRUE;
-    public static $type = Bluebox_PackageManager::TYPE_SERVICE;
+    public static $type = Package_Manager::TYPE_SERVICE;
     public static $required = array(
         'core' => 0.1
     );

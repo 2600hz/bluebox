@@ -10,7 +10,7 @@ class Bluebox_Core
             return TRUE;
         }
 
-        $installedPackages = Doctrine::getTable('Package')->findByStatus(Bluebox_PackageManager::STATUS_INSTALLED);
+        $installedPackages = Doctrine::getTable('Package')->findByStatus(Package_Manager::STATUS_INSTALLED);
 
         if (empty($installedPackages))
         {

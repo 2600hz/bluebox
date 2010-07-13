@@ -23,7 +23,10 @@ class Package_Catalog_Remote
 
         foreach ($repos as $repo)
         {
-            $repoXMLCatalog = self::fetch($repo);
+            if(!$repoXMLCatalog = self::fetch($repo))
+            {
+                continue;
+            }
 
             $remoteCatalog = self::fromXML($repoXMLCatalog);
 
@@ -74,7 +77,7 @@ class Package_Catalog_Remote
     {
         // needs caching...
 
-        return file_get_contents($URL);
+        return @file_get_contents($URL);
     }
 
     protected static function toXml($data, $rootNodeName = 'packages', $xml = null)

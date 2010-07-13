@@ -39,7 +39,7 @@ class MediaManager_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Manage sound/media files on this system. Provides upload/download facilities and allows for managing built-in system files.';
     public static $default = TRUE;
-    public static $type = Bluebox_PackageManager::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );
@@ -68,8 +68,8 @@ class MediaManager_Configure extends Bluebox_Configure
             )
         )
     );
-
-/*    public static function _checkDirectory()
+/*
+    public static function _checkDirectory()
     {
         $upload_dir = rtrim(Kohana::config('upload.directory') , '/') . '/';
         // Check if the upload.directory can be written to

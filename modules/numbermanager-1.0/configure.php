@@ -2,7 +2,7 @@
 
 class NumberManagement_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'numbermanager';
     public static $displayName = 'Number Manager';
     public static $author = 'Karl Anderson';
@@ -11,7 +11,7 @@ class NumberManagement_Configure extends Bluebox_Configure
     public static $summary = 'Number Management Controller Class';
     public static $description = 'When this module is loaded along with the above listed modules (and possibly others), address fields will automatically appear within relevant modules. In addition, an order of precedence is set for loaded modules as well. This plugin might be overridden by an alternative address module that has better support for international addresses, validation and other features. Make sure you don\'t have conflicts.';
     public static $default = true;
-    public static $type = Bluebox_PackageManager::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

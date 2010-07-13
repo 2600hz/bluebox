@@ -2,7 +2,7 @@
 
 class ContextManager_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'contextmanager';
     public static $displayName = 'Context Manager';
     public static $author = 'The Collective Greater Good';
@@ -11,7 +11,7 @@ class ContextManager_Configure extends Bluebox_Configure
     public static $summary = 'Manage contexts for call routing';
     public static $description = 'Allows for management of contexts, allowing you to group together devices, SIP interfaces. These groupings determine what is accessible to inbound and outbound callers.';
     public static $default = true;
-    public static $type = Bluebox_PackageManager::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

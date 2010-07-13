@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class Freeswitch_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'freeswitch';
     public static $displayName = 'FreeSWITCH Driver';
     public static $author = 'Darren Schreiber';

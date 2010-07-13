@@ -2,7 +2,7 @@
 
 class AutoAttendant_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'autoattendant';
     public static $displayName = 'Auto Attendant';
     public static $author = 'Karl Anderson';
@@ -10,7 +10,7 @@ class AutoAttendant_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Auto Attendant Management and builder';
     public static $default = true;
-    public static $type = Bluebox_PackageManager::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'mediamanager' => 0.1
