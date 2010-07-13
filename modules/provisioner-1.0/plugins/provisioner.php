@@ -14,7 +14,7 @@ class Provisioner_Plugin extends Bluebox_Plugin
         $base = $this->getBaseModelObject();
 
         if (empty($base['device_id']))
-            return FALSE;	// Nothing to do here.
+            return TRUE;	// Nothing to do here.
 
         // get the endpoints that use this device
         $endpointLines = Doctrine::getTable('EndpointLine')->findByDeviceId($base['device_id']);
@@ -37,6 +37,8 @@ class Provisioner_Plugin extends Bluebox_Plugin
                 $driver->createFiles();
             }
         }
+
+        return TRUE;
     }
 
     public function removeLine()

@@ -63,7 +63,7 @@ class FreeSwitch extends Telephony_Driver
     private static $trunksDirty = FALSE;
 
     protected static $sectionPaths = array(
-        'user' => 	'//document/section[@name="directory"]/domain[@name="%s"]/groups/group[@name="default"]/users/user[@blubox_id="%s"]',
+        'user' => 	'//document/section[@name="directory"]/domain[@name="%s"]/groups/group[@name="default"]/users/user[@bluebox_id="%s"]',
         'autoattendants' => '//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]/menus',
         'autoattendant' => '//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]/menus/menu[@name="auto_attendant_%s"]',
         'ringgroup' => '//document/section[@name="directory"]/domain[@name="%s"]/groups/group[@name="%s"]',

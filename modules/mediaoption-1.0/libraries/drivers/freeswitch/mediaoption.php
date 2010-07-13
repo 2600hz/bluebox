@@ -27,15 +27,6 @@ class FreeSwitch_MediaOption_Driver extends FreeSwitch_Base_Driver
             {
                 $xml->update('/variables/variable[@name="bypass_media"]{@value="yes"}');
             }
-
-            if (empty($mediaoption['proxy_media']))
-            {
-                $xml->update('/variables/variable[@name="proxy_media"]{@value="no"}');
-            }
-            else
-            {
-                $xml->update('/variables/variable[@name="proxy_media"]{@value="yes"}');
-            }
         }
     }
 
@@ -48,8 +39,6 @@ class FreeSwitch_MediaOption_Driver extends FreeSwitch_Base_Driver
             $xml = FreeSwitch::setSection('user', $domain, $base['device_id']);
 
             $xml->deleteNode('/variables/variable[@name="bypass_media"]');
-
-            $xml->deleteNode('/variables/variable[@name="proxy_media"]');
         }
     }
 }

@@ -29,13 +29,26 @@
     <div class="field">
     <?php
         echo form::label(array(
+                'for' => 'callerid[external_name]',
+                'hint' => 'Used for outside calls',
+                'help' => 'Caller ID information used when calling phones outside this network.'
+            ),
+            'External Caller Name:'
+        );
+        echo form::input('callerid[external_name]');
+    ?>
+    </div>
+
+    <div class="field">
+    <?php
+        echo form::label(array(
                 'for' => 'callerid[external_number]',
-                'hint' => 'Used for off-network calls',
-                'help' => 'Caller ID information used when calling outside of the network, such as to the PSTN.'
+                'hint' => 'Used for outside calls',
+                'help' => 'Caller ID information used when calling phones outside this network.'
             ),
             'External Caller Number:'
         );
-        echo callid::dropdown('callerid[external_number]');
+        echo form::input('callerid[external_number]');
     ?>
     </div>
 
