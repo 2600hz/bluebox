@@ -4,6 +4,6 @@
 ##
 bluebox/logs/*
 bluebox/cache/*
-bluebox/config/*
+#bluebox/config/*
 nbproject/*
 uploads/*

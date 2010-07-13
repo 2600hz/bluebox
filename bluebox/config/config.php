@@ -100,8 +100,8 @@ $config['extension_prefix'] = 'Bluebox_';
  */
 $config['modules'] = array
 (
-	MODPATH.'auth',      // Authentication
-        MODPATH.'packagemanager'
+	MODPATH.'auth-1.0',      // Authentication
+        MODPATH.'packagemanager-1.0'
 	// MODPATH.'forge',     // Form generation
 	// MODPATH.'kodoc',     // Self-generating documentation
 	// MODPATH.'media',     // Media caching and compression
