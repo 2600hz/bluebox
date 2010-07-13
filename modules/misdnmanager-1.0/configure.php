@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class MisdnManager_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'misdnmanager';
     public static $displayName = 'mISDN Manager';
     public static $author = '<ul><li>Reto Haile</li></ul>';

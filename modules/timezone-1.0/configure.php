@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class Timezone_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'timezone';
     public static $author = 'Darren Schreiber';
     public static $vendor = 'Bluebox';
@@ -10,6 +10,7 @@ class Timezone_Configure extends Bluebox_Configure
     public static $default = false;
     public static $type = Bluebox_Installer::TYPE_PLUGIN;
     public static $required = array(
-        'core' => 0.1
+        'core' => 0.1,
+        'callerid' => '1.0.3'
     );
 }

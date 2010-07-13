@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /*class Lcr_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'lcr';
     public static $displayName = 'Least Cost Routing';
     public static $author = 'Raymond Chandler';

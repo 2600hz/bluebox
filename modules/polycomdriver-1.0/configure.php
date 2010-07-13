@@ -1,12 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class Polycomdriver_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'polycomdriver';
     public static $displayName = 'Polycom Driver';
     public static $author = 'Karl Anderson';
     public static $vendor = 'Bluebox';
-    public static $license = 'LGPL';
+    public static $license = 'MPL';
     public static $summary = 'Polycom Provision Driver';
     public static $default = true;
     public static $type = Bluebox_Installer::TYPE_ENDPOINT;

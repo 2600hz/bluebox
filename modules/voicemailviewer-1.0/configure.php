@@ -33,7 +33,7 @@
  */
 class VoicemailViewer_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'voicemailviewer';
     public static $displayName = 'Voicemail Viewer';
     public static $author = 'Michael Phillips';

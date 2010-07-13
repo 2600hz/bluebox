@@ -2,7 +2,7 @@
 
 class Voicemail_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'voicemail';
     public static $displayName = 'Voicemail Support';
     public static $author = 'K Anderson';
@@ -10,7 +10,7 @@ class Voicemail_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Voicemail box support module - allows creation and assignment of voicemail boxes';
     public static $default = true;
-    public static $type = Bluebox_PackageManager::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

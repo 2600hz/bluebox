@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class InterfaceManager_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'sipinterface';
     public static $displayName = 'SIP Interface Manager';
     public static $author = 'Darren Schreiber';
@@ -13,7 +13,8 @@ class InterfaceManager_Configure extends Bluebox_Configure
     public static $required = array(
         'core' => 0.1,
         'freeswitch' => 0.1,
-        'trunkmanager' => 0.1
+        'trunkmanager' => 0.1,
+        'sip' => 0.1
     );
     public static $navIcon = 'assets/img/icons/mainSettingsX.png';
     public static $navBranch = '/Connectivity/';

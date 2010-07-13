@@ -1,15 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * configure.php - Media Manager Hook
- *
- * @author Michael Phillips <michael.j.phillips@gmail.com>
- * @license MPL
- * @package Bluebox
- * @subpackage MediaManager
- */
+
 class PowerDns_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'powerdns';
     public static $displayName = 'PowerDNS Management';
     public static $author = 'K Anderson';

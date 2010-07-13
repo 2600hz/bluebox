@@ -10,7 +10,7 @@
  */
 class NetList_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'netlistmanager';
     public static $displayName = 'Network List Manager';
     public static $author = 'Darren Schreiber';
