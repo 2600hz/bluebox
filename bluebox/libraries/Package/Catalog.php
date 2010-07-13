@@ -18,7 +18,6 @@ class Package_Catalog
 
         $installedPackages = array();
 
-        // Process each of the known package configuration classes
         foreach($configureFiles as $class => $filepath)
         {
             $metadata = get_class_vars($class);
@@ -37,48 +36,24 @@ class Package_Catalog
 
             self::$packageList[$metadata['packageName']][$metadata['status']][$metadata['identifier']]
                 = &self::$catalog[$metadata['identifier']];
-
-            $installedPackages[$metadata['identifier']] = $metadata['packageName'];
         }
 
-        foreach ($installedPackages as $identifier => $name)
+        $remoteCatalog = Package_Catalog_Remote::queryRepositories();
+
+        foreach($remoteCatalog as $identifier => $metadata)
         {
-            $installedPackage = &self::$catalog[$identifier];
-
-            foreach (self::$packageList[$name] as $status => $packages)
+            if (!empty(self::$catalog[$identifier]))
             {
-                if ($status == Package_Manager::STATUS_INSTALLED)
-                {
-                    continue;
-                }
-
-                foreach ($packages as $key => $package)
-                {
-                    if (Package_Dependency::compareVersion($package['version'], $installedPackage['version']))
-                    {
-                        $installedPackage['upgrades'][$package['version']] = $key;
-                    }
-                    else
-                    {
-                        $installedPackage['downgrades'][$package['version']] = $key;
-                    }
-                }
-
-                if (!empty($installedPackage['upgrades']))
-                {
-                    uksort($installedPackage['upgrades'], array('Package_Dependency', 'compareVersion'));
-
-                    $installedPackage['upgrades'] = array_reverse($installedPackage['upgrades']);
-                }
-
-                if (!empty($installedPackage['downgrades']))
-                {
-                    uksort($installedPackage['downgrades'], array('Package_Dependency', 'compareVersion'));
-
-                    $installedPackage['downgrades'] = array_reverse($installedPackage['downgrades']);
-                }
+                continue;
             }
+
+            self::$catalog[$identifier] = $metadata;
+
+            self::$packageList[$metadata['packageName']][Package_Manager::STATUS_UNINSTALLED][$identifier]
+                = &self::$catalog[$identifier];
         }
+        
+        self::findAvaliableMigrations();
 
         return self::$catalog;
     }
@@ -210,6 +185,55 @@ class Package_Catalog
         }
     }
 
+    protected static function findAvaliableMigrations()
+    {
+        foreach (self::$packageList as $name => $packages)
+        {
+            if (empty($packages[Package_Manager::STATUS_INSTALLED]))
+            {
+                continue;
+            }
+
+            $installedIdentifier = key($packages[Package_Manager::STATUS_INSTALLED]);
+
+            $installedPackage = &$packages[Package_Manager::STATUS_INSTALLED][$installedIdentifier];
+
+            foreach ($packages as $status => $avaliable)
+            {
+                if ($status == Package_Manager::STATUS_INSTALLED)
+                {
+                    continue;
+                }
+
+                foreach ($avaliable as $identifier => $package)
+                {
+                    if (Package_Dependency::compareVersion($package['version'], $installedPackage['version']))
+                    {
+                        $installedPackage['upgrades'][$package['version']] = $identifier;
+                    }
+                    else
+                    {
+                        $installedPackage['downgrades'][$package['version']] = $identifier;
+                    }
+                }
+            }
+            
+            if (!empty($installedPackage['upgrades']))
+            {
+                uksort($installedPackage['upgrades'], array('Package_Dependency', 'compareVersion'));
+
+                $installedPackage['upgrades'] = array_reverse($installedPackage['upgrades']);
+            }
+
+            if (!empty($installedPackage['downgrades']))
+            {
+                uksort($installedPackage['downgrades'], array('Package_Dependency', 'compareVersion'));
+
+                $installedPackage['downgrades'] = array_reverse($installedPackage['downgrades']);
+            }
+        }
+    }
+
     protected static function listConfigureFiles()
     {
         $configureFiles = glob(MODPATH . '*/configure.php', GLOB_MARK);
@@ -218,21 +242,40 @@ class Package_Catalog
         {
             array_unshift($configureFiles, APPPATH . 'configure.php');
         }
-        
+
+        require_once(APPPATH .'libraries/Bluebox_Configure.php');
+
         foreach($configureFiles as $configureFile)
         {
-            require_once ($configureFile);
+            $declaredBefore = get_declared_classes();
+
+            require_once($configureFile);
 
             $declaredAfter = get_declared_classes();
 
-            $foundClass = end($declaredAfter);
-
-            if ($foundClass && is_subclass_of($foundClass, 'Bluebox_Configure'))
+            if (count($declaredBefore) == count($declaredAfter))
             {
-                self::$configureCache[$foundClass] = $configureFile;
+                continue;
+            }
+
+            $foundClasses = array_diff($declaredAfter, $declaredBefore);
+
+            if ($foundClasses)
+            {
+                foreach ($foundClasses as $className)
+                {
+                    if ($className && is_subclass_of($className, 'Bluebox_Configure'))
+                    {
+                        self::$configureCache[$className] = $configureFile;
+                    }
+                }
+
+                $foundClasses = array();
             }
         }
-        
+
+
+
         return self::$configureCache;
     }
 }
