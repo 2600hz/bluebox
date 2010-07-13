@@ -231,6 +231,8 @@ abstract class Bluebox_Plugin
         {
             return TRUE;
         }
+
+        return TRUE;
     }
 
     public function update()
