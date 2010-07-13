@@ -3,8 +3,9 @@
 abstract class Bluebox_Configure
 {
     /**
-     * Version of this module. Use integers/decimals only please.
-     * @var float
+     * Version of this module. Use any php version string
+     * see http://php.net/manual/en/function.version-compare.php
+     * @var mixed
      */
     public static $version = 0.0;
 
@@ -46,19 +47,13 @@ abstract class Bluebox_Configure
     public static $description = '';
 
     /**
-     * The default enabled value
+     * The default enabled value, if true it will attempt to install by default
      * @var bool
      */
     public static $default = FALSE;
 
     /**
-     * If false this module can not be disabled
-     * @var bool
-     */
-    public static $denyDisable = FALSE;
-    
-    /**
-     * If false this module can not be uninstalled
+     * If true this module can not be uninstalled
      * @var bool
      */
     public static $denyRemoval = FALSE;
@@ -67,7 +62,7 @@ abstract class Bluebox_Configure
      * This is a list of catagories constants as defined in Core_PackageManager
      * @var string
      */
-    public static $type = Bluebox_PackageManager::TYPE_DEFAULT;
+    public static $type = Package_Manager::TYPE_DEFAULT;
 
     /**
      * This variable is useful for making sure the user has other modules installed that may be required
@@ -104,7 +99,7 @@ abstract class Bluebox_Configure
      * @var array
      */
     public static $navSubmenu = array();
-    
+
     /**
      * The constuctor for this class ensures that the modules manditory defaults are fulfilled
      * @return void
@@ -114,31 +109,6 @@ abstract class Bluebox_Configure
         $this->noMethodMethod(__FUNCTION__);
     }
 
-    public function sanityCheck()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-
-    public function completedInstall()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-
-    /**
-     * Verify module is intact.
-     *
-     * Verify that this module has all it's parts and nothing looks out of whack.
-     * This gets called by install, upgrade, downgrade, repair and sanityCheck.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function verify()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-    
     /*************************
     * INSTALLATION ROUTINES *
     *************************/
@@ -157,7 +127,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    
+
     /**
      * Do the actual installation.
      *
@@ -172,6 +142,11 @@ abstract class Bluebox_Configure
      */
     public function install($package = NULL)
     {
+        if (is_string($package) && !empty($package))
+        {
+            $package = Package_Catalog::getPackageByIdentifier($package);
+        }
+        
         // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)
         // Note that we do this because Postgers & Doctrine don't like our polymorphic class extensions and try to create the same
         // tables twice.
@@ -187,14 +162,14 @@ abstract class Bluebox_Configure
                 }
             }
         }
-        
+
         // If this package has any models of it's own (not extensions) then create the tables!
         if (!empty($models))
         {
             Doctrine::createTablesFromArray($models);
         }
     }
-    
+
     /**
      * Post-install routine for this module.
      *
@@ -209,113 +184,60 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    
-    /********************
-    * UPGRADE ROUTINES *
-    ********************/
-    /**
-     * Do any pre-upgrade preparation.
-     *
-     * Things like making a temp directory or downloading stuff you might need.
-     * All modules have their preUpgrade() methods run first, before upgrade() runs, so if you may need to setup
-     * something another module's install method depends on, do it here.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function preUpgrade()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-    
-    /**
-     * Perform an upgrade of this module.
-     *
-     * Make sure you rollback any changes if your install fails (using uninstall())!
-     *
-     * By default, the upgrade routine just runs the migrations in Doctrine for your models, based on the version of
-     * this module (assumed to be the new version) and the version registered in the database (assumed to be the old version).
-     * If that's all you need for your upgrade, you don't need to override this function.
-     * All models in the directory of your module will be upgraded.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function upgrade()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-    
-    /**
-     * Post-upgrade routine for this module.
-     *
-     * Do any post-upgrade configuration that should happen after ALL modules have upgraded.
-     * This is the safest place to do things that may depend on other modules.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function postUpgrade()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-    
+
     /**********************
-    * DOWNGRADE ROUTINES *
+    * MIGRATION ROUTINES *
     **********************/
     /**
-     * Do any pre-downgrade preparation.
+     * Do any pre-migration preparation.
      *
      * Things like making a temp directory or downloading stuff you might need.
-     * All modules have their preDowngrade() methods run first, before downgrade() runs, so if you may need to setup
+     * All modules have their preMigrate() methods run first, before mirgrate() runs, so if you may need to setup
      * something another module's install method depends on, do it here.
      *
      * You do not need to override this class if you are not adding additional functionality to it.
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function preDowngrade()
+    public function preMigrate()
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    
+
     /**
-     * Perform a downgrade of this module.
+     * Perform a migration of this module.
      *
-     * Make sure you rollback any changes if your install fails (using uninstall())!
+     * Make sure you rollback any changes if your migration fails!
      *
-     * By default, the upgrade routine just runs the migrations in Doctrine for your models, based on the version of
-     * this module (assumed to be the new version) and the version registered in the database (assumed to be the old version).
-     * If that's all you need for your upgrade, you don't need to override this function.
-     * All models in the directory of your module will be upgraded.
+     * By default, the migrate routine just runs the migrations in Doctrine for your models, based on the version of
+     * this module and the version registered in the database.
+     * If that's all you need for your migrations, you don't need to override this function.
+     * All models in the directory of your module will be migrated.
      *
      * You do not need to override this class if you are not adding additional functionality to it.
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function downgrade()
+    public function migrate()
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    
+
     /**
-     * Post-downgrade routine for this module.
+     * Post-migration routine for this module.
      *
-     * Do any post-downgrade configuration that should happen after ALL modules have downgraded.
+     * Do any post-migration configuration that should happen after ALL modules have migrated.
      * This is the safest place to do things that may depend on other modules.
      *
      * You do not need to override this class if you are not adding additional functionality to it.
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function postDowngrade()
+    public function postMigrate()
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    
+
     /**********************
     * UNINSTALL ROUTINES *
     **********************/
@@ -323,6 +245,7 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
+
     /**
      * Removes your module.
      *
@@ -337,8 +260,13 @@ abstract class Bluebox_Configure
      */
     public function uninstall($package = NULL)
     {
+        if (is_string($package) && !empty($package))
+        {
+            $package = Package_Catalog::getPackageByIdentifier($package);
+        }
+
         $tables = array();
-        
+
         // Get the doctrine overlord
         try
         {
@@ -347,7 +275,7 @@ abstract class Bluebox_Configure
         catch(Exception $e)
         {
             Kohana::log('error', 'Uninstall unable to get the overlord!');
-            
+
             return 'Unable to connect to the database!';
         }
 
@@ -362,13 +290,13 @@ abstract class Bluebox_Configure
                 $table = Doctrine::getTable($model);
 
                 $tableName = $table->getOption('tableName');
-                
+
                 $declaringClass = $table->getOption('declaringClass');
             }
             catch(Exception $e)
             {
                 Kohana::log('debug', 'Uninstall skipping model ' . $model . ', doesnt seem to have a doctrine table.');
-                
+
                 continue;
             }
 
@@ -376,7 +304,7 @@ abstract class Bluebox_Configure
             {
                 continue;
             }
-            
+
             if (!in_array($declaringClass->name, $models))
             {
                 Kohana::log('alert', 'UNINSTALL REMOVING ' . $package['packageName'] . ' FROM TABLE ' . $model);
@@ -388,19 +316,19 @@ abstract class Bluebox_Configure
                     $row->class_type = null;
 
                     $row->foreign_id = null;
-                    
+
                     $row->save();
                 }
 
                 continue;
-            } 
+            }
             else
             {
                 Kohana::log('alert', 'UNINSTALL TRUNCATING TABLE: ' . $tableName);
 
                 $rows = $table->findAll();
 
-                foreach($rows as $row) 
+                foreach($rows as $row)
                 {
                     $row->delete();
                 }
@@ -440,7 +368,7 @@ abstract class Bluebox_Configure
                     if (!$conn->import->tableExists($drop))
                     {
                         unset($tables[$key]);
-                        
+
                         continue;
                     }
 
@@ -473,34 +401,49 @@ abstract class Bluebox_Configure
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    
-    /**********************
-    * ENABLE ROUTINES *
-    **********************/
-    public function enable()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-    
-    /**********************
-    * DISABLE ROUTINES *
-    **********************/
-    public function disable()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-    
+
     /************************
     * MAINTENANCE ROUTINES *
     ************************/
     /**
-     * What the heck should we do here by default? No idea... Maybe this is forced to be defined.
+     * Preform any possible automatic repairs
+     *
+     * By default this will update the package datastore, and numbertype tables.
+     *
+     * You do not need to override this class if you are not adding additional functionality to it.
+     *
+     * @return array | NULL Array of failures, or NULL if everything is OK
      */
     public function repair()
     {
         $this->noMethodMethod(__FUNCTION__);
     }
-    
+
+    /**
+     * Verify module is intact.
+     *
+     * Verify that this module has all it's parts and nothing looks out of whack.
+     * This gets called by install, upgrade, downgrade, repair and sanityCheck.
+     *
+     * You do not need to override this class if you are not adding additional functionality to it.
+     *
+     * @return array | NULL Array of failures, or NULL if everything is OK
+     */
+    public function verify()
+    {
+        $this->noMethodMethod(__FUNCTION__);
+    }
+
+    public function sanityCheck()
+    {
+        $this->noMethodMethod(__FUNCTION__);
+    }
+
+    public function completedInstall()
+    {
+        $this->noMethodMethod(__FUNCTION__);
+    }
+
     private function noMethodMethod($method)
     {
         $class = str_replace('_Configure', '', get_class($this));

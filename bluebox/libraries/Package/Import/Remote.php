@@ -29,7 +29,7 @@ class Package_Import_Remote
 
         kohana::log('debug', 'Retrieving package archive from ' .$URL);
 
-        if (!file_put_contents($filepath, file_get_contents($URL)))
+        if (!@file_put_contents($filepath, file_get_contents($URL)))
         {
             throw new Package_Import_Exception('Unable to fetch ' .$URL);
         }

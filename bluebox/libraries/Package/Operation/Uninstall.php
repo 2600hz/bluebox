@@ -30,12 +30,7 @@ class Package_Operation_uninstall extends Package_Operation
         }
 
         try
-        {
-            $package = Package_Catalog::getPackageByIdentifier($identifier);
-            var_dump($package);
-
-
-
+        {  
             self::uninstall($identifier);
         }
         catch (Exception $e)

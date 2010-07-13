@@ -91,21 +91,21 @@ class Package_Operation_Migrate extends Package_Operation
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
-        $configureInstance->preMigrate();
+        $configureInstance->preMigrate($identifier);
     }
 
     protected static function migrate($identifier)
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
-        $configureInstance->migrate();
+        $configureInstance->migrate($identifier);
     }
 
     protected static function postMigrate($identifier)
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
-        $configureInstance->postMigrate();
+        $configureInstance->postMigrate($identifier);
     }
 
     protected static function finalize($identifier)
