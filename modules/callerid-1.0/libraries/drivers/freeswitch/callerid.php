@@ -29,6 +29,11 @@ class FreeSwitch_CallerId_Driver extends FreeSwitch_Base_Driver
             FreeSwitch::setSection('user', $domain, $base['device_id']);
 
             // These vars are made up by this library. They are used consistently throughout.
+            if (!empty($callerid['external_name']))
+            {
+                $xml->update('/variables/variable[@name="outbound_caller_id_name"]{@value="' .$callerid['external_name'] .'"}');
+            }
+
             if (!empty($callerid['external_number']))
             {
                 $xml->update('/variables/variable[@name="outbound_caller_id_number"]{@value="' .$callerid['external_number'] .'"}');

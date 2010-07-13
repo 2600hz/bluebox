@@ -13,16 +13,4 @@
     ?>
     </div>
 
-    <div class="field">
-    <?php
-        echo form::label(array(
-                'for' => 'mediaoption[proxy_media]',
-                'hint' => 'Whether to proxy the media path or not',
-            ),
-            'Allow RTP/Media Proxy Mode:'
-        );
-        echo form::checkbox('mediaoption[proxy_media]');
-    ?>
-    </div>
-
 <?php echo form::close_section(); ?>
