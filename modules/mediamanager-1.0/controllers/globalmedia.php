@@ -34,17 +34,21 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
     protected $soundPath = "/usr/local/freeswitch/sounds/";
 
+    public function getDetails()
+    {
+        return 'Details';
+    }
+
     public function __construct()
     {
         parent::__construct();
-        //$this->uploadPath = Kohana::config('upload.directory') . "/" . $this->session->get('user_id') . "/";
         $this->uploadPath = Kohana::config('upload.directory') . "/" . $this->session->get('user_id') . "/";
     }
 
     public function index()
     {
         $this->template->content = new View('globalmedia/index');
-        $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:$('#MediaGrid').setCaption('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
+        $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:$('#MediaGrid').setCaption('[link]');$('#MediaGrid').searchGrid({sopt:['eq']});", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
         javascript::add('php_file_tree_jquery.js');
         stylesheet::add('php_file_tree.css');
 
@@ -56,11 +60,17 @@ class GlobalMedia_Controller extends Bluebox_Controller
             'width' => '80',
             'hidden' => true,
             'key' => true
-        ))->add('filename', 'Filename', array(
+        ))->add('file', 'Filename', array(
             'width' => '40',
-            'search' => true
+            'search' => true,
+            'callback' => array('MediaFile', 'getBaseName')
+        ))->add('path', 'Path', array(
+            'width' => '80',
+            'hidden' => true,
+            'key' => true,
+            'search' => true,
         ))->add('description', 'Description', array(
-            'width' => '40',
+            'width' => '80',
             'search' => true
         ))->add('size', 'File Size', array(
             'width' => '40',
@@ -76,27 +86,18 @@ class GlobalMedia_Controller extends Bluebox_Controller
                 'function' => array('MediaFile', 'getLength'),
                 'arguments' => 'registry'
             )
-        ))->add('sample_rate', 'Sample Rate', array(
-            'width' => '60',
-            'align' => 'right',
-            'callback' => array(
-                'function' => array('MediaFile', 'getSampleRate'),
-                'arguments' => 'registry'
-            )
         ))->navButtonAdd('Columns', array(
             'onClickButton' => 'function () {  $(\'#{table_id}\').setColumns(); }',
             'buttonimg' => url::base() . 'assets/css/jqGrid/table_insert_column.png',
             'title' => 'Show/Hide Columns',
             'noCaption' => true,
             'position' => 'first'
-        ))->addAction('mediamanager/delete', 'Delete', array(
-            'width' => '60',
+        ))->addAction('mediamanager/edit', 'Details', array(
             'arguments' => 'mediafile_id'
         ))->addAction('mediamanager/download', 'Download', array(
             'arguments' => 'mediafile_id'
-        ))->addAction('mediamanager/edit', 'Edit', array(
-            'arguments' => 'mediafile_id'
-        ))->addAction('mediamanager/preview', 'Preview', array(
+        ))->addAction('mediamanager/delete', 'Delete', array(
+            'width' => '60',
             'arguments' => 'mediafile_id'
         ));
         // dont foget to let the plugins add to the grid!
@@ -114,7 +115,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
     public function scan()
     {
-        set_time_limit(86400);
+        set_time_limit(0);
         // TODO: Make this a queued event to scan all files. Only possible once.
 
         /*
@@ -137,7 +138,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
         /*
          * Now compare what we know with what we find on disk and add any new stuff
          */
-        var_dump($knownFiles);
         
         // Initialize audio analysis routine
         $audioFile = new AudioFile();
@@ -153,7 +153,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
             // Is this a new file or an existing one?
             if ($mediafile_id = array_search($shortname, $knownFiles)) {
-                echo 'Updating ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ";flush();
                 // Yes, existing file! Just make sure the rate is in here. Good enough for now.
                 $mediaFile = Doctrine::getTable('MediaFile')->find($mediafile_id);
                 
@@ -161,11 +160,11 @@ class GlobalMedia_Controller extends Bluebox_Controller
                 // We assume that all other properties in the file we just found match the file already uploaded.
                 // That means if someone uploads the wrong audio file, it kinda messes things up big time.
                 if (!in_array($audioFile->wave_framerate, (array)$mediaFile['registry']['rates'])) {
+                    Kohana::log('debug', 'Updating ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
                     $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], array('rates' => $audioFile->wave_framerate));;
                     $mediaFile->save();
-                    echo "SUCCESS!<BR>\n";
                 } else {
-                    echo "SKIPPED - NOTHING TO UPDATE.<BR>\n";
+                    Kohana::log('debug', 'SKIPPED - Nothing to update on ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
                 }
 
             } else {
@@ -181,7 +180,8 @@ class GlobalMedia_Controller extends Bluebox_Controller
                 } else {
                     $mediaFile['description'] = 'Unknown';
                 }
-                echo 'Adding ' . $mediaFile['file'] . "... ";flush();
+
+                Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
 
                 $audioInfo = array( 'type' => $audioFile->wave_type,
                                     'compression' => $audioFile->wave_compression,
@@ -194,17 +194,14 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
                 $mediaFile['registry'] += $audioInfo;
                 
-                var_dump($mediaFile);
                 $mediaFile->save();
 
                 // Add to list of "known" files
                 $knownFiles[$mediaFile['mediafile_id']] = $mediaFile['file'];
-
-                echo "SUCCESS!<br>\n";
             }
         }
-        
-        echo 'Done scanning.';
+
+        Kohana::log('debug', 'Finished scanning sound files in ' . $this->soundPath);
         flush();exit();
     }
 
@@ -232,6 +229,10 @@ class GlobalMedia_Controller extends Bluebox_Controller
     
     public function add()
     {
+        javascript::add('jquery_uploadify');
+        javascript::add('swfobject');
+        stylesheet::add('uploadify');
+        
         $this->view->title = 'Upload Media';
 
         $maxFilesize = $this->tobytes(ini_get('upload_max_filesize'));
@@ -306,6 +307,42 @@ class GlobalMedia_Controller extends Bluebox_Controller
             }
         }
     }
+
+    public function uploadify()
+    {
+        header('Content-type: application/x-shockwave-flash');
+        readfile(MODPATH . 'mediamanager-1.0/assets/uploadify.swf');
+        die();
+    }
+
+    public function upload($session = NULL)
+    {
+        if ($session) {
+            session_id($session);
+        }
+
+        //folder where the files are stored at
+        //you may need to chmod this folder to 775 or 777 for it to work
+        $src_folder = '/tmp/';
+
+        //if javascript is disabled, the ftp will still work
+        if (isset($_FILES["file"])) {
+            if ($_FILES["file"]["error"] > 0) {
+              $error = 'Error Uploading!';
+            } else {
+            $count = '1';
+            $file_loc = $path . $_FILES["file"]["name"];
+            $base = $_FILES["file"]["name"];
+            while ( file_exists($file_loc) ) {
+                $file_loc = $path . $count.'-'. $_FILES["file"]["name"];
+                $base = $count.'-'. $_FILES["file"]["name"];
+                $count++;
+            }
+            move_uploaded_file($_FILES["file"]["tmp_name"], $file_loc);
+            }
+        }
+    }
+
     public function edit($id)
     {
         $this->view->title = 'Edit Media';

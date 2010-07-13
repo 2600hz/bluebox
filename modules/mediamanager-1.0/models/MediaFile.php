@@ -44,4 +44,8 @@ class MediaFile extends Bluebox_Record
             return 'Unknown';
     }
 
+    public static function getBaseName($field) {
+        return basename($field);
+    }
+
 }

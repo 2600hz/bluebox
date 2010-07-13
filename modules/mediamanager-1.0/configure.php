@@ -52,6 +52,7 @@ class MediaManager_Configure extends Bluebox_Configure
             'navBranch' => '/Media/',
             'navURL' => '/globalmedia/index',
             'navSubmenu' => array(
+                'Add Sounds' => '/globalmedia/add',
                 'Rescan Sounds' => '/globalmedia/scan'
             )
         ),
