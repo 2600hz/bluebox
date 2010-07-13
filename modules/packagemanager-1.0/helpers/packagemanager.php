@@ -2,53 +2,36 @@
 
 class packagemanager
 {
-
-    public static function dropdown($data, $packageStatus, $selected = NULL, $extra = '')
+    public static function avaliableActions($identifier)
     {
+        $actions = html::anchor('packagemanager/verify/' .$identifier, __('Verify'), array('class' => 'packageAction'));
 
-        $options = array();
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-        switch($packageStatus) {
+        switch ($package['status'])
+        {
+            case Package_Manager::STATUS_INSTALLED:
+                $actions .= html::anchor('packagemanager/uninstall/' .$identifier, __('Uninstall'), array('class' => 'packageAction requiresConfirmation'));
 
-            case Bluebox_PackageManager::STATUS_UNACCESSIBLE:
+                $actions .= html::anchor('packagemanager/repair/' .$identifier, __('Repair'), array('class' => 'packageAction'));
 
+                if (!empty($package['upgrades']))
+                {
+                    $upgradePackage = reset($package['upgrades']);
+
+                    $upgradeVersion = key($package['upgrades']);
+
+                    $actions .= html::anchor('packagemanager/migrate/' .$upgradePackage, __('Update to ') .$upgradeVersion, array('class' => 'packageAction'));
+                }
+                
                 break;
 
-            case Bluebox_PackageManager::STATUS_UNINSTALLED:
-
-                $options = array(
-                    Bluebox_PackageManager::OPERATION_INSTALL => 'Install on Update',
-                );
+            case Package_Manager::STATUS_UNINSTALLED:
+                $actions .= html::anchor('packagemanager/install/' .$identifier, __('Install'), array('class' => 'packageAction'));
 
                 break;
-
-            case Bluebox_PackageManager::STATUS_DISABLED:
-
-                $options = array(
-                    Bluebox_PackageManager::OPERATION_ENABLE => 'Enable on Update',
-                    Bluebox_PackageManager::OPERATION_UNINSTALL => 'Uninstall on Update',
-                    Bluebox_PackageManager::OPERATION_REPAIR => 'Repair on Update'
-                );
-
-                break;
-
-            case Bluebox_PackageManager::STATUS_INSTALLED:
-
-                $options = array(
-                    Bluebox_PackageManager::OPERATION_DISABLE => 'Disable on Update',
-                    Bluebox_PackageManager::OPERATION_UNINSTALL => 'Uninstall on Update',
-                    Bluebox_PackageManager::OPERATION_REPAIR => 'Repair on Update'
-                );
-
-                break;
-
         }
 
-        $nullOption = ucfirst(Bluebox_PackageManager::statusToString($packageStatus));
-
-        array_unshift($options, $nullOption);
-
-        return form::dropdown($data, $options, $selected, $extra);
-        
+        return $actions;
     }
 }
