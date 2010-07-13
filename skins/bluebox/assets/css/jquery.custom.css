@@ -57,7 +57,7 @@
 .ui-jqgrid tr.jqgrow td {
     border-right:0 !important;
     border-bottom:1px solid #EEEED7 !important;
-    padding: 2px 0;
+    padding: 2px 4px;
 }
 .ui-jqgrid .action_seperator {
     color:#75A51F;
