@@ -30,7 +30,7 @@ class EslManager
             $this->esl = new ESLconnection($host, $port, $password); // socket connection
             $this->extension = FALSE;
         } else {
-            include_once(DOCROOT . 'modules/esl/assets/ESL.php');
+            include_once(MODPATH .'esl-1.0/assets/ESL.php');
             $this->esl = new ESLconnection($host, $port, $password); // FreeSWITCH ESL Swigged class
             $this->extension = TRUE;
 	}
