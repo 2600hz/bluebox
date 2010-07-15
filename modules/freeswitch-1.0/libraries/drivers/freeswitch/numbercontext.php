@@ -38,9 +38,6 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
     {
         $xml = Telephony::getDriver()->xml;
 
-        // Add any "global" hooks that come before the processing of any numbers (this is per context)
-        dialplan::start('context_' .$base['context_id']);
-
         // Reference to our XML document, context and extension. Creates the extension & context if does not already exist
         $xml = FreeSwitch::createExtension('number_' .$base['Number']['number_id'], 'main', 'context_' .$base['context_id']);
 
@@ -86,9 +83,6 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
         {
             $xml->deleteNode();
         }
-
-        // Add any "global" hooks that come after the processing of any numbers (this is per context)
-        dialplan::end('context_' .$base['context_id']);
     }
 
     public static function delete($base)
