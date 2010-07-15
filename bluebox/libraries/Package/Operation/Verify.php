@@ -2,20 +2,8 @@
 
 class Package_Operation_Verify extends Package_Operation
 {
-    public static function execute($args)
+    public function exec($identifier)
     {
-        if (!is_array($args))
-        {
-            $args = array($args);
-        }
-
-        if (empty($args[0]))
-        {
-            throw new Package_Operation_Exception('Verify requires the package identifier to verify');
-        }
-
-        $identifier = $args[0];
-
         kohana::log('debug', 'Starting verify of ' .$identifier);
 
         self::verify($identifier);
@@ -58,7 +46,7 @@ class Package_Operation_Verify extends Package_Operation
             }
             catch (Exception $e)
             {
-
+                //TODO: Still have not figure out how to handle errors...
             }
         }
     }

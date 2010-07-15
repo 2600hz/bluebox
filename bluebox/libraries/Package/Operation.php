@@ -2,35 +2,102 @@
 
 class Package_Operation
 {
-    public static function dispatch($operation)
+    public static function dispatch($operation, $identifiers)
     {
-        $args = func_get_args();
-
-        array_shift($args);
-
-        switch (strtolower($operation))
+        switch ($operation)
         {
             case 'verify':
-                return Package_Operation_Verify::execute($args);
+                $agent = new Package_Operation_Verify;
+
+                $steps = array('exec');
+
+                break;
 
             case 'repair':
-                return Package_Operation_Repair::execute($args);
-            
+                $agent = new Package_Operation_Repair;
+
+                $steps = array('validate', 'exec', 'finalize');
+
+                break;
+
             case 'install':
-                return Package_Operation_Install::execute($args);
+                $agent = new Package_Operation_Install;
+
+                $steps = array('validate', 'preExec', 'exec', 'postExec', 'finalize');
+
+                break;
 
             case 'uninstall':
-                return Package_Operation_Uninstall::execute($args);
+                $agent = new Package_Operation_Uninstall;
+
+                $steps = array('validate', 'preExec', 'exec', 'postExec', 'finalize');
+
+                break;            
 
             case 'migrate':
-                return Package_Operation_Migrate::execute($args);
+                $agent = Package_Operation_Migrate;
+
+                $steps = array('validate', 'exec', 'finalize');
+
+                break;
 
             default:
                 throw new Package_Operation_Exception('Unknown operation ' .$operation);
         }
+
+        foreach($steps as $step)
+        {
+            foreach($identifiers as $identifier)
+            {
+                try
+                {
+                    self::execStep($identifier, $step, $agent);
+                }
+                catch (Exception $e)
+                {
+                    unset($identifiers[$identifier]);
+
+                    self::rollback($operation, $identifier, $step, $e);
+                }
+            }
+        }
     }
 
-    protected static function finalize($identifier, $operation = NULL)
+    protected static function execStep($identifier, $step, $agent)
+    {
+        switch($step)
+        {
+            case 'validate':
+                $agent->validate($identifier);
+
+                break;
+
+            case 'preExec':
+                $agent->preExec($identifier);
+
+                break;
+
+            case 'exec':
+                $agent->exec($identifier);
+
+                break;
+
+            case 'postExec':
+                $agent->postExec($identifier);
+
+                break;
+
+            case 'finalize':
+                $agent->finalize($identifier);
+            
+                break;
+
+            default:
+                throw new Package_Operation_Exception('Unknown step ' .$step);
+        }
+    }
+
+    protected static function finalize($operation, $identifier)
     {
         $metadata = &Package_Catalog::getPackageByIdentifier($identifier);
 
@@ -60,7 +127,7 @@ class Package_Operation
         }
     }
 
-    protected static function rollback($identifier, $failed_step, $error)
+    protected static function rollback($operation, $identifier, $step, $error)
     {
         throw $error;
     }

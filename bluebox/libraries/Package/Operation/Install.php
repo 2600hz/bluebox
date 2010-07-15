@@ -2,6 +2,62 @@
 
 class Package_Operation_Install extends Package_Operation
 {
+    protected function validate($identifier)
+    {
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
+
+        if (empty($package['directory']))
+        {
+            if (empty($package['sourceURL']))
+            {
+                throw new Package_Operation_Exception('Install could not find the source for the package');
+            }
+
+            Package_Import::package($package['sourceURL']);
+
+            $package = Package_Catalog::getPackageByIdentifier($identifier);
+        }
+
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
+
+        if ($package['status'] != Package_Manager::STATUS_UNINSTALLED)
+        {
+            throw new Package_Operation_Exception('Install is not a sane operation for a package with status ' .$package['status']);
+        }
+
+        Package_Operation_Verify::exec($identifier);
+    }
+
+    protected function preExec($identifier)
+    {
+        $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
+
+        $configureInstance->preInstall($identifier);
+    }
+
+    protected function exec($identifier)
+    {
+        kohana::log('debug', 'Starting install of ' .$identifier);
+
+        $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
+
+        $configureInstance->install($identifier);
+    }
+
+    protected function postExec($identifier)
+    {
+        $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
+
+        $configureInstance->postInstall($identifier);
+    }
+
+    protected function finalize($identifier)
+    {
+        $metadata = &Package_Catalog::getPackageByIdentifier($identifier);
+
+        Package_Catalog_Datastore::remove($metadata);
+    }
+
     public static function execute($args)
     {
         if (!is_array($args))

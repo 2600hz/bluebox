@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class Package_Dependency_Graph
+class Package_Transaction_Graph
 {
     public static function getDependents($parentPackage)
     {

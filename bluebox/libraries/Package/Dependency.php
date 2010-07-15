@@ -4,8 +4,6 @@ class Package_Dependency
 {
     public static function validateIntegration($identifier)
     {
-        //var_dump(self::compareVersion('0.6', '< 0.1 or > 0.5'));
-  
         $package = Package_Catalog::getPackageByIdentifier($identifier);
 
         $failures = array();
@@ -89,8 +87,6 @@ class Package_Dependency
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-        $parentName = $package['packageName'];
-
         if (!empty($package['denyRemoval']))
         {
             kohana::log('debug', 'Dependency error: ' .$parentName .' has the denyRemoval flag set');
@@ -98,17 +94,17 @@ class Package_Dependency
             throw new Package_Dependency_Exception('Package is not eligible for removal');
         }
 
-        $dependents = Package_Dependency_Graph::getDependents($parentName);
+        $dependents = self::listDependents($package['packageName']);
 
         $failures = array();
 
-        foreach($dependents as $name)
+        foreach($dependents as $dependent)
         {
-            if ($package = Package_Catalog::getInstalledPackage($name))
+            if ($dependentPackage = Package_Catalog::getInstalledPackage($dependent))
             {
-                kohana::log('debug', 'Dependency error: ' .$parentName .' is being used by ' .$name .' version ' . $package['version']);
+                kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' is being used by ' .$dependent .' version ' . $dependentPackage['version']);
 
-                $failures['indispensable'][$name] = $package['version'];
+                $failures['indispensable'][$dependent] = $dependentPackage['version'];
             }
         }
 
@@ -166,5 +162,51 @@ class Package_Dependency
         
         // make the comparision
         return version_compare($avaliableVersion, $requiredVersion, $operator);
+    }
+
+    protected static function listDependents($parentPackage)
+    {
+        $catalog = Package_Catalog::getCatalog();
+
+        $dependents = array();
+
+        foreach ($catalog as $id => $package)
+        {
+            $dependent = $package['packageName'];
+            
+            foreach($package['required'] as $requirement => $conditions)
+            {
+                switch($requirement)
+                {
+                    case 'not':
+                        continue;
+
+                    case 'or':
+                        foreach($conditions as $name => $condition)
+                        {
+                            if ($name == $parentPackage)
+                            {
+                                if (!in_array($dependent, $dependents))
+                                {
+                                    $dependents[] = $dependent;
+                                }
+                            }
+                        }
+
+                        break;
+
+                    default:
+                        if ($requirement == $parentPackage)
+                        {
+                            if (!in_array($dependent, $dependents))
+                            {
+                                $dependents[] = $dependent;
+                            }
+                        }
+                }
+            }
+        }
+
+        return $dependents;
     }
 }
