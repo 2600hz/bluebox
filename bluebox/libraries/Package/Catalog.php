@@ -54,7 +54,7 @@ class Package_Catalog
         }
         
         self::findAvaliableMigrations();
-
+        
         return self::$catalog;
     }
 
