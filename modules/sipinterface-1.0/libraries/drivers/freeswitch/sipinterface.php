@@ -29,66 +29,93 @@
  * @package Bluebox
  * @subpackage SipInterface
  */
-class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver {
+class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
+{
     /**
      * Indicate we support FreeSWITCH
      */
-    public static function set($obj)
+    public static function set($sipinterface)
     {
         // Reference to our XML document
         $xml = Telephony::getDriver()->xml;
 
         // The section we are working with is <document><section name="configuration"><configuration name="conference.conf">
-        FreeSwitch::setSection('sofia', 'sipinterface_' . $obj->sipinterface_id);
+        FreeSwitch::setSection('sofia', 'sipinterface_' . $sipinterface['sipinterface_id']);
 
         $xml->update('/domains/domain[@name="all"][@alias="true"][@parse="false"]');
 
         // Set our internal IPs for SIP & RTP. This also defines what interface we bind to.
-        if ($obj->ip_address) {
-            $xml->update('/settings/param[@name="rtp-ip"]{@value="' . $obj->ip_address . '"}');
-            $xml->update('/settings/param[@name="sip-ip"]{@value="' . $obj->ip_address . '"}');
-        } else {
+        if ($sipinterface['ip_address'])
+        {
+            $xml->update('/settings/param[@name="rtp-ip"]{@value="' . $sipinterface['ip_address'] .'"}');
+
+            $xml->update('/settings/param[@name="sip-ip"]{@value="' . $sipinterface['ip_address'] .'"}');
+        } 
+        else
+        {
             $xml->update('/settings/param[@name="rtp-ip"]{@value="$${local_ip_v4}"}');
+            
             $xml->update('/settings/param[@name="sip-ip"]{@value="$${local_ip_v4}"}');
         }
 
-        if ($obj->port) {
-            $xml->update('/settings/param[@name="sip-port"]{@value="' . $obj->port . '"}');
-        } else {
+        if ($sipinterface['port'])
+        {
+            $xml->update('/settings/param[@name="sip-port"]{@value="' . $sipinterface['port'] . '"}');
+        } 
+        else
+        {
             $xml->update('/settings/param[@name="sip-port"]{@value="5060"}');
         }
 
-        if(!empty($obj->multiple)) {
+        if(!empty($sipinterface['multiple']))
+        {
             $xml->update('/settings/param[@name="multiple-registrations"]{@value="true"}');
-        } else {
+        }
+        else
+        {
             $xml->deleteNode('/settings/param[@name="multiple-registrations"]');
         }
 
         // Set our external IPs for SIP & RTP
-        if ($obj->ext_ip_address) {
-            if ($obj->nat_type) {
+        if ($sipinterface['ext_ip_address'])
+        {
+            if ($sipinterface['nat_type'])
+            {
                 // Force external IP w/ auto-nat
-                $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $obj->ext_ip_address . '"}');
-                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="autonat:' . $obj->ext_ip_address . '"}');
-            } else {
+                $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $sipinterface['ext_ip_address'] . '"}');
+
+                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="autonat:' . $sipinterface['ext_ip_address'] . '"}');
+            } 
+            else
+            {
                 // Force static external IP
-                $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $obj->ext_ip_address . '"}');
-                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="' . $obj->ext_ip_address . '"}');
+                $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $sipinterface['ext_ip_address'] . '"}');
+
+                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="' . $sipinterface['ext_ip_address'] . '"}');
             }
-        } elseif ($obj->nat_type == 1) {
+        } 
+        elseif ($sipinterface['nat_type'] == 1)
+        {
             // Automatically detect NAT and external IP using various strategies built into FS
             $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="auto-nat"}');
+
             $xml->update('/settings/param[@name="ext-sip-ip"]{@value="auto-nat"}');
-        } elseif($obj->nat_type == 2) {
+        } 
+        elseif($sipinterface['nat_type'] == 2)
+        {
             // No IP defined and no auto-nat set... Just try to use stun to auto-detect
             $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="stun:stun.freeswitch.org"}');
+            
             $xml->update('/settings/param[@name="ext-sip-ip"]{@value="stun:stun.freeswitch.org"}');
-        } else {
+        } 
+        else
+        {
             $xml->deleteNode('/settings/param[@name="ext-rtp-ip"]');
+            
             $xml->deleteNode('/settings/param[@name="ext-sip-ip"]');
         }
 
-        $xml->update('/settings/param[@name="auth-calls"]{@value="' . ($obj->auth ? 'true' : 'false') .'"}');
+        $xml->update('/settings/param[@name="auth-calls"]{@value="' . ($sipinterface['auth'] ? 'true' : 'false') .'"}');
 
         // This may be overly optimistic but it should work in pretty much all cases
         $xml->update('/settings/param[@name="aggressive-nat-detection"][@value="true"]');
@@ -98,13 +125,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver {
 
         $xml->update('/settings/param[@name="user-agent-string"][@value="Configured by TCAPI"]');
 
-        if ($aclList = netlists::getListName($obj->nat_net_list_id)) {
+        if ($aclList = netlists::getListName($sipinterface['nat_net_list_id']))
+        {
             $xml->update('/settings/param[@name="apply-nat-acl"]{@value="' .$aclList .'"}');
-        } else {
+        } 
+        else
+        {
             $xml->deleteNode('/settings/param[@name="apply-nat-acl"]');
         }
         
-        $xml->update('/settings/param[@name="context"]{@value="context_' . $obj->context_id . '"}');
+        $xml->update('/settings/param[@name="context"]{@value="context_' . $sipinterface['context_id'] . '"}');
 		
         $xml->update('/settings/param[@name="rtp-timer-name"]{@value="soft"}');
 
@@ -125,26 +155,32 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver {
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
 
         // Set relevant ACLs
-        if ($aclList = netlists::getListName($obj->inbound_net_list_id)) {
+        if ($aclList = netlists::getListName($sipinterface['inbound_net_list_id']))
+        {
             $xml->update('/settings/param[@name="apply-inbound-acl"]{@value="' .$aclList .'"}');
-        } else {
+        } 
+        else
+        {
             $xml->deleteNode('/settings/param[@name="apply-inbound-acl"]');
         }
 
-        if ($aclList = netlists::getListName($obj->register_net_list_id)) {
+        if ($aclList = netlists::getListName($sipinterface['register_net_list_id']))
+        {
             $xml->update('/settings/param[@name="apply-register-acl"]{@value="' .$aclList .'"}');
-        } else {
+        } 
+        else
+        {
             $xml->deleteNode('/settings/param[@name="apply-register-acl"]');
         }
     }
 
-    public static function delete($obj)
+    public static function delete($sipinterface)
     {
         // Reference to our XML document
         $xml = Telephony::getDriver()->xml;
         
         // The section we are working with is <document><section name="configuration"><configuration name="conference.conf">
-        FreeSwitch::setSection('sofia', 'sipinterface_' . $obj->sipinterface_id);
+        FreeSwitch::setSection('sofia', 'sipinterface_' . $sipinterface['sipinterface_id']);
 
         $xml->deleteNode();
     }

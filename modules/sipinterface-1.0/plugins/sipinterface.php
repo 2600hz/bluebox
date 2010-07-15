@@ -27,63 +27,25 @@
  */
 class SipInterface_Plugin extends Bluebox_Plugin
 {
-    protected $preloadModels = array('SipInterfaceTrunk');
+    protected $name = 'sipinterface';
 
-    public function index()
+    protected function viewSetup()
     {
-/*		$this->grid->add('Sip/username', 'SIP Username', array(
-						'width' => '80',
-						'align' => 'center'
-					));
- */
-    }
+        $this->subview = new View('sipinterface/select');
 
-    public function view()
-    {
-        $subview = new View('sipinterface/select');
-        $subview->section = 'routing';
-        $subview->tab = 'main';
+        $this->subview->tab = 'main';
 
-        // What are we working with here?
-        $base = $this->getBaseModelObject();
-
-        // While the field may be defined by an app or another module, it may not be populated! Double-check
-        if (!$base)
-            return FALSE;	// Nothing to do here.
+        $this->subview->section = 'general';
 
         $subview->options = array();
+
         $result = Doctrine::getTable('SipInterface')->findAll(Doctrine::HYDRATE_ARRAY);
-        foreach ($result as $row) {
+
+        foreach ($result as $row)
+        {
             $subview->options[$row['sipinterface_id']] = $row['name'];
         }
 
-        $subview->sipinterface = $base->SipInterfaceTrunk->SipInterface;
-
-        // Add our view to the main application
-        $this->views[] = $subview;
-    }
-
-    public function save()
-    {
-        // What are we working with here?
-        $base = $this->getBaseModelObject();
-
-        // While the field may be defined by an app or another module, it may not be populated! Double-check
-        if (!$base) {
-            return FALSE;	// Nothing to do here.
-        }
-
-        // Is there an actual mapping to save?
-        if (!isset($_POST['sipinterface']['sipinterface_id'])) {
-            return FALSE;       // Nothing to do here.
-        }
-
-        // Prep the relation
-        if (!$base->SipInterfaceTrunk) {
-            $base->SipInterfaceTrunk = new SipInterfaceTrunk();
-            $base->SipInterfaceTrunk->Trunk = $base;
-        }
-
-        $base->SipInterfaceTrunk->sipinterface_id = $_POST['sipinterface']['sipinterface_id'];
+        return TRUE;
     }
 }
