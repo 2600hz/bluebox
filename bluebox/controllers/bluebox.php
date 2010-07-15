@@ -9,7 +9,7 @@ abstract class Bluebox_Controller extends Template_Controller
     /**
      * @var float The bluebox core version
      */
-    public static $version = '3.0';
+    public static $version = '1.0';
 
     /*************************
     * DATA RELATED SETTINGS *
