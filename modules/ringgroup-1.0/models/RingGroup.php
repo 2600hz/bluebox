@@ -18,7 +18,7 @@ class RingGroup extends Bluebox_Record
 
     function setUp()
     {
-        $this->hasOne('RingGroupNumber as Number', array('local' => 'ring_group_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
+        $this->hasMany('RingGroupNumber as Number', array('local' => 'ring_group_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
         $this->hasOne('Location', array('local' => 'location_id', 'foreign' => 'location_id'));
 
         $this->actAs('GenericStructure');

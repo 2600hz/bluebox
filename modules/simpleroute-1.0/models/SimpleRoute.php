@@ -46,7 +46,7 @@ class SimpleRoute extends Bluebox_Record
         $this->hasColumn('emergency_prepend', 'string', 20, array('notnull' => TRUE, 'default' => ''));
         $this->hasColumn('area_code', 'integer', NULL, array());
         $this->hasColumn('caller_id_number', 'integer', NULL, array('default' => ''));
-        $this->hasColumn('caller_id_name', 'string', 80, array('default' => 'Bluebox v3'));
+        $this->hasColumn('caller_id_name', 'string', 80, array('default' => 'Bluebox'));
     }
 
     /**
