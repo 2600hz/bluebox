@@ -551,7 +551,7 @@ class FreeSwitch extends Telephony_Driver
 
                 self::$instance->xml->appendSibling($newNode, $element);
             }
-        } 
+        }
         else
         {
             Kohana::log('debug', 'FreeSWITCH ->  Extension ' . $section . '_' . $extensionName . ' already exists in context ' . $context . '. Not adding anything.');
