@@ -27,7 +27,7 @@ class Numbers
 
         if (!class_exists($checkFor))
         {
-            kohana::log('debug', 'Base model `' .$base .'`has no relation to number');
+            kohana::log('debug', 'Base model `' .$base .'` has no relation to number');
 
             return TRUE;
         }
