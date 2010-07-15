@@ -285,6 +285,11 @@ abstract class Bluebox_Configure
 
         foreach($models as $model)
         {
+            if (!$conn->import->tableExists($model))
+            {
+                continue;
+            }
+
             try
             {
                 $table = Doctrine::getTable($model);
@@ -297,11 +302,6 @@ abstract class Bluebox_Configure
             {
                 Kohana::log('debug', 'Uninstall skipping model ' . $model . ', doesnt seem to have a doctrine table.');
 
-                continue;
-            }
-
-            if (!$conn->import->tableExists($tableName))
-            {
                 continue;
             }
 
