@@ -167,7 +167,8 @@ class jquery
             'js' => array(
                 'ui.core.js',
                 'ui.sortable.js'
-            )
+            ),
+            'css' => 'ui.all.css'
         ) ,
         'multiselect' => array(
             'js' => array(
