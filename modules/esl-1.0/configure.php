@@ -13,7 +13,8 @@ class Esl_Configure extends Bluebox_Configure
     public static $type = Bluebox_Installer::TYPE_MODULE;
     public static $required = array(
         'freeswitch' => 0.1,
-        'core' => 0.1
+        'core' => 0.1,
+        'sipinterface' => 0.1
     );
     public static $navIcon = 'assets/img/icons/mainSettingsX.png';
     public static $navBranch = '/Status/';
