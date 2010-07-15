@@ -1,6 +1,6 @@
 <?php
 // Add routing support to trunks
-plugins::register('trunkmanager/add', 'view', array('SimpleRoute_Plugin', 'update'));
+plugins::register('trunkmanager/create', 'view', array('SimpleRoute_Plugin', 'update'));
 plugins::register('trunkmanager/edit', 'view', array('SimpleRoute_Plugin', 'update'));
 plugins::register('trunkmanager/index', 'view', array('SimpleRoute_Plugin', 'index'));
 
