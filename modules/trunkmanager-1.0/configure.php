@@ -13,12 +13,11 @@ class Trunkmanager_Configure extends Bluebox_Configure
     public static $required = array(
         'core' => 0.1
     );
-    public static $navIcon = 'assets/img/icons/mainSettingsX.png';
     public static $navBranch = '/Connectivity/';
     public static $navURL = 'trunkmanager/index';
     public static $navSubmenu = array(
         'Search Trunks' => '/trunkmanager/index',
-        'Add Trunk' => '/trunkmanager/add',
+        'Add Trunk' => '/trunkmanager/create',
         'Edit Trunk' => array(
             'url' => '/trunkmanager/edit',
             'disabled' => 'true'
