@@ -9,14 +9,13 @@ class InterfaceManager_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'SIP Interface Management Controller Class (FreeSWITCH Specific)';
     public static $default = false;
-    public static $type = Bluebox_Installer::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
         'freeswitch' => 0.1,
         'trunkmanager' => 0.1,
         'sip' => 0.1
     );
-    public static $navIcon = 'assets/img/icons/mainSettingsX.png';
     public static $navBranch = '/Connectivity/';
     public static $navURL = 'sipinterface/index';    
     public static $navSubmenu = array(

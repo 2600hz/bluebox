@@ -17,7 +17,15 @@ class Package_Dependency
                     {
                         if (!$dependency = Package_Catalog::getInstalledPackage($name))
                         {
-                            continue;
+                            try
+                            {
+                                // Hmmm, this is offly optimistic....
+                                $dependency = Package_Transaction::checkTransaction($name);
+                            }
+                            catch(Exception $e)
+                            {
+                                continue;
+                            }
                         }
 
                         if (self::compareVersion($dependency['version'], $condition))
@@ -37,7 +45,15 @@ class Package_Dependency
                     {
                         if (!$dependency = Package_Catalog::getInstalledPackage($name))
                         {
-                            continue;
+                            try
+                            {
+                                // Hmmm, this is offly optimistic....
+                                $dependency = Package_Transaction::checkTransaction($name);
+                            }
+                            catch(Exception $e)
+                            {
+                                continue;
+                            }
                         }
 
                         if (self::compareVersion($dependency['version'], $condition))
@@ -57,11 +73,19 @@ class Package_Dependency
                 default:
                     if (!$dependency = Package_Catalog::getInstalledPackage($requirement))
                     {
-                        kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions .' but it isnt installed');
+                        try
+                        {
+                            // Hmmm, this is offly optimistic....
+                            $dependency = Package_Transaction::checkTransaction($requirement);
+                        }
+                        catch(Exception $e)
+                        {
+                            kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions .' but it isnt installed');
 
-                        $failures['missing'][$requirement] = $conditions;
+                            $failures['missing'][$requirement] = $conditions;
 
-                        continue;
+                            continue;
+                        }                        
                     }
 
                     if (!self::compareVersion($dependency['version'], $conditions))

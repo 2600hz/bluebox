@@ -103,6 +103,20 @@ class Package_Catalog
         return array_reverse($avaliableVersions);
     }
 
+    public static function getFirstAvaliablePackage($name)
+    {
+        $avaliable = self::getAvaliableVersions($name);
+
+        if (!is_array($avaliable))
+        {
+            throw new Package_Catalog_Exception('Unable to determine avaliable package version for ' .$name);
+        }
+
+        $avaliable = array_keys($avaliable);
+
+        return array_shift($avaliable);
+    }
+
     public static function getPackageByName($name)
     {
         self::init();

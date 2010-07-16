@@ -4,9 +4,50 @@ class Package_Transaction
 {
     protected $transaction = array();
 
+    protected static $instance = NULL;
+
     public static function beginTransaction()
     {
-        return new Package_Transaction();
+        if (is_null(self::$instance))
+        {
+            self::$instance = new Package_Transaction();
+        }
+        
+        self::$instance->transaction = array();
+
+        return self::$instance;
+    }
+
+    public static function getTransaction()
+    {
+        return self::$instance;
+    }
+
+    public static function checkTransaction($name, $operation = NULL)
+    {
+        $transaction = self::$instance->transaction;
+
+        if (is_null($operation))
+        {
+            $operation = Package_Manager::OPERATION_INSTALL;
+        }
+
+        if (empty($transaction[$operation]))
+        {
+            throw new Package_Transaction_Exception('Transcation contains no packages for that operation');
+        }
+
+        foreach($transaction[$operation] as $identifier)
+        {
+            $package = Package_Catalog::getPackageByIdentifier($identifier);
+
+            if ($package['packageName'] == $name)
+            {
+                return $package;
+            }
+        }
+
+        throw new Package_Transaction_Exception('Transcation does not containt package');
     }
 
     public function install($identifier)
