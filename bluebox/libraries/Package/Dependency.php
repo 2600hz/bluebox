@@ -15,14 +15,14 @@ class Package_Dependency
                 case 'not':
                     foreach($conditions as $name => $condition)
                     {
-                        if (!$package = Package_Catalog::getInstalledPackage($name))
+                        if (!$dependency = Package_Catalog::getInstalledPackage($name))
                         {
                             continue;
                         }
 
-                        if (self::compareVersion($package['version'], $condition))
+                        if (self::compareVersion($dependency['version'], $condition))
                         {
-                            kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' can not be installed with ' .$name .' version ' .$condition);
+                            kohana::log('debug', 'dependency restriction, ' .$package['packageName'] .' can not be installed with ' .$name .' version ' .$condition);
                             
                             $failures['not'][$name] = $condition;
                         }
@@ -35,12 +35,12 @@ class Package_Dependency
 
                     foreach($conditions as $name => $condition)
                     {
-                        if (!$required = Package_Catalog::getInstalledPackage($name))
+                        if (!$dependency = Package_Catalog::getInstalledPackage($name))
                         {
                             continue;
                         }
 
-                        if (self::compareVersion($required['version'], $condition))
+                        if (self::compareVersion($dependency['version'], $condition))
                         {
                             continue 2;
                         }
@@ -48,25 +48,25 @@ class Package_Dependency
                         $failed[$name] = $condition;
                     }
 
-                    kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' requires one to be installed -> ' .implode(', ', $failed));
+                    kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' requires one to be installed -> ' .implode(', ', $failed));
 
                     $failures['or'] += $failed;
                     
                     break;
 
                 default:
-                    if (!$required = Package_Catalog::getInstalledPackage($requirement))
+                    if (!$dependency = Package_Catalog::getInstalledPackage($requirement))
                     {
-                        kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions .' but it isnt installed');
+                        kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions .' but it isnt installed');
 
                         $failures['missing'][$requirement] = $conditions;
 
                         continue;
                     }
 
-                    if (!self::compareVersion($required['version'], $conditions))
+                    if (!self::compareVersion($dependency['version'], $conditions))
                     {
-                        kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions);
+                        kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions);
 
                         $failures['incompatible'][$requirement] = $conditions;
                     }
@@ -89,7 +89,7 @@ class Package_Dependency
 
         if (!empty($package['denyRemoval']))
         {
-            kohana::log('debug', 'Dependency error: ' .$parentName .' has the denyRemoval flag set');
+            kohana::log('debug', 'denyRemoval flag set on package ' .$package['packageName']);
 
             throw new Package_Dependency_Exception('Package is not eligible for removal');
         }
@@ -102,7 +102,7 @@ class Package_Dependency
         {
             if ($dependentPackage = Package_Catalog::getInstalledPackage($dependent))
             {
-                kohana::log('debug', 'Dependency error: ' .$package['packageName'] .' is being used by ' .$dependent .' version ' . $dependentPackage['version']);
+                kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' is being used by ' .$dependent .' version ' . $dependentPackage['version']);
 
                 $failures['indispensable'][$dependent] = $dependentPackage['version'];
             }

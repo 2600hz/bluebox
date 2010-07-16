@@ -2,8 +2,10 @@
 
 class Package_Operation_uninstall extends Package_Operation
 {
-    protected function validate($identifier)
+    public function validate($identifier)
     {
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
+        
         if ($package['status'] != Package_Manager::STATUS_INSTALLED)
         {
             throw new Package_Operation_Exception('Uninstall is not a sane operation for a package with status ' .$package['status']);
@@ -12,30 +14,28 @@ class Package_Operation_uninstall extends Package_Operation
         Package_Dependency::validateAbandon($identifier);
     }
 
-    protected function preExec($identifier)
+    public function preExec($identifier)
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
         $configureInstance->preUninstall($identifier);
     }
 
-    protected function exec($identifier)
-    {
-        kohana::log('debug', 'Starting uninstall of ' .$identifier);
-        
+    public function exec($identifier)
+    {   
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
         $configureInstance->uninstall($identifier);
     }
 
-    protected function postExec($identifier)
+    public function postExec($identifier)
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
         $configureInstance->postUninstall($identifier);
     }
 
-    protected function finalize($identifier)
+    public function finalize($identifier)
     {
         $metadata = &Package_Catalog::getPackageByIdentifier($identifier);
         

@@ -11,35 +11,56 @@ class Package_Transaction
 
     public function install($identifier)
     {
-        $this->transaction[$identifier] = Package_Manager::OPERATION_INSTALL;
+        $this->transaction[Package_Manager::OPERATION_INSTALL][$identifier]
+            = $identifier;
     }
 
     public function uninstall($identifier)
     {
-        $this->transaction[$identifier] = Package_Manager::OPERATION_UNINSTALL;
+        $this->transaction[Package_Manager::OPERATION_UNINSTALL][$identifier]
+                = $identifier;
     }
 
     public function verify($identifier)
     {
-        $this->transaction[$identifier] = Package_Manager::OPERATION_VERIFY;
+        $this->transaction[Package_Manager::OPERATION_VERIFY][$identifier]
+                = $identifier;
     }
 
     public function repair($identifier)
     {
-        $this->transaction[$identifier] = Package_Manager::OPERATION_REPAIR;
+        $this->transaction[Package_Manager::OPERATION_REPAIR][$identifier]
+                = $identifier;
     }
 
     public function migrate($identifier)
     {
-        $this->transaction[$identifier] = Package_Manager::OPERATION_MIGRATE;
+        $this->transaction[Package_Manager::OPERATION_MIGRATE][$identifier]
+                = $identifier;
     }
 
     public function commit()
     {
-        foreach ($this->transaction as $identifier => $operation)
+        foreach ($this->transaction as $operation => $identifiers)
         {
-            Package_Operation::dispatch($operation, $identifier);
+            if ($operation == Package_Manager::OPERATION_UNINSTALL)
+            {
+                kohana::log('debug', 'Sorting package ' .$operation .' transaction list by dependencies');
+
+                Package_Transaction_Graph::determineUninstallOrder();
+
+                usort($identifiers, array('Package_Transaction_Graph', 'sortUninstall'));
+            }
+            else
+            {
+                kohana::log('debug', 'Sorting package ' .$operation .' transaction list by requirements');
+
+                Package_Transaction_Graph::determineInstallOrder();
+
+                usort($identifiers, array('Package_Transaction_Graph', 'sortInstall'));
+            }
+
+            Package_Operation::dispatch($operation, $identifiers);
         }
     }
-
 }

@@ -31,7 +31,11 @@ class PackageManager_Controller extends Bluebox_Controller
     {
         try
         {
-            Package_Operation::dispatch('verify', $identifier);
+            $transaction = Package_Transaction::beginTransaction();
+
+            $transaction->verify($identifier);
+
+            $transaction->commit();
 
             $name = Package_Catalog::getPackageDisplayName($identifier);
 
@@ -49,7 +53,11 @@ class PackageManager_Controller extends Bluebox_Controller
     {
         try
         {
-            Package_Operation::dispatch('repair', $identifier);
+            $transaction = Package_Transaction::beginTransaction();
+
+            $transaction->repair($identifier);
+
+            $transaction->commit();
 
             $name = Package_Catalog::getPackageDisplayName($identifier);
 
@@ -67,8 +75,12 @@ class PackageManager_Controller extends Bluebox_Controller
     {
         try
         {
-            Package_Operation::dispatch('install', $identifier);
-            
+            $transaction = Package_Transaction::beginTransaction();
+
+            $transaction->install($identifier);
+
+            $transaction->commit();
+
             $name = Package_Catalog::getPackageDisplayName($identifier);
 
             message::set('Install of package ' .$name .' succeeded', 'success');
@@ -85,7 +97,11 @@ class PackageManager_Controller extends Bluebox_Controller
     {
         try
         {
-            Package_Operation::dispatch('uninstall', $identifier);
+            $transaction = Package_Transaction::beginTransaction();
+
+            $transaction->uninstall($identifier);
+
+            $transaction->commit();
 
             $name = Package_Catalog::getPackageDisplayName($identifier);
 
@@ -103,7 +119,11 @@ class PackageManager_Controller extends Bluebox_Controller
     {
         try
         {
-            Package_Operation::dispatch('migrate', $identifier);
+            $transaction = Package_Transaction::beginTransaction();
+
+            $transaction->migrate($identifier);
+
+            $transaction->commit();
 
             $name = Package_Catalog::getPackageDisplayName($identifier);
 

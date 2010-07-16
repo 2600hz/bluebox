@@ -2,37 +2,37 @@
 
 class Package_Operation_Repair extends Package_Operation
 {
-    public static function execute($args)
+    public function validate($identifier)
     {
-        if (!is_array($args))
-        {
-            $args = array($args);
-        }
+        kohana::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
 
-        if (empty($args[0]))
-        {
-            throw new Package_Operation_Exception('Repair requires the package identifier to repair');
-        }
-
-        $identifier = $args[0];
-
-        kohana::log('debug', 'Starting repair of ' .$identifier);
-
-        Package_Operation_Verify::execute($identifier);
-
-        self::repair($identifier);
-
-        $metadata = &Package_Catalog::getPackageByIdentifier($identifier);
-
-        unset($metadata['datastore_id']);
-
-        Package_Catalog_Datastore::export($metadata);
+        // TODO: If this failes find unistall all dependent packages
+        Package_Operation_Verify::exec($identifier);
     }
 
-    protected static function repair($identifier)
+    public function preExec($identifier)
+    {
+        
+    }
+
+    public function exec($identifier)
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
         $configureInstance->repair($identifier);
+    }
+
+    public function postExec($identifier)
+    {
+
+    }
+
+    public function finalize($identifier)
+    {
+        $package = &Package_Catalog::getPackageByIdentifier($identifier);
+
+        unset($package['datastore_id']);
+
+        Package_Catalog_Datastore::export($package);
     }
 }

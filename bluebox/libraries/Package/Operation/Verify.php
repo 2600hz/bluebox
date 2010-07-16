@@ -2,15 +2,33 @@
 
 class Package_Operation_Verify extends Package_Operation
 {
+    public function validate($identifier)
+    {
+        
+    }
+
+    public function preExec($identifier)
+    {
+
+    }
+
     public function exec($identifier)
     {
-        kohana::log('debug', 'Starting verify of ' .$identifier);
-
         self::verify($identifier);
 
         self::runCheckMethods($identifier);
 
         Package_Dependency::validateIntegration($identifier);
+    }
+
+    public function postExec($identifier)
+    {
+
+    }
+
+    public function finalize($identifier)
+    {
+
     }
 
     protected static function verify($identifier)

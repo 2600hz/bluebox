@@ -4,40 +4,37 @@ class Package_Operation
 {
     public static function dispatch($operation, $identifiers)
     {
+        if (!is_array($identifiers))
+        {
+            $identifiers = array($identifiers);
+        }
+
+        $steps = array('validate', 'preExec', 'exec', 'postExec', 'finalize');
+
         switch ($operation)
         {
             case 'verify':
                 $agent = new Package_Operation_Verify;
-
-                $steps = array('exec');
 
                 break;
 
             case 'repair':
                 $agent = new Package_Operation_Repair;
 
-                $steps = array('validate', 'exec', 'finalize');
-
                 break;
 
             case 'install':
                 $agent = new Package_Operation_Install;
-
-                $steps = array('validate', 'preExec', 'exec', 'postExec', 'finalize');
 
                 break;
 
             case 'uninstall':
                 $agent = new Package_Operation_Uninstall;
 
-                $steps = array('validate', 'preExec', 'exec', 'postExec', 'finalize');
-
                 break;            
 
             case 'migrate':
                 $agent = Package_Operation_Migrate;
-
-                $steps = array('validate', 'exec', 'finalize');
 
                 break;
 
@@ -45,17 +42,28 @@ class Package_Operation
                 throw new Package_Operation_Exception('Unknown operation ' .$operation);
         }
 
+        foreach($identifiers as $identifier)
+        {
+            $name = Package_Catalog::getPackageName($identifier);
+
+            kohana::log('debug', 'Package management dispatching ' .$operation .' on ' .$identifier .'(' .$name .')');
+        }
+
         foreach($steps as $step)
         {
-            foreach($identifiers as $identifier)
+            foreach($identifiers as $pos => $identifier)
             {
                 try
                 {
+                    kohana::log('debug', 'Package management executing ' .get_class($agent) .'->' .$step .'(' .$identifier .')');
+
                     self::execStep($identifier, $step, $agent);
                 }
                 catch (Exception $e)
                 {
-                    unset($identifiers[$identifier]);
+                    // TODO: This needs to also stop anything depending on it during
+                    // install or uninstall.
+                    unset($identifiers[$pos]);
 
                     self::rollback($operation, $identifier, $step, $e);
                 }
@@ -97,38 +105,25 @@ class Package_Operation
         }
     }
 
-    protected static function finalize($operation, $identifier)
+    protected static function locatePackageSource($identifier)
     {
-        $metadata = &Package_Catalog::getPackageByIdentifier($identifier);
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-        switch ($operation)
+        if (empty($package['directory']))
         {
-            case 'install':
-                $metadata['status'] = Package_Manager::STATUS_INSTALLED;
+            if (empty($package['sourceURL']))
+            {
+                throw new Package_Operation_Exception('Migrate could not find the source for the package');
+            }
 
-                Package_Catalog_Datastore::export($metadata);
-
-                break;
-
-            case 'uninstall':
-                Package_Catalog_Datastore::remove($metadata);
-
-                break;
-
-            case 'migrate':
-                $metadata['status'] = Package_Manager::STATUS_INSTALLED;
-            
-                Package_Catalog_Datastore::export($metadata);
-
-                break;
-
-            default:
-                break;
+            Package_Import::package($package['sourceURL']);
         }
     }
 
     protected static function rollback($operation, $identifier, $step, $error)
     {
+        kohana::log('error', 'Package operation ' .$operation .' failed during ' .$step .' on package ' .$identifier .': ' .$error->getMessage());
+
         throw $error;
     }
 }
