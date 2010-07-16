@@ -9,8 +9,16 @@
         <a href="#" onClick="clearPath()">Show All</a><br/>
         <br/>
         <a href="#">Create Folder</a><br/>
+        <br/>
+        <?php echo html::anchor('globalmedia/scan', 'Rescan Folders', array('class' => 'qtipAjaxForm')); ?>
+        <br/>
     </div>
 
+    <div class="topbar">
+        <h1>Media Manager</h1>
+        <p>These files are accessible to all users of the system. Last file scan was XX</p>
+    </div>
+    
     <div id="grid" style="float:right;width:80%">
         <?php if (isset($gridMenu)): ?>
 
