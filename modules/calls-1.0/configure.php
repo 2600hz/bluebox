@@ -15,10 +15,9 @@ class Call_Configure extends Bluebox_Configure
     );
     public static $navLabel = 'Calls';
     public static $navBranch = '/Reports/';
-    public static $navURL = 'calls/index';
+    public static $navURL = 'call/index';
     public static $navSubmenu = array(
-        'Search Call Records' => '/calls/index',
-        'Download Records' => '/calls/download',
-        'Import Call Records' => '/calls/import'
+        'Download Records' => '/call/download',
+        'Import Call Records' => '/call/import'
     );
 }
