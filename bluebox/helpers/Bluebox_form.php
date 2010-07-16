@@ -501,7 +501,7 @@ class form extends form_Core
             unset($data['help']);
         }
 
-        $data['for'] = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['for']), '_');
+        $data['for'] = trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['for']), '_');
 
         // Call the parent
         $result = parent::label($data, $text, $extra);

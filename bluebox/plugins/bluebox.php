@@ -281,7 +281,7 @@ abstract class Bluebox_Plugin
             return FALSE;
         }
 
-        if (!empty($this->base['plugins'][$this->name]))
+        if (isset($this->base['plugins'][$this->name]))
         {
             $this->subview->{$this->name} = $this->base['plugins'][$this->name];
         }
@@ -324,7 +324,7 @@ abstract class Bluebox_Plugin
         $this->formData = $this->input->post($this->name, array());
 
         // If the plugin already has data merge what came from the form
-        if (!empty($this->base['plugins'][$this->name]))
+        if (isset($this->base['plugins'][$this->name]))
         {
             $this->pluginData = arr::merge($this->base['plugins'][$this->name], $this->formData);
         }
