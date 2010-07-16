@@ -6,6 +6,8 @@
 
     ?>
         <br/>
+        <a href="#" onClick="clearPath()">Show All</a><br/>
+        <br/>
         <a href="#">Create Folder</a><br/>
     </div>
 
@@ -34,5 +36,14 @@ function filterPath(path) {
     $('#MediaGrid')[0].p.postData.searchString=path;
     $('#MediaGrid').trigger('reloadGrid');
     $('#MediaGrid').setCaption(path);
+}
+
+function clearPath() {
+    $('#MediaGrid')[0].p.postData._search = false;
+    delete $('#MediaGrid')[0].p.postData.searchField;
+    delete $('#MediaGrid')[0].p.postData.searchOper;
+    delete $('#MediaGrid')[0].p.postData.searchString;
+    $('#MediaGrid').trigger('reloadGrid');
+    $('#MediaGrid').setCaption('');
 }
 <?php javascript::blockEnd(); ?>
