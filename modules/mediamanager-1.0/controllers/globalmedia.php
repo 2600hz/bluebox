@@ -48,7 +48,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
     public function index()
     {
         $this->template->content = new View('globalmedia/index');
-        $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:$('#MediaGrid').setCaption('[link]');$('#MediaGrid').searchGrid({sopt:['eq']});", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
+        $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:filterPath('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
         javascript::add('php_file_tree_jquery.js');
         stylesheet::add('php_file_tree.css');
 

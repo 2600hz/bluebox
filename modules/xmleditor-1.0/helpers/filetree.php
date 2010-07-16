@@ -85,7 +85,7 @@ class filetree {
                                             $subTree = self::php_file_tree_dir("$directory/$this_file", $return_link ,$extensions, $excludeRegEx, false, $depthDir . $this_file . '/');
                                             if (!$subTree) {
                                                 $link = $return_link;
-                                                $link = str_replace("[link]", $depthDir . urlencode($this_file) . '/', $return_link);
+                                                $link = str_replace("[link]", $depthDir . urlencode($this_file), $return_link);
                                             }
 
                                             // Add current element
