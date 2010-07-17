@@ -1,11 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Libraries/Package
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class Package_Dependency
 {
     public static function validateIntegration($identifier)
     {
-        //var_dump(self::compareVersion('0.6', '< 0.1 or > 0.5'));
-  
         $package = Package_Catalog::getPackageByIdentifier($identifier);
 
         $failures = array();

@@ -353,62 +353,6 @@ $(document).ready(function () {
     .hide(); // Hide it initially
 
     /**
-     * DRIVES THE DESTINATION SELECTOR
-     ***************************************************************/
-    $('.destination_select').each(function() {
-
-        var contentLoadedOnce = false;
-        $(this).qtip({
-            content: {
-                title: {
-                    text: 'Select a Destination...'
-                },
-                url: '../../destinations/selector/' + this.id + '/' + $(this).attr('numberId')
-            },
-            position: {
-                target: $(document.body),
-                corner: 'center'
-            },
-            show: {
-                when: 'click', // Show it on click
-                solo: true // And hide all other tooltips
-            },
-            hide: {
-                when: 'unfocus'
-            },
-            api: {
-                beforeShow: function(){
-                    if (!contentLoadedOnce) {
-                        contentLoadedOnce = true;
-                    } else {
-                        this.loadContent(this.options.content.url, this.options.content.data, this.options.content.method);
-                    }
-                     $('#qtip-blanket').fadeIn(this.options.show.effect.length);
-                },                
-                beforeHide: function () {
-                    $('#qtip-blanket').fadeOut(this.options.hide.effect.length);
-                    this.elements.content.html(this.options.content.text);
-                },
-            },
-            style: {
-                width: 700,
-                padding: '8px',
-                title: {
-                    'background-color': '#72a400',
-                    color: '#ffffff',
-                    padding: '3px 10px 5px 10px',
-                    'font-size': '110%'
-                },
-                border: {
-                    width: 8,
-                    radius: 4,
-                    color: '#72a400'
-                }
-            }
-        });
-    });
-
-    /**
      * QTIP MODAL BACKDROP
      ***************************************************************/
     $('<div id="qtip-blanket">')

@@ -1,7 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-
-class DataGrid_Table_Row {
-
+/**
+ * @package    Core/Libraries/DataGrid
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
+class DataGrid_Table_Row
+{
     private $elements = array();
 
     private $attributes = array();
@@ -17,23 +21,28 @@ class DataGrid_Table_Row {
     
     public function __get($attribute)
     {
-        switch (strtolower($attribute)) {
+        switch (strtolower($attribute))
+        {
             case 'cells':
                 return $this->elements;
+
             default:
                 if (isset($this->attributes[$attribute]))
                 {
                     return $this->attributes[$attribute];
                 }
+                
                 return NULL;
         }
     }
 
     public function __isset($attribute)
     {
-        switch (strtolower($attribute)) {
+        switch (strtolower($attribute))
+        {
             case 'cells':
                 return isset($this->elements);
+            
             default:
                 return isset($this->attributes[$attribute]);
         }
@@ -41,10 +50,13 @@ class DataGrid_Table_Row {
 
     public function __unset($attribute)
     {
-        switch (strtolower($attribute)) {
+        switch (strtolower($attribute))
+        {
             case 'cells':
                 $this->elements = array();
+
                 break;
+
             default:
                 unset($this->attributes[$attribute]);
         }
@@ -54,7 +66,8 @@ class DataGrid_Table_Row {
     {
         $html = '<tr' .html::attributes($this->attributes) .' >';
 
-        foreach ($this->elements as $element) {
+        foreach ($this->elements as $element)
+        {
             $html .= $element->toString();
         }
 

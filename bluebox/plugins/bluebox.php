@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Bluebox/Plugins
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
+ */
 abstract class Bluebox_Plugin
 {
     protected $name = NULL;
@@ -281,7 +285,7 @@ abstract class Bluebox_Plugin
             return FALSE;
         }
 
-        if (!empty($this->base['plugins'][$this->name]))
+        if (isset($this->base['plugins'][$this->name]))
         {
             $this->subview->{$this->name} = $this->base['plugins'][$this->name];
         }
@@ -324,7 +328,7 @@ abstract class Bluebox_Plugin
         $this->formData = $this->input->post($this->name, array());
 
         // If the plugin already has data merge what came from the form
-        if (!empty($this->base['plugins'][$this->name]))
+        if (isset($this->base['plugins'][$this->name]))
         {
             $this->pluginData = arr::merge($this->base['plugins'][$this->name], $this->formData);
         }

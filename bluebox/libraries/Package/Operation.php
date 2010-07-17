@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Libraries/Package
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class Package_Operation
 {
     public static function dispatch($operation)
@@ -62,6 +66,12 @@ class Package_Operation
 
     protected static function rollback($identifier, $failed_step, $error)
     {
+        kohana::log('error', 'Package operation ' .$operation .' failed during ' .$step .' on package ' .$identifier .': ' .$error->getMessage());
+
+        //$configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
+
+        //$configureInstance->uninstall($identifier);
+        
         throw $error;
     }
 }
