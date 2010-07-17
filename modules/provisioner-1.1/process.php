@@ -30,7 +30,7 @@ $endpoint = new $class();
 $endpoint->mac = '000B820D0057';
 
 //Phone Model (Please reference family_data.xml in the family directory for a list of recognized models)
-$endpoint->model = "GXP2000";
+$endpoint->model = "SoundPoint IP 550";
 
 //Timezone
 $endpoint->timezone = 'GMT-11:00';
