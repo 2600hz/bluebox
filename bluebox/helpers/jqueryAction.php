@@ -1,14 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * Class jqueryAction
- *
- * Abstract class for any parameter of any action
- * retrieved from http://jquery.hohli.com/ by K Anderson on 06 05 2009
- *
- * @author Anton Shevchuk
- * @license LGPL
- * @access   public
- * @package  jQuery
+ * @package    Core/Helpers/JgridAction
+ * @author     Anton Shevchuk
+ * @license    Mozilla Public License (MPL)
  */
 class jqueryAction
 {

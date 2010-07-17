@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Bluebox/Libraries/Core
+ * @author     Darren Schreiber
+ * @license    Mozilla Public License (MPL)
+ */
 class Bluebox_Core
 {
     public static function bootstrapPackages()
