@@ -24,7 +24,47 @@ class Installer_Controller extends Bluebox_Controller
      */
     public $minimumPackages = array(
         'core',
-        'packagemanager'
+        'packagemanager',
+        'multitenant',
+
+        // System Modules
+        'accountmanager',
+        'contextmanager',
+        'locationmanager',
+        'usermanager',
+        'numbermanager',
+        'powerdns',
+        'rosetta',
+        
+        // Modules
+        'devicemanager',
+        'conference',
+        'voicemail',
+        'ringgroup',
+        'timeofday',
+        'trunkmanager',
+        'simpleroute',
+
+        // Plugins
+        'address',
+        'callerid',
+        'sip',
+        
+        //'autoattendant',
+        //'mediamanager',
+
+        // Freeswitch
+        //'esl',
+        'netlistmanager',
+        //'sipinterface',
+        'sofia',
+        'xmleditor',
+        'mediaoption',
+        'odbc',
+        
+        'provisioner',
+        'polycomdriver'
+
     );
 
     /**

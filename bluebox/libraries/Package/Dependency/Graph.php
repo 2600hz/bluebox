@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class Package_Transaction_Graph
+class Package_Dependency_Graph
 {
     protected static $installOrder = NULL;
 
@@ -119,7 +119,7 @@ class Package_Transaction_Graph
         return $relianceList;
     }
 
-    protected static function listDependencies()
+    public static function listDependencies()
     {
         $catalog = Package_Catalog::getCatalog();
 

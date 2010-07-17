@@ -88,17 +88,17 @@ class Package_Transaction
             {
                 kohana::log('debug', 'Sorting package ' .$operation .' transaction list by dependencies');
 
-                Package_Transaction_Graph::determineUninstallOrder();
+                Package_Dependency_Graph::determineUninstallOrder();
 
-                usort($identifiers, array('Package_Transaction_Graph', 'sortUninstall'));
+                usort($identifiers, array('Package_Dependency_Graph', 'sortUninstall'));
             }
             else
             {
                 kohana::log('debug', 'Sorting package ' .$operation .' transaction list by requirements');
 
-                Package_Transaction_Graph::determineInstallOrder();
+                Package_Dependency_Graph::determineInstallOrder();
 
-                usort($identifiers, array('Package_Transaction_Graph', 'sortInstall'));
+                usort($identifiers, array('Package_Dependency_Graph', 'sortInstall'));
             }
 
             Package_Operation::dispatch($operation, $identifiers);
