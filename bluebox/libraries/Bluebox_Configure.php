@@ -140,12 +140,9 @@ abstract class Bluebox_Configure
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function install($package = NULL)
+    public function install($identifier)
     {
-        if (is_string($package) && !empty($package))
-        {
-            $package = Package_Catalog::getPackageByIdentifier($package);
-        }
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
         
         // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)
         // Note that we do this because Postgers & Doctrine don't like our polymorphic class extensions and try to create the same
@@ -260,12 +257,9 @@ abstract class Bluebox_Configure
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function uninstall($package = NULL)
+    public function uninstall($identifier)
     {
-        if (is_string($package) && !empty($package))
-        {
-            $package = Package_Catalog::getPackageByIdentifier($package);
-        }
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
 
         $tables = array();
 
