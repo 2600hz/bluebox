@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Helpers/Skins
+ * @author     Darren Schreiber
+ * @license    Mozilla Public License (MPL)
+ */
 class skins {
     /**
      * @var object the singleton implementation

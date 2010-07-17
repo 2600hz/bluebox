@@ -1,11 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * Bluebox_html.php - Bluebox html helper extension
- *
- * @author Karl Anderson
- * @license LGPL
- * @package Bluebox
- * @subpackage Core
+ * @package    Core/Helpers/Html
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
 class html extends html_Core {
     /**

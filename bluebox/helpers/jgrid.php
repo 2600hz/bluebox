@@ -1,6 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
-define('DELIM', '/'); //put this someplace else?
+define('DELIM', '/');
+/**
+ * @package    Core/Helpers/Jgrid
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class jgrid
 {
     /**

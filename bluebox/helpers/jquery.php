@@ -2,13 +2,11 @@
 /**
  * jquery helper
  * retrieved from http://jquery.hohli.com/ and modified by K Anderson on 06 05 2009
- *
+ * 
+ * @package    Core/Helpers/Jquery
  * @author Anton Shevchuk
- * @author Karl Anderson
- * @license LGPL
- * @access   public
- * @package  jquery
- * @version  0.8
+ * @author K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
 class jquery
 {
