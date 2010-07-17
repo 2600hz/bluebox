@@ -51,7 +51,7 @@ class Installer_Controller extends Bluebox_Controller
         //'mediamanager',
 
         // Freeswitch
-        //'esl',
+        'esl',
         'netlistmanager',
         'sipinterface',
         'sofia',
