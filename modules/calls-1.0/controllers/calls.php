@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class Call_Controller extends Bluebox_Controller
+class Calls_Controller extends Bluebox_Controller
 {
-    protected $baseModel = 'Call';
+    protected $baseModel = 'Calls';
 
     public function index()
     {
@@ -20,12 +20,12 @@ class Call_Controller extends Bluebox_Controller
         ))
         ->add('name', 'Name')
         // Add the actions to the grid
-        ->addAction('call/edit', 'Edit', array(
+        ->addAction('calls/edit', 'Edit', array(
                 'arguments' => 'call_id',
                 'width' => '120'
             )
         )
-        ->addAction('call/delete', 'Delete', array(
+        ->addAction('calls/delete', 'Delete', array(
                 'arguments' => 'call_id',
                 'width' => '20'
             )
@@ -41,6 +41,36 @@ class Call_Controller extends Bluebox_Controller
 
     public function download() {
         // Download a CDR
+
+        // Setup the base grid object
+        $grid = jgrid::grid($this->baseModel, array(
+                'caption' => 'Calls'
+            )
+        )
+        // Add the base model columns to the grid
+        ->add('call_id', 'ID', array(
+                'hidden' => true,
+                'key' => true
+        ))
+        ->add('name', 'Name')
+        // Add the actions to the grid
+        ->addAction('calls/edit', 'Edit', array(
+                'arguments' => 'call_id',
+                'width' => '120'
+            )
+        )
+        ->addAction('calls/delete', 'Delete', array(
+                'arguments' => 'call_id',
+                'width' => '20'
+            )
+        );
+
+        // Let plugins populate the grid as well
+        $this->grid = $grid;
+        plugins::views($this);
+
+        // Produce a grid in the view
+        $this->view->grid = $this->grid->produce();
     }
 
     public function downloadAsCsv($startDate, $endDate, $otherStuff) {
