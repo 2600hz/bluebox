@@ -21,7 +21,7 @@ class InterfaceManager_Configure extends Bluebox_Configure
     public static $navURL = 'sipinterface/index';    
     public static $navSubmenu = array(
         'SIP Interfaces' => '/sipinterface/index',
-        'Add SIP Interface' => '/sipinterface/add',
+        'Add SIP Interface' => '/sipinterface/create',
         'Edit SIP Interface' => array(
             'url' => '/sipinterface/edit',
             'disabled' => true
