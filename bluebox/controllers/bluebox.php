@@ -590,7 +590,7 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->save_prepare($object);
 
             // Allow plugins to process any form-related data we just got back and attach to our data object
-            if(!plugins::save($this, $saveEvents))
+            if(!plugins::save($object, $saveEvents))
             {
                 throw new Bluebox_Exception('Plugins failed to save');
             }
