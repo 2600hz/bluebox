@@ -35,27 +35,33 @@ class Odbc_Configure extends Bluebox_Configure
     
     public function postInstall()
     {
-    }
-    public function postUninstall()
-    {
-    }
-
-    public function completedInstall() {
         // Add the relevant database settings to a new ODBC config automagically
         // TODO: Generate odbc.ini, too?
-
         $installSamples = Session::instance()->get('installer.samples', FALSE);
-        if (empty($installSamples)) return TRUE;
+
+        if (empty($installSamples))
+        {
+            return TRUE;
+        }
 
         $odbc = new Odbc();
+
         $odbc->dsn_name = 'Bluebox';
+
         $odbc->database = $_SESSION['installer.dbName'];
+
         $odbc->user = $_SESSION['installer.dbUserName'];
+
         $odbc->pass = $_SESSION['installer.dbUserPwd'];
+
         $odbc->host = $_SESSION['installer.dbHostName'];
+
         $odbc->port = (integer)$_SESSION['installer.dbPortSelection'];
+
         $odbc->type = $_SESSION['installer.dbType'];
+
         $odbc->description = 'Default FreeSWITCH ODBC Connection';
+
         $odbc->save();
     }
 }
