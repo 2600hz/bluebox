@@ -19,7 +19,6 @@ class NetList extends Bluebox_Record
         $this->hasColumn('net_list_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('name', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('system_list', 'string', 100, array('default' => '', 'notnull' => true));
-        //ALTER TABLE `bluebox`.`net_list` ADD COLUMN `allow` TINYINT(1)  NOT NULL DEFAULT 0 AFTER `system_list`;
         $this->hasColumn('allow', 'boolean', NULL, array('notnull' => true, 'default' => FALSE));
     }
 
