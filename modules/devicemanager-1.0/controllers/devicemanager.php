@@ -29,13 +29,11 @@ class DeviceManager_Controller extends Bluebox_Controller
 
         // Add the actions to the grid
         $grid->addAction('devicemanager/edit', 'Edit', array(
-                'arguments' => 'device_id',
-                'width' => '120'
+                'arguments' => 'device_id'
             )
         );
         $grid->addAction('devicemanager/delete', 'Delete', array(
-                'arguments' => 'device_id',
-                'width' => '20'
+                'arguments' => 'device_id'
             )
         );
 
