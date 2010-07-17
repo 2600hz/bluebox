@@ -133,10 +133,10 @@ class NetListManager_Controller extends Bluebox_Controller
         // Execute plugin hooks here, after we've loaded the core data sets
         plugins::views($this);
     }
-    public function delete($id = NULL)
+    /*public function delete($id = NULL)
     {
         $this->stdDelete($id);
-    }
+    }*/
     private function populateDropdowns($netListID) {
         $allowList = empty($_POST['ips']['allow']) ? array() : array_flip($_POST['ips']['allow']);
         $denyList = empty($_POST['ips']['deny']) ? array() : array_flip($_POST['ips']['deny']);
