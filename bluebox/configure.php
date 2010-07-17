@@ -130,9 +130,9 @@ class Core_Configure extends Bluebox_Configure
         $netList->save(TRUE);
 
 
-        $netlist = new NetList;
+        $netList = new NetList();
 
-        $netlist->name = 'Trunks (auto)';
+        $netList->name = 'Trunks (auto)';
 
         $netList->system_list = 'trunks.auto';
 
