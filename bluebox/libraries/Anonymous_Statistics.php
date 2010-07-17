@@ -1,11 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * Anonymous_Statistics.php - collects and send anonymous usage statistics.
- *
- * @author Karl Anderson
- * @license MPL
- * @package Bluebox
- * @subpackage Core
+ * @package    Core/Libraries/AnonymousStatistics
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
 class Anonymous_Statistics
 {

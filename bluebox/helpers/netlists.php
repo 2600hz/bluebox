@@ -1,13 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * netlist.php - Netlist helper
- *
- * @author K Anderson
- * @license LGPL
- * @package Bluebox
- * @subpackage Core
+ * @package    Core/Helpers/NetLists
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
-
 class netlists
 {
     public static function dropdown($data, $selected = NULL, $extra = '', $nullOption = 'None') {

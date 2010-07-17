@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core
+ * @author     Darren Schreiber <d@d-man.org>
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 abstract class Bluebox_Controller extends Template_Controller
 {
     const SUBMIT_CONFIRM = 'confirm';

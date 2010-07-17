@@ -13,7 +13,6 @@ class Core_Configure extends Bluebox_Configure
     public static $type = Package_Manager::TYPE_CORE;
     public static $required = array();
 
-
     public function postInstall()
     {
         self::initializeMasterTenant();
