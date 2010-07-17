@@ -38,13 +38,25 @@ class InterfaceManager_Configure extends Bluebox_Configure
         
         // By default, we assume a new install is going to want port 5060 on the local machine to be where all traffic comes into
         $sipInterface = new SipInterface();
-        $sipInterface->name = 'Default Network Interface';
-        $sipInterface->ip_address = network::guessServerIP();
-        $sipInterface->port = 5060;
-        $sipInterface->auth = TRUE;
-        $sipInterface->nat_type = 1;
-        $sipInterface->Context = Doctrine::getTable('Context')->findOneByName('In-house Only');
-        $sipInterface->nat_net_list_id = netlists::getSystemListId('nat.auto');
+
+        $sipInterface['name'] = 'Default Network Interface';
+
+        $sipInterface['ip_address'] = network::guessServerIP();
+
+        $sipInterface['port'] = 5060;
+
+        $sipInterface['auth'] = TRUE;
+
+        $sipInterface['nat_type'] = 1;
+
+        $sipInterface['Context'] = Doctrine::getTable('Context')->findOneByName('In-house Only');
+
+        $sipInterface['nat_net_list_id'] = netlists::getSystemListId('nat.auto');
+
+        $sipInterface['inbound_net_list_id'] = netlists::getSystemListId('trunks.auto');
+
+        $sipInterface['register_net_list_id'] = 0;
+
         $sipInterface->save();
     }
 }
