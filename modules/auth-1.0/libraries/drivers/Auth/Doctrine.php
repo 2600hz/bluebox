@@ -140,7 +140,7 @@ class Auth_Doctrine_Driver extends Auth_Driver
             $user->password_reset_token = sha1(rand(1000000, 9999999));
 
             $user->save();
-        } 
+        }
         else
         {
             return FALSE;
@@ -176,23 +176,23 @@ class Auth_Doctrine_Driver extends Auth_Driver
             $user->password_reset_token = '';
 
             $user->save();
-        } 
+        }
         else
         {
             return FALSE;
         }
-        
+
         return TRUE;
     }
 
     public function getRealIpAddr()
     {
-        if (!empty($_SERVER['HTTP_CLIENT_IP']))   
+        if (!empty($_SERVER['HTTP_CLIENT_IP']))
         {
             //check ip from share internet
             $ip=$_SERVER['HTTP_CLIENT_IP'];
         }
-        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   
+        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
         {
             //to check ip is pass from proxy
             $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
