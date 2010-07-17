@@ -10,11 +10,10 @@ class Odbc_Configure extends Bluebox_Configure
     public static $summary = 'ODBC Connection Manager';
     public static $description = 'Provides access to a variety of databases via obdc';
     public static $default = TRUE;
-    public static $type = Bluebox_Installer::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );
-    public static $navIcon = 'assets/img/icons/mainVoicemailsX.png';
     public static $navBranch = '/System/';
     public static $navURL = 'odbc/index';
     public static $navSubmenu = array(

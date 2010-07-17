@@ -2,14 +2,9 @@
 
 class Package_Operation_Migrate extends Package_Operation
 {
-    public static function execute($args)
+    public function validate($identifier)
     {
-        if (empty($args[0]))
-        {
-            throw new Package_Operation_Exception('Migrate requires the package identifier to migrate');
-        }
-
-        $identifier = $args[0];
+        self::locatePackageSource($identifier);
 
         $package = Package_Catalog::getPackageByIdentifier($identifier);
 
@@ -22,94 +17,43 @@ class Package_Operation_Migrate extends Package_Operation
 
         $from = $from['identifier'];
 
-        if (empty($package['directory']))
-        {
-            if (empty($package['sourceURL']))
-            {
-                throw new Package_Operation_Exception('Migrate could not find the source for the package');
-            }
-
-            Package_Import::package($package['sourceURL']);
-
-            $package = Package_Catalog::getPackageByIdentifier($identifier);
-        }
-
-        self::verify($identifier, $from);
-
-        kohana::log('debug', 'Starting migrate of ' .$from .' to ' .$identifier);
-
-        try
-        {
-            self::preMigrate($identifier);
-        }
-        catch (Exception $e)
-        {
-            self::rollback($identifier, 'preMigrate', $e);
-        }
-
-        try
-        {
-            self::migrate($identifier);
-        }
-        catch (Exception $e)
-        {
-            self::rollback($identifier, 'migrate', $e);
-        }
-
-        try
-        {
-            self::postMigrate($identifier);
-        }
-        catch (Exception $e)
-        {
-            self::rollback($identifier, 'postMigrate', $e);
-        }
-
-        try
-        {
-            self::finalize($identifier);
-        }
-        catch (Exception $e)
-        {
-            self::rollback($identifier, 'finalize', $e);
-        }
-    }
-
-    protected static function verify($identifier, $from)
-    {
-        $package = Package_Catalog::getPackageByIdentifier($from);
-
         if ($package['status'] != Package_Manager::STATUS_INSTALLED)
         {
             throw new Package_Operation_Exception('Migrate is not a sane operation for a package with status ' .$package['status']);
         }
 
-        Package_Operation_Verify::execute($identifier);
+        kohana::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
+
+        Package_Operation_Verify::exec($identifier);
     }
 
-    protected static function preMigrate($identifier)
+    public function preExec($identifier)
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
         $configureInstance->preMigrate($identifier);
     }
 
-    protected static function migrate($identifier)
+    public function exec($identifier)
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
         $configureInstance->migrate($identifier);
     }
 
-    protected static function postMigrate($identifier)
+    public function postExec($identifier)
     {
         $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
 
         $configureInstance->postMigrate($identifier);
     }
 
-    protected static function finalize($identifier)
+    public function finalize($identifier)
     {
-        parent::finalize($identifier, 'migrate');
+        $package = &Package_Catalog::getPackageByIdentifier($identifier);
+
+        $package['status'] = Package_Manager::STATUS_INSTALLED;
+
+        Package_Catalog_Datastore::export($package);
     }
 }

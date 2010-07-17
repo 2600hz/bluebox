@@ -196,8 +196,6 @@ class Package_Catalog_Standardize extends Package_Catalog
 
                 $metadata['denyRemoval'] = TRUE;
 
-                $metadata['status'] = Package_Manager::STATUS_INSTALLED;
-
                 break;
 
             case Package_Manager::TYPE_MODULE:

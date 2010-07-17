@@ -9,7 +9,7 @@ class Rosetta_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Rosetta automatic language translations.';
     public static $default = true;
-    public static $type = Bluebox_Installer::TYPE_SERVICE;
+    public static $type = Package_Manager::TYPE_SERVICE;
     public static $required = array(
         'core' => 0.1
     );

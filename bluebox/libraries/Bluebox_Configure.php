@@ -140,12 +140,9 @@ abstract class Bluebox_Configure
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function install($package = NULL)
+    public function install($identifier)
     {
-        if (is_string($package) && !empty($package))
-        {
-            $package = Package_Catalog::getPackageByIdentifier($package);
-        }
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
         
         // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)
         // Note that we do this because Postgers & Doctrine don't like our polymorphic class extensions and try to create the same
@@ -166,6 +163,8 @@ abstract class Bluebox_Configure
         // If this package has any models of it's own (not extensions) then create the tables!
         if (!empty($models))
         {
+            kohana::log('debug', 'Adding table(s) ' .implode(', ', $models));
+
             Doctrine::createTablesFromArray($models);
         }
     }
@@ -258,12 +257,9 @@ abstract class Bluebox_Configure
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function uninstall($package = NULL)
+    public function uninstall($identifier)
     {
-        if (is_string($package) && !empty($package))
-        {
-            $package = Package_Catalog::getPackageByIdentifier($package);
-        }
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
 
         $tables = array();
 
@@ -274,9 +270,9 @@ abstract class Bluebox_Configure
         }
         catch(Exception $e)
         {
-            Kohana::log('error', 'Uninstall unable to get the overlord!');
+            Kohana::log('error', 'Unable to get the doctrine overlord!');
 
-            return 'Unable to connect to the database!';
+            throw new Exception('Unable to connect to the database!');
         }
 
         // For each of this modules models loop through all of their rows and delete them
@@ -285,11 +281,6 @@ abstract class Bluebox_Configure
 
         foreach($models as $model)
         {
-            if (!$conn->import->tableExists($model))
-            {
-                continue;
-            }
-
             try
             {
                 $table = Doctrine::getTable($model);
@@ -300,14 +291,14 @@ abstract class Bluebox_Configure
             }
             catch(Exception $e)
             {
-                Kohana::log('debug', 'Uninstall skipping model ' . $model . ', doesnt seem to have a doctrine table.');
+                Kohana::log('debug', 'Skipping model ' . $model . ', doesnt seem to have a doctrine table.');
 
                 continue;
             }
 
             if (!in_array($declaringClass->name, $models))
             {
-                Kohana::log('alert', 'UNINSTALL REMOVING ' . $package['packageName'] . ' FROM TABLE ' . $model);
+                Kohana::log('debug', 'Removing ' . $package['packageName'] . ' from table ' . $model);
 
                 $rows = Doctrine_Query::create()->from($model . ' t')->execute();
 
@@ -324,7 +315,7 @@ abstract class Bluebox_Configure
             }
             else
             {
-                Kohana::log('alert', 'UNINSTALL TRUNCATING TABLE: ' . $tableName);
+                Kohana::log('debug', 'Truncating table ' . $tableName);
 
                 $rows = $table->findAll();
 
@@ -376,7 +367,7 @@ abstract class Bluebox_Configure
                     {
                         $conn->export->dropTable($drop);
 
-                        Kohana::log('alert', 'UNINSTALL DROPING TABLE: ' . $drop);
+                        Kohana::log('debug', 'Drop ' .$drop .' like its hot');
 
                         unset($tables[$key]);
                     }
@@ -389,9 +380,9 @@ abstract class Bluebox_Configure
 
                 if ($errorCount < 0)
                 {
-                    Kohana::log('error', 'Uninstall unable to resolve drop table order!');
+                    Kohana::log('error', 'Unable to resolve drop table order!');
 
-                    return 'Unable to resolve drop table order!';
+                    throw new Exception('Unable to resolve drop table order!');
                 }
             }
         }

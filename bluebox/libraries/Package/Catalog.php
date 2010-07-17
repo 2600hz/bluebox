@@ -32,6 +32,8 @@ class Package_Catalog
 
             Package_Catalog_Datastore::import($metadata);
 
+            //kohana::log('debug', 'Catalog added ' .str_replace(DOCROOT, '', $filepath) .' as ' .$metadata['packageName'] .' version ' .$metadata['version'] . ' identified by ' .$metadata['identifier']);
+
             self::$catalog[$metadata['identifier']] = $metadata;
 
             self::$packageList[$metadata['packageName']][$metadata['status']][$metadata['identifier']]
@@ -65,7 +67,6 @@ class Package_Catalog
         return self::$catalog;
     }
 
-
     public static function getPackageList()
     {
         self::init();
@@ -79,7 +80,7 @@ class Package_Catalog
         
         $avaliableVersions = array();
 
-        if (!isset(self::$packageList[$name]))
+        if (empty($name) OR !isset(self::$packageList[$name]))
         {
             throw new Package_Catalog_Exception('Unknown package name ' .$name);
         }
@@ -102,11 +103,25 @@ class Package_Catalog
         return array_reverse($avaliableVersions);
     }
 
+    public static function getFirstAvaliablePackage($name)
+    {
+        $avaliable = self::getAvaliableVersions($name);
+
+        if (!is_array($avaliable))
+        {
+            throw new Package_Catalog_Exception('Unable to determine avaliable package version for ' .$name);
+        }
+
+        $avaliable = array_keys($avaliable);
+
+        return array_shift($avaliable);
+    }
+
     public static function getPackageByName($name)
     {
         self::init();
 
-        if (!isset(self::$packageList[$name]))
+        if (empty($name) OR !isset(self::$packageList[$name]))
         {
             throw new Package_Catalog_Exception('Unknown package name ' .$name);
         }
@@ -118,7 +133,7 @@ class Package_Catalog
     {
         self::init();
 
-        if (!isset(self::$packageList[$name][Package_Manager::STATUS_INSTALLED]))
+        if (empty($name) OR !isset(self::$packageList[$name][Package_Manager::STATUS_INSTALLED]))
         {
             return FALSE;
         }
@@ -136,7 +151,7 @@ class Package_Catalog
     {
         self::init();
 
-        if (!isset(self::$catalog[$identifier]))
+        if (empty($identifier) OR !isset(self::$catalog[$identifier]))
         {
             throw new Package_Catalog_Exception('Unknown package identifier ' .$identifier);
         }
@@ -162,7 +177,7 @@ class Package_Catalog
     {
         self::init();
 
-        if (!isset(self::$catalog[$identifier]))
+        if (empty($identifier) OR !isset(self::$catalog[$identifier]))
         {
             throw new Package_Catalog_Exception('Unknown package identifier ' .$identifier);
         }
@@ -273,8 +288,6 @@ class Package_Catalog
                 $foundClasses = array();
             }
         }
-
-
 
         return self::$configureCache;
     }

@@ -10,7 +10,7 @@ class SimpleRoute_Configure extends Bluebox_Configure
     public static $summary = 'Simple Route';
     public static $description = 'A simplified routing mechanism for trunk modules';
     public static $default = true;
-    public static $type = Bluebox_Installer::TYPE_PLUGIN;
+    public static $type = Package_Manager::TYPE_PLUGIN;
     public static $required = array(
         'core' => 0.1,
         'trunkmanager' => 0.1
