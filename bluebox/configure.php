@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core
+ * @author     Darren Schreiber
+ * @author     K Anderson
+ * @license    Mozilla Public License (MPL) v1.1
+ */
 class Core_Configure extends Bluebox_Configure
 {
     public static $version = 1.0;
@@ -89,8 +94,6 @@ class Core_Configure extends Bluebox_Configure
 
     public static function createDefaultNetlists()
     {
-        Doctrine::getTable('NetList')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
-        
         $netList = new NetList();
         $netList->name = 'Private/Local Network (auto)';
         $netList->system_list = 'rfc1918.auto';
