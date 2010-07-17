@@ -503,7 +503,7 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->delete_prepare($object);
 
             // Allow plugins to process any data related to this object prior to deletion
-            if(!plugins::delete($this, $deleteEvents))
+            if(!plugins::delete($object, $deleteEvents))
             {
                 throw new Bluebox_Exception('Plugins failed to delete');
             }
@@ -707,7 +707,7 @@ abstract class Bluebox_Controller extends Template_Controller
         Event::run('bluebox.create_view', $this->view);
     }
 
-    protected function loadBaseModel($id = NULL, $baseModel = NULl)
+    protected function loadBaseModel($id = NULL, $baseModel = NULL)
     {
         if (is_null($baseModel))
         {
