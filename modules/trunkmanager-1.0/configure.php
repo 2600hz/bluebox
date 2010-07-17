@@ -17,7 +17,7 @@ class Trunkmanager_Configure extends Bluebox_Configure
     public static $navURL = 'trunkmanager/index';
     public static $navSubmenu = array(
         'Search Trunks' => '/trunkmanager/index',
-        'Add Trunk' => '/trunkmanager/add',
+        'Add Trunk' => '/trunkmanager/create',
         'Edit Trunk' => array(
             'url' => '/trunkmanager/edit',
             'disabled' => 'true'
