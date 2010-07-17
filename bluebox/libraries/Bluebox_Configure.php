@@ -148,7 +148,7 @@ abstract class Bluebox_Configure
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-        if (!empty($package['directory']))
+        if (!empty($package['directory']) AND $package['type'] != Package_Manager::TYPE_CORE)
         {
             kohana::log('debug', 'Dynamically adding `' .$package['directory'] .'` to kohana');
 
