@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-
+/**
+ * @package    Core/Libraries/View
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class View extends View_Core {
 
     public static $instance = NULL;

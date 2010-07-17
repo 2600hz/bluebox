@@ -1,11 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * installer.php - Auto-installer. Installs Bluebox and initializes modules.
- *
- * @author Karl Anderson
- * @license MPL
- * @package Bluebox
- * @subpackage Installer
+ * @package    Core/Installer
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
 class Installer_Controller extends Bluebox_Controller
 {
