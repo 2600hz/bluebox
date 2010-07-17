@@ -29,36 +29,31 @@
  * @package TCAPI
  * @subpackage FreeSWITCH_Driver
  */
-class FreeSwitch_NetList_Driver extends FreeSwitch_Base_Driver {
-    public static function set($obj)
+class FreeSwitch_NetList_Driver extends FreeSwitch_Base_Driver
+{
+    public static function set($netList)
     {
-        // Test if the allow for the ACL changed because if so the setSection
-        // will miss selecting the old set so we need to delete the old
-        // node first
-        $orgValues = $obj->getLastModified();
-        if (isset($orgValues['allow'])) {
-            // Reference to our old network list. Notice the allow logic is reversed
-            $xml = FreeSwitch::setSection('netlist', $obj->net_list_id, $obj->allow ? 'deny' : 'allow');
-            // remove any of the acl's alread there
-            $xml->deleteNode();
-        }
-
         // Reference to our new network list
-        $xml = FreeSwitch::setSection('netlist', $obj->net_list_id, $obj->allow ? 'allow' : 'deny');
+        $xml = FreeSwitch::setSection('netlist', $netList['net_list_id']);
+
+        $xml->setAttributeValue('', 'default', $netList['allow'] ? 'allow' : 'deny');
+
         // remove any of the acl's alread there
-        $xml->deleteNode();
+        $xml->deleteChildren();
 
         // Cycle through all network list items and add them to the ACL file
-        foreach ($obj->NetListItem as $item) {
-          $item->record = str_replace('/', '\/', $item->record);
-          $xml->update('/node[@freepbx="net_list_item_' . $item->net_list_item_id . '"]{@type="' . ($item->allow ? 'allow' : 'deny') . '"}{@cidr="' . $item->record . '"}');
+        foreach ($netList['NetListItem'] as $item)
+        {
+            $item['record'] = str_replace('/', '\/', $item['record']);
+
+            $xml->update('/node[@freepbx="net_list_item_' . $item['net_list_item_id'] . '"]{@type="' . ($item['allow'] ? 'allow' : 'deny') . '"}{@cidr="' . $item['record'] . '"}');
         }
     }
 
-    public static function delete($obj)
+    public static function delete($netList)
     {
         // Reference to our XML document & context
-        $xml = FreeSwitch::setSection('netlist', $obj->net_list_id, $obj->allow ? 'allow' : 'deny');
+        $xml = FreeSwitch::setSection('netlist', $netList['net_list_id']);
 
         $xml->deleteNode();
     }
