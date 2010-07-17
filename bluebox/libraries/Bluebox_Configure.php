@@ -147,7 +147,18 @@ abstract class Bluebox_Configure
     public function install($identifier)
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
-        
+
+        if (!empty($package['directory']))
+        {
+            kohana::log('debug', 'Dynamically adding `' .$package['directory'] .'` to kohana');
+
+            $loadedModules = Kohana::config('core.modules');
+
+            $modules = array_unique(array_merge($loadedModules, array($package['directory'])));
+
+            Kohana::config_set('core.modules', $modules);
+        }
+
         // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)
         // Note that we do this because Postgers & Doctrine don't like our polymorphic class extensions and try to create the same
         // tables twice.
