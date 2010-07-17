@@ -10,11 +10,6 @@ class Package_Operation_uninstall extends Package_Operation
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
         
-        if ($package['status'] != Package_Manager::STATUS_INSTALLED)
-        {
-            throw new Package_Operation_Exception('Uninstall is not a sane operation for a package with status ' .$package['status']);
-        }
-
         Package_Dependency::validateAbandon($identifier);
     }
 

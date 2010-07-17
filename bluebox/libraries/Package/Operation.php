@@ -17,27 +17,27 @@ class Package_Operation
 
         switch ($operation)
         {
-            case 'verify':
+            case Package_Manager::OPERATION_VERIFY:
                 $agent = new Package_Operation_Verify;
 
                 break;
 
-            case 'repair':
+            case Package_Manager::OPERATION_REPAIR:
                 $agent = new Package_Operation_Repair;
 
                 break;
 
-            case 'install':
+            case Package_Manager::OPERATION_INSTALL:
                 $agent = new Package_Operation_Install;
 
                 break;
 
-            case 'uninstall':
+            case Package_Manager::OPERATION_UNINSTALL:
                 $agent = new Package_Operation_Uninstall;
 
                 break;            
 
-            case 'migrate':
+            case Package_Manager::OPERATION_MIGRATE:
                 $agent = Package_Operation_Migrate;
 
                 break;
@@ -127,6 +127,18 @@ class Package_Operation
     protected static function rollback($operation, $identifier, $step, $error)
     {
         kohana::log('error', 'Package operation ' .$operation .' failed during ' .$step .' on package ' .$identifier .': ' .$error->getMessage());
+        
+        try
+        {
+            if ($operation != Package_Manager::OPERATION_UNINSTALL)
+            {
+                self::dispatch(Package_Manager::OPERATION_UNINSTALL, $identifier);
+            }
+        }
+        catch (Exception $e)
+        {
+            kohana::log('error', 'Error during rollback: ' .$e->getMessage());
+        }
 
         throw $error;
     }

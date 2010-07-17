@@ -291,11 +291,16 @@ abstract class Bluebox_Configure
 
                 $tableName = $table->getOption('tableName');
 
+                if (!$conn->import->tableExists($tableName))
+                {
+                    throw new Exception('Table does not exist');
+                }
+
                 $declaringClass = $table->getOption('declaringClass');
             }
             catch(Exception $e)
             {
-                Kohana::log('debug', 'Skipping model ' . $model . ', doesnt seem to have a doctrine table.');
+                Kohana::log('debug', 'Skipping uninstall on model ' . $model . ': ' .$e->getMessage());
 
                 continue;
             }
