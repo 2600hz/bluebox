@@ -1,12 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * jqueryElement - class for work with jquery framework
- * retrieved from http://jquery.hohli.com/ by K Anderson on 06 05 2009
- *
- * @author Anton Shevchuk
- * @license LGPL
- * @access   public
- * @package  jquery
+ * @package    Core/Helpers/JgridElement
+ * @author     Anton Shevchuk
+ * @license    Mozilla Public License (MPL)
  */
 class jqueryElement
 {

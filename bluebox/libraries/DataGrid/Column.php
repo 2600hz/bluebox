@@ -1,7 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-
-class DataGrid_Column {
-
+/**
+ * @package    Core/Libraries/DataGrid
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
+class DataGrid_Column
+{
     private $content = NULL;
 
     private $displayName = NULL;
@@ -37,6 +41,7 @@ class DataGrid_Column {
         {
             return $this->attributes['cell'][$attribute];
         }
+
         return NULL;
     }
 
@@ -68,7 +73,9 @@ class DataGrid_Column {
             case 'cell':
             case 'footer':
                 $this->attributes[$for][$attribute] = $value;
+
                 break;
+
             default:
                 throw new Exception('Unknown attribute owner');
         }
@@ -82,6 +89,7 @@ class DataGrid_Column {
             case 'cell':
             case 'footer':
                 return $this->attributes[$for][$attribute];
+
             default:
                 throw new Exception('Unknown attribute owner');
         }
@@ -95,6 +103,7 @@ class DataGrid_Column {
             case 'cell':
             case 'footer':
                 return $this->attributes[$for];
+
             default:
                 throw new Exception('Unknown attribute owner');
         }

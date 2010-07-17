@@ -16,5 +16,4 @@
     }
 ?>
 
-
 <?php javascript::renderCodeBlocks(); ?>

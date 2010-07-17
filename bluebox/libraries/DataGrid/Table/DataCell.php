@@ -1,7 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-
-class DataGrid_Table_DataCell {
-    
+/**
+ * @package    Core/Libraries/DataGrid
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
+class DataGrid_Table_DataCell
+{    
     private $value = NULL;
 
     private $attributes = array();
@@ -9,6 +13,7 @@ class DataGrid_Table_DataCell {
     public function __construct($value = NULL, $attributes = array())
     {
         $this->value = $value;
+
         $this->attributes = $attributes;
     }
 
@@ -17,7 +22,9 @@ class DataGrid_Table_DataCell {
         if (strtolower($attribute) == 'value')
         {
             $this->value = $value;
-        } else {
+        }
+        else
+        {
             $this->attributes[$attribute] = $value;
         }
     }
@@ -33,6 +40,7 @@ class DataGrid_Table_DataCell {
         {
             return $this->attributes[$attribute];
         }
+
         return NULL;
     }
 
@@ -42,6 +50,7 @@ class DataGrid_Table_DataCell {
         {
             return TRUE;
         }
+
         return isset($this->attributes[$attribute]);
     }
 
@@ -50,7 +59,9 @@ class DataGrid_Table_DataCell {
         if (strtolower($attribute) == 'value')
         {
             $this->value = NULL;
-        } else {
+        } 
+        else
+        {
             unset($this->attributes[$attribute]);
         }
     }

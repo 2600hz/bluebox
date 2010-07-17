@@ -1,12 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-
 /**
- * Description of Array
- *
- * @author kanderson
+ * @package    Core/Libraries/DataGrid
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
-class DataGrid_Driver_Array implements Iterator {
-    
+class DataGrid_Driver_Array implements Iterator
+{    
     private $data = array();
 
     public function  __construct()
@@ -36,7 +35,9 @@ class DataGrid_Driver_Array implements Iterator {
         if (is_null($rowNumber))
         {
             $this->data[] = $data;
-        } else {
+        } 
+        else
+        {
             $this->data[$rowNumber] = $data;
         }
 
@@ -49,6 +50,7 @@ class DataGrid_Driver_Array implements Iterator {
         {
             return $dataSet[$field];
         }
+        
         return '&nbsp';
     }
 
@@ -76,5 +78,4 @@ class DataGrid_Driver_Array implements Iterator {
     {
         return isset($this->data[$this->key()]);
     }
-
 }
