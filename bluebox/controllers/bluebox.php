@@ -78,9 +78,6 @@ abstract class Bluebox_Controller extends Template_Controller
         // FIXME: This should be moved!!!
         self::$validation = new Validation($_POST);
 
-        //$this->freshInstall();
-        //die();
-
         // Setup anything related to this website's pages rendering
         Event::run('bluebox.setup', $this);
 
@@ -228,6 +225,9 @@ abstract class Bluebox_Controller extends Template_Controller
 
         // Setup anything related to authorizing the user
         Event::run('bluebox.ready', $this);
+
+        //var_dump(Package_Transaction_Graph::listDependencies());
+        //die();
     }
 
     /**
@@ -707,7 +707,7 @@ abstract class Bluebox_Controller extends Template_Controller
         Event::run('bluebox.create_view', $this->view);
     }
 
-    protected function loadBaseModel($id = NULL, $baseModel = NULl)
+    protected function loadBaseModel($id = NULL, $baseModel = NULL)
     {
         if (is_null($baseModel))
         {

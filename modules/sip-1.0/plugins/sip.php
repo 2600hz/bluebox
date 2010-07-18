@@ -25,6 +25,11 @@ class Sip_Plugin extends Bluebox_Plugin
         );
     }
 
+    public function provideTrunkType()
+    {
+        $this->supportedTrunkTypes['sip'] = 'Sip Interface';
+    }
+
     public function validate()
     {
         $valid = TRUE;

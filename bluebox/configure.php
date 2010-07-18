@@ -36,13 +36,17 @@ class Core_Configure extends Bluebox_Configure
 
         $options = array();
 
-        $options['account'] = array('name' => 'Master Account');
+        $options['account'] = array(
+            'name' => 'Master Account',
+            'type' => Account::TYPE_NORMAL
+        );
 
         $options['location'] = array('name' => 'Main Location');
 
         $options['user'] = array(
             'username' => $session->get('installer.adminEmailAddress'),
-            'password' => $session->get('installer.adminPassword')
+            'password' => $session->get('installer.adminPassword'),
+            'user_type' => User::TYPE_SYSTEM_ADMIN
         );
 
         Bluebox_Tenant::initializeTenant($options);
@@ -96,66 +100,60 @@ class Core_Configure extends Bluebox_Configure
     {
         $netList = new NetList();
 
-        $netList->name = 'Private/Local Network (auto)';
+        $netList['name'] = 'Private/Local Network (auto)';
 
-        $netList->system_list = 'rfc1918.auto';
+        $netList['system_list'] = 'rfc1918.auto';
 
         $netList->save(TRUE);
 
         
         $netList = new NetList();
 
-        $netList->name = 'Private Network (auto)';
+        $netList['name'] = 'Private Network (auto)';
 
-        $netList->system_list = 'nat.auto';
-
-        $netList->save(TRUE);
-
-
-        $netList = new NetList();
-
-        $netList->name = 'Local Network (auto)';
-
-        $netList->system_list = 'localnet.auto';
+        $netList['system_list'] = 'nat.auto';
 
         $netList->save(TRUE);
 
 
         $netList = new NetList();
 
-        $netList->name = 'Loopback Network (auto)';
+        $netList['name'] = 'Local Network (auto)';
 
-        $netList->system_list = 'loopback.auto';
-
-        $netList->save(TRUE);
-
-
-        $netlist = new NetList;
-
-        $netlist->name = 'Trunks (auto)';
-
-        $netList->system_list = 'trunks.auto';
+        $netList['system_list'] = 'localnet.auto';
 
         $netList->save(TRUE);
 
 
         $netList = new NetList();
 
-        $netList->name = 'Public Internet';
+        $netList['name'] = 'Loopback Network (auto)';
 
-        $netList->allow = TRUE;
+        $netList['system_list'] = 'loopback.auto';
 
         $netList->save(TRUE);
 
 
-        $netItem = new NetListItem();
+        $netList = new NetList();
 
-        $netItem->NetList = $netList;
+        $netList['name'] = 'Trunks (auto)';
 
-        $netItem->record = '0.0.0.0/0';
+        $netList['system_list'] = 'trunks.auto';
 
-        $netItem->allow = TRUE;
+        $netList->save(TRUE);
 
-        $netItem->save(TRUE);
+
+        $netList = new NetList();
+
+        $netList['name'] = 'Public Internet';
+
+        $netList['allow'] = TRUE;
+
+        $netList['NetListItem']->fromArray(array(
+                array('record' => '0.0.0.0/0', 'allow' => TRUE)
+            )
+        );
+
+        $netList->save(TRUE);
     }
 }

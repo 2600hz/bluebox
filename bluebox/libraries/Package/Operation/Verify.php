@@ -6,27 +6,33 @@
  */
 class Package_Operation_Verify extends Package_Operation
 {
-    public static function execute($args)
+    public function validate($identifier)
     {
-        if (!is_array($args))
-        {
-            $args = array($args);
-        }
+        
+    }
 
-        if (empty($args[0]))
-        {
-            throw new Package_Operation_Exception('Verify requires the package identifier to verify');
-        }
+    public function preExec($identifier)
+    {
 
-        $identifier = $args[0];
+    }
 
-        kohana::log('debug', 'Starting verify of ' .$identifier);
-
+    public function exec($identifier)
+    {
         self::verify($identifier);
 
         self::runCheckMethods($identifier);
 
         Package_Dependency::validateIntegration($identifier);
+    }
+
+    public function postExec($identifier)
+    {
+
+    }
+
+    public function finalize($identifier)
+    {
+
     }
 
     protected static function verify($identifier)
@@ -62,7 +68,7 @@ class Package_Operation_Verify extends Package_Operation
             }
             catch (Exception $e)
             {
-
+                //TODO: Still have not figure out how to handle errors...
             }
         }
     }

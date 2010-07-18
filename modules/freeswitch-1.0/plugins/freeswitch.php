@@ -18,10 +18,9 @@ class Freeswitch_Plugin extends Bluebox_Plugin
         'C:\freeswitch'
     );
 
-    public function index()
-    {
+    public static $initialModuels = array(
 
-    }
+    );
 
     /**
      * Setup the subview for the address plugin

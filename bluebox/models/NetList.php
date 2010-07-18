@@ -28,7 +28,7 @@ class NetList extends Bluebox_Record
     function setUp()
     {
         // RELATIONSHIPS
-        $this->hasMany('NetListItem', array('local' => 'net_list_id', 'foreign' => 'net_list_id', 'onDelete' => 'CASCADE'));
+        $this->hasMany('NetListItem', array('local' => 'net_list_id', 'foreign' => 'net_list_id', 'cascade' => array('delete')));
 
         // BEHAVIORS
         $this->actAs('TelephonyEnabled');

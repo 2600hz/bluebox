@@ -16,7 +16,7 @@ class netlists
 
         // add in all the defaults if they are not provided
         $data += array(
-            'nullOption' => FALSE
+            'nullOption' => 'None'
         );
 
         arr::update($data, 'class', ' netlist_dropdown');
