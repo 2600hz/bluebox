@@ -13,9 +13,7 @@ class InterfaceManager_Configure extends Bluebox_Configure
     public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
-        'freeswitch' => 0.1,
-        'trunkmanager' => 0.1,
-        'sip' => 0.1
+        'freeswitch' => 0.1
     );
     public static $navBranch = '/Connectivity/';
     public static $navURL = 'sipinterface/index';    
