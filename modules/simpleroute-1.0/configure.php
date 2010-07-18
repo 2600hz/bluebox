@@ -1,10 +1,11 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
+
 class SimpleRoute_Configure extends Bluebox_Configure
 {
     public static $version = 1.0;
     public static $packageName = 'simpleroute';
     public static $displayName = 'Simple Route';
-    public static $author = 'Darren Schreiber';
+    public static $author = 'K Anderson';
     public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'Simple Route';
