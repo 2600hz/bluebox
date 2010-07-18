@@ -46,7 +46,7 @@ class FreeSwitch_NetList_Driver extends FreeSwitch_Base_Driver
         {
             $item['record'] = str_replace('/', '\/', $item['record']);
 
-            $xml->update('/node[@freepbx="net_list_item_' . $item['net_list_item_id'] . '"]{@type="' . ($item['allow'] ? 'allow' : 'deny') . '"}{@cidr="' . $item['record'] . '"}');
+            $xml->update('/node[@bluebox="net_list_item_' . $item['net_list_item_id'] . '"]{@type="' . ($item['allow'] ? 'allow' : 'deny') . '"}{@cidr="' . $item['record'] . '"}');
         }
     }
 
