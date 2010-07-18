@@ -46,7 +46,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
                 }
                 else
                 {
-                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' .$options['prepend'] . '"}');
+                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend="}');
                 }
 
                 if (!empty($simpleroute['caller_id_name']))
