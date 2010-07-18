@@ -36,6 +36,11 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
      */
     public static function set($sipinterface)
     {
+        if (!($sipinterface instanceof SipInterface))
+        {
+            return TRUE;
+        }
+
         // Reference to our XML document
         $xml = Telephony::getDriver()->xml;
 
@@ -176,6 +181,11 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
     public static function delete($sipinterface)
     {
+        if (!($sipinterface instanceof SipInterface))
+        {
+            return TRUE;
+        }
+        
         // Reference to our XML document
         $xml = Telephony::getDriver()->xml;
         
