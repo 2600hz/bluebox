@@ -75,7 +75,6 @@ class FreeSwitch extends Telephony_Driver
         'conferences' => '//document/section[@name="configuration"]/configuration[@name="conference.conf"]',
         'conference_profile' => '//document/section[@name="configuration"]/configuration[@name="conference.conf"]/profiles/profile[@name="conference_%s"]',
         'sofia' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]',
-        'trunk' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]/gateways/gateway[@name="%s"]',
         'gateway' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]/gateways/gateway[@name="%s"]',
         'voicemail' => '//document/section[@name="configuration"]/configuration[@name="voicemail.conf"]/profiles/profile[@name="%s"]',
         'odbc' => '//document/section[@name="odbc"]',
