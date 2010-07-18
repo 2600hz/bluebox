@@ -34,33 +34,27 @@ class FreeSwitch_Trunk_Driver extends FreeSwitch_Base_Driver
     /**
      * Indicate we support FreeSWITCH
      */
-    public static function set($obj)
+    public static function set($trunk)
     {
-        // Only setup a gateway if it's attached to an interface
-        if ($obj->SipInterfaceTrunk->sipinterface_id)
+        $plugins = $trunk['plugins'];
+
+        if (!empty($plugins['sipinterface']['sipinterface_id']))
         {
-            // Reference to our XML document
-            $xml = Telephony::getDriver()->xml;
+            $xml = FreeSwitch::setSection('trunk', 'sipinterface_' .$plugins['sipinterface']['sipinterface_id'], 'trunk_' . $trunk['trunk_id']);
 
-            // The section we are working with is <document><section name="configuration"><configuration name="sofia.conf"><profiles><profile name=X><gateways><gateway name=X>
-            $xml->setXmlRoot(sprintf('//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]/gateways/gateway[@name="%s"]', 'sipinterface_' . $obj->SipInterfaceTrunk->sipinterface_id, 'trunk_' . $obj->trunk_id));
-
-            $xml->update('/param[@name="realm"]{@value="' . $obj->server . '"}');
-            //$xml->set('/param[@name="extension"][@value="number_XX"]');
+            $xml->update('/param[@name="realm"]{@value="' . $trunk['server'] . '"}');
         }
 
         // Note - sip settings for trunks get added by the sip driver
     }
 
-    public static function delete($obj)
+    public static function delete($trunk)
     {
-        // Only setup a gateway if it's attached to an interface
-        if ($obj->SipInterfaceTrunk->sipinterface_id) {
-            // Reference to our XML document
-            $xml = Telephony::getDriver()->xml;
+        $plugins = $trunk['plugins'];
 
-            // The section we are working with is <document><section name="configuration"><configuration name="sofia.conf"><profiles><profile name=X><gateways><gateway name=X>
-            $xml->setXmlRoot(sprintf('//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]/gateways/gateway[@name="%s"]', 'sipinterface_' . $obj->SipInterfaceTrunk->sipinterface_id, 'trunk_' . $obj->trunk_id));
+        if (!empty($plugins['sipinterface']['sipinterface_id']))
+        {
+            $xml = FreeSwitch::setSection('trunk', 'sipinterface_' .$plugins['sipinterface']['sipinterface_id'], 'trunk_' . $trunk['trunk_id']);
 
             $xml->deleteNode();
         }
