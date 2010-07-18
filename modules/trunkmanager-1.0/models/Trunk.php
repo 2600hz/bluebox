@@ -28,47 +28,55 @@
  * @subpackage Trunk
  */
 
-class Trunk extends Bluebox_Record {
+class Trunk extends Bluebox_Record
+{
     public static $errors = array(
-    'name' => array(
-    'required' => 'A name must be entered.',
-    'default' => 'Invalid name.'
-    ),
-    'provider' => array(
-    'required' => 'A provider must be entered.',
-    'default' => 'Invalid provider.'
-    ),
-    'provider_id' => array(
-    'required' => 'A provider must be entered',
-    'default' => 'Invalid Provider'
-    ),
-    'server' => array(
-    'required' => 'A server must be entered.',
-    'default' => 'Invalid server.'
-    )
+        'name' => array(
+            'required' => 'A name must be entered.',
+            'default' => 'Invalid name.'
+        ),
+        'provider' => array(
+            'required' => 'A provider must be entered.',
+            'default' => 'Invalid provider.'
+        ),
+        'provider_id' => array(
+            'required' => 'A provider must be entered',
+            'default' => 'Invalid Provider'
+        ),
+        'server' => array(
+            'required' => 'A server must be entered.',
+            'default' => 'Invalid server.'
+        )
     );
 
     /**
      * Sets the table name, and defines the table columns.
      */
-    public function setTableDefinition() {
-    // COLUMN DEFINITIONS
+    public function setTableDefinition()
+    {
+        // COLUMN DEFINITIONS
         $this->hasColumn('trunk_id', 'integer', 11, array(
-            'unsigned' => true,
-            'notnull' => true,
-            'primary' => true,
-            'autoincrement' => true
+                'unsigned' => true,
+                'notnull' => true,
+                'primary' => true,
+                'autoincrement' => true
             )
         );
 
         $this->hasColumn('name', 'string', 100, array(
-            'notnull' => true,
-            'notblank' => true
+                'notnull' => true,
+                'notblank' => true
+            )
+        );
+
+        $this->hasColumn('type', 'string', 50, array(
+                'notnull' => true,
+                'notblank' => true
             )
         );
 
         $this->hasColumn('active', 'boolean', 1, array(
-            'default' => 1
+                'default' => 1
             )
         );
         $this->hasColumn('server', 'string', 100);
@@ -82,11 +90,12 @@ class Trunk extends Bluebox_Record {
     /**
      * Sets up relationships, behaviors, etc.
      */
-    public function setUp() {
+    public function setUp()
+    {
         // RELATIONSHIPS
 
         // BEHAVIORS
-        $this->actAs('Polymorphic');
+        // $this->actAs('Polymorphic');
 
         $this->actAs('Timestampable');
         $this->actAs('TelephonyEnabled');

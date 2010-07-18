@@ -12,28 +12,57 @@ class Installer_Controller extends Bluebox_Controller
     public $autoloadUser = FALSE;
 
     /**
-     * @var array $defaultLanguages list of supported langauges were keys are the short name and values the display name
-     */
-    public $defaultLanguages = array(
-        'EN_US' => 'English (US)',
-        'ES' => 'Español'
-    );
-
-    /**
-     * @var array $defaultCurrencies list of supported currencies
-     */
-    public $defaultCurrencies = array(
-        'USD' => 'US Dollars ($)',
-        'CAD' => 'Canadian Dollars ($)',
-        'EUR' => 'Euro (€)',
-        'GBP' => 'British Pounds (£)',
-        'JPY' => 'Japanese Yen (¥)'
-    );
-
-    /**
      * @var string $template name of the installer base template
      */
     public $template = 'skins/installer/';
+
+    /**
+     * @var array The absolute minimum packages that will be installed
+     */
+    public $minimumPackages = array(
+        'core',
+        'packagemanager',
+        'multitenant',
+
+        // System Modules
+        'accountmanager',
+        'contextmanager',
+        'locationmanager',
+        'usermanager',
+        'numbermanager',
+        'powerdns',
+        'rosetta',
+        
+        // Modules
+        'devicemanager',
+        'conference',
+        'voicemail',
+        'ringgroup',
+        'timeofday',
+        'trunkmanager',
+        'simpleroute',
+
+        // Plugins
+        'address',
+        'callerid',
+        'sip',
+        
+        //'autoattendant',
+        //'mediamanager',
+
+        // Freeswitch
+        'esl',
+        'netlistmanager',
+        'sipinterface',
+        'sofia',
+        'xmleditor',
+        'mediaoption',
+        'odbc',
+        
+        'provisioner',
+        'polycomdriver'
+
+    );
 
     /**
      *
@@ -44,14 +73,11 @@ class Installer_Controller extends Bluebox_Controller
     /**
      * @var array $steps List of functions to process for install (order is important)
      */
-    //protected $steps = array('welcome', 'testEnvironment', 'installMode', 'configure', 'choosePackages', 'doInstall', 'finalize');
     protected $steps = array(
         'welcome',
-        'testEnvironment',
         'configure',
         'createAdmin',
         'telephony',
-        'choosePackages',
         'doInstall',
         'finalize'
     );
@@ -135,7 +161,7 @@ class Installer_Controller extends Bluebox_Controller
             // This test makes sure that the form being submitted has a matching token,
             // since the token changes every time the form is rendered if the tokens dont
             // match then it must be a refresh....
-            $testToken = $this->session->get('installer.formToken', false);
+            $testToken = $this->session->get('installer.formToken', FALSE);
 
             if (empty($returns['form_token']) || $returns['form_token'] != $testToken)
             {
@@ -188,7 +214,7 @@ class Installer_Controller extends Bluebox_Controller
                 } 
                 else
                 {
-                    $proceed = true;
+                    $proceed = TRUE;
                 }
 
                 // Run all registered save hooks for this installer.step
@@ -204,17 +230,17 @@ class Installer_Controller extends Bluebox_Controller
         }
         // Lets generate a unique token that the form must respond with so on refresh
         // it doesnt progress unexpectedly
-        $formToken = strtoupper(md5(uniqid(rand() , true)));
+        $formToken = strtoupper(md5(uniqid(rand() , TRUE)));
 
         $this->session->set('installer.formToken', $formToken);
 
         $this->template->formToken = $formToken;
 
         // Default to allow them to go to the back a step if the are not on the first.
-        $this->template->allowPrev = $this->currentStepKey > 0 ? true : false;
+        $this->template->allowPrev = $this->currentStepKey > 0 ? TRUE : FALSE;
 
         // By default they can always continue (but a step may disable this ability!)
-        $this->template->allowNext = true;
+        $this->template->allowNext = TRUE;
 
         // Attempt to render this step
         try
@@ -236,9 +262,9 @@ class Installer_Controller extends Bluebox_Controller
         {
             $this->template->title = 'INSTALLATION ERROR';
 
-            $this->template->allowPrev = false;
+            $this->template->allowPrev = FALSE;
 
-            $this->template->allowNext = false;
+            $this->template->allowNext = FALSE;
 
             $subview  = '<h2 class="error">ERROR: Can not execute step ' . $this->currentStep .', wizard terminated!</h2>';
 
@@ -303,16 +329,16 @@ class Installer_Controller extends Bluebox_Controller
 
         // If we got the file then we must have made changes, attempt to save it back
         // but if there is an error doing so have the user do it
-        if (@file_put_contents(end($files) , $file) === false)
+        if (@file_put_contents(end($files) , $file) === FALSE)
         {
             // Use the preLog because we dont know if we have write permissions on logs/ yet!
             $_GET['config_file'] = 'config';
 
             $this->viewCache($file);
 
-            $this->template->allowNext = true;
+            $this->template->allowNext = TRUE;
 
-            return false;
+            return FALSE;
         }
         
         url::redirect('/installer');
@@ -370,9 +396,9 @@ class Installer_Controller extends Bluebox_Controller
             message::set('Oops, I can\'t find the new content for ' . $cache_file . '.php! Sorry guess you are on your own...');
         }
 
-        $this->template->allowPrev = false;
+        $this->template->allowPrev = FALSE;
 
-        $this->template->allowNext = false;
+        $this->template->allowNext = FALSE;
     }
     
     /**
@@ -417,7 +443,7 @@ class Installer_Controller extends Bluebox_Controller
         {
             message::set('Could not locate or read ' . $config . '.php!');
             
-            return false;
+            return FALSE;
         }
 
         // Compare what we where given to what is in the file and replace what differs
@@ -427,7 +453,7 @@ class Installer_Controller extends Bluebox_Controller
 
             // If we got the file then we must have made changes, attempt to save it back
             // but if there is an error doing so have the user do it
-            if (@file_put_contents(end($files) , $file) === false)
+            if (@file_put_contents(end($files) , $file) === FALSE)
             {
                 $cache->set(time() , $file, $config . '_file');
 
@@ -435,11 +461,11 @@ class Installer_Controller extends Bluebox_Controller
                     'target' => '_blank'
                 )));
 
-                return false;
+                return FALSE;
             }
         }
         
-        return true;
+        return TRUE;
     }
     /************************************************************************
     *						 INSTALL WIZARD STEPS							*
@@ -473,42 +499,7 @@ class Installer_Controller extends Bluebox_Controller
 
             message::set('You are still legally accepting the license so please ensure you read it!', 'alert');
         }
-        
-        return $subview;
-    }
 
-    /**
-     * Process the license step and only allows the next step if the user accepts the terms
-     *
-     * @return bool true if terms accepted otherwise false
-     * @param object $return[optional] The form return values to check accpteLicense
-     */
-    private function processWelcome()
-    {
-        $acceptLicense = $this->session->get('installer.acceptLicense', false);
-
-        if (!empty($acceptLicense))
-        {
-            return true;
-        }
-
-        message::set('Please accept the license to continue!');
-        
-        return false;
-    }
-    
-    /**
-     * This step looks for methods in this class that start with '_check' and executes each of them
-     * in the order it finds them.  It expects to get a result array back with information about
-     * if the environment is capable of supporting the Bluebox dependency each method is designed to check.
-     *
-     * @return subview
-     */
-    private function testEnvironment()
-    {
-        $subview = new View('installer/testEnvironment');
-
-        $this->template->title = __('Test Environment');
 
         // Every time we recheck the environment we need to rest any prevous failure marker
         $this->session->delete('installer.environmentTestFailed');
@@ -537,22 +528,22 @@ class Installer_Controller extends Bluebox_Controller
                 $this,
                 $checkMethod
             ));
-            
+
             // Check the result to track if we fail either the required or optional dependencies
             if (!$result['result'])
             {
                 if ($result['required'])
                 {
                     $hasErrors = TRUE;
-                } 
+                }
                 else
                 {
                     $hasWarnings = TRUE;
                 }
+
+                // Build the final results array so the user can see the overal status
+                $subview->results[] = $result;
             }
-            
-            // Build the final results array so the user can see the overal status
-            $subview->results[] = $result;
         }
 
         if (!empty($hasErrors))
@@ -560,78 +551,52 @@ class Installer_Controller extends Bluebox_Controller
             message::set('Installation can not continue until dependiencies have been met! Refresh to test again.');
 
             // Set a session var so we can tell if we should be allowed to continue without re-running all the methods
-            $this->session->set('installer.environmentTestFailed', true);
+            $this->session->set('installer.environmentTestFailed', TRUE);
         }
 
         if (!empty($hasWarnings))
         {
             message::set('Installation can continue but functionality may be reduced! Refresh to test again.', 'alert');
         }
-        
+
         return $subview;
     }
-    
-    /**
-     * This process the return to the next step from the environment test.  If a required
-     * dependency has failed then it stops the wizard by returning false.  Otherwise it
-     * returns true.
-     *
-     * @return bool False if a required dependency is missing otherwise true
-     * @param object $return[optional] The form return values, inconsequential to this method
-     */
-    private function processTestEnvironment()
-    {
-        $environmentGood = $this->session->get('installer.environmentTestFailed', false) ? false : true;
 
-        if ($environmentGood)
+    /**
+     * Process the license step and only allows the next step if the user accepts the terms
+     *
+     * @return bool true if terms accepted otherwise false
+     * @param object $return[optional] The form return values to check accpteLicense
+     */
+    private function processWelcome()
+    {
+        $valid = TRUE;
+
+        $acceptLicense = $this->session->get('installer.acceptLicense', FALSE);
+
+        if (empty($acceptLicense))
+        {
+            message::set('Please accept the license to continue!');
+            
+            $valid = FALSE;
+        }
+
+        $environmentGood = $this->session->get('installer.environmentTestFailed', FALSE) ? FALSE : TRUE;
+
+        if (!$environmentGood)
+        {
+            $valid = FALSE;
+        }
+        else
         {
             // Untill this point we couldnt write to the log because we may not have had permissions in logs/
             // so write out everything that was stored now that we know we can.
             Kohana::config_set('core.log_threshold', $this->log_threshold);
-            
-            return true;
         }
-        
-        return false;
-    }
-    
-    /**
-     * This step allows the user to choose either install or upgrade
-     *
-     * @return subview
-     */
-    private function installMode()
-    {
-        $subview = new View('installer/installMode');
 
-        $this->template->title = __('Installation Mode');
-
-        // Send any previous response back to to form, otherwise set the default
-        $subview->installMode = $this->session->get('installer.installMode', 'install');
-
-        return $subview;
+        return $valid;
     }
 
-    /**
-     * This process does not allow the user to continue if they choose upgrade
-     *
-     * TODO: No such option for upgrade yet...
-     *
-     * @return bool false if user requested upgrade otherwise true
-     * @param object $return[optional] The form return values
-     */
-    private function processInstallMode($returns = '')
-    {
-        if (!empty($returns['installMode']) && $returns['installMode'] == 'upgrade')
-        {
-            message::set('That function is unsupported at this time!');
-            
-            // some mechanism to change the steps here....
-            return false;
-        }
-        
-        return true;
-    }
     /**
      * This step requires the user to configure the default settings
      *
@@ -695,7 +660,7 @@ class Installer_Controller extends Bluebox_Controller
 
         $subview->dbName = $this->session->get('installer.dbName', Kohana::config('database.default.connection.database'));
 
-        $subview->dbPersistent = $this->session->get('installer.dbPersistent', Kohana::config('database.default.persistent'));
+        //$subview->dbPersistent = $this->session->get('installer.dbPersistent', Kohana::config('database.default.persistent'));
 
         // Passback or setup the site domain
         $subview->autoURI = $this->session->get('installer.siteDomain', '/' .trim(Kohana::config('core.site_domain'), '/'));
@@ -703,18 +668,8 @@ class Installer_Controller extends Bluebox_Controller
         // Passback or setup the upload dir
         $subview->uploadDir = $this->session->get('installer.uploadDir', Kohana::config('upload.directory'));
 
-        // Get the langauge if not specified default to english (US)
-        $subview->defaultLanguage = $this->session->get('installer.language', 'EN_US');
-
-        $subview->defaultLanguages = $this->defaultLanguages;
-        
         // Get the default timezone
         $subview->defaultTimeZone = $this->session->get('installer.defaultTimeZone');
-        
-        // Get the currency if not specified default to US Dollars (USD)
-        $subview->defaultCurrency = $this->session->get('installer.defaultCurrency', 'USD');
-        
-        $subview->defaultCurrencies = $this->defaultCurrencies;
         
         // Get the installSample option
         $subview->samples = $this->session->get('installer.samples', TRUE);
@@ -750,13 +705,12 @@ class Installer_Controller extends Bluebox_Controller
 
         // This array maps the database returns to the database config file
         $databaseOptions = array(
-            'type' => $this->session->get('installer.dbType') ,
-            'host' => $this->session->get('installer.dbHostName') ,
-            'port' => $this->session->get('installer.dbPortSelection') ,
-            'user' => $this->session->get('installer.dbUserName') ,
-            'pass' => $this->session->get('installer.dbUserPwd') ,
-            'database' => $this->session->get('installer.dbName') ,
-            'persistent' => (bool)$this->session->get('installer.dbPersistent') ,
+            'type' => $this->session->get('installer.dbType'),
+            'host' => $this->session->get('installer.dbHostName'),
+            'port' => $this->session->get('installer.dbPortSelection'),
+            'user' => $this->session->get('installer.dbUserName'),
+            'pass' => $this->session->get('installer.dbUserPwd'),
+            'database' => $this->session->get('installer.dbName')
         );
 
         // This array maps the configuration returns to the config file
@@ -907,31 +861,31 @@ class Installer_Controller extends Bluebox_Controller
             // This session var lets the user continue the second time around (after the warning)
             $this->session->set('installer.ensureInstall', $databaseOptions['type']);
             
-            return false;
+            return FALSE;
         }
 
         // Write $configOptions to config.php
         if (!self::updateConfig($configOptions, 'config'))
         {
-            return false;
+            return FALSE;
         }
 
         // Write $localeOptions to locale.php
         if (!self::updateConfig($localeOptions, 'locale'))
         {
-            return false;
+            return FALSE;
         }
         
         // Write $databaseOptions to database.php
         if (!self::updateConfig($databaseOptions, 'database'))
         {
-            return false;
+            return FALSE;
         }
         
         // Write $uploadOptions to upload.php
         if (!self::updateConfig($uploadOptions, 'upload')) 
         {
-            return false;
+            return FALSE;
         }
 
         // Go ahead and enable or disable anonymous stats based on the user, because we are about to try to use it
@@ -939,11 +893,11 @@ class Installer_Controller extends Bluebox_Controller
         {
             //Anonymous_Statistics::clear();
 
-            Kohana::config_set('core.anonymous_statistics', false);
+            Kohana::config_set('core.anonymous_statistics', FALSE);
         } 
         else
         {
-            Kohana::config_set('core.anonymous_statistics', true);
+            Kohana::config_set('core.anonymous_statistics', TRUE);
 
             // If the user has opted into anonymous_statistics then write out what we have stored in session previously
             $preStats = $this->session->get('installer.pre_stats');
@@ -961,7 +915,7 @@ class Installer_Controller extends Bluebox_Controller
             //Anonymous_Statistics::addMsg($databaseOptions['type'], 'db_type', 'installer', 'db_type');
         }
 
-        return true;
+        return TRUE;
     }
     
     private function createAdmin()
@@ -981,25 +935,25 @@ class Installer_Controller extends Bluebox_Controller
     
     private function processCreateAdmin()
     {
-        $valid = true;
+        $valid = TRUE;
 
         if (!valid::email($this->session->get('installer.adminEmailAddress')))
         {
             message::set('You must enter a valid email address to continue!');
 
-            $valid = false;
+            $valid = FALSE;
         } 
         elseif (strlen($this->session->get('installer.adminPassword')) < 1)
         {
             message::set('You need to set a password!');
 
-            $valid = false;
+            $valid = FALSE;
         } 
         elseif ($this->session->get('installer.adminPassword') != $this->session->get('installer.adminConfirmPassword'))
         {
             message::set('Passwords do not match!');
             
-            $valid = false;
+            $valid = FALSE;
         }
         
         return $valid;
@@ -1016,15 +970,20 @@ class Installer_Controller extends Bluebox_Controller
 
         $this->template->title = __('Telephony Engine');
 
-        $packages = Bluebox_Installer::listPackages(Bluebox_Installer::TYPE_DRIVER);
-
         $drivers = array(
             'none' => 'None'
         );
 
+        $packages = Package_Catalog::getCatalog();
+
         foreach($packages as $package)
         {
-            $this->session->set('installer.install_' . $package['packageName'], false);
+            if ($package['type'] != Package_Manager::TYPE_DRIVER)
+            {
+                continue;
+            }
+
+            $this->session->set('installer.install_' . $package['packageName'], FALSE);
 
             $drivers[$package['packageName']] = $package['displayName'];
         }
@@ -1062,7 +1021,7 @@ class Installer_Controller extends Bluebox_Controller
 
         if ($driver != 'none')
         {
-            $this->session->set('installer.install_' . $driver, true);
+            $this->session->set('installer.install_' . $driver, TRUE);
 
             // Add an event for this telephony driver exclusively
             $this->pluginEvents['driver'] = Router::$controller . '.' . $this->currentStep . '.' . $driver;
@@ -1072,195 +1031,14 @@ class Installer_Controller extends Bluebox_Controller
             // Set the driver name to none in telephony.php if there is no driver
             if (!Installer_Controller::updateConfig(array(
                 'driver' => 'none'
-            ) , 'telephony')) return false;
+            ) , 'telephony')) return FALSE;
         }
 
         //Anonymous_Statistics::addMsg($driver, 'tel_driver', 'installer', 'tel_driver');
         
-        return true;
+        return TRUE;
     }
-    
-    /**
-     * This step allows the user to select what set of modules to install
-     *
-     * @return subview
-     */
-    private function choosePackages()
-    {
-        $subview = new View('installer/choosePackages');
 
-        $this->template->title = __('Package Selection');
-
-        // Get a list of all the modules on the system
-        if ($this->session->get('installer.installMode', 'install') == 'install')
-        {
-            $ignoreDB = true;
-        }
-        else
-        {
-            $ignoreDB = false;
-        }
-
-        $telDrivers = Bluebox_Installer::listPackages(Bluebox_Installer::TYPE_DRIVER);
-
-        $currentDriver = $this->session->get('installer.tel_driver', 'none');
-
-        if (array_key_exists($currentDriver, $telDrivers))
-        {
-            unset($telDrivers[$currentDriver]);
-        }
-
-        $telDrivers = array_keys($telDrivers);
-
-        $packages = Bluebox_Installer::listPackages(array() , $ignoreDB);
-
-        $install = array();
-
-        foreach($packages as $name => $package)
-        {
-            foreach ($telDrivers as $telDriver)
-            {
-                if (array_key_exists($telDriver, $package['required']))
-                {
-                    unset($packages[$name]);
-
-                    continue 2;
-                }
-
-                if ($name == $telDriver)
-                {
-                    unset($packages[$name]);
-                    
-                    continue 2;
-                }
-            }
-            
-            // For each module get the users preference for installation or default to true
-            $value = $this->session->get('installer.install_' . $package['packageName'], $package['default']);
-
-            // If the user wants to install this module then build a list so we can check its dependencies
-            // Also set the form checkbox appropriately
-            $checkboxName = 'install_' .$package['packageName'];
-
-            if (empty($value))
-            {
-                $subview->$checkboxName = false;
-            } 
-            else
-            {
-                $install[] = $package['packageName'];
-                
-                $subview->$checkboxName = true;
-            }
-        }
-        
-        // Test the dependencies of all the modules the user wants to install
-        $packages = Bluebox_Installer::checkDependencies($packages, $install);
-
-        Bluebox_Installer::warningSort($packages);
-
-        Bluebox_Installer::errorSort($packages);
-
-        // Check if there where any errors or warnings from the dependency checker
-        if (!empty(Bluebox_Installer::$errors))
-        {
-            message::set('Installation can not continue until dependiencies have been met! See errors below.');
-        }
-        else if (!empty(Bluebox_Installer::$warnings))
-        {
-            message::set('You may continue installation however some packages have potential issues.', 'info');
-            
-            $this->session->set('installer.warnings', Bluebox_Installer::$warnings);
-        }
-
-        // Pass all the warnings and errors onto the view
-        $subview->currentDriver = $currentDriver;
-
-        $subview->packageList = $this->createPackageList($packages, Bluebox_Installer::$errors, Bluebox_Installer::$warnings);
-
-        return $subview;
-    }
-    
-    private function processChoosePackages()
-    {
-        // Get a list of all the modules on the system
-        if ($this->session->get('installer.installMode', 'install') == 'install')
-        {
-            $ignoreDB = true;
-        }
-        else
-        {
-            $ignoreDB = false;
-        }
-
-        $telDrivers = Bluebox_Installer::listPackages(Bluebox_Installer::TYPE_DRIVER);
-
-        $currentDriver = $this->session->get('installer.tel_driver', 'none');
-
-        if (array_key_exists($currentDriver, $telDrivers))
-        {
-            unset($telDrivers[$currentDriver]);
-        }
-
-        $telDrivers = array_keys($telDrivers);
-
-        $packages = Bluebox_Installer::listPackages(array() , $ignoreDB);
-
-        $install = array();
-
-        foreach($packages as $name => $package)
-        {
-            foreach ($telDrivers as $telDriver)
-            {
-                if (array_key_exists($telDriver, $package['required']))
-                {
-                    unset($packages[$name]);
-                    
-                    continue 2;
-                }
-                
-                if ($name == $telDriver)
-                {
-                    unset($packages[$name]);
-                    
-                    continue 2;
-                }
-            }
-            
-            if ($name == $currentDriver)
-            {
-                $this->session->set('installer.install_' . $package['packageName'], true);
-
-                $install[] = $package['packageName'];
-
-                continue;
-            }
-
-            // For each module get the users preference for installation or default to true
-            $value = $this->session->get('installer.install_' . $package['packageName'], 'false');
-
-            // If the user wants to install this module then build a list so we can re-check its dependencies
-            if (!empty($value))
-            {
-                $install[] = $package['packageName'];
-            }
-        }
-
-        // Test the dependencies of all the modules the user wants to install
-        Bluebox_Installer::checkDependencies($packages, $install);
-
-        // Ensure there are no new warnings
-        $old_warnings = $this->session->get('installer.warnings', array());
-
-        if (!arr::array_compare_recursive(Bluebox_Installer::$warnings, $old_warnings)) 
-        {
-            return FALSE;
-        }
-        
-        // If all the dependencies are met let the user continue
-        return empty(Bluebox_Installer::$errors);
-    }
-    
     /**
      * This step installs stuff
      *
@@ -1297,11 +1075,11 @@ class Installer_Controller extends Bluebox_Controller
             $result = self::_existingUpgrade();
         }
 
-        if ($result != false && empty(Bluebox_Installer::$errors))
+        if ($result != FALSE && empty(Bluebox_Installer::$errors))
         {
             Kohana::log('info', 'Install wizard completed successfully');
 
-            return true;
+            return TRUE;
         } 
         else
         {
@@ -1314,7 +1092,7 @@ class Installer_Controller extends Bluebox_Controller
                 );
             }
 
-            return false;
+            return FALSE;
         }
     }
     
@@ -1329,9 +1107,9 @@ class Installer_Controller extends Bluebox_Controller
 
         $this->template->title = __('Complete!');
 
-        $this->template->allowPrev = false;
+        $this->template->allowPrev = FALSE;
 
-        $this->template->allowNext = false;
+        $this->template->allowNext = FALSE;
 
         self::_resetWizard();
 
@@ -1395,7 +1173,7 @@ class Installer_Controller extends Bluebox_Controller
      * @return void
      * @param bool $allow[optional] It will only actually advance the wizard if this is true or not specified
      */
-    private function _nextWizard($allow = true)
+    private function _nextWizard($allow = TRUE)
     {
         if ($allow)
         {
@@ -1517,10 +1295,6 @@ class Installer_Controller extends Bluebox_Controller
     
     private function _freshInstall()
     {
-        kohana::log('alert', 'Now installing, to conserve memory logging will be suppressed.');
-
-        Kohana::config_set('core.log_threshold', 0);
-
         // Get the doctrine overlord
         $manager = Doctrine_Manager::getInstance();
 
@@ -1546,7 +1320,7 @@ class Installer_Controller extends Bluebox_Controller
                     .'! <div class="error_details">' . $e->getMessage() . '</div>'
                 );
 
-                return false;
+                return FALSE;
             }
         }
 
@@ -1582,127 +1356,48 @@ class Installer_Controller extends Bluebox_Controller
                     .'! <div class="error_details">' . $e->getMessage() . '</div>'
                 );
                 
-                return false;
+                return FALSE;
             }
         }
         
-        // Add in the core tables (only core!)
-        try
-        {
-            $models = Doctrine::loadModels(APPPATH . 'models/', Doctrine::MODEL_LOADING_CONSERVATIVE);
-            
-            Doctrine::createTablesFromModels();
-           // foreach($models as $model) Kohana::log('debug', 'INSTALLER::Create core table ' . $model);
-        }
-        catch(Exception $e)
-        {
-            message::set('Unable to create core tables!'
-                .'<div class="error_details">' . $e->getMessage() . '</div>'
-            );
-            
-            return false;
-        }
+        $driver = $this->session->get('installer.tel_driver', 'none');
 
-        // For each core table see if there is an initialization routine and run it
-        $initMethods = get_class_methods('Bluebox_Initialize');
+        kohana::log('debug', 'Installer running for driver ' .$driver);
 
-        $initMethods = array_filter($initMethods, array(
-            $this,
-            '_filterInitMethods'
-        ));
+        $packages = $this->session->get('installer.modules', array());
 
-        // For each method found run it and build a results array with the result
-        foreach($initMethods as $initMethod)
-        {
-            try
-            {
-                call_user_func(array(
-                    'Bluebox_Initialize',
-                    $initMethod
-                ));
-
-                Kohana::log('debug', 'Core table ' .$initMethod . ' complete');
-
-            }
-            catch(Exception $e)
-            {
-                Kohana::log('error', 'Core table ' .$initMethod . ' failed! ' . $e->getMessage());
-
-                message::set('Unable to initialize core table!'
-                        .'<div class="error_details">' . $e->getMessage() . '</div>'
-                    );
-
-                return false;
-            }
-        }
-        // Now, on to the user selected packages...
-        $telDrivers = Bluebox_Installer::listPackages(Bluebox_Installer::TYPE_DRIVER);
-
-        $currentDriver = $this->session->get('installer.tel_driver', 'none');
-
-        if (array_key_exists($currentDriver, $telDrivers)) 
-        {
-            unset($telDrivers[$currentDriver]);
-        }
-
-        $telDrivers = array_keys($telDrivers);
-
-        $packages = Bluebox_Installer::listPackages(array() , true);
-
-        $install = array();
-
-        foreach($packages as $name => $package)
-        {
-            foreach ($telDrivers as $telDriver)
-            {
-                if (array_key_exists($telDriver, $package['required']))
-                {
-                    unset($packages[$name]);
-                    
-                    continue 2;
-                }
-
-                if ($name == $telDriver)
-                {
-                    unset($packages[$name]);
-                    
-                    continue 2;
-                }
-            }
-
-            // For each module get the users preference for installation or default to true
-            $value = $this->session->get('installer.install_' . $package['packageName'], FALSE);
-
-            // If the user wants to install this module then build a list so we can re-check its dependencies
-            if (empty($value))
-            {
-                $stats[$package['packageName']] = 'not_installed';
-            } 
-            else
-            {
-                $install[] = $package['packageName'];
-                
-                $stats[$package['packageName']] = $package['version'];
-            }
-        }
-
-        //Anonymous_Statistics::addMsg($stats, 'modules', 'installer', 'modules');
+        $packages = arr::merge($this->minimumPackages, $packages, array($driver));
         
         try
         {
-            $result = Bluebox_Installer::processActions($packages, $install);
+            $transaction = Package_Transaction::beginTransaction();
 
-            Kohana::config_set('core.log_threshold', $this->log_threshold);
+            foreach ($packages as $package)
+            {
+                try
+                {
+                    $identifier = Package_Catalog::getFirstAvaliablePackage($package);
+                    
+                    $transaction->install($identifier);
+                }
+                catch(Exception $e)
+                {
+                    kohana::log('error', 'Error during initial install package selection: ' .$e->getMessage());
+                }
 
-            return $result;
-        } 
+            }
+
+            $transaction->commit();
+
+            return TRUE;
+        }
         catch(Exception $e)
         {
             message::set('Installer Error!'
                 .'<div class="error_details">' . $e->getMessage() . '</div>'
             );
-            
-            return false;
+
+            return FALSE;
         }
     }
     
@@ -1715,9 +1410,9 @@ class Installer_Controller extends Bluebox_Controller
      * @param $config array an array where the keys are the var names and the values are then values to check for
      * @param $lines array an array of lines from a file
      */
-    private function _replaceConfig($config, &$lines, $convertBool = true)
+    private function _replaceConfig($config, &$lines, $convertBool = TRUE)
     {
-        $replacementMade = false;
+        $replacementMade = FALSE;
 
         foreach($lines as $lineNum => $line)
         {
@@ -1800,7 +1495,7 @@ class Installer_Controller extends Bluebox_Controller
             Kohana::log('debug', 'Update config file with ' . preg_replace('/\s\s+/', ' ', $newLine));
 
             // Set a marker that $lines has been updated
-            $replacementMade = true;
+            $replacementMade = TRUE;
         }
         
         return $replacementMade;
@@ -1885,8 +1580,8 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('PHP Version') ,
             'fail_msg' => __('This requires PHP 5.2.3 or newer, this version is ') . phpversion() ,
             'pass_msg' => phpversion() ,
-            'result' => version_compare(phpversion() , '5.2.3') > 0 ? true : false,
-            'required' => true
+            'result' => version_compare(phpversion() , '5.2.3') > 0 ? TRUE : FALSE,
+            'required' => TRUE
         );
 
         // Use the pre_stats because we dont know if we have write permissions on cache/ yet!
@@ -1914,8 +1609,8 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('Server Software') ,
             'fail_msg' => ' ',
             'pass_msg' => $_SERVER['SERVER_SOFTWARE'],
-            'result' => true,
-            'required' => true
+            'result' => TRUE,
+            'required' => TRUE
         );
 
         // Use the pre_stats because we dont know if we have write permissions on cache/ yet!
@@ -1957,7 +1652,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => __('You don\'t have any ') . html::anchor('http://us3.php.net/manual/en/pdo.setup.php', 'PDO driver support') . __(' in your PHP install!') ,
             'pass_msg' => '',
             'result' => !empty($drivers) ,
-            'required' => true
+            'required' => TRUE
         );
         
         foreach($drivers as $drive)
@@ -1983,17 +1678,17 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('Safe Mode ') ,
             'fail_msg' => __('This will not operate properly if safe mode is active') ,
             'pass_msg' => __('Pass') ,
-            'result' => false,
-            'required' => true
+            'result' => FALSE,
+            'required' => TRUE
         );
         
         $safe_mode = ini_get('safe_mode');
 
-        if (empty($safe_mode) || $safe_mode === false)
+        if (empty($safe_mode) || $safe_mode === FALSE)
         {
-            $result['result'] = true;
+            $result['result'] = TRUE;
         }
-        
+
         return $result;
     }
     
@@ -2008,15 +1703,15 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('Open_BaseDir') ,
             'fail_msg' => __('Your open_basedir must be null or contain the Bluebox directory') ,
             'pass_msg' => __('Pass') ,
-            'result' => false,
-            'required' => true
+            'result' => FALSE,
+            'required' => TRUE
         );
 
         $open_basedir = ini_get('open_basedir');
 
         if (empty($open_basedir))
         {
-            $result['result'] = true;
+            $result['result'] = TRUE;
         } 
         else
         {
@@ -2024,10 +1719,10 @@ class Installer_Controller extends Bluebox_Controller
             
             if (preg_match($workingDir, $open_basedir))
             {
-                $result['result'] = true;
+                $result['result'] = TRUE;
             }
         }
-        
+
         return $result;
     }
     /**
@@ -2046,11 +1741,11 @@ class Installer_Controller extends Bluebox_Controller
             case 'Apache':
                 if (function_exists('apache_get_modules'))
                 {
-                    $rewrite = in_array("mod_rewrite", apache_get_modules()) ? true : false;
+                    $rewrite = in_array("mod_rewrite", apache_get_modules()) ? TRUE : FALSE;
                 }
                 else
                 {
-                    $rewrite = false;
+                    $rewrite = FALSE;
                 }
 
                 break;
@@ -2059,7 +1754,7 @@ class Installer_Controller extends Bluebox_Controller
             case 'cherokee':
             case 'nginx':
             default:
-                $rewrite = false;
+                $rewrite = FALSE;
         }
 
         $result = array(
@@ -2067,7 +1762,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => __('Mod rewite can be used ') . html::anchor('http://httpd.apache.org/docs/1.3/mod/mod_rewrite.html', 'mod_rewrite') . __(' for clean URLs') ,
             'pass_msg' => __('Pass') ,
             'result' => $rewrite,
-            'required' => false
+            'required' => FALSE
         );
 
         // Use the pre_stats because we dont know if we have write permissions on cache/ yet!
@@ -2098,13 +1793,13 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('PCRE UTF-8 ') ,
             'fail_msg' => html::anchor('http://php.net/pcre', 'PCRE') . __(' has not been compiled with UTF-8 support.') ,
             'pass_msg' => __('Pass') ,
-            'result' => false,
-            'required' => true
+            'result' => FALSE,
+            'required' => TRUE
         );
 
         if (@preg_match('/^.$/u', 'ñ'))
         {
-            $result['result'] = true;
+            $result['result'] = TRUE;
         }
         else if (!@preg_match('/^\pL$/u', 'ñ'))
         {
@@ -2126,7 +1821,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => html::anchor('http://www.php.net/reflection', 'PHP Reflection') . __(' is either not loaded or not compiled in.') ,
             'pass_msg' => __('Pass') ,
             'result' => class_exists('ReflectionClass') ,
-            'required' => true
+            'required' => TRUE
         );
         
         return $result;
@@ -2144,7 +1839,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => html::anchor('http://us3.php.net/manual/en/filter.installation.php', 'Filter') . __(' extension is either not loaded or not compiled in.') ,
             'pass_msg' => __('Pass') ,
             'result' => function_exists('filter_list') ,
-            'required' => true
+            'required' => TRUE
         );
         
         return $result;
@@ -2162,7 +1857,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => html::anchor('http://us.php.net/manual/en/iconv.installation.php', 'Iconv') . __(' extension is not loaded.') ,
             'pass_msg' => __('Pass') ,
             'result' => extension_loaded('iconv') ,
-            'required' => true
+            'required' => TRUE
         );
         
         return $result;
@@ -2180,7 +1875,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => __('The optional ') . html::anchor('http://us2.php.net/manual/en/curl.installation.php', 'cURL') . __(' extension is not loaded.') ,
             'pass_msg' => __('Pass') ,
             'result' => extension_loaded('curl') ,
-            'required' => false
+            'required' => FALSE
         );
 
         return $result;
@@ -2198,7 +1893,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => __('Unable to locate the ') . html::anchor('http://uk.php.net/manual/en/json.installation.php', 'json extenstion') ,
             'pass_msg' => __('Pass') ,
             'result' => extension_loaded('json') ,
-            'required' => true
+            'required' => TRUE
         );
 
         return $result;
@@ -2215,8 +1910,8 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('Mbstring Not Overloaded') ,
             'fail_msg' => html::anchor('http://php.net/mbstring', 'Mbstring') . __(' extension is overloading PHP\'s native string functions.') ,
             'pass_msg' => __('Pass') ,
-            'result' => true,
-            'required' => true
+            'result' => TRUE,
+            'required' => TRUE
         );
 
         if (extension_loaded('mbstring'))
@@ -2238,7 +1933,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => __('Neither ') . '<code>$_SERVER[\'REQUEST_URI\']</code> or <code>$_SERVER[\'PHP_SELF\']</code>' . __(' is available.') ,
             'pass_msg' => __('Pass') ,
             'result' => isset($_SERVER['REQUEST_URI']) OR isset($_SERVER['PHP_SELF']) ,
-            'required' => true
+            'required' => TRUE
         );
         
         return $result;
@@ -2254,8 +1949,8 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('Memory Limit') ,
             'fail_msg' => html::anchor('http://us3.php.net/manual/en/ini.core.php#ini.memory-limit', 'Memory_limit') . __(' is set bellow the required 32MB.') ,
             'pass_msg' => __('Pass') ,
-            'result' => false,
-            'required' => true
+            'result' => FALSE,
+            'required' => TRUE
         );
 
         $memoryLimit = ini_get('memory_limit');
@@ -2266,12 +1961,12 @@ class Installer_Controller extends Bluebox_Controller
 
             if ($memoryLimit >= 33554431)
             {
-                $result['result'] = true;
+                $result['result'] = TRUE;
             }
         } 
         else
         {
-            $result['result'] = true;
+            $result['result'] = TRUE;
         }
         
         return $result;
@@ -2289,7 +1984,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => __('The configured system directory does not exist or does not contain required files.') ,
             'pass_msg' => __('Pass') ,
             'result' => is_dir(SYSPATH) AND is_file(SYSPATH . 'core/Bootstrap' . EXT) ,
-            'required' => true
+            'required' => TRUE
         );
         
         return $result;
@@ -2307,7 +2002,7 @@ class Installer_Controller extends Bluebox_Controller
             'fail_msg' => __('The configured Bluebox directory does not exist or does not contain required files.') ,
             'pass_msg' => __('Pass') ,
             'result' => is_dir(APPPATH) AND is_file(APPPATH . 'config/config' . EXT) ,
-            'required' => false
+            'required' => FALSE
         );
         
         return $result;
@@ -2326,20 +2021,20 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('Core Modules Directory') ,
             'fail_msg' => __('The configured core module(s) could not be found') . ':<ul>',
             'pass_msg' => __('Pass') ,
-            'result' => true,
-            'required' => true
+            'result' => TRUE,
+            'required' => TRUE
         );
 
         foreach(Kohana::config('core.modules') as $modDir)
         {
             if (!is_dir($modDir))
             {
-                if (($modPos = strrpos($modDir, '/')) !== false)
+                if (($modPos = strrpos($modDir, '/')) !== FALSE)
                 {
                     $result['fail_msg'].= '<li>' . substr($modDir, $modPos + 1) . '</li>';
                 }
 
-                $result['result'] = false;
+                $result['result'] = FALSE;
             }
         }
         
@@ -2366,8 +2061,8 @@ class Installer_Controller extends Bluebox_Controller
             'name' => __('Directory Permissions') ,
             'fail_msg' => __('The following directories do not have write permissions') . ':<ul>',
             'pass_msg' => __('Pass') ,
-            'result' => true,
-            'required' => true
+            'result' => TRUE,
+            'required' => TRUE
         );
 
         foreach($testDirectories as $testDirectory)
@@ -2376,9 +2071,9 @@ class Installer_Controller extends Bluebox_Controller
 
             if (!filesystem::is_writable($dir))
             {
-                $result['fail_msg'].= '<li>' . $testDirectory . '</li>';
+                $result['fail_msg'].= '<li>' .ltrim($testDirectory, '/') . '</li>';
 
-                $result['result'] = false;
+                $result['result'] = FALSE;
             }
         }
 

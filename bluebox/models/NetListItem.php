@@ -21,6 +21,7 @@ class NetListItem extends Bluebox_Record
         $this->hasColumn('record', 'string', 100, array('notnull' => true, 'notblank' => true));  // Can be an IP address, network range, or domain name
         $this->hasColumn('description', 'string', 100);
         $this->hasColumn('allow', 'boolean', NULL, array('notnull' => true, 'default' => TRUE));
+        $this->hasColumn('trunk_id', 'integer', 11, array('unsigned' => true));
     }
 
     /**

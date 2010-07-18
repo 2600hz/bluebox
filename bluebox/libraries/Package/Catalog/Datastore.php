@@ -18,17 +18,23 @@ class Package_Catalog_Datastore extends Package_Catalog
         {
             $metadata['models'] = array();
         }
-        
-        $package = Doctrine::getTable('Package')->findOneByBasedir($metadata['basedir']);
 
-        if (!$package)
+        try
         {
-            return;
+            $package = Doctrine::getTable('Package')->findOneByBasedir($metadata['basedir']);
+
+            if (!$package)
+            {
+                return;
+            }
+
+            $metadata['status'] = $package['status'];
+
+            $metadata['datastore_id'] = $package['package_id'];
         }
-
-        $metadata['status'] = $package['status'];
-
-        $metadata['datastore_id'] = $package['package_id'];
+        catch(Exception $e)
+        {
+        }
     }
 
     public static function export(&$metadata)

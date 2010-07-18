@@ -6,38 +6,162 @@
  */
 class Package_Dependency_Graph
 {
-    public static function getDependents($parentPackage)
+    protected static $installOrder = NULL;
+
+    protected static $uninstallOrder = NULL;
+
+    public static function sortInstall($packageA, $packageB)
     {
-        $graph = self::buildRelianceGraph();
-
-        $reliantPackages = self::graphReliance($graph, $parentPackage);
-
-        if (($self = array_search($parentPackage, $reliantPackages)) !== FALSE)
+        try
         {
-            unset($reliantPackages[$self]);
+            $packageA = Package_Catalog::getPackageName($packageA);
+
+            $packageB = Package_Catalog::getPackageName($packageB);
+
+            return self::$installOrder[$packageA] - self::$installOrder[$packageB];
+        }
+        catch(Exception $e)
+        {
+            return -1;
+        }
+    }
+
+    public static function sortUninstall($packageA, $packageB)
+    {
+        try
+        {
+            $packageA = Package_Catalog::getPackageName($packageA);
+
+            $packageB = Package_Catalog::getPackageName($packageB);
+
+            return self::$uninstallOrder[$packageA] - self::$uninstallOrder[$packageB];
+        }
+        catch(Exception $e)
+        {
+            return -1;
+        }
+    }
+
+    public static function determineInstallOrder()
+    {
+        self::$installOrder = array();
+
+        $requirements = self::listRequirements();
+
+        $catalog = Package_Catalog::getCatalog();
+
+        foreach ($catalog as $id => $package)
+        {
+            $reliance = self::graphReliance($requirements, $package['packageName']);
+
+            self::$installOrder = arr::merge(self::$installOrder, $reliance);
         }
 
-        return $reliantPackages;
+        self::$installOrder = array_unique(self::$installOrder);
+
+        self::$installOrder = array_flip(self::$installOrder);
     }
 
-    public static function sortInstall($packages)
+    public static function determineUninstallOrder()
     {
-//        $dependencies = $this->graphReliance($relianceGraph, $packageName);
-//        $dependencies = array_flip($dependencies);
-//        foreach ($dependencies as $key => $value) {
-//            $dependencies[$key] = array($packageName);
-//        }
-//        $reliantPackages = array_merge_recursive($dependencies, $reliantPackages);
+        self::$uninstallOrder = array();
+
+        $dependencies = self::listDependencies();
+
+        $catalog = Package_Catalog::getCatalog();
+
+        foreach ($catalog as $id => $package)
+        {
+            $reliance = self::graphReliance($dependencies, $package['packageName']);
+
+            self::$uninstallOrder = arr::merge(self::$uninstallOrder, $reliance);
+        }
+
+        self::$uninstallOrder = array_unique(self::$uninstallOrder);
+
+        self::$uninstallOrder = array_flip(self::$uninstallOrder);
     }
 
-    public static function sortUninstall($packages)
+    protected static function listRequirements()
     {
-//        $dependencies = $this->graphReliance($relianceGraph, $packageName);
-//        $dependencies = array_flip($dependencies);
-//        foreach ($dependencies as $key => $value) {
-//            $dependencies[$key] = array($packageName);
-//        }
-//        $reliantPackages = array_merge_recursive($dependencies, $reliantPackages);
+        $catalog = Package_Catalog::getCatalog();
+
+        $relianceList = array();
+
+        foreach ($catalog as $id => $package)
+        {
+            $packageName = $package['packageName'];
+            
+            if (!array_key_exists($packageName, $relianceList))
+            {
+                $relianceList[$packageName] = array();
+            }
+
+            foreach($package['required'] as $requirement => $conditions)
+            {
+                switch($requirement)
+                {
+                    case 'not':
+                        continue;
+
+                        break;
+
+                    case 'or':
+                        foreach($conditions as $name => $condition)
+                        {
+                            $relianceList[$packageName][] = $name;
+                        }
+
+                        break;
+
+                    default:
+                        $relianceList[$packageName][] = $requirement;
+                }
+            }
+        }
+
+        return $relianceList;
+    }
+
+    public static function listDependencies()
+    {
+        $catalog = Package_Catalog::getCatalog();
+
+        $dependencyList = array();
+
+        foreach ($catalog as $id => $package)
+        {
+            $packageName = $package['packageName'];
+
+            if (!array_key_exists($packageName, $dependencyList))
+            {
+                $dependencyList[$packageName] = array();
+            }
+
+            foreach($package['required'] as $requirement => $conditions)
+            {
+                switch($requirement)
+                {
+                    case 'not':
+                        continue;
+
+                        break;
+
+                    case 'or':
+                        foreach($conditions as $name => $condition)
+                        {
+                            $dependencyList[$name][] = $packageName;
+                        }
+
+                        break;
+
+                    default:
+                        $dependencyList[$requirement][] = $packageName;
+                }
+            }
+        }
+
+        return $dependencyList;
     }
 
     /**
@@ -51,13 +175,14 @@ class Package_Dependency_Graph
      * @param array Internall array traking seen dependencies for circular reference detection
      * @return array
      */
-    protected static function graphReliance ($graph, $node, &$resolved = array(), &$unresolved = array()) {
+    protected static function graphReliance ($graph, $node, &$resolved = array(), &$unresolved = array())
+    {
         // Track a list of unresolved nodes for circular reference detection
         $unresolved[] = $node;
 
         // Find the edges of this graph node
         $edges = array();
-        
+
         if (!empty($graph[$node]))
         {
             $edges = $graph[$node];
@@ -78,7 +203,7 @@ class Package_Dependency_Graph
                             .$this->displayName($node)
                     );
                 }
-                
+
                 self::graphReliance($graph, $edge, $resolved, $unresolved);
             }
         }
@@ -91,51 +216,5 @@ class Package_Dependency_Graph
         $resolved[] = $node;
 
         return $resolved;
-    }
-
-    protected static function buildRelianceGraph()
-    {
-        $catalog = Package_Catalog::getCatalog();
-
-        $relianceGraph = array();
-
-        foreach ($catalog as $id => $package)
-        {
-            $packageName = $package['packageName'];
-
-            if (!array_key_exists($packageName, $relianceGraph))
-            {
-                $relianceGraph[$packageName] = array();
-            }
-
-            foreach($package['required'] as $requirement => $conditions)
-            {
-                switch($requirement)
-                {
-                    case 'not':
-                        continue;
-
-                        break;
-
-                    case 'or':
-                        foreach($conditions as $name => $condition)
-                        {
-                            if (!array_key_exists($name, $relianceGraph))
-                            {
-                                $relianceGraph[$name] = array();
-                            }
-
-                            $relianceGraph[$name][] = $packageName;
-                        }
-
-                        break;
-
-                    default:
-                        $relianceGraph[$requirement][] = $packageName;
-                }
-            }
-        }
-
-        return $relianceGraph;
     }
 }

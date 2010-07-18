@@ -29,14 +29,16 @@
  * @package Bluebox
  * @subpackage Trunk
  */
-class FreeSwitch_Trunk_Driver extends FreeSwitch_Base_Driver {
+class FreeSwitch_Trunk_Driver extends FreeSwitch_Base_Driver
+{
     /**
      * Indicate we support FreeSWITCH
      */
     public static function set($obj)
     {
         // Only setup a gateway if it's attached to an interface
-        if ($obj->SipInterfaceTrunk->sipinterface_id) {
+        if ($obj->SipInterfaceTrunk->sipinterface_id)
+        {
             // Reference to our XML document
             $xml = Telephony::getDriver()->xml;
 

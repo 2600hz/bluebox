@@ -9,7 +9,8 @@
 
 class TrunkManager_Plugin extends Bluebox_Plugin
 {
-    public function delete() {
+    public function delete()
+    {
         $base = Event::$data;
 
         if (!$base)
@@ -17,5 +18,4 @@ class TrunkManager_Plugin extends Bluebox_Plugin
 
         netlists::removeTrunkFromAuto($base);
     }
-
 }
