@@ -4,8 +4,6 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($base)
     {
-        $xml = Telephony::getDriver()->xml;
-
         if (empty($base['plugins']['simpleroute']))
         {
             return;
@@ -15,27 +13,31 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
         foreach ($simpleroute['patterns'] as $index => $options)
         {
-            if (empty($options['enabled']))
-            {
-                continue;
-            }
-
-            if (!$pattern = simplerouter::getOutboundPattern($index, 'freeswitch'))
-            {
-                continue;
-            }
-
             foreach ($simpleroute['contexts'] as $context_id => $enabled)
             {
                 $xml = FreeSwitch::createExtension('trunk_' .$base['trunk_id'] .'_pattern_' .$index, 'main', 'context_' .$context_id);
 
                 if (empty($enabled))
                 {
-
+                    $xml->deleteNode();
 
                     continue;
                 }
-                
+
+                if (empty($options['enabled']))
+                {
+                    $xml->deleteNode();
+                    
+                    continue;
+                }
+
+                if (!$pattern = simplerouter::getOutboundPattern($index, 'freeswitch'))
+                {
+                    $xml->deleteNode();
+                    
+                    continue;
+                }
+
                 $condition = '/condition[@field="destination_number"][@expression="' .$pattern . '"][@bluebox="pattern_' .$index .'"]';
 
                 if (!empty($options['prepend']))
@@ -71,26 +73,24 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
             }
         }
     }
-    public static function delete($obj)
+    
+    public static function delete($base)
     {
-        $base = Bluebox_Record::getBaseTransactionObject();
-
-        if (empty($base->trunk_id)) {
-                return FALSE;
+        if (empty($base['plugins']['simpleroute']))
+        {
+            return;
         }
 
-        // Delete the whole darn extension for each type of extension
-        $xml = FreeSwitch::createExtension('trunk_' . $base->trunk_id . '_911', 'main', 'context_' . $obj->context_id);
-        $xml->deleteNode();
+        $simpleroute = $base['plugins']['simpleroute'];
 
-        $xml = FreeSwitch::createExtension('trunk_' . $base->trunk_id . '_intl', 'main', 'context_' . $obj->context_id);
-        $xml->deleteNode();
+        foreach ($simpleroute['patterns'] as $index => $options)
+        {
+            foreach ($simpleroute['contexts'] as $context_id => $enabled)
+            {
+                $xml = FreeSwitch::createExtension('trunk_' .$base['trunk_id'] .'_pattern_' .$index, 'main', 'context_' .$context_id);
 
-        $xml = FreeSwitch::createExtension('trunk_' . $base->trunk_id . '_domestic_10', 'main', 'context_' . $obj->context_id);
-        $xml->deleteNode();
-
-        $xml = FreeSwitch::createExtension('trunk_' . $base->trunk_id . '_domestic_7', 'main', 'context_' . $obj->context_id);
-        $xml->deleteNode();
-
+                $xml->deleteNode();
+            }
+        }
     }
 }
