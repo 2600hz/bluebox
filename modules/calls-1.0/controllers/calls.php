@@ -83,5 +83,6 @@ class Calls_Controller extends Bluebox_Controller
 
     public function import() {
         // Manually import a CDR
+        ProcessLog::importLogs();
     }
 }

@@ -3,5 +3,5 @@
  * Config options for the Calls module
  */
 
-$config['scanDir'] = 'SOMEDIR';
+$config['scandir'] = '/usr/local/freeswitch/log/cdr-csv';
 
