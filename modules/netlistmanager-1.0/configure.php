@@ -1,19 +1,11 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/**
- * NetList_Configure - Configuration metadata / class
- *
- * Gives info about how to install this module
- *
- * @author Darren Schreiber
- * @package Bluebox
- * @subpackage NetList
- */
+
 class NetList_Configure extends Bluebox_Configure
 {
     public static $version = 1.0;
     public static $packageName = 'netlistmanager';
     public static $displayName = 'Network List Manager';
-    public static $author = 'Darren Schreiber';
+    public static $author = '<ul><li>Darren Schreiber</li><li>K Anderson</li></ul>';
     public static $vendor = 'Bluebox';
     public static $license = 'MPL';
     public static $summary = 'Access Control List Support';
@@ -28,7 +20,7 @@ class NetList_Configure extends Bluebox_Configure
     public static $navURL = 'netlistmanager/index';
     public static $navSubmenu = array(
         'Search Network List' => '/netlistmanager/index',
-        'Add Network List' => '/netlistmanager/add',
+        'Add Network List' => '/netlistmanager/create',
         'Edit Network List' => array(
             'url' => '/netlistmanager/edit',
             'disabled' => TRUE

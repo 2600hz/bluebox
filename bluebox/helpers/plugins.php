@@ -71,7 +71,7 @@ class plugins
 
         // Register event as controller.method.action with the callback array as the callback
         Event::add($url . '.' . $action, $callback);
-        
+
         return TRUE;
     }
     

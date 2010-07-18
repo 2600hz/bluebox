@@ -707,7 +707,7 @@ abstract class Bluebox_Controller extends Template_Controller
         Event::run('bluebox.create_view', $this->view);
     }
 
-    protected function loadBaseModel($id = NULL, $baseModel = NULl)
+    protected function loadBaseModel($id = NULL, $baseModel = NULL)
     {
         if (is_null($baseModel))
         {

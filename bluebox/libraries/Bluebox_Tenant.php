@@ -10,6 +10,8 @@ class Bluebox_Tenant
 
         $account->name = (isset($options['name']) ? $options['name'] : 'New Account');
 
+        $account->type = (isset($options['type']) ? $options['type'] : Account::TYPE_NORMAL);
+
         $account->save();
 
         return $account->account_id;
@@ -49,6 +51,8 @@ class Bluebox_Tenant
 
         // Create a random password if none is given
         $user->password = (isset($options['password']) ? $options['password'] : substr(mdr(rand(1000000, 9999999)), 0, 5));
+
+        $user->user_type = (isset($options['user_type']) ? $options['user_type'] : User::TYPE_NORMAL_USER);
 
         $user->location_id = $locationId;
 

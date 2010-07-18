@@ -36,13 +36,17 @@ class Core_Configure extends Bluebox_Configure
 
         $options = array();
 
-        $options['account'] = array('name' => 'Master Account');
+        $options['account'] = array(
+            'name' => 'Master Account',
+            'type' => Account::TYPE_NORMAL
+        );
 
         $options['location'] = array('name' => 'Main Location');
 
         $options['user'] = array(
             'username' => $session->get('installer.adminEmailAddress'),
-            'password' => $session->get('installer.adminPassword')
+            'password' => $session->get('installer.adminPassword'),
+            'user_type' => User::TYPE_SYSTEM_ADMIN
         );
 
         Bluebox_Tenant::initializeTenant($options);
