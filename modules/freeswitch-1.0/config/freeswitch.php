@@ -34,7 +34,7 @@ $config['default_packages'] = array(
     'netlistmanager',
     'odbc',
     'sipinterface',
-    'sofia',
+    //'sofia',
     'xmleditor',
 );
 
