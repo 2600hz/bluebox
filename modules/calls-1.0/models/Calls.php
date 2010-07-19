@@ -4,7 +4,7 @@ class Calls extends Bluebox_Record
 {    
     function setTableDefinition()
     {
-        $this->hasColumn('call_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
+        $this->hasColumn('calls_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('uuid', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('accountcode', 'string', 100, array('notnull' => true));
         $this->hasColumn('caller_id_number', 'string', 100, array('notnull' => true));
@@ -18,6 +18,16 @@ class Calls extends Bluebox_Record
         $this->hasColumn('hangup_cause', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('channel_name', 'string', 100, array('notnull' => true));
         $this->hasColumn('bridge_channel', 'string', 100, array('notnull' => true));
+
+        $this->index('calls_index', array(
+            'fields' => array(
+                0 => 'uuid',
+                1 => 'start_stamp',
+                2 => 'end_stamp',
+             ),
+            'type' => 'unique',
+        ));
+
     }
 
     function setUp()

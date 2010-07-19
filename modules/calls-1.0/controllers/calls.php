@@ -15,13 +15,13 @@ class Calls_Controller extends Bluebox_Controller
             )
         )
         // Add the base model columns to the grid
-        ->add('call_id', 'ID', array(
+        ->add('calls_id', 'ID', array(
                 'hidden' => true,
                 'key' => true
         ))
         ->add('start_stamp', 'Start', array(
                 'callback' => array(
-                    'arguments' => 'call_id',  
+                    'arguments' => 'calls_id',  
                     'function' => array($this, '_showCall')
                 )
         ))
@@ -31,12 +31,12 @@ class Calls_Controller extends Bluebox_Controller
         ->add('hangup_cause', 'Length')
         // Add the actions to the grid
         ->addAction('calls/edit', 'Edit', array(
-                'arguments' => 'call_id',
+                'arguments' => 'calls_id',
                 'width' => '120'
             )
         )
         ->addAction('calls/delete', 'Delete', array(
-                'arguments' => 'call_id',
+                'arguments' => 'calls_id',
                 'width' => '20'
             )
         );
@@ -58,19 +58,19 @@ class Calls_Controller extends Bluebox_Controller
             )
         )
         // Add the base model columns to the grid
-        ->add('call_id', 'ID', array(
+        ->add('calls_id', 'ID', array(
                 'hidden' => true,
                 'key' => true
         ))
         ->add('name', 'Name')
         // Add the actions to the grid
         ->addAction('calls/edit', 'Edit', array(
-                'arguments' => 'call_id',
+                'arguments' => 'calls_id',
                 'width' => '120'
             )
         )
         ->addAction('calls/delete', 'Delete', array(
-                'arguments' => 'call_id',
+                'arguments' => 'calls_id',
                 'width' => '20'
             )
         );
@@ -96,7 +96,7 @@ class Calls_Controller extends Bluebox_Controller
         ProcessLog::importLogs();
     }
 
-    public function _showCall($NULL, $call_id)
+    public function _showCall($NULL, $calls_id)
     {
 
         $coreFields = array(
@@ -117,7 +117,7 @@ class Calls_Controller extends Bluebox_Controller
 
 
 
-        $call = Doctrine::getTable('Calls')->find($call_id)->toArray();
+        $call = Doctrine::getTable('Calls')->find($calls_id)->toArray();
 
         $callDetail = '<table>';
 

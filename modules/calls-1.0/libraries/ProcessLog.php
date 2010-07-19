@@ -28,14 +28,25 @@ class ProcessLog {
             'bridge_channel' => 1
         );
 
-        $recordCount = 0;
-
         Kohana::log('debug', 'scandir: ' . Kohana::config('calls.scandir'));
 
         $callFiles = glob(rtrim(Kohana::config('calls.scandir'), '/') . '/' . 'Master.csv.*', GLOB_MARK);
 
         foreach( $callFiles as $callFile ) {
+
+            $recordCount = 0;
+            $recordsInserted = 0;
+            $recordsErrored = 0;
+            $recordsDup = 0;
+
+            $callFileHistory = new CallsFiles;
+            $callFileHistory->filename = $callFile;
+
+            // Save before we start so we can see if we crash. Also lets us calc how long it took.
+            $callFileHistory->save();
+
             if (($callFileHandle = fopen($callFile, "r")) !== FALSE) {
+
                 while (($callRecord = fgetcsv($callFileHandle, 2000, ",")) !== FALSE) {
 
                     $corecdr = array();
@@ -57,13 +68,35 @@ class ProcessLog {
                     }
                     $corecdr['registry'] = $extracdr;
                     $insertCall->synchronizeWithArray($corecdr);
-                    $insertCall->save();
+
+                    try {
+                        $insertCall->save();
+                        $recordsInserted++;
+                    } catch (Exception $e) {
+                        if(preg_match('/Duplicate entry/',$e->getMessage())) {
+                            $recordsDup++;
+                        } else {
+                            $recordsErrored++;
+                        }
+                        Kohana::log('debug', 'Insert of Call Log Failed. UUID: ' . $corecdr['uuid'] . 'Message: ' . $e->getMessage());
+                    }
+
+
                     Kohana::log('debug', 'Call Log: ' . print_r($corecdr,true));
                     Kohana::log('debug', 'Call Log: ' . print_r($extracdr,true));
                     
                 }
+
                 fclose($callFileHandle);
             }
+
+            // Update the history adter we have processed the file.	
+            $callFileHistory->records_processed = $recordCount;
+            $callFileHistory->records_inserted = $recordsInserted;
+            $callFileHistory->records_errored = $recordsErrored;
+            $callFileHistory->records_dup = $recordsDup;
+
+            $callFileHistory->save(); 
         }
     }
 }
