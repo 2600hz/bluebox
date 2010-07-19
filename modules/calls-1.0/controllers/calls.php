@@ -28,16 +28,11 @@ class Calls_Controller extends Bluebox_Controller
         ->add('caller_id_number', 'Calling Party')
         ->add('destination_number', 'Called Party')
         ->add('duration', 'Length')
-        ->add('hangup_cause', 'Length')
+        ->add('hangup_cause', 'Call End Cause')
         // Add the actions to the grid
-        ->addAction('calls/edit', 'Edit', array(
+        ->addAction('calls/view', 'View', array(
                 'arguments' => 'calls_id',
                 'width' => '120'
-            )
-        )
-        ->addAction('calls/delete', 'Delete', array(
-                'arguments' => 'calls_id',
-                'width' => '20'
             )
         );
 
@@ -62,18 +57,12 @@ class Calls_Controller extends Bluebox_Controller
                 'hidden' => true,
                 'key' => true
         ))
-        ->add('name', 'Name')
-        // Add the actions to the grid
-        ->addAction('calls/edit', 'Edit', array(
-                'arguments' => 'calls_id',
-                'width' => '120'
-            )
-        )
-        ->addAction('calls/delete', 'Delete', array(
-                'arguments' => 'calls_id',
-                'width' => '20'
-            )
-        );
+        ->add('start_stamp', 'Start')
+        ->add('end_stamp', 'End')
+        ->add('caller_id_number', 'Calling Party')
+        ->add('destination_number', 'Called Party')
+        ->add('duration', 'Length')
+        ->add('hangup_cause', 'Call End Cause');
 
         // Let plugins populate the grid as well
         $this->grid = $grid;
