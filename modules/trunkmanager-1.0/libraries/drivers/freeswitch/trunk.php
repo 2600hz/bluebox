@@ -40,9 +40,26 @@ class FreeSwitch_Trunk_Driver extends FreeSwitch_Base_Driver
 
         if (!empty($plugins['sipinterface']['sipinterface_id']))
         {
-            $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$plugins['sipinterface']['sipinterface_id'], 'trunk_' . $trunk['trunk_id']);
+            $interface = $plugins['sipinterface']['sipinterface_id'];
+
+            $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$interface, 'trunk_' . $trunk['trunk_id']);
 
             $xml->update('/param[@name="realm"]{@value="' . $trunk['server'] . '"}');
+        }
+
+        $modified = $trunk->getModified(TRUE, TRUE);
+
+        if (!empty($modified['plugins']['sipinterface']['sipinterface_id']))
+        {
+            $oldInterface = $modified['plugins']['sipinterface']['sipinterface_id'];
+
+            if (empty($interface) OR $interface != $oldInterface)
+            {
+                $xml = FreeSwitch::setSection('trunk', 'sipinterface_' .$oldInterface, 'trunk_' . $trunk['trunk_id']);
+
+                $xml->deleteNode();
+            }
+
         }
 
         // Note - sip settings for trunks get added by the sip driver
