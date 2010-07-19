@@ -55,6 +55,9 @@ class ProcessLog {
                             $extracdr[$callRecord[$field]] = $callRecord[$field+1];
                        }
                     }
+                    $corecdr['registry'] = $extracdr;
+                    $insertCall->synchronizeWithArray($corecdr);
+                    $insertCall->save();
                     Kohana::log('debug', 'Call Log: ' . print_r($corecdr,true));
                     Kohana::log('debug', 'Call Log: ' . print_r($extracdr,true));
                     
