@@ -225,9 +225,6 @@ abstract class Bluebox_Controller extends Template_Controller
 
         // Setup anything related to authorizing the user
         Event::run('bluebox.ready', $this);
-
-        //var_dump(Package_Transaction_Graph::listDependencies());
-        //die();
     }
 
     /**
