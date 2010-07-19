@@ -53,7 +53,7 @@ class netlists
         
         $netlist = Doctrine::getTable('NetList')->findOneByNetListId($id);
 
-        if (!empty($netlist['system_list']))
+        if (!empty($netlist['system_list']) AND $netlist['system_list'] != 'trunks.auto')
         {
             return $netlist['system_list'];
         } 
@@ -84,7 +84,7 @@ class netlists
 
     public static function addToTrunkAuto($trunk)
     {
-        $ip = $trunk->server;
+        $ip = $trunk['server'];
         
         if (empty($ip))
         {
@@ -182,7 +182,7 @@ class netlists
     public static function removeTrunkFromAuto($trunk)
     {
         // get and delete any net list items already setup for this trunk
-        $currentTrunkItems = Doctrine::getTable('NetListItem')->findByDescription('Trunk '. $trunk->trunk_id);
+        $currentTrunkItems = Doctrine::getTable('NetListItem')->findByTrunkId($trunk['trunk_id']);
 
         if (empty($currentTrunkItems))
         {
@@ -194,7 +194,7 @@ class netlists
             $currentTrunkItem->delete();
         }
 
-        $netlist = Doctrine::getTable('NetList')->findOneByName('Trunks (auto)');
+        $netlist = Doctrine::getTable('NetList')->findOneBySystemList('trunks.auto');
 
         if (!$netlist)
         {

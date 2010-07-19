@@ -1,0 +1,163 @@
+/* Customize jqgrid
+-------------------------------------------------------------- */
+.ui-jqgrid {
+    /* remove the default border */
+    border:0;
+}
+.ui-jqgrid a {
+    color:#75A51F !important;
+}
+.ui-jqgrid a:visited {
+    color:#75A51F !important;
+}
+.ui-jqgrid a:hover {
+    border-bottom:1px dashed #75A51F;
+}
+
+/* Grid title */
+.ui-jqgrid .ui-jqgrid-titlebar {
+    line-height:27px;
+    background:#F2F2E5;
+    border-bottom:3px solid #EEEED7;
+    text-align:left;
+    padding-top:9px;
+}
+.ui-jqgrid .ui-jqgrid-title {
+    color:#629800;
+    font-size:16px;
+    font-weight:bold;
+    padding-left:11px;
+}
+.ui-jqgrid .ui-jqgrid-title {
+    /* dont let the title float so the titlebar will contain it */
+    float:none;
+}
+
+/* Grid column headers */
+.ui-jqgrid .ui-jqgrid-hdiv {
+    border:0;
+}
+.ui-jqgrid .ui-jqgrid-bdiv {
+    min-height:36px;
+}
+.ui-jqgrid .ui-jqgrid-hdiv .ui-th-ltr {
+    background:#F9F9EE;
+    color:#629800;
+    font-weight:bold;
+    border:0;
+}
+
+/* Grid rows */
+.ui-jqgrid .ui-row-ltr {
+    border:0;
+}
+.ui-jqgrid .ui-state-hover {
+    background:#F2F2E5 !important;
+}
+.ui-jqgrid tr.jqgrow td {
+    border-right:0 !important;
+    border-bottom:1px solid #EEEED7 !important;
+    padding: 2px 4px;
+}
+.ui-jqgrid .action_seperator {
+    color:#75A51F;
+    padding:0 2px;
+}
+
+/* Pager */
+.ui-jqgrid .ui-jqgrid-pager {
+    background:#F9F9EE;
+    color:#629800;
+}
+.ui-jqgrid .ui-jqgrid-pager  .ui-separator {
+    display:none !important;
+}
+.ui-jqgrid .ui-jqgrid-pager  .ui-pg-input{
+    background:#F9F9EE;
+    border:1px solid #EEEED7;
+    text-align:center;
+    font-size:10px;
+}
+
+/* jGrowl
+-------------------------------------------------------------- */
+div.jGrowl div.jGrowl-notification,
+div.jGrowl div.jGrowl-closer {
+    opacity: 100 !important;
+    min-height: 10px !important;
+    min-width:235px;
+    width:auto;
+}
+div.jGrowl div.jGrowl-notification .message ul,
+div.jGrowl div.jGrowl-closer .message ul {
+    padding-left:25px;
+    font-weight:normal;
+}
+div.jGrowl div.jGrowl-notification.error {
+    background: #FBE3E4;
+    color: #8a1f11;
+    border-color: #FBC2C4;
+}
+div.jGrowl div.jGrowl-notification.alert {
+    background: #FFF6BF;
+    color: #514721;
+    border-color: #FFD324;
+}
+div.jGrowl div.jGrowl-notification.info {
+    background: #E3E3FB;
+    color: #514721;
+    border-color: #9696FA;
+}
+div.jGrowl div.jGrowl-notification.success {
+    background: #E6EFC2;
+    color: #264409;
+    border-color: #C6D880;
+}
+
+/* Customize dropdown helper
+-------------------------------------------------------------- */
+form.form .assign_numbers .ui-dropdownchecklist-wrapper {
+    margin: 0;
+}
+
+/* asm List
+-------------------------------------------------------------- */
+form.form .field .asmSelect {
+    min-width:185px;
+}
+form.form .field .asmList {
+    margin: 10px 0px;
+    width: 50%;
+    float: left;
+    padding-left:200px;
+}
+
+/* Block UI message
+-------------------------------------------------------------- */
+.thinking {
+    background-image:url('../img/thinking.gif');
+    background-repeat:no-repeat;
+    background-position:center bottom;
+    font-weight:bold;
+    height:32px
+}
+.blockUI.blockOverlay{
+    background:#FFFFFF;
+    -moz-opacity:.50;
+    filter:alpha(opacity=50);
+    opacity:.50;
+}
+
+/* The multiselect needs to float to fit into our form
+-------------------------------------------------------------- */
+.ui-multiselect {
+    float:left;
+}
+
+.ui-widget {
+    font-size:  11px !important;
+}
+
+.ui-th-column, .ui-jqgrid .ui-jqgrid-htable th.ui-th-column {
+    text-align: left;
+}

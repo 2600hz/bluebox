@@ -83,14 +83,14 @@ class TrunkManager_Controller extends Bluebox_Controller
 
     protected function save_succeeded(&$object)
     {
-        //netlists::addToTrunkAuto($object);
+        netlists::addToTrunkAuto($object);
         
         parent::save_succeeded($object);
     }
 
     protected function delete_succeeded(&$object)
     {
-        //netlists::addToTrunkAuto($object);
+        netlists::removeTrunkFromAuto($object);
 
         parent::delete_succeeded($object);
     }

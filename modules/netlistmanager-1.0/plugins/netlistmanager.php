@@ -9,7 +9,7 @@ class NetListManager_Plugin extends Bluebox_Plugin
 {
     public function delete()
     {
-        $base = Event::$data;
+        $base = $this->getBaseModelObject();
 
         if (!$base)
         {

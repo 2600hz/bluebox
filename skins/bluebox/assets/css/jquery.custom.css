@@ -5,13 +5,13 @@
     border:0;
 }
 .ui-jqgrid a {
-    color:#75A51F !important;
+    color:#005f80 !important;
 }
 .ui-jqgrid a:visited {
-    color:#75A51F !important;
+    color:#005f80 !important;
 }
 .ui-jqgrid a:hover {
-    border-bottom:1px dashed #75A51F;
+    border-bottom:1px dashed #005f80;
 }
 
 /* Grid title */
@@ -24,7 +24,7 @@
 }
 .title,
 .ui-jqgrid .ui-jqgrid-title {
-    color:#629800;
+    color:#005f80;
     font-size:16px;
     font-weight:bold;
 }
@@ -43,7 +43,7 @@
 }
 .ui-jqgrid .ui-jqgrid-hdiv .ui-th-ltr {
     background:#F9F9EE;
-    color:#629800;
+    color:#005f80;
     font-weight:bold;
     border:0;
 }
@@ -61,14 +61,14 @@
     padding: 2px 4px;
 }
 .ui-jqgrid .action_seperator {
-    color:#75A51F;
+    color:#005f80;
     padding:0 2px;
 }
 
 /* Pager */
 .ui-jqgrid .ui-jqgrid-pager {
     background:#F9F9EE;
-    color:#629800;
+    color:#005f80;
 }
 .ui-jqgrid .ui-jqgrid-pager  .ui-separator {
     display:none !important;
@@ -156,9 +156,5 @@ form.form .field .asmList {
 }
 
 .ui-widget {
-    font-size:  11px !important;
-}
-
-.ui-th-column, .ui-jqgrid .ui-jqgrid-htable th.ui-th-column {
-    text-align: left;
+    font-size: 11px;
 }
