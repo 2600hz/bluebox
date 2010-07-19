@@ -9,7 +9,7 @@ class Polycomdriver_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Polycom Provision Driver';
     public static $default = true;
-    public static $type = Bluebox_Installer::TYPE_ENDPOINT;
+    public static $type = Package_Manager::TYPE_ENDPOINT;
     public static $required = array(
         'core' => 0.1,
         'provisioner' => 0.1

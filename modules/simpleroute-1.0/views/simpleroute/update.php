@@ -1,31 +1,36 @@
 <?php echo form::open_section('Route Outbound Calls Matching...'); ?>
 
-    <?php
-        $routeType = array('local', 'international', 'emergency');
-        $routeDisplay = kohana::config('simpleroute.route_display');
-        foreach ($routeType as $route) {
-            echo '<div class="field">';
-            echo form::label('simpleroute[' . $route . ']', $routeDisplay[$route]);
-            echo form::checkbox('simpleroute[' . $route . ']');
-            echo '&nbsp;&nbsp; Prepend calls with: ';
-            //echo form::label('simpleroute[' . $route . '_prepend]', 'Prepend Calls With: ');
-            echo form::input('simpleroute[' . $route . '_prepend]');
-            echo '</div>';
-        }
-    ?>
+    <?php foreach ($outboundPatterns as $key => $pattern): ?>
+
+        <div class="field">
+
+            <?php echo form::label('simpleroute[patterns][' . $key .']', $pattern['name']); ?>
+
+            <?php echo form::checkbox('simpleroute[patterns][' . $key .'][enabled]'); ?>
+
+            <span style="padding:0 5px 0;">Prepend calls with:</span>
+
+            <?php echo form::input('simpleroute[patterns][' .$key .'][prepend]'); ?>
+
+        </div>
+
+    <?php endforeach; ?>
 
 <?php echo form::close_section(); ?>
 
 <?php echo form::open_section('Made from These Contexts...'); ?>
 
-    <?php
-        foreach ($contexts as $context) {
-            echo '<div class="field">';
-            echo form::label('simpleroute[SimpleRouteContext]', $context['name']);
-            echo form::checkbox('simpleroute[SimpleRouteContext][][context_id]', $context['context_id'], isset($checkedSimpleRouteContext[$context['context_id']]));
-            echo '</div>';
-        }
-    ?>
+    <?php foreach ($contexts as $context): ?>
+
+        <div class="field">
+
+        <?php echo form::label('simpleroute[contexts][' .$context['context_id'] .']', $context['name']); ?>
+
+        <?php echo form::checkbox('simpleroute[contexts][' .$context['context_id'] .']'); ?>
+
+        </div>
+
+    <?php endforeach; ?>
 
 <?php echo form::close_section(); ?>
 

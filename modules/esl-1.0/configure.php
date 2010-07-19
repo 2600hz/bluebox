@@ -10,13 +10,12 @@ class Esl_Configure extends Bluebox_Configure
     public static $summary = 'FreeSWTICH Even Socket Layer Support';
     public static $description = 'FreeSWITCH ESL access. Provides real-time data to modules that interact directly with the switch, such as voicemail interactions';
     public static $default = TRUE;
-    public static $type = Bluebox_Installer::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'freeswitch' => 0.1,
         'core' => 0.1,
         'sipinterface' => 0.1
     );
-    public static $navIcon = 'assets/img/icons/mainSettingsX.png';
     public static $navBranch = '/Status/';
     public static $navURL = 'esl/index';
     /**

@@ -43,20 +43,6 @@
         ?>
         </div>
 
-        <div class="field dbCredentials">
-        <?php
-            echo form::label('dbPersistent', 'Use Persistent Connection');
-            echo form::checkbox('dbPersistent');
-        ?>
-        </div>
-
-        <div class="field">
-        <?php
-            echo form::label('samples', 'Install Sample Data');
-            echo form::checkbox('samples');
-        ?>
-        </div>
-
     <?php echo form::close_section(); ?>
 
 
@@ -69,10 +55,10 @@
         ?>
         </div>
 
-        <div class="field">
+        <div class="field upload">
         <?php
-            echo form::label('language', 'Default Langauage');
-            echo form::dropdown('language', $defaultLanguages, $defaultLanguage);
+            echo form::label('uploadDir', 'Upload Directory');
+            echo form::input('uploadDir');
         ?>
         </div>
 
@@ -85,15 +71,8 @@
 
         <div class="field">
         <?php
-            echo form::label('defaultCurrency', 'Default Currency');
-            echo form::dropdown('defaultCurrency', $defaultCurrencies);
-        ?>
-        </div>
-
-        <div class="field upload">
-        <?php
-            echo form::label('uploadDir', 'Upload Directory');
-            echo form::input('uploadDir');
+            echo form::label('samples', 'Install Sample Data');
+            echo form::checkbox('samples');
         ?>
         </div>
 

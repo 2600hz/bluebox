@@ -9,7 +9,7 @@ class Asterisk_Configure extends Bluebox_Configure
     public static $license = 'LGPL';
     public static $summary = 'Driver for Asterisk';
     public static $default = FALSE;
-    public static $type = Bluebox_Installer::TYPE_DRIVER;
+    public static $type = Package_Manager::TYPE_DRIVER;
     public static $required = array(
         'core' => 0.1,
         'not' => array(

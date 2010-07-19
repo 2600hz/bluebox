@@ -10,7 +10,7 @@ class PowerDns_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'PowerDNS Management';
     public static $default = TRUE;
-    public static $type = Bluebox_Installer::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

@@ -1,0 +1,231 @@
+/* Navigation layout
+-------------------------------------------------------------- */
+#navigation {
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    background:transparent url(../img/categories_nav_bg.gif) repeat-y scroll 0 0;
+    clear:both;
+    padding:35px 20px 10px;
+    position:relative;
+    width:860px;
+}
+#navigation #navCap {
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    background:transparent url(../img/nav_bg_bottom.gif) repeat scroll 0 0;
+    font-size:1px;
+    left:0;
+    overflow:hidden;
+    position:absolute;
+    bottom:0;
+    height:4px;
+    width:900px;
+}
+
+/* Layout for the categories list
+-------------------------------------------------------------- */
+#navCategories {
+    -moz-background-clip:border;
+    -moz-background-inline-policy:continuous;
+    -moz-background-origin:padding;
+    background:transparent url(../img/categories_nav.gif) no-repeat scroll 0 0;
+    height:37px;
+    left:0;
+    position:absolute;
+    text-align:center;
+    top:0;
+    width:890px;
+    padding: 0 5px;
+}
+#navCategories li {
+    -moz-border-radius-bottomleft:4px;
+    -moz-border-radius-bottomright:4px;
+    -moz-border-radius-topleft:4px;
+    -moz-border-radius-topright:4px;
+    cursor:pointer;
+    float:left;
+    height:27px;
+    line-height:27px;
+    margin-top:4px;
+}
+#navCategories li:hover {
+    color:white;
+    background:#75A51F;
+}
+#navCategories li.current_category {
+    color:white;
+    background:#75A51F;
+}
+
+/* Layout for the modules list
+-------------------------------------------------------------- */
+#navigation .navGroup {
+    position:relative;  
+    color:#666666;
+    font-size:11px;
+    line-height:1.6em;
+}
+#navigation .navGroup .wrapper {
+    height:87px;
+    width:800px;
+    margin:0 20px;
+    overflow:hidden;
+    position:relative;    
+}
+#navigation .navGroup .wrapper ul {
+    clear:left;
+    display:inline-block;
+    margin-bottom:0;
+    margin:0;
+    padding:0;
+    position:absolute;
+    width:9999px;
+}
+#navigation .navGroup .wrapper li {
+    float:left;
+    height:82px;
+    margin:0;
+    padding:10px 10px 0;
+    text-align:center;
+}
+#navigation .navGroup .wrapper li .navIcon {
+    display:block;
+    width:80px;
+    height:61px;
+    background-position:left top;
+    background-repeat:no-repeat;
+    border:0 none;
+    margin:0 auto;
+    text-align:center;
+}
+#navigation .navGroup .wrapper li a.navItem {
+    text-decoration:none;
+}
+#navigation .navGroup .wrapper li a.navItem span {
+    display:block;
+    font-size:12px;
+    text-align:center;
+}
+
+/* Layout for long groups with the infiniteCarousel animaiton
+-------------------------------------------------------------- */
+#navigation .arrow {
+  display: block;
+  height: 36px;
+  width: 37px;
+  background: url(../img/arrow.gif) no-repeat 0 0;
+  text-indent: -9999px;
+  position: absolute;
+  top: 25px;
+  cursor: pointer;
+}
+
+#navigation .forward {
+  background-position: 0 0;
+  right: 0;
+}
+
+#navigation .back {
+  background-position: 0 -72px;
+  left: 0;
+}
+
+#navigation .forward:hover {
+  background-position: 0 -36px;
+}
+
+#navigation .back:hover {
+  background-position: 0 -108px;
+}
+
+
+/* Layout for long groups with the infiniteCarousel animaiton
+-------------------------------------------------------------- */
+.infiniteCarousel {
+  width: 860px;
+  position: relative;
+}
+
+.infiniteCarousel .wrapper {
+  overflow: auto;
+  margin: 0 40px !important;
+  width: 780px !important; /* .infiniteCarousel width - (.wrapper margin-left + .wrapper margin-right) */
+  position: absolute;
+  top: 0;
+}
+
+.infiniteCarousel .wrapper ul {
+  width: 9999px;
+  list-style-image:none;
+  list-style-position:outside;
+  list-style-type:none;
+  margin:0;
+  padding:0;
+  position: absolute;
+  top: 0;
+}
+
+.infiniteCarousel ul li {
+  display:block;
+  float:left;
+  padding:10px;
+  height:78px;
+  width:110px;
+}
+
+.infiniteCarousel .arrow {
+  display: block;
+  height: 36px;
+  width: 37px;
+  background: url(../img/arrow.png) no-repeat 0 0;
+  text-indent: -9999px;
+  position: absolute;
+  top: 37px;
+  cursor: pointer;
+}
+
+.infiniteCarousel .forward {
+  background-position: 0 0;
+  right: 0;
+}
+
+.infiniteCarousel .back {
+  background-position: 0 -72px;
+  left: 0;
+}
+
+.infiniteCarousel .forward:hover {
+  background-position: 0 -36px;
+}
+
+.infiniteCarousel .back:hover {
+  background-position: 0 -108px;
+}
+
+/* Submenu
+-------------------------------------------------------------- */
+.sub_menu {
+    float:right;
+    padding-right:20px;
+    position:relative;
+    top:13px;
+    z-index:900;
+}
+.sub_menu a{
+    -moz-border-radius-bottomleft:4px;
+    -moz-border-radius-bottomright:4px;
+    -moz-border-radius-topleft:4px;
+    -moz-border-radius-topright:4px;
+    background-color:transparent;
+    border:medium none;
+    color:white;
+    font-size:10pt;
+    font-weight:bold;
+    padding:0px 1.75em;
+    text-decoration:none;
+    min-width: 150px;
+    background-image:url(../img/buttonSmallMiddle.png);
+    margin:0 5px;
+}
