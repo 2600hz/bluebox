@@ -41,10 +41,14 @@ class SipInterface_Plugin extends Bluebox_Plugin
 
         $result = Doctrine::getTable('SipInterface')->findAll(Doctrine::HYDRATE_ARRAY);
 
+        $options = array();
+
         foreach ($result as $row)
         {
-            $subview->options[$row['sipinterface_id']] = $row['name'];
+            $options[$row['sipinterface_id']] = $row['name'];
         }
+
+        $this->subview->options = $options;
 
         return TRUE;
     }

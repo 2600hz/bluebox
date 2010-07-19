@@ -503,7 +503,7 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->delete_prepare($object);
 
             // Allow plugins to process any data related to this object prior to deletion
-            if(!plugins::delete($object, $deleteEvents))
+            if(!plugins::delete($this, $deleteEvents))
             {
                 throw new Bluebox_Exception('Plugins failed to delete');
             }
@@ -590,7 +590,7 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->save_prepare($object);
 
             // Allow plugins to process any form-related data we just got back and attach to our data object
-            if(!plugins::save($object, $saveEvents))
+            if(!plugins::save($this, $saveEvents))
             {
                 throw new Bluebox_Exception('Plugins failed to save');
             }
