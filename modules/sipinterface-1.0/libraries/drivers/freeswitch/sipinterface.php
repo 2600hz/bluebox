@@ -109,9 +109,9 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         elseif($sipinterface['nat_type'] == 2)
         {
             // No IP defined and no auto-nat set... Just try to use stun to auto-detect
-            $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="stun:freeswitch.org"}');
+            $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="stun:stun.freeswitch.org"}');
             
-            $xml->update('/settings/param[@name="ext-sip-ip"]{@value="stun:freeswitch.org"}');
+            $xml->update('/settings/param[@name="ext-sip-ip"]{@value="stun:stun.freeswitch.org"}');
         } 
         else
         {
