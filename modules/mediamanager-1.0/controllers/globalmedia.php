@@ -52,6 +52,15 @@ class GlobalMedia_Controller extends Bluebox_Controller
         javascript::add('php_file_tree_jquery.js');
         stylesheet::add('php_file_tree.css');
 
+        // Remember the last path that was clicked on. We use this for uploads and other items.
+        // Why store this as a session var? Prevents people from screwing with paths they aren't supposed to be
+        // able to touch. In this way, we NEVER expose paths directly to our scripts with data from the outside
+        if (isset($_REQUEST['searchString'])) {
+            $_SESSION['globalmedia']['path'] = $_REQUEST['searchString'];
+        } else {
+            unset ($_SESSION['globalmedia']['path']);
+        }
+
         // Build a grid with a hidden device_id, device_type, and add an option for the user to select the display columns
         $this->grid = jgrid::grid($this->baseModel, array(
             'caption' => '&nbsp;',
@@ -108,18 +117,106 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
     public function scan() {
+        // TODO: Make this run
+        
         //MediaScanner::scan();
     }
 
-    public function details($mediaid) {
+    public function details($mediaId) {
+        $this->view->mediaId = $mediaId;
         
+        $this->view->media = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
     }
+
+    private function locateFile($media, $sampleRate = NULL) {
+        $file = $this->soundPath . $media['file'];
+
+        // See if the file exists. If not, try adding sample rates to the path
+        if (!file_exists($file)) {
+            $found = FALSE;
+            $file = $this->soundPath . dirname($media['file']) . '/' . $sampleRate . '/' . basename($media['file']);
+
+            if (($sampleRate) and (file_exists($file))) {
+                $found = TRUE;
+            } else {
+                if (isset($media['registry']['rates'])) foreach ($media['registry']['rates'] as $rate) {
+                    $file = $this->soundPath . dirname($media['file']) . '/' . $rate . '/' . basename($media['file']);
+                    if (file_exists($file)) {
+                        $found = TRUE;
+                        continue;
+                    }
+                }
+            }
+
+            if (!$found)
+                return FALSE;
+        }
+        
+        return $file;
+    }
+
+    public function visualize($mediaId) {
+        $media = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
+        $file = $this->locateFile($media);
+        if (!$file) {
+            die();
+        }
+
+        // Initialize audio analysis routine
+        $audioFile = new AudioFile();
+        $audioFile->loadFile($file);
+
+        $audioFile->visual_height = 250;
+        $audioFile->visual_background_color = '#FFFFFF';
+        $audioFile->visual_border_color = '#FFFFFF';
+        $audioFile->visual_grid_color = '#CCCCCC';
+        $audioFile->visual_graph_color = '#0000FF';
+
+        header('Content-type: image/jpeg');
+        $audioFile->getVisualization(NULL);
+        
+        flush();
+        exit();
+    }
+
+
+    public function download($mediaId, $sampleRate = NULL, $stream = FALSE)
+    {
+        $file = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
+        $fullPath = $this->locateFile($file, $sampleRate);
+        
+        $name = basename($file['file']);
+        if ($file['registry']['type'] == 'MPEG') {
+            $mime = 'audio/mpeg';
+        } else {
+            $mime = 'audio/x-wav';
+        }
+        header(sprintf('Content-type: %s', $mime));
+        if (!$stream) {
+            // Include filename and attachment disposition only if we don't want to stream
+            header(sprintf('Content-Disposition: attachment; filename="%s"', $name));
+        }
+        readfile($fullPath);
+        die();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function add()
     {
-        javascript::add('jquery_uploadify');
-        javascript::add('swfobject');
-        stylesheet::add('uploadify');
+        javascript::add('ajaxupload');
         
         $this->view->title = 'Upload Media';
 
@@ -132,7 +229,8 @@ class GlobalMedia_Controller extends Bluebox_Controller
             $this->view->maxUpload .= __('If you attempt to upload something larger than this the page will simply reload.');
         }
         
-        if ($this->submitted()) {
+        if (isset($_FILES['upload'])) {
+            Kohana::log('debug', 'File uploaded. ' . print_r($_FILES, TRUE));
             switch ($_FILES['upload']['error']) {
                 case UPLOAD_ERR_INI_SIZE:
                     message::set('The uploaded file exceeds the upload_max_filesize directive in php.ini');
@@ -163,30 +261,10 @@ class GlobalMedia_Controller extends Bluebox_Controller
                     break;
 
               case UPLOAD_ERR_OK:
-                    switch ($this->input->post('type')) {
-                        case 'package':
-                            $description = '';
-                            $replace = TRUE;
-                            break;
-
-                        default:
-                            if (empty($_POST['mediamanager']['description'])) {
-                                $description = '';
-                            } else {
-                                $description = $_POST['mediamanager']['description'];
-                            }
-                            $replace = !empty($_POST['mediamanager']['replace']);
-                            break;
-                    }
-                    if ($this->upload($replace, $description)) {
+                    $description = (empty($_POST['upload']['description']) ? $_POST['upload']['description'] : '');
+                  
+                    if ($this->upload($this->soundPath, $description, TRUE)) {
                         message::set('Uploaded file', 'success');
-
-
-
-
-
-
-
                     }
                     break;
 
@@ -196,42 +274,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
         }
     }
 
-    public function uploadify()
-    {
-        header('Content-type: application/x-shockwave-flash');
-        readfile(MODPATH . 'mediamanager-1.0/assets/uploadify.swf');
-        die();
-    }
-
-    public function upload($session = NULL)
-    {
-        if ($session) {
-            session_id($session);
-        }
-
-        //folder where the files are stored at
-        //you may need to chmod this folder to 775 or 777 for it to work
-        $src_folder = '/tmp/';
-
-        //if javascript is disabled, the ftp will still work
-        if (isset($_FILES["file"])) {
-            if ($_FILES["file"]["error"] > 0) {
-              $error = 'Error Uploading!';
-            } else {
-            $count = '1';
-            $file_loc = $path . $_FILES["file"]["name"];
-            $base = $_FILES["file"]["name"];
-            while ( file_exists($file_loc) ) {
-                $file_loc = $path . $count.'-'. $_FILES["file"]["name"];
-                $base = $count.'-'. $_FILES["file"]["name"];
-                $count++;
-            }
-            move_uploaded_file($_FILES["file"]["tmp_name"], $file_loc);
-            }
-        }
-    }
-
-    public function edit($id)
+/*    public function edit($id)
     {
         $this->view->title = 'Edit Media';
         $file = Doctrine::getTable('File')->find($id);
@@ -254,24 +297,13 @@ class GlobalMedia_Controller extends Bluebox_Controller
         $this->view->mediamanager = array('description' => $file->description);
     }
 
-    public function download($id)
-    {
-        $file = Doctrine::getTable('File')->find($id);
-        $fullPath = $file->path . $file->name;
-        $name = $file->name;
-        $mime = $file->type;
-        header(sprintf('Content-type: %s', $mime));
-        header(sprintf('Content-Disposition: attachment; filename="%s"', $name));
-        readfile($fullPath);
-        die();
-    }
-
     public function preview($id)
     {
         stylesheet::add('mediamanager', 40);
         $this->view->title = 'Preview Media';
         $this->view->url = url::site('mediamanager/listen/' . $id);
     }
+ 
     public function listen($id)
     {
         $file = Doctrine::getTable('File')->find($id);
@@ -279,7 +311,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
         $name = $file->name;
         $mime = $file->type;
         header(sprintf('Content-type: %s', $mime));
-        //header(sprintf('Content-Disposition: attachment; filename="%s"', $name));
         readfile($fullPath);
         die();
     }
@@ -287,17 +318,18 @@ class GlobalMedia_Controller extends Bluebox_Controller
     public function delete($id)
     {
         $this->stdDelete($id);
-    }
+    }*/
 
-    private function old_upload($replace = false, $description = '')
+    private function upload($description = '', $replace = false)
     {
         /* check if folder exists */
-        if (!is_dir($this->uploadPath)) {
+        /*if (!is_dir($this->uploadPath)) {
             if (!filesystem::createDirectory($this->uploadPath)) {
                 message::set('The path ' . $this->uploadPath . 'does not exist and could not be created!');
                 return false;
             }
-        }
+        }*/
+
         /* can we write to the target folder? */
         if (!filesystem::is_writable($this->uploadPath)) {
             message::set('The path ' . $this->uploadPath . ' is not writable!');
