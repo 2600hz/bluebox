@@ -50,10 +50,7 @@ class SipInterface_Controller extends Bluebox_Controller
         );
         $grid->add('ip_address', 'IP Address');
         $grid->add('port', 'Port');
-        $grid->add('Context/name as context', 'Default Context', array(
-                'colModel' => 'context'
-            )
-        );
+        $grid->add('Context/name', 'Default Context');
 
         // Add the actions to the grid
         $grid->addAction('sipinterface/edit', 'Edit', array(
