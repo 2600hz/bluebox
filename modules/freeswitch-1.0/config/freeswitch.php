@@ -7,6 +7,37 @@
  *
  * Best not to mess with this unless you think you know what you are doing ;)
  */
+$config['default_packages'] = array(
+    // Modules
+    'contextmanager',
+    'locationmanager',
+    //'mediamanager',
+    'numbermanager',
+    'trunkmanager',
+    //'autoattendant',
+    'conference',
+    'devicemanager',
+    'ringgroup',
+    'timeofday',
+    'voicemail',
+
+    // Plugins
+    'address',
+    'callerid',
+    'simpleroute',
+    'sip',
+
+    // Freeswitch
+    'esl',
+    'mediaoption',
+    'multitenant',
+    'netlistmanager',
+    'odbc',
+    'sipinterface',
+    'sofia',
+    'xmleditor',
+);
+
 $config['ESLHost'] = '127.0.0.1';
 $config['ESLPort'] = '8021';
 $config['ESLAuth'] = 'ClueCon';
