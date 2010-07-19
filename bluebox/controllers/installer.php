@@ -22,46 +22,11 @@ class Installer_Controller extends Bluebox_Controller
     public $minimumPackages = array(
         'core',
         'packagemanager',
-        'multitenant',
 
         // System Modules
         'accountmanager',
-        'contextmanager',
-        'locationmanager',
         'usermanager',
-        'numbermanager',
-        'powerdns',
-        'rosetta',
-        
-        // Modules
-        'devicemanager',
-        'conference',
-        'voicemail',
-        'ringgroup',
-        'timeofday',
-        'trunkmanager',
-        'simpleroute',
-
-        // Plugins
-        'address',
-        'callerid',
-        'sip',
-        
-        //'autoattendant',
-        //'mediamanager',
-
-        // Freeswitch
-        'esl',
-        'netlistmanager',
-        'sipinterface',
-        'sofia',
-        'xmleditor',
-        'mediaoption',
-        'odbc',
-        
-        'provisioner',
-        'polycomdriver'
-
+        'rosetta'
     );
 
     /**
@@ -1364,7 +1329,7 @@ class Installer_Controller extends Bluebox_Controller
 
         kohana::log('debug', 'Installer running for driver ' .$driver);
 
-        $packages = $this->session->get('installer.modules', array());
+        $packages = $this->session->get('installer.default_packages', array());
 
         $packages = arr::merge($this->minimumPackages, $packages, array($driver));
         
