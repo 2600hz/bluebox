@@ -35,9 +35,9 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
 
     public static function delete($conference)
     {
-        $xml = FreeSwitch::setSection('conferences');
-       
-        $xml->deleteNode(sprintf('/profiles/profile[@name="conference_%s"]', $conference['conference_id']));
+        $xml = FreeSwitch::setSection('conference_profile', $conference['conference_id']);
+
+        $xml->deleteNode();
     }
 
     public static function dialplan($number)
