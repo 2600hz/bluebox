@@ -4,10 +4,9 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($conference)
     {
-        $xml = FreeSwitch::setSection('conferences');
+        $xml = FreeSwitch::setSection('conference_profile', $conference['conference_id']);
 
-        // The section we are working with is <document><section name="configuration"><configuration name="conference.conf">
-        $prefix = sprintf('/profiles/profile[@name="conference_%s"]', $conference['conference_id']);
+        $xml->deleteChildren();
 
         $profile = arr::merge(Conference::$default_profile, $conference['profile']);
 
@@ -15,7 +14,22 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
         {
             $value = str_replace('/', '\/', $value);
             
-            $xml->update($prefix .'/param[@name="' .$parameter .'"]{@value="' .$value .'"}');
+            $xml->update('/param[@name="' .$parameter .'"]{@value="' .$value .'"}');
+        }
+
+        if (empty($conference['pins']))
+        {
+            return;
+        }
+        
+        foreach ($conference['pins'] as $pin)
+        {
+            if (empty($pin))
+            {
+                continue;
+            }
+            
+            $xml->update('/param[@name="pin"]{@value="' .$pin .'"}');
         }
     }
 
