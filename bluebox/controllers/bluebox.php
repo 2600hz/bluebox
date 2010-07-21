@@ -16,6 +16,8 @@ abstract class Bluebox_Controller extends Template_Controller
      */
     public static $version = '1.0';
 
+    protected $authBypass = array();
+
     /*************************
     * DATA RELATED SETTINGS *
     *************************/
@@ -283,6 +285,11 @@ abstract class Bluebox_Controller extends Template_Controller
     public function getBaseModel()
     {
         return $this->baseModel;
+    }
+
+    public function getAuthBypass()
+    {
+        return $this->authBypass;
     }
 
     /**
