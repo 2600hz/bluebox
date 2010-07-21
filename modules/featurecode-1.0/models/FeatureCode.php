@@ -1,27 +1,40 @@
 <?php
-class FeatureCode extends Bluebox_Record
-{
-    /**
-     * Sets the table name, and defines the table columns.
-     */
-	public function setTableDefinition() {
-            // COLUMN DEFINITIONS
-            $this->hasColumn('feature_code_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
-            $this->hasColumn('name', 'string', 80);
-            $this->hasColumn('xml', 'string', 4096); // 4kb max xml size
-            $this->hasColumn('description', 'string', 512);
-	}
+class FeatureCode extends Bluebox_Record {
 
-    /**
-     * Sets up relationships, behaviors, etc.
-     */
-    public function setUp() {
-        $this->hasOne('FeatureCodeNumber as Number', array('local' => 'feature_code_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
+  public function construct() {
+    if ( ! empty($this->registry) ) return;
 
-        // BEHAVIORS
-        //$this->actAs('Polymorphic');
+    $registry = array();
+    $sections = FreeSwitch::getDialplanSections();
 
-        $this->actAs('Timestampable');
-        $this->actAs('TelephonyEnabled');
+    foreach($sections as $section) {
+      $registry[$section] = ''; // no xml defined by default
     }
+
+    $this->registry = $registry;
+  }
+  /**
+   * Sets the table name, and defines the table columns.
+   */
+  public function setTableDefinition() {
+    // COLUMN DEFINITIONS
+    $this->hasColumn('feature_code_id', 'integer', 11, array('unsigned' => TRUE
+							     ,'notnull' => TRUE
+							     ,'primary' => TRUE
+							     ,'autoincrement' => TRUE));
+    $this->hasColumn('name', 'string', 80);
+    $this->hasColumn('description', 'string', 512);
+    // section-specific XML is stored in the $registry, provided by the GenericStructure behaviour
+  }
+
+  /**
+   * Sets up relationships, behaviors, etc.
+   */
+  public function setUp() {
+    // BEHAVIORS
+    //$this->actAs('Polymorphic');
+    $this->actAs('GenericStructure'); // Gives a generic $registry
+    $this->actAs('Timestampable');
+    $this->actAs('TelephonyEnabled');
+  }
 }

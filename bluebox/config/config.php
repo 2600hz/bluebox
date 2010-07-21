@@ -2,14 +2,14 @@
 /**
  * Allow the installer to be run.  This should be set to false after installation
  */
-$config['installer_enabled'] = TRUE;
+$config['installer_enabled'] = FALSE;
 
 /**
  * Base path of the web site. If this includes a domain, eg: localhost/kohana/
  * then a full URL will be used, eg: http://localhost/kohana/. If it only includes
  * the path, and a site_protocol is specified, the domain will be auto-detected.
  */
-$config['site_domain'] = '/';
+$config['site_domain'] = '/bluebox/';
 
 /**
  * Force a default protocol to be used by the site. If no site_protocol is
@@ -66,7 +66,7 @@ $config['enable_hooks'] = TRUE;     // Bluebox will fail miserably if you turn t
  *  3 - Notices
  *  4 - Debugging
  */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 4;
 
 /**
  * Message logging directory.
@@ -125,7 +125,7 @@ $config['anonymous_statistics'] = TRUE;
  * Is this an oxymoron? Well we need to be able to group
  * multiple responses, it is not used for any other reason. Promise :)
  */
-$config['anonymous_id'] = '';
+$config['anonymous_id'] = '3FC517398396E580502E72C2576A9CA4';
 
 /**
  * If true then a minimum password complexity is enforced
