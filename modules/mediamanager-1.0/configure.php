@@ -50,10 +50,7 @@ class MediaManager_Configure extends Bluebox_Configure
             'summary' => 'Modify and maintain media (sound) files for the entire system',
             'navIcon' => 'assets/img/icons/mainToolsX.png',
             'navBranch' => '/Media/',
-            'navURL' => '/globalmedia/index',
-            'navSubmenu' => array(
-                'Add Sounds' => '/globalmedia/add'
-            )
+            'navURL' => '/globalmedia/index'
         ),
 
         array (
@@ -61,10 +58,7 @@ class MediaManager_Configure extends Bluebox_Configure
             'summary' => 'Modify and maintain media (sound) files for this account',
             'navIcon' => 'assets/img/icons/mainToolsX.png',
             'navBranch' => '/Media/',
-            'navURL' => '/accountmedia/index',
-            'navSubmenu' => array(
-                'Rescan Sounds' => '/accountmedia/scan'
-            )
+            'navURL' => '/accountmedia/index'
         )
     );
 /*

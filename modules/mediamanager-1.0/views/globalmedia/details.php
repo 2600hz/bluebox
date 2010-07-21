@@ -29,7 +29,7 @@
         <label class="label">Sample Rates: </label>
         <span>
         <?php
-        foreach ($media['registry']['rates'] as $rate) {
+        foreach ((array)$media['registry']['rates'] as $rate) {
             echo html::anchor('globalmedia/download/' . $mediaId . '/' . $rate, $rate . 'hz') . '&nbsp;&nbsp;';
         }
         ?>

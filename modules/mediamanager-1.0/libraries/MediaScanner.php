@@ -1,14 +1,14 @@
 <?php
 
 class MediaScanner {
-    private static function NormalizeFSNames($filename) {
+    public static function NormalizeFSNames($filename) {
         // NOTE: This is a FreeSWITCH-specific feature
         // Trim the 8000/16000/32000/48000 from directory names
         $filename = preg_replace('/\/8000\/|\/16000\/|\/32000\/|\/48000\//', '/', $filename);
         return $filename;
     }
 
-    public static function scan()
+    public static function scan($soundPath, $fileTypes)
     {
         set_time_limit(0);
         // TODO: Make this a queued event to scan all files. Only possible once.
@@ -38,13 +38,13 @@ class MediaScanner {
         $audioFile = new AudioFile();
 
         // Initialize iterator
-        $dir_iterator = new RecursiveDirectoryIterator(self::soundPath);
+        $dir_iterator = new RecursiveDirectoryIterator($soundPath);
         $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
 
         // Read in a list of files already registered in the system
-        foreach ($iterator as $filename) if (preg_match('/^.+\.(' . implode('|', self::knownTypes) . ')$/i', $filename) and ($filename->isFile())) {
+        foreach ($iterator as $filename) if (preg_match('/^.+\.(' . implode('|', $fileTypes) . ')$/i', $filename) and ($filename->isFile())) {
             $audioFile->loadFile($filename);
-            $shortname = str_replace(self::soundPath, '', self::NormalizeFSNames($filename));
+            $shortname = str_replace($soundPath, '', self::NormalizeFSNames($filename));
 
             // Is this a new file or an existing one?
             if ($mediafile_id = array_search($shortname, $knownFiles)) {
@@ -96,7 +96,7 @@ class MediaScanner {
             }
         }
 
-        Kohana::log('debug', 'Finished scanning sound files in ' . self::soundPath);
+        Kohana::log('debug', 'Finished scanning sound files in ' . $soundPath);
         flush();exit();
     }
 

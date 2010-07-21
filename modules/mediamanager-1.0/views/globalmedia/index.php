@@ -8,8 +8,6 @@
         <br/>
         <a href="#" onClick="clearPath()">Show All</a><br/>
         <br/>
-        <a href="#">Create Folder</a><br/>
-        <br/>
         <?php echo html::anchor('globalmedia/scan', 'Rescan Folders', array('class' => 'qtipAjaxForm')); ?>
         <br/>
     </div>
@@ -30,6 +28,8 @@
 
         <?php if (isset($grid)) echo $grid; ?>
 
+        <div id="upload_button">To upload a file, choose a folder from the left</div>
+        
         <div style="width:100%; margin: 10px;">&nbsp;</div>
     </div>
     
@@ -44,6 +44,7 @@ function filterPath(path) {
     $('#MediaGrid')[0].p.postData.searchString=path;
     $('#MediaGrid').trigger('reloadGrid');
     $('#MediaGrid').setCaption(path);
+    $('div#upload_button').html('Upload new file to ' + path);
 }
 
 function clearPath() {
@@ -53,5 +54,6 @@ function clearPath() {
     delete $('#MediaGrid')[0].p.postData.searchString;
     $('#MediaGrid').trigger('reloadGrid');
     $('#MediaGrid').setCaption('');
+    $('div#upload_button').html('To upload a file, choose a folder from the left');
 }
 <?php javascript::blockEnd(); ?>
