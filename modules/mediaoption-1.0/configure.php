@@ -13,6 +13,7 @@ class MediaOption_Configure extends Bluebox_Configure
     public static $default = true;
     public static $type = Package_Manager::TYPE_PLUGIN;
     public static $required = array(
-        'core' => 0.1
+        'core' => 0.1,
+        'freeswitch' => 0.1
     );
 }

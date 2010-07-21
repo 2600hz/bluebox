@@ -9,7 +9,7 @@ class MisdnManager_Configure extends Bluebox_Configure
     public static $license = 'FPL';
     public static $summary = 'Configuration of mISDN compatible interface cards';
     public static $default = false;
-    public static $type = Bluebox_Installer::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1
     );

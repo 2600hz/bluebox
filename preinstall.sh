@@ -4,7 +4,9 @@ if [ -f /etc/redhat-release ]
 then
 	# Must be CentOS! Need a better check then this at some point.
 	webuser='nobody'
-
+elif [ `uname` = 'Darwin' ]; then
+    # Mac
+    webuser='www'
 else
 
 	# Assume Debian. This needs improvement.
@@ -13,7 +15,7 @@ else
 fi
 
 # BlueBox Startup
-echo "Prepping for a typical BlueBox install. Your mileage may vary. It\'s OK if some things fail..."
+echo "Prepping for a typical BlueBox install. Your mileage may vary. It's OK if some things fail..."
 
 # SELinux
 echo '  Disabling SE Linux, if installed...'

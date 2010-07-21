@@ -8,9 +8,8 @@ class Timezone_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'This module provides the the ability to manage timezones for users and devices.';
     public static $default = false;
-    public static $type = Bluebox_Installer::TYPE_PLUGIN;
+    public static $type = Package_Manager::TYPE_PLUGIN;
     public static $required = array(
-        'core' => 0.1,
-        'callerid' => '1.0.3'
+        'core' => 0.1
     );
 }

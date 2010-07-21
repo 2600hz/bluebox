@@ -31,4 +31,6 @@
 class TrunkRelation extends Bluebox_Relation
 {
     protected $baseModelName = 'Trunk';
+
+    protected $cascade = TRUE;
 }
