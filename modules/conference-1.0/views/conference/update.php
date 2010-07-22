@@ -16,6 +16,18 @@
             echo form::input('conference[name]');
         ?>
         </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'conference[pins][0]',
+                    'hint' => 'Leave blank for no pin'
+                ),
+                'Pin:'
+            );
+            echo form::input('conference[pins][0]');
+        ?>
+        </div>
     
     <?php echo form::close_section(); ?>
 
