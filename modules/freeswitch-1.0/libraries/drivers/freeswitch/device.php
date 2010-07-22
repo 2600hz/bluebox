@@ -24,10 +24,6 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
 
             $numberOptions = fs::getNumberOptions($number);
 
-            $xml->update('/action[@application="set"][@bluebox="settingIgnoreEarlyMedia"]{@data="ignore_early_media=true"}');
-
-            $xml->update('/action[@application="set"][@bluebox="settingEndBridge"][@data="hangup_after_bridge=true"]');
-
             $xml->update('/action[@application="set"][@bluebox="settingTimeout"]{@data="call_timeout=' .$numberOptions['timeout'] .'"}');
 
             $xml->update('/action[@application="set"][@bluebox="settingRing"]{@data="ringback=${' . $numberOptions['ringtype'] . '}"}');
