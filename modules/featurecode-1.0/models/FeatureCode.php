@@ -22,7 +22,7 @@ class FeatureCode extends Bluebox_Record {
 							     ,'notnull' => TRUE
 							     ,'primary' => TRUE
 							     ,'autoincrement' => TRUE));
-    $this->hasColumn('name', 'string', 80);
+    $this->hasColumn('name', 'string', 80, array('notnull' => TRUE, 'minlength' => 2));
     $this->hasColumn('description', 'string', 512);
     // section-specific XML is stored in the $registry, provided by the GenericStructure behaviour
   }
