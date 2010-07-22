@@ -11,7 +11,7 @@ class usermanager {
             User::TYPE_POWER_USER => 'Power User',
             User::TYPE_RESTRICTED_ADMIN => 'Restricted Admin',
             User::TYPE_ACCOUNT_ADMIN => 'Account Admin',
-            User::TYPE_SYSTEM_ADMIN => 'God'
+            User::TYPE_SYSTEM_ADMIN => 'System Admin'
         );
     }
 
