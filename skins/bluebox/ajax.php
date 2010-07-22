@@ -3,6 +3,18 @@
 
 <?php message::render(); ?>
 
-<?php echo ($content == "")? 'NO CONTENT' : $content; ?>
+<?php
+    $content = (string)$content;
+
+    if (empty($content))
+    {
+        echo 'NO CONTENT';
+    }
+    else
+    {
+        echo $content;
+    }
+?>
+
 
 <?php javascript::renderCodeBlocks(); ?>

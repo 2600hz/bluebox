@@ -298,6 +298,13 @@ abstract class Bluebox_Configure
         {
             try
             {
+                $reflection = new ReflectionClass($model);
+
+                if ($reflection->isSubclassOf('Doctrine_Template'))
+                {
+                    throw new Exception('Model is a doctrine template');
+                }
+
                 $table = Doctrine::getTable($model);
 
                 $tableName = $table->getOption('tableName');
