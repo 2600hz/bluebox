@@ -13,8 +13,8 @@ class FeatureCode_Controller extends Bluebox_Controller {
   protected $baseModel = 'FeatureCode';
   protected $writable = array(
 			      'name'
-			      ,'xml'
 			      ,'description'
+			      ,'registry'
 			      );
 
   public function index() {
@@ -80,6 +80,7 @@ class FeatureCode_Controller extends Bluebox_Controller {
   }
 
   public function add() {
+    javascript::add('editarea/edit_area_full.js');
     javascript::add('featurecode.js');
     stylesheet::add('featurecode.css');
 
@@ -103,6 +104,7 @@ class FeatureCode_Controller extends Bluebox_Controller {
   }
 
   public function edit($id = NULL) {
+    javascript::add('editarea/edit_area_full.js');
     javascript::add('featurecode.js');
     stylesheet::add('featurecode.css');
 

@@ -13,9 +13,9 @@ div.section-used { display:none; }
 div.used {
   float: left;
   border: 1px solid #444;
-  margin: 5px 5px;
+  margin: 5px 2px;
   padding: 0 5px;
-  width: 350px;
+  width: 425px;
 }
 
 div.section-xml div {
@@ -33,7 +33,7 @@ span.clear-section {
 }
 
 div.section-xml textarea {
-  width: 340px;
+  width: 400px;
   margin: 0 5px 5px 5px;
 }
 

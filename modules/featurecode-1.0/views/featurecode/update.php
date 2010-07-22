@@ -34,7 +34,11 @@
 	<span><?php echo ucfirst($section) ?></span>
 	<span class="clear-section">&mdash;</span>
       </div>
-      <textarea name="featurecode[registry][<?php echo $section; ?>]"><?php echo $this->featureCode->registry[$section]; ?></textarea>
+      <textarea
+        class="section-editor"
+        id="featurecode_registry_<?php echo $section; ?>"
+        name="featurecode[registry][<?php echo $section; ?>]"
+      ><?php echo $this->featureCode->registry[$section]; ?></textarea>
     </div>    
     <?php endforeach; ?>
   <?php echo form::close_section(); ?>
