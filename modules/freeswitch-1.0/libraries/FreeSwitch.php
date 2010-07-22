@@ -361,23 +361,31 @@ class FreeSwitch extends Telephony_Driver
     public function commit()
     {
         // Activate any changed settings on the switch, live
-//        if (!Bluebox_Installer::is_installing()) {
-//            if (class_exists('EslManager', TRUE) && (self::$dirty or self::$aclDirty or self::$sofiaDirty)) {
-//                $esl = new EslManager();
-//                if (self::$dirty) {
-//                    $esl->reloadxml();
-//                }
-//
-//                if (self::$aclDirty) {
-//                    $esl->reloadacl();
-//                }
-//
-//                // NOTE: Sofia reload must come after reloadxml, and also note that sofia reload implies trunk reload so this is an elseif
-//                if (self::$sofiaDirty) {
-//                    $esl->reload('mod_sofia');
-//                }
-//            }
-//        }
+        if (!Bluebox_Installer::is_installing())
+        {
+            if (class_exists('EslManager', TRUE) && (self::$dirty or self::$aclDirty or self::$sofiaDirty))
+            {
+                $esl = new EslManager();
+
+                if (self::$dirty)
+                {
+                    $esl->reloadxml();
+                }
+
+                if (self::$aclDirty)
+                {
+                    $esl->reloadacl();
+                }
+
+                // NOTE: Sofia reload must come after reloadxml,
+                // and also note that sofia reload implies trunk
+                // reload so this is an elseif
+                if (self::$sofiaDirty)
+                {
+                    $esl->reload('mod_sofia');
+                }
+            }
+        }
 
         self::$dirty = FALSE;
 
