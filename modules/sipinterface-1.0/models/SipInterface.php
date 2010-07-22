@@ -137,12 +137,6 @@ class SipInterface extends Bluebox_Record
     public function setUp()
     {
         // RELATIONSHIPS
-        $this->hasMany('SipInterfaceTrunk', array(
-                'local' => 'sipinterface_id',
-                'foreign' => 'sipinterface_id'
-            )
-        );
-
         $this->hasOne('Context', array(
                 'local' => 'context_id',
                 'foreign' => 'context_id'
@@ -150,6 +144,7 @@ class SipInterface extends Bluebox_Record
         );
 
         // BEHAVIORS
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
         $this->actAs('TelephonyEnabled');
     }

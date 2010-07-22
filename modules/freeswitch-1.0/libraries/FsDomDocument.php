@@ -282,6 +282,8 @@ class FsDomDocument extends DOMDocument
 
             $elements = $xp->query($element, $currentnode);
 
+            $element = str_replace('\@', '@', $element);
+
             // Does path not exist (0 elements)?
             if ($elements->length == 0)
             {

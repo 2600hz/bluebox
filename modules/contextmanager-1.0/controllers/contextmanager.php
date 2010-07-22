@@ -27,6 +27,10 @@ class ContextManager_Controller extends Bluebox_Controller {
                 'arguments' => 'context_id',
             )
         );
+        $grid->addAction('contextmanager/rebuild', 'Rebuild', array(
+                'arguments' => 'context_id',
+            )
+        );
         $grid->addAction('contextmanager/delete', 'Delete', array(
                 'arguments' => 'context_id',
             )
@@ -38,5 +42,44 @@ class ContextManager_Controller extends Bluebox_Controller {
 
         // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
+    }
+
+    public function rebuild($context_id)
+    {
+        $this->loadBaseModel($context_id);
+
+        foreach($this->context['NumberContext'] as $key => &$numberContext)
+        {
+            $number = &$numberContext['Number'];
+
+            $number->markModified('number');
+        }
+
+        try
+        {
+            $this->context->save();
+
+            message::set('Context ' .$this->context['name'] .' dialplan rebuild complete!', 'success');
+        }
+        catch (Exception $e)
+        {
+            message::set($e->getMessage());
+        }
+
+        $this->returnQtipAjaxForm();
+
+        url::redirect(Router_Core::$controller);
+    }
+
+    protected function pre_save(&$object)
+    {
+//        foreach($object['NumberContext'] as $key => &$numberContext)
+//        {
+//            $number = &$numberContext['Number'];
+//
+//            $number->markModified('number');
+//        }
+
+        parent::pre_save($object);
     }
 }

@@ -27,12 +27,10 @@ class Numbers
 
         if (!class_exists($checkFor))
         {
-            kohana::log('debug', 'Base model `' .$base .'` has no relation to number');
-
             return TRUE;
         }
 
-        kohana::log('debug', 'Base model `' .$base .'` found reference to number');
+        kohana::log('debug', 'Base model `' .$base .'` found reference to number, registering NumberManager_Plugin::numberInventory()');
 
         plugins::register(Router::$controller .'/' .Router::$method, 'view', array('NumberManager_Plugin', 'numberInventory'));
     }
@@ -57,7 +55,7 @@ class Numbers
         javascript::codeBlock("selectDestination('${update['object_number_type']}', ${update['object_id']});");
     }
 
-    public static function updateAssignment()
+    public static function disassociateNumbers()
     {
         $base = Event::$data;
 
@@ -66,24 +64,54 @@ class Numbers
             return TRUE;
         }
 
-        // When this happens we need to do something to attach once we know
-        // the number_id
-        if (Router::$method == 'create')
-        {
-            return;
-        }
+        $numbers = $base['Number']->toArray();
 
-        try
+        foreach ($numbers as $key => $number)
         {
-            //$base->loadReference('Number');
-        } 
-        catch (Exception $e)
+            if (empty($_POST['numbers']['assigned'][$number['number_id']]))
+            {
+                Kohana::log('debug', 'Disassociate number ' .$number['number'] .' (' .$number['number_id'] .') from ' .str_replace('Number', '', $base['Number'][$key]['class_type']) .' ' .$base['Number'][$key]['foreign_id']);
+
+                $base['Number'][$key]['foreign_id'] = 0;
+
+                $base['Number'][$key]['class_type'] = NULL;
+            }
+            else
+            {
+                if (isset($_POST['number' .$number['number_id']]['registry']))
+                {
+                    Kohana::log('debug', 'Updating registry for number ' .$number['number'] .' (' .$number['number_id'] .')');
+
+                    $base['Number'][$key]['registry'] = arr::merge(
+                            $number['registry'],
+                            $_POST['number' .$number['number_id']]['registry']
+                    );
+                }
+
+                if (isset($_POST['number' .$number['number_id']]['dialplan']))
+                {
+                    Kohana::log('debug', 'Updating dialplan for number ' .$number['number'] .' (' .$number['number_id'] .')');
+
+                    $base['Number'][$key]['dialplan'] = arr::merge(
+                            $number['dialplan'],
+                            $_POST['number' .$number['number_id']]['dialplan']
+                    );
+                }
+
+                unset($_POST['numbers']['assigned'][$number['number_id']]);
+            }
+        }
+    }
+
+    public static function associateNumbers()
+    {
+        $base = Event::$data;
+
+        if (empty($_POST['numbers']['assigned']))
         {
             return TRUE;
         }
-
-        kohana::log('debug', 'Updating number assignements on ' .get_class($base));
-
+        
         if (get_parent_class($base) == 'Bluebox_Record')
         {
             $class_type = get_class($base) .'Number';
@@ -104,64 +132,19 @@ class Numbers
             $foreign_id = 0;
         }
 
-        
-        if (!empty($base['Number'][0]))
-        {
-        foreach ($base['Number']->toArray() as $key => $number)
-        {
-            if (empty($_POST['numbers']['assigned'][$number['number_id']]))
-            {
-                Kohana::log('debug', 'Attempting to unmap number id # ' .$number['number_id'] .' from ' .$class_type .' id #' .$foreign_id);
-
-                $base['Number'][$key]['foreign_id'] = 0;
-
-                $base['Number'][$key]['class_type'] = NULL;    
-            } 
-            else
-            {
-                if (isset($_POST['number' .$number['number_id']]['registry']))
-                {
-                    Kohana::log('debug', 'Updating registry for number id # ' . $number['number_id']);
-
-                    $base['Number'][$key]['registry'] = arr::merge(
-                            $number['registry'],
-                            $_POST['number' .$number['number_id']]['registry']
-                    );
-                }
-
-                if (isset($_POST['number' .$number['number_id']]['dialplan']))
-                {
-                    Kohana::log('debug', 'Updating dialplan for number id # ' . $number['number_id']);
-
-                    $base['Number'][$key]['dialplan'] = arr::merge(
-                            $number['dialplan'],
-                            $_POST['number' .$number['number_id']]['dialplan']
-                    );
-                }
-
-                unset($_POST['numbers']['assigned'][$number['number_id']]);
-            }
-        }
-        }
-        
-        if (empty($_POST['numbers']['assigned']))
-        {
-            return TRUE;
-        }
-
         foreach($_POST['numbers']['assigned'] as $number_id => $details)
         {
-            Kohana::log('debug', 'Attempting to map number id # ' .$number_id .' to ' .$class_type .' id #' .$foreign_id);
-
             $newNumber = Doctrine::getTable('Number')->find($number_id);
-            
+
+            Kohana::log('debug', 'Associate number ' .$newNumber['number'] .' (' .$number_id .') with ' .str_replace('Number', '', $class_type) .' ' .$foreign_id);
+
             $newNumber['class_type'] = $class_type;
 
             $newNumber['foreign_id'] = $foreign_id;
 
             if (isset($_POST['number' .$number_id]['registry']))
             {
-                Kohana::log('debug', 'Updating registry for number id # ' .$number_id);
+                Kohana::log('debug', 'Updating registry for number ' .$newNumber['number'] .' (' .$number_id .')');
 
                 $newNumber['registry'] = arr::merge(
                         $newNumber['registry'],
@@ -171,13 +154,13 @@ class Numbers
 
             if (isset($_POST['number' .$number_id]['dialplan']))
             {
-                Kohana::log('debug', 'Updating dialplan for number id # ' .$number_id);
+                Kohana::log('debug', 'Updating dialplan for number ' .$newNumber['number'] .' (' .$number_id .')');
 
                 $newNumber['dialplan'] = arr::merge(
                         $newNumber['dialplan'],
                         $_POST['number' .$number_id]['dialplan']
                 );
-            }            
+            }
 
             $newNumber->save();
         }
@@ -195,8 +178,6 @@ class Numbers
         {
             return TRUE;
         }
-
-        kohana::log('debug', 'Running custom validation of number on ' .get_class($base));
 
         $base['number'] = trim($base['number']);
 

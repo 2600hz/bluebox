@@ -1,6 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
-define('DELIM', '/'); //put this someplace else?
+define('DELIM', '/');
+/**
+ * @package    Core/Helpers/Jgrid
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class jgrid
 {
     /**
@@ -669,7 +673,7 @@ class jgrid
         $this->jquery['colNames'] = array_values($this->query['columns']);
         if (!empty($this->query['actions'])) {
             // Add this column name to the jqgrid colName headers
-            $this->jquery['colNames'][] = __('Actions');
+            $this->jquery['colNames'][] = '<div style="text-align:center;">' .__('Actions') .'</div>';
             // A convience wraper for adding a colModel to jqgrid
             $colModel = & $this->jquery['colModel'][];
             // Accept any custom parameters for the action column

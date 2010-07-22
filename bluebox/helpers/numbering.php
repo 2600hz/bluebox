@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Helpers/Numbering
+ * @author     Darren Schreiber
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class numbering extends form
 {
     protected static $fieldCount = 1;
@@ -664,7 +669,7 @@ class numbering extends form
         $numbers = Doctrine_Query::create()
             ->select('np.number_id, n.number')
             ->from('NumberPool np, np.Number n, np.NumberType nt')
-            ->whereNotIn('n.foreign_id', array(0, 'NULL'))
+            ->where('(n.foreign_id = ? OR n.foreign_id IS NULL)', array(0))
             ->andwhereIn('n.class_type', $numberType)
             ->orderBy('number')
             ->execute(array(), Doctrine::HYDRATE_ARRAY);

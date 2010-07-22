@@ -31,115 +31,75 @@
 class SipInterface_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'SipInterface';
-    protected $writable = array(
-        'name',
-        'ip_address',
-        'port',
-        'ext_ip_address',
-        'auth',
-        'multiple',
-        'nat_type',
-        'nat_net_list_id',
-        'inbound_net_list_id',
-        'register_net_list_id',
-        'context_id'
-    );
+    
     public function index()
     {
         $this->template->content = new View('generic/grid');
-        // Build a grid with a hidden sipinterface_id, sipinterface info, and add an option for the user to select the display columns
-        $this->grid = jgrid::grid($this->baseModel, array(
-            'caption' => 'SIP Interfaces',
-            'multiselect' => true
-        ))->add('sipinterface_id', 'ID', array(
-            'hidden' => true,
-            'key' => true
-        ))->add('name', 'SIP Interface Name')->add('ip_address', 'IP Address')->add('port', 'Port')->add('Context/name as context', 'Default Context', array(
-            'colModel' => 'context'
-        ))->navButtonAdd('Columns', array(
-            'onClickButton' => 'function () {  $(\'#{table_id}\').setColumns(); }',
-            'buttonimg' => url::base() . 'assets/css/jqGrid/table_insert_column.png',
-            'title' => 'Show/Hide Columns',
-            'noCaption' => true,
-            'position' => 'first'
-        ))->addAction('sipinterface/edit', 'Edit SIP Interface', array(
-            'arguments' => 'sipinterface_id',
-            'width' => '120'
-        ))->addAction('sipinterface/delete', 'Delete SIP Interface', array(
-            'arguments' => 'sipinterface_id',
-            'width' => '200'
-        ));
-        // dont foget to let the plugins add to the grid!
+
+        // Setup the base grid object
+        $grid = jgrid::grid($this->baseModel, array(
+                'caption' => 'SIP Interfaces',
+            )
+        );
+
+        // Add the base model columns to the grid
+        $grid->add('sipinterface_id', 'ID', array(
+                'hidden' => true,
+                'key' => true
+            )
+        );
+        $grid->add('ip_address', 'IP Address');
+        $grid->add('port', 'Port');
+        $grid->add('Context/name', 'Default Context');
+
+        // Add the actions to the grid
+        $grid->addAction('sipinterface/edit', 'Edit', array(
+                'arguments' => 'sipinterface_id'
+            )
+        );
+        $grid->addAction('sipinterface/delete', 'Delete', array(
+                'arguments' => 'sipinterface_id'
+            )
+        );
+
+        // Let plugins populate the grid as well
+        $this->grid = $grid;
         plugins::views($this);
-        // Produces the grid markup or JSON, respectively
+
+        // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
     }
-    public function add()
-    {
-        // Use the edit view here, too
-        $this->template->content = new View(Router::$controller . '/update');
-        $this->view->title = 'Add SIP Interface';
 
-        $this->sipInterface = new SipInterface();
-        $this->sipInterface['nat_net_list_id'] = netlists::getSystemListId('nat.auto');
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
-            if (!isset($_POST['sipinterface']['auth'])) {
-                $this->sipInterface->auth = FALSE;
-            }
-            if (!isset($_POST['behind_nat']) or ($_POST['behind_nat'] == 0)) {
-                $this->sipInterface->nat_type = 0;
-                unset ($_POST['sipinterface']['nat_type']);
-            }
-            if ($this->formSave($this->sipInterface)) {
-                url::redirect(Router_Core::$controller);
-            }
+    public function prepareUpdateView()
+    {
+        $this->view->behind_nat = FALSE;
+
+        if (!empty($this->sipinterface['nat_type']))
+        {
+            $this->view->behind_nat = TRUE;
         }
-        // Allow our sip interface object to be seen by the view
-        $this->view->sipinterface = $this->sipInterface;
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
+
+        // This is not the best way to to do this but I am mimicing the
+        // behavior that was already here
+        if (Router::$method == 'add')
+        {
+            $this->sipinterface['nat_net_list_id']
+                    = netlists::getSystemListId('nat.auto');
+        }
+
+        parent::prepareUpdateView();
     }
-    public function edit($id = NULL)
+
+    public function save_prepare(&$object)
     {
-        $this->template->content = new View(Router::$controller . '/update');
-        $this->view->title = 'Edit SIP Interface';
-        
-        $this->sipInterface = Doctrine::getTable('SipInterface')->find($id);
-        // Was anything retrieved? If no, this may be an invalid request
-        if (!$this->sipInterface) {
-            // Send any errors back to the index
-            $error = i18n('Unable to locate SIP Interface id %1$d!', $id)->sprintf()->s();
-            message::set($error, array(
-                'translate' => false,
-                'redirect' => Router::$controller . '/index'
-            ));
-            return true;
-        }
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
-            if (!isset($_POST['sipinterface']['auth'])) {
-                $this->sipInterface->auth = FALSE;
-            }
-            if (!isset($_POST['behind_nat']) or ($_POST['behind_nat'] == 0)) {
-                $this->sipInterface->nat_type = 0;
-                unset ($_POST['sipinterface']['nat_type']);
-            }
-            if ($this->formSave($this->sipInterface)) {
-                url::redirect(Router_Core::$controller);
-            }
+        if (!isset($_POST['sipinterface']['auth']))
+        {
+            $object['auth'] = FALSE;
         }
 
-        // Manually check "behind_nat" if necessary
-        $this->view->behind_nat = ($this->sipInterface->nat_type > 0 ? TRUE : FALSE);
-
-        // dont foget to let the plugins add to the grid!
-        plugins::views($this);
-        // Allow our sipinterface object to be seen by the view
-        $this->view->sipinterface = $this->sipInterface;
-    }
-    public function delete($id = NULL)
-    {
-        $this->stdDelete($id);
+        if (!isset($_POST['behind_nat']) or ($_POST['behind_nat'] == 0))
+        {
+            $object['nat_type'] = 0;
+        }
     }
 }

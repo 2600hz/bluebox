@@ -1,11 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * Telephony Driver interface for Bluebox
- *
- * @author Darren Schreiber <d@d-man.org>
- * @license MPL
- * @package TCAPI
- * @subpackage Core
+ * @package    TCAPI
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
  */
 class Telephony
 {

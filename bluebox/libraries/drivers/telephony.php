@@ -1,15 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * telephony.php - telephony driver class
- *
- * This is the base class that all telephony drivers must extend.
- *
- * @author Darren Schreiber <d@d-man.org>
- * @license MPL
- * @package TCAPI
- * @subpackage Core
+ * @package    TCAPI
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
  */
-
 interface Telephony_Driver_Interface
 {
     public static function getInstance();

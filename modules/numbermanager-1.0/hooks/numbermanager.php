@@ -2,7 +2,9 @@
 
     Event::add('bluebox.pre_save', array('Numbers', 'customValidation'));
 
-    Event::add('bluebox.pre_save', array('Numbers', 'updateAssignment'));
+    Event::add('bluebox.pre_save', array('Numbers', 'disassociateNumbers'));
+
+    Event::add('bluebox.post_save', array('Numbers', 'associateNumbers'));
 
     Event::add('bluebox.prepare_update_view', array('Numbers', 'dynamicNumberPlugin'));
 

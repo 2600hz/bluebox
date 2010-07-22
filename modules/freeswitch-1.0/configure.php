@@ -9,7 +9,7 @@ class Freeswitch_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Driver for FreeSWITCH';
     public static $default = TRUE;
-    public static $type = Bluebox_Installer::TYPE_DRIVER;
+    public static $type = Package_Manager::TYPE_DRIVER;
     public static $required = array(
         'core' => 0.1,
         'not' => array(
