@@ -193,16 +193,16 @@ class FsDomDocument extends DOMDocument
      */
     public function setAttributeValue($xpath, $attributename = 'value', $value)
     {
-        $xpath = $this->preUpdate($xpath);
+        $search = $this->preUpdate($xpath);
 
         $xp = new DOMXPath($this);
 
         if (defined('XPATH_DEBUG'))
         {
-            Kohana::log('debug', "Search Query Is: $xpath");
+            Kohana::log('debug', "Search Query Is: $search");
         }
 
-        $elements = $xp->query($xpath);
+        $elements = $xp->query($search);
 
         if ($elements->length > 0)
         {
@@ -534,6 +534,7 @@ class FsDomDocument extends DOMDocument
 
         $this->deleteChildren($query);
 
+
         // Grab an XPath pointer to the query we just ran
         $xp = new DOMXPath($this);
 
@@ -545,6 +546,26 @@ class FsDomDocument extends DOMDocument
         $newXmlFragment->appendXML($newXml);
 
         $base->item(0)->appendChild($newXmlFragment);
+    }
+
+    public function replaceWithText($newText, $query = '')
+    {
+        // Create the base if it doesn't already exist. Delete all children of the base
+
+        $this->set($query);
+
+        $this->deleteChildren($query);
+
+        $query = $this->preUpdate($query);
+
+        // Grab an XPath pointer to the query we just ran
+        $xp = new DOMXPath($this);
+
+        $base = $xp->query($query);
+
+        $newTextNode = $this->createTextNode($newText);
+
+        $base->item(0)->appendChild($newTextNode);
     }
 
 

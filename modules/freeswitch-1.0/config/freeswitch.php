@@ -53,6 +53,11 @@ $config['filemap'][] = array (
     'query' => '//document/section[@name="configuration"]/configuration[@name="acl.conf"]'
 );
 
+$config['filemap'][] = array (
+    'filename' => $config['cfg_root'] .'/autoload_configs/cdr_csv.conf.xml',
+    'query' => '//document/section[@name="configuration"]/configuration[@name="cdr_csv.conf"][@description="CDR CSV Format"]'
+);
+
 // Base file - note that because the query string is //document, this section will contain
 // the remaining document and any includes for other filemap sections
 /*$config['filemap'][] = array (

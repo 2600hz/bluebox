@@ -20,4 +20,21 @@ class Call_Configure extends Bluebox_Configure
         'Download Records' => '/calls/download',
         'Import Call Records' => '/calls/import'
     );
+
+    public function postInstall()
+    {
+
+        $settings = new CallsSetting;
+        $settings->save();
+
+    }
+
+    public function repair()
+    {
+
+        $settings = new CallsSetting;
+        $settings->save();
+
+    }
+
 }

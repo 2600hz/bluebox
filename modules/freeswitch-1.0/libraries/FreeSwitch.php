@@ -78,6 +78,7 @@ class FreeSwitch extends Telephony_Driver
         'gateway' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]/gateways/gateway[@name="%s"]',
         'voicemail' => '//document/section[@name="configuration"]/configuration[@name="voicemail.conf"]/profiles/profile[@name="%s"]',
         'odbc' => '//document/section[@name="odbc"]',
+        'cdr_csv' => '//document/section[@name="configuration"]/configuration[@name="cdr_csv.conf"][@description="CDR CSV Format"]',
     );
 
     public static function getInstance()
