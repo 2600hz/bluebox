@@ -218,6 +218,9 @@ class jquery
                 'ui.spinner.js'
             ) ,
             'css' => 'jquery/spinner.css'
+        ),
+        'autoGrow' => array(
+            'js' => 'jquery.autoGrowInput.js'
         )
     );
     /**
