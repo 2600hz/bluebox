@@ -95,8 +95,7 @@ class Trunk extends Bluebox_Record
         // RELATIONSHIPS
 
         // BEHAVIORS
-        // $this->actAs('Polymorphic');
-
+        $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
         $this->actAs('TelephonyEnabled');
         $this->actAs('MultiTenant');

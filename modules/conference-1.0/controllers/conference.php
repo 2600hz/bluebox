@@ -34,13 +34,11 @@ class Conference_Controller extends Bluebox_Controller
 
         // Add the actions to the grid
         $grid->addAction('conference/edit', 'Edit', array(
-                'arguments' => 'conference_id',
-                'width' => '120'
+                'arguments' => 'conference_id'
             )
         );
         $grid->addAction('conference/delete', 'Delete', array(
-                'arguments' => 'conference_id',
-                'width' => '20'
+                'arguments' => 'conference_id'
             )
         );
 

@@ -147,6 +147,8 @@ class Bluebox_Installer
         }
         else
         {
+            kohana::log('debug', 'Quessing that the site domain is `/`');
+
             return '/';
         }
 
@@ -169,9 +171,15 @@ class Bluebox_Installer
             // Reduce multiple slashes into single slashes
             $current_uri = preg_replace('#//+#', '/', $current_uri);
 
-            return '/' .trim($current_uri, '/') .'/';
+            $current_uri = '/' .trim($current_uri, '/') .'/';
+
+            kohana::log('debug', 'Quessing that the site domain is `' .$current_uri .'`');
+
+            return $current_uri;
 
         }
+
+        kohana::log('debug', 'Quessing that the site domain is `/`');
 
         return '/';
     }

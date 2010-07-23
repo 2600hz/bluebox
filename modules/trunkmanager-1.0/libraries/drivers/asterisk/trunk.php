@@ -52,7 +52,7 @@ class Asterisk_Trunk_Driver extends Asterisk_Base_Driver {
         $trunkName = 'trunk_' . $base->trunk_id;
 
         // If this is a sip trunk it belongs in sip.conf
-        if ($base instanceof SipTrunk) {
+        if (isset($base['plugins']['sip']['username'])) {
             $ami->queueConfigUpdate('sip.conf', 'NewCat', $trunkName);
             $ami->queueConfigUpdate('sip.conf', 'Append', $trunkName, 'type', 'friend');
             $ami->queueConfigUpdate('sip.conf', 'Append', $trunkName, 'host', $obj->server);
