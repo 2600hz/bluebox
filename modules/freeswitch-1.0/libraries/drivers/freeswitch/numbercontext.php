@@ -53,9 +53,24 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
             // Now that the extension and condition fields are created for this number, set our root to inside the condition
             $xml->setXmlRoot($xml->getXmlRoot() . '/condition[@field="destination_number"][@expression="^' .$base['Number']['number'] . '$"]');
 
+            $dialplan = $base['Number']['dialplan'];
+
             // Add an extension-specific prenumber items
             // Note that unlike other dialplan adds, this one assumes you're already in the right spot in the XML document for the add
             dialplan::preNumber($base['Number']);
+
+            if (!empty($dialplan['terminate']['action']))
+            {
+                switch($dialplan['terminate']['action'])
+                {
+                    case 'transfer':
+                        $xml->update('/action[@application="set"][@bluebox="settingEndBridge"][@data="hangup_after_bridge=true"]');
+
+                        $xml->update('/action[@application="set"][@bluebox="settingFail"][@data="continue_on_fail=true"]');
+
+                        break;
+                }
+            }
 
             // Add related final destination XML
             $destinationDriverName = Telephony::getDriverName() .'_' .substr($base['Number']['class_type'], 0, strlen($base['Number']['class_type']) - 6) .'_Driver';
@@ -78,6 +93,28 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
             // Add an anti-action / failure route for this dialplan
             // Note that unlike other dialplan adds, this one assumes you're already in the right spot in the XML document for the add
             dialplan::postNumber($base['Number']);
+
+            if (!empty($dialplan['terminate']['action']))
+            {
+                switch($dialplan['terminate']['action'])
+                {
+                    case 'transfer':
+                        if($transfer = fs::getTransferToNumber($dialplan['terminate']['transfer']))
+                        {
+                            $xml->update('/action[@application="transfer"][@data="' .$transfer .'"]');
+                        }
+                        else
+                        {
+                            $xml->update('/action[@application="hangup"]');
+                        }
+
+                        break;
+                    case 'hangup':
+                        $xml->update('/action[@application="hangup"]');
+                    
+                        break;
+                }
+            }
         } 
         else
         {

@@ -2,6 +2,11 @@
 
 class Voicemails
 {
+    public static function provideNumberTerminator()
+    {
+        Event::$data['VoicemailNumber'] = 'voicemail/terminateOption.mus';
+    }
+    
     public static function provideNumberOptions()
     {
         Event::$data['VoicemailNumber'] = 'voicemail/numberOptions.mus';
@@ -29,19 +34,5 @@ class Voicemails
             'target_objects' => $target_objects,
             'quick_add' =>'/voicemail/create'
         );
-    }
-
-    public static function provideNumberTerminators()
-    {
-        $target_objects = array();
-
-        $voicemails = Doctrine::getTable('Voicemail')->findAll(Doctrine::HYDRATE_ARRAY);
-
-        foreach ($voicemails as $voicemail)
-        {
-            $target_objects[$voicemail['voicemail_id']] = $voicemail['name'];
-        }
-
-        return $target_objects;
     }
 }
