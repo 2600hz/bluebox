@@ -7,48 +7,10 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver {
   public static function delete($obj) {
   }
 
-  public static function network($obj) {
-    self::createExtensionSection($obj, 'network');
-  }
-
-  public static function conditioning() {
-    self::createExtensionSection($obj, 'conditioning');
-  }
-
-  public static function preroute() {
-    self::createExtensionSection($obj, 'preroute');
-  }
-
-  public static function postroute() {
-    self::createExtensionSection($obj, 'postroute');
-  }
-
-  public static function preanswer() {
-    self::createExtensionSection($obj, 'preanswer');
-  }
-
-  public static function postanswer() {
-    self::createExtensionSection($obj, 'postanswer');
-  }
-
-  public static function main() {
-    self::createExtensionSection($obj, 'main');
-  }
-
-  public static function prenumber() {
-    self::createExtensionSection($obj, 'prenumber');
-  }
-
-  public static function postnumber() {
-    self::createExtensionSection($obj, 'postnumber');
-  }
-
-  public static function catchall() {
-    self::createExtensionSection($obj, 'catchall');
-  }
-
-  public static function postexecute() {
-    self::createExtensionSection($obj, 'postexecute');
+  public static function dialplan($obj) {
+    foreach ( self::$dialplanSections as $section ) {
+      self::createExtensionSection($obj, $section);
+    }
   }
 
   protected static function createExtensionSection($obj, $section) {
@@ -59,7 +21,7 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver {
       return;
     }
 
-    $xml = FreeSWITCH::createExtension('featurecode_' . $obj->feature_code_id);
+    $xml = FreeSWITCH::createExtension('featurecode_' . $obj->feature_code_id, $section);
     $xml->replaceWithXml($obj->registry[$section]);
   }
 }

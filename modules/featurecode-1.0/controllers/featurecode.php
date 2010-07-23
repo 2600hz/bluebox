@@ -155,6 +155,7 @@ class FeatureCode_Controller extends Bluebox_Controller {
 
     foreach ( $featureCode->registry as $section => $xml ) {
       $dom = new DOMDocument('1.0');
+      $dom->formatOutput = FALSE;
 
       if ( strlen(trim($xml)) == 0 ) {
 	kohana::log('debug', 'Section: ' . $section . ' Empty XML');
