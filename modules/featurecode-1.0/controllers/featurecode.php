@@ -136,6 +136,59 @@ class FeatureCode_Controller extends Bluebox_Controller {
     plugins::views($this);
   }
 
+  protected function formSave($featureCode, $saveMessage = NULL, $saveEvents = array()) {
+    $errors = array();
+    $cleaned = array();
+
+    libxml_use_internal_errors(TRUE);
+
+    // Determine name of the base model for the object being saved
+    if (get_parent_class($featureCode) == 'Bluebox_Record') {
+      $baseClass = get_class($featureCode);
+    } else {
+      $baseClass = get_parent_class($featureCode);
+    }
+
+    // Import any post vars with the key of this model into the object
+    $formData = $this->input->post(strtolower($baseClass), array());
+    $featureCode->fromArray($formData);
+
+    foreach ( $featureCode->registry as $section => $xml ) {
+      $dom = new DOMDocument('1.0');
+
+      if ( strlen(trim($xml)) == 0 ) {
+	kohana::log('debug', 'Section: ' . $section . ' Empty XML');
+	$cleaned[$section] = '';
+	continue;
+      }
+      
+      try {
+	if ( $dom->loadXML(trim($xml)) ) {
+	  $cleaned[$section] = $dom->saveXML();
+	  kohana::log('debug', 'Section: ' . $section . ' Cleaned XML: ' . $dom->saveXML());
+	  continue;
+	} else {
+	  $errors[] = ucfirst($section);
+	}
+      } catch(Exception $e) {
+	$errors[] = ucfirst($section);
+      }
+    }
+
+    if ( count($errors) > 0 ) {
+      $errstr = '<br />';
+
+      message::set('Please correct the XML errors in these sections: ' . implode(', ', $errors));
+      return FALSE;
+    }
+
+    $featureCode->registry = $cleaned;
+
+    kohana::log('debug', 'Successfully validated XML');
+
+    return parent::formSave($featureCode, $saveMessage, $saveEvents);
+  }
+
   public function _showSections($null, $registry) {
     if ( empty($registry) ) {
       return 'None';
