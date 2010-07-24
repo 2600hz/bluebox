@@ -80,7 +80,12 @@ class Conference_Controller extends Bluebox_Controller
 
     public function _hasPin($pins)
     {
-        return empty($pins) ? 'No' : 'Yes';
+        foreach($pins as $pin) {
+            if( ! empty($pin)) {
+                return 'Yes';
+            }
+        }
+        return 'No';
     }
 
     public function qtipAjaxReturn($data)

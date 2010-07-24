@@ -17,6 +17,12 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
             $xml->update('/param[@name="' .$parameter .'"]{@value="' .$value .'"}');
         }
 
+        $registry = $conference['registry'];
+        if( ! empty($registry['moh_type'])) {
+            $value = str_replace('/', '\/', $registry['moh_type']);
+            
+            $xml->update('/param[@name="moh-sound"]{@value="' . $value .'"}');
+        }
         if (empty($conference['pins']))
         {
             return;
