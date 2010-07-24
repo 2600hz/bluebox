@@ -109,7 +109,7 @@
         }
     ?>
 
-    <input type="hidden" value="<?php echo $action; ?>" name="<?php echo $baseName; ?>[dialplan][terminate][action]" id="<?php echo $baseName; ?>_terminate_action"/>
+    <input type="hidden" value="<?php echo empty($action) ? 'hangup' : $action; ?>" name="<?php echo $baseName; ?>[dialplan][terminate][action]" id="<?php echo $baseName; ?>_terminate_action"/>
 
 <?php echo form::close_section(); ?>
 
