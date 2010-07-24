@@ -48,7 +48,10 @@ class SipInterface_Controller extends Bluebox_Controller
                 'key' => true
             )
         );
-        $grid->add('ip_address', 'IP Address');
+        $grid->add('ip_address', 'IP Address', array(
+                'callback' => array($this, '_showIp')
+            )
+        );
         $grid->add('port', 'Port');
         $grid->add('Context/name', 'Default Context');
 
@@ -88,6 +91,15 @@ class SipInterface_Controller extends Bluebox_Controller
         }
 
         parent::prepareUpdateView();
+    }
+
+    public function _showIp($ip)
+    {
+        if(empty($ip)) {
+            return 'Auto Detect';
+        } else {
+            return $ip;
+        }
     }
 
     public function save_prepare(&$object)
