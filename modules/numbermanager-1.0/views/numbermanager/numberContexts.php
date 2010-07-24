@@ -7,7 +7,7 @@
 
     <ul>
 
-        <?php foreach ($order as $context_id => $pos) : // ($contexts['contexts'] as $key => $context): ?>
+        <?php foreach ($order as $context_id => $pos): ?>
 
             <li>
 
