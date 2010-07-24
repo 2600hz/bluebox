@@ -44,6 +44,8 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
         // Does this number go anywhere?
         if ($base['Number']['class_type'])
         {
+            kohana::log('debug', 'FreeSWITCH -> ADDING NUMBER ' .$base['Number']['number'] .' (' .$base['Number']['number_id'] .') TO CONTEXT ' .$base['context_id']);
+
             // Dialplans are a bit different - we don't want to keep anything that is currently in an extension, in the event it's totally changed
             $xml->deleteChildren();
 
@@ -118,16 +120,36 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
         } 
         else
         {
+            kohana::log('debug', 'FreeSWITCH -> REMOVING NUMBER ID ' .$base['Number']['number_id'] .' FROM CONTEXT ' .$base['context_id']);
+
             $xml->deleteNode();
         }
     }
 
     public static function delete($base)
     {
+        $identifier = $base->identifier();
+
+        $context_id = $base['context_id'];
+
+        if (!empty($identifier['context_id']))
+        {
+            $context_id = $identifier['context_id'];
+        }
+
+        $number_id = $base['number_id'];
+
+        if (!empty($identifier['number_id']))
+        {
+            $number_id = $identifier['number_id'];
+        }
+
+        kohana::log('debug', 'FreeSWITCH -> REMOVING NUMBER ID ' .$number_id .' FROM CONTEXT ' .$context_id);
+
         $xml = Telephony::getDriver()->xml;
 
         // Reference to our XML document & context
-        $xml->setXmlRoot(sprintf('//document/section[@name="dialplan"]/context[@name="context_' .$base['context_id'] . '"]/extension[@name="%s"]', 'main_number_' .$base['Number']['number_id']));
+        $xml->setXmlRoot(sprintf('//document/section[@name="dialplan"]/context[@name="context_%s"]/extension[@name="%s"]', $context_id, 'main_number_' .$number_id));
 
         $xml->deleteNode();
     }
