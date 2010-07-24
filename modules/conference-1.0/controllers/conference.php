@@ -22,12 +22,10 @@ class Conference_Controller extends Bluebox_Controller
         );
         $grid->add('name', 'Name');
         $grid->add('registry', 'Record?', array(
-                'align' => 'center',
                 'callback' => array($this, '_showRecord')
             )
         );
         $grid->add('pins', 'Has Pin?', array(
-                'align' => 'center',
                 'callback' => array($this, '_hasPin')
             )
         );
@@ -80,11 +78,17 @@ class Conference_Controller extends Bluebox_Controller
 
     public function _hasPin($pins)
     {
-        foreach($pins as $pin) {
-            if( ! empty($pin)) {
-                return 'Yes';
+        if (!empty($pins) AND is_array($pins))
+        {
+            foreach($pins as $pin)
+            {
+                if (!empty($pin))
+                {
+                    return 'Yes';
+                }
             }
         }
+
         return 'No';
     }
 
