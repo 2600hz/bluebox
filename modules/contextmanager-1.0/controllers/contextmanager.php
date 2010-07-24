@@ -29,6 +29,7 @@ class ContextManager_Controller extends Bluebox_Controller
         );
         $grid->addAction('contextmanager/rebuild', 'Rebuild', array(
                 'arguments' => 'context_id',
+                'attributes' => array('class' => 'qtipAjaxForm')
             )
         );
         $grid->addAction('contextmanager/delete', 'Delete', array(
