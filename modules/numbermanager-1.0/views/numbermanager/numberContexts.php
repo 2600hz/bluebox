@@ -7,20 +7,20 @@
 
     <ul>
 
-        <?php foreach ($contexts['contexts'] as $context): ?>
+        <?php foreach ($order as $context_id => $pos) : // ($contexts['contexts'] as $key => $context): ?>
 
             <li>
 
                 <div class="field">
 
-                    <?php echo form::label('context_' .$context['context_id'], $context['name']); ?>
+                    <?php echo form::label('context_' .$context_id, $contexts[$context_id]); ?>
 
                     <?php
                         echo form::checkbox(array(
-                                'name' => 'number[NumberContext][][context_id]',
-                                'id' => 'context_' .$context['context_id'],
+                                'name' => 'number[NumberContext][' .$pos .'][context_id]',
+                                'id' => 'context_' .$context_id,
                             ),
-                            $context['context_id']
+                            $context_id
                         );
                     ?>
 
