@@ -199,6 +199,19 @@ class Numbers
 
         $numberContexts = $base->NumberContext->toArray();
 
+//
+//        $numberContexts = $base['NumberContext']->toArray();
+//
+//        foreach ($numberContexts as $key => $context)
+//        {
+//            if (empty($context['context_id']))
+//            {
+//                unset($numberContexts[$key]);
+//            }
+//        }
+//
+//        $base['NumberContext']->synchronizeWithArray($numberContexts);
+//
         $numberPools = $base->NumberPool->toArray();
 
         $modified = $base->getModified();
