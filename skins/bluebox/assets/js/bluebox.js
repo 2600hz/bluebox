@@ -34,7 +34,7 @@ function qtipAjaxForm(link) {
             width: 550,
             padding: '8px',
             title: {
-                'background-color': '#72a400',
+                'background-color': '#005F80',
                 color: '#ffffff',
                 padding: '3px 10px 5px 10px',
                 'font-size': '110%'
@@ -42,7 +42,7 @@ function qtipAjaxForm(link) {
             border: {
                 width: 8,
                 radius: 4,
-                color: '#72a400'
+                color: '#005F80'
             }
         },
         api: {
@@ -270,7 +270,7 @@ $(document).ready(function () {
                     width: 550,
                     padding: '8px',
                     title: {
-                        'background-color': '#72a400',
+                        'background-color': '#005F80',
                         color: '#ffffff',
                         padding: '3px 10px 5px 10px',
                         'font-size': '110%'
@@ -278,7 +278,7 @@ $(document).ready(function () {
                     border: {
                         width: 8,
                         radius: 4,
-                        color: '#72a400'
+                        color: '#005F80'
                     }
                 }
             });
@@ -320,7 +320,7 @@ $(document).ready(function () {
                 style: {
                     padding: '8px',
                     title: {
-                        'background-color': '#72a400',
+                        'background-color': '#005F80',
                         color: '#ffffff',
                         padding: '3px 10px 5px 10px',
                         'font-size': '110%'
@@ -328,7 +328,7 @@ $(document).ready(function () {
                     border: {
                         width: 8,
                         radius: 4,
-                        color: '#72a400'
+                        color: '#005F80'
                     }
                 }
             });
@@ -394,7 +394,7 @@ $(document).ready(function () {
                 width: 700,
                 padding: '8px',
                 title: {
-                    'background-color': '#72a400',
+                    'background-color': '#005F80',
                     color: '#ffffff',
                     padding: '3px 10px 5px 10px',
                     'font-size': '110%'
@@ -402,7 +402,7 @@ $(document).ready(function () {
                 border: {
                     width: 8,
                     radius: 4,
-                    color: '#72a400'
+                    color: '#005F80'
                 }
             }
         });

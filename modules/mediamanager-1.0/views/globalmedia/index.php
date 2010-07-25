@@ -28,9 +28,10 @@
 
         <?php if (isset($grid)) echo $grid; ?>
 
-        <div id="upload_button">To upload a file, choose a folder from the left</div>
-        
         <div style="width:100%; margin: 10px;">&nbsp;</div>
+        
+        <div id="upload_button"><B>To upload a file, choose a folder from the left</b></div>
+
     </div>
     
     <div style="clear:both">&nbsp;</div>
@@ -44,7 +45,7 @@ function filterPath(path) {
     $('#MediaGrid')[0].p.postData.searchString=path;
     $('#MediaGrid').trigger('reloadGrid');
     $('#MediaGrid').setCaption(path);
-    $('div#upload_button').html('Upload new file to ' + path);
+    $('div#upload_button').html('<button href="add" class="qtipAjaxForm small_green_button button">Upload new file to ' + path + '</button>');
 }
 
 function clearPath() {

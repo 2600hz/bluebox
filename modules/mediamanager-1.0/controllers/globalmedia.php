@@ -43,9 +43,11 @@ class GlobalMedia_Controller extends Bluebox_Controller
     public function index()
     {
         $this->template->content = new View('globalmedia/index');
-        $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:filterPath('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
         javascript::add('php_file_tree_jquery.js');
         stylesheet::add('php_file_tree.css');
+
+        // Collect a list of paths in the system, to be displayed as a list
+        $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:filterPath('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
 
         // Remember the last path that was clicked on. We use this for uploads and other items.
         // Why store this as a session var? Prevents people from screwing with paths they aren't supposed to be

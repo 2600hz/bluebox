@@ -1,4 +1,4 @@
-<p>A background request to scan your media files has been made.</p>
+<p><b>A background request to scan your media files has been made.</b></p>
 <br/>
 
 <p>Your system will now look through all your media-related folders for any new/changed files. You will see the "last scan" at the top of the media manager page update when the scan is complete.</p>
