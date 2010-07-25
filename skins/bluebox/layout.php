@@ -48,20 +48,19 @@
                                 <?php  echo __('Welcome') . ' ' . users::$user->first_name . ' ' . users::$user->last_name; ?>
                             |
                             <?php echo html::anchor('user/logout', __('Logout')); ?>
-                        <?php endif; ?>
-                            
-                        <?php
-                            /*
-                            echo ' | ';
-                            echo html::anchor('#', __('Language') , array('id' => 'change_lang'));
-                            echo form::dropdown(array(
-                                'name' => 'lang',
-                                'id' => 'lang',
-                                'style' => 'display:none;',
-                                'translate' => false
-                            ) , i18n::$langs, Session::instance()->get('lang', 'en'));
-                            */
-                        ?>
+       
+                            <?php
+                                echo ' | ';
+                                echo html::anchor('#', __('Language') , array('id' => 'change_lang'));
+                                echo form::dropdown(array(
+                                    'name' => 'lang',
+                                    'id' => 'lang',
+                                    'style' => 'display:none;',
+                                    'translate' => false
+                                ) , i18n::$langs, Session::instance()->get('lang', 'en'));
+                            ?>
+
+                            <?php endif; ?>
 
                             <?php if (!empty(users::$user)): ?>
                             <!-- dash board -->

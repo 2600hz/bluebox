@@ -1255,6 +1255,6 @@ class form extends form_Core
      */
     protected function _i18n($value)
     {
-        return $value;
+        return __($value);
     }
 }

@@ -87,9 +87,11 @@ class navigation
                     $parameters['currentNavItem'] = FALSE;
                 }
 
+                $parameters['navLabel'] = __($parameters['navLabel']);
+
                 // Save these parameters to the pointer
                 $navPt = $parameters;
-                
+
                 // merge the pointer with the result array
                 $navTree = array_merge_recursive($navTree, $navigation);
             }
