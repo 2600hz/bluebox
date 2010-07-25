@@ -1,6 +1,30 @@
+    <?php echo form::open(); ?>
+
+    <?php echo form::open_section('Upload File'); ?>
+
+            <div class="field">
+            <?php
+                echo form::label('upload[name]', 'Audio File (MP3 or WAV):');
+                echo form::upload('upload[name]');
+            ?>
+            </div>
+
+            <div class="field">
+            <?php
+                echo form::label('conference[registry][comfort_noise]', 'Generate Comfort Noise?');
+                echo form::checkbox('conference[registry][comfort_noise]');
+            ?>
+            </div>
+
+    <?php echo form::close_section(); ?>
+
+    <?php echo form::close(); ?>
+
+
+
 <form name="upload" enctype="multipart/form-data" action="add" method="POST">
     Upload an audio file of format MP3 or WAV.<br/>
-    <input type="file" name="upload"><br>
+    <input type="file" name="upload" value="Upload File">
 
 
 
