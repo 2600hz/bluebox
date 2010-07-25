@@ -8,13 +8,13 @@
 
         <h3>
             
-            <a href="#" rel="hangup">Hangup</a>
+            <a href="#" rel="hangup"><?php echo __('Hangup'); ?></a>
             
         </h3>
 
         <div style="text-align: center;">
 
-            If this call is not answered hangup.
+            <?php echo __('If this call is not answered hangup.'); ?>
 
         </div>
 
@@ -27,7 +27,7 @@
 
         <h3>
 
-            <a href="#" rel="transfer">Transfer</a>
+            <a href="#" rel="transfer"><?php echo __('Transfer'); ?></a>
 
         </h3>
 
@@ -35,7 +35,7 @@
 
             <div>
             
-                If this call is not answered transfer the caller to
+                <?php echo __('If this call is not answered transfer the caller to'); ?>
                 
             </div>
 
@@ -54,7 +54,7 @@
                     $selectedClass
                 );
 
-                echo ' named ';
+                echo __(' named ');
 
                 echo numbering::numbersDropdown(array(
                     'id' => 'number{{number_id}}_targets',

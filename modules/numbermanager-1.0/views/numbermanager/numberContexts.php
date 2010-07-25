@@ -1,8 +1,8 @@
 <?php echo form::open_section('Contexts'); ?>
 
     <p>
-        Select the groups of callers who can dial or call this number.  By placing numbers in to
-        certain contexts you can controll what numbers can call eachother.
+        <?php echo __('Select the groups of callers who can dial or call this number.  By placing numbers in to
+        certain contexts you can controll what numbers can call eachother.'); ?>
     </p>
 
     <ul>
