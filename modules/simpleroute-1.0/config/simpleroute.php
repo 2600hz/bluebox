@@ -1,4 +1,4 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Patterns
  * ----------------------------------------------------------------
@@ -46,26 +46,28 @@
  *       by exactly 10 digits.  Both the 9 and, if present, the 1 will
  *       NOT be sent to the trunk.
  */
+$config['outbound_patterns'][] = array(
+    'name' => '10-digit US',
+    'patterns' => array(
+        '1?(NPA NXX XXXX)',
+        '411',
+        '611'
+    )
+);
 
-// These are the local rules, allowing local dialing as well as to
-// information and city services
-$config['route_display']['local'] = '10-digit US dialing';
-$config['outbound_patterns']['local'][] = '1?(NPA NXX XXXX)';
-$config['outbound_patterns']['local'][] = '411';
-$config['outbound_patterns']['local'][] = '611';
+$config['outbound_patterns'][] = array(
+    'name' => 'International (011+)',
+    'patterns' => array(
+        '011(X.)'
+    )
+);
+
+$config['outbound_patterns'][] = array(
+    'name' => 'Emergency Services (911)',
+    'patterns' => array(
+        '911'
+    )
+);
 
 // this allows dialing without the default area code
-$config['outbound_patterns']['short'] = '1?(NXX XXXX)';
-
-// this is the rule for dialing international
-$config['route_display']['international'] = 'International dialing (011+)';
-$config['outbound_patterns']['international'] = '011(X.)';
-
-// this is the rule for dialing emergency services
-$config['route_display']['emergency'] = 'Emergency diailing (911)';
-$config['outbound_patterns']['emergency'] = '911';
-
-
-
-
-
+//$config['outbound_patterns']['short'] = '1?(NXX XXXX)';

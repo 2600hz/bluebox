@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Helpers/Dialplan
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
+ */
 class dialplan
 {
     protected static $dialplanSections = array();

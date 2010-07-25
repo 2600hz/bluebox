@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Helpers/Users
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
+ */
 class users
 {
     public static $user = array();
@@ -8,7 +12,7 @@ class users
 
     protected static $authBypass = array(
         'user' => array(
-            'login', 'index', 'logout'
+            'login', 'index', 'logout', 'password_request', 'password_reset'
         )
     );
 
@@ -39,6 +43,13 @@ class users
             $method = strtolower(Router::$method);
 
             $noAuth = FALSE;
+
+            $controllerBypass = Event::$data->getAuthBypass();
+
+            if (!empty($controllerBypass) AND is_array($controllerBypass))
+            {
+                self::$authBypass = arr::merge(self::$authBypass, array($controller => $controllerBypass));
+            }
 
             if (!empty(self::$authBypass[$controller]))
             {

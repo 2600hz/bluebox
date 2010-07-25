@@ -1,10 +1,11 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
-class User_Controller extends Bluebox_Controller {
-    protected $noAuth = array('login', 'index', 'logout', 'password_request', 'password_reset');
-
-    public $writable = array('first_name', 'last_name', 'username', 'email_address');
-
+/**
+ * @package    Core/User
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
+ */
+class User_Controller extends Bluebox_Controller
+{
     protected $baseModel = 'User';
 
     /**

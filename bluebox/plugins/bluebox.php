@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Bluebox/Plugins
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
+ */
 abstract class Bluebox_Plugin
 {
     protected $name = NULL;
@@ -281,7 +285,7 @@ abstract class Bluebox_Plugin
             return FALSE;
         }
 
-        if (!empty($this->base['plugins'][$this->name]))
+        if (isset($this->base['plugins'][$this->name]))
         {
             $this->subview->{$this->name} = $this->base['plugins'][$this->name];
         }
@@ -309,9 +313,13 @@ abstract class Bluebox_Plugin
         // Get the base object
         $this->base = $this->getBaseModelObject();
 
+        kohana::log('debug', 'Attempting to attach plugin data ' .$this->name .' to ' .get_class($this->base));
+
         // If the base object doesnt have a place for plugins we are done
         if (!isset($this->base['plugins']))
         {
+            kohana::log('error', 'Base does not contain the plugins column');
+
             return FALSE;
         }
 
@@ -324,7 +332,7 @@ abstract class Bluebox_Plugin
         $this->formData = $this->input->post($this->name, array());
 
         // If the plugin already has data merge what came from the form
-        if (!empty($this->base['plugins'][$this->name]))
+        if (isset($this->base['plugins'][$this->name]))
         {
             $this->pluginData = arr::merge($this->base['plugins'][$this->name], $this->formData);
         }
