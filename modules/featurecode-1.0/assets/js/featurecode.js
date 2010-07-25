@@ -38,7 +38,7 @@ var Featurecode = {
 	editAreaLoader.init({
 	  id : evt.target.id // textarea id
 	  ,syntax: "xml" // syntax to be used for highlighting
-	  ,start_highlight: true // to display with highlight mode on start-up
+	  ,start_highlight: false // to display with highlight mode on start-up
 	  ,font_size: 9
 	  ,save_callback: 'Featurecode.saveSnippet'
 	  ,toolbar: "save, |, search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
@@ -47,7 +47,6 @@ var Featurecode = {
   },
 
   saveSnippet: function(id, content) {
-    editAreaLoader.delete_instance(id);
     $('#submit_Save').focus();
   }
 };

@@ -37,13 +37,15 @@ class FreeSwitch_RingGroup_Driver extends FreeSwitch_Base_Driver
 
         $numberOptions = fs::getNumberOptions($number);
 
-        $xml->update('/action[@application="set"][@bluebox="settingEndBridge"][@data="hangup_after_bridge=true"]');
-
         $xml->update('/action[@application="set"][@bluebox="settingTimeout"]{@data="call_timeout=' .$numberOptions['timeout'] .'"}');
 
         $xml->update('/action[@application="set"][@bluebox="settingRing"]{@data="ringback=${' . $numberOptions['ringtype'] . '}"}');
 
         $xml->update('/action[@application="set"][@bluebox="settingRingXfer"]{@data="transfer_ringback=${' . $numberOptions['ringtype'] . '}"}');
+
+        $xml->update('/action[@application="export"][@bluebox="sipCalleeIdName"]{@data="sip_callee_id_name=' .$destination['name'] .'"}');
+
+        $xml->update('/action[@application="export"][@bluebox="sipCalleeIdNumber"]{@data="sip_callee_id_number=' .$number['number'] .'"}');
 
         $dialstring = '';
 
