@@ -16,6 +16,8 @@ abstract class Bluebox_Controller extends Template_Controller
      */
     public static $version = '1.0';
 
+    protected $authBypass = array();
+
     /*************************
     * DATA RELATED SETTINGS *
     *************************/
@@ -225,9 +227,6 @@ abstract class Bluebox_Controller extends Template_Controller
 
         // Setup anything related to authorizing the user
         Event::run('bluebox.ready', $this);
-
-        //var_dump(Package_Transaction_Graph::listDependencies());
-        //die();
     }
 
     /**
@@ -286,6 +285,11 @@ abstract class Bluebox_Controller extends Template_Controller
     public function getBaseModel()
     {
         return $this->baseModel;
+    }
+
+    public function getAuthBypass()
+    {
+        return $this->authBypass;
     }
 
     /**
@@ -651,6 +655,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted())
         {
+            Event::run('bluebox.updateOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formSave($base)))
             {
                 $this->returnQtipAjaxForm($base);
@@ -670,6 +676,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted(array('submitString' => 'delete')))
         {
+            Event::run('bluebox.deleteOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formDelete($base)))
             {
                 $this->returnQtipAjaxForm(NULL);

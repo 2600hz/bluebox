@@ -95,4 +95,71 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/action[@application="hangup"]');
     }
+
+    public static function preNumber()
+    {
+        $xml = Telephony::getDriver()->xml;
+
+        $number = Event::$data;
+
+        $dialplan = $number['dialplan'];
+
+        if (empty($dialplan['terminate']['action']))
+        {
+            return;
+        }
+
+        if ($dialplan['terminate']['action'] != 'voicemail')
+        {
+            return;
+        }
+
+        if (empty($dialplan['terminate']['voicemail']))
+        {
+            return;
+        }
+
+        $xml->update('/action[@application="set"][@bluebox="settingEndBridge"][@data="hangup_after_bridge=true"]');
+        
+        $xml->update('/action[@application="set"][@bluebox="settingFail"][@data="continue_on_fail=true"]');
+    }
+
+    public static function postnumber()
+    {
+        $xml = Telephony::getDriver()->xml;
+
+        $number = Event::$data;
+
+        $dialplan = $number['dialplan'];
+
+        if (empty($dialplan['terminate']['action']))
+        {
+            return;
+        }
+
+        if ($dialplan['terminate']['action'] != 'voicemail')
+        {
+            return;
+        }
+
+        if (empty($dialplan['terminate']['voicemail']))
+        {
+            return;
+        }
+
+        $voicemail = Doctrine::getTable('Voicemail')->find($dialplan['terminate']['voicemail']);
+
+        if (!$voicemail)
+        {
+            return;
+        }
+
+        $destination = $number['Destination'];
+
+        $domain = 'voicemail_' .$destination['account_id'];
+
+        $xml->update('/action[@application="voicemail"]{@data="default voicemail_' .$destination['account_id'] .' ' .$voicemail['mailbox'] .'"}');
+
+        $xml->update('/action[@application="hangup"]');
+    }
 }

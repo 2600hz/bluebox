@@ -353,6 +353,7 @@ $(document).ready(function () {
     .hide(); // Hide it initially
 
     /**
+<<<<<<< HEAD
      * DRIVES THE DESTINATION SELECTOR
      ***************************************************************/
     $('.destination_select').each(function() {
@@ -409,6 +410,8 @@ $(document).ready(function () {
     });
 
     /**
+=======
+>>>>>>> origin/master
      * QTIP MODAL BACKDROP
      ***************************************************************/
     $('<div id="qtip-blanket">')

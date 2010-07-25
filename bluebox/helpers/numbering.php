@@ -43,7 +43,8 @@ class numbering extends form
      * @param   string        a string to be attached to the end of the attributes
      * @return  string
      */
-    public static function dropdown($data, $selected = NULL, $extra = '') {
+    public static function dropdown($data, $selected = NULL, $extra = '')
+    {
         // standardize the $data as an array, strings default to the class_type
         if ( ! is_array($data))
         {
@@ -51,8 +52,10 @@ class numbering extends form
         }
 
         // if we dont have a class type then we fail
-        if (empty($data['classType'])) {
+        if (empty($data['classType']))
+        {
             kohana::log('error', 'You can not render the numbering::assigndropdown without a class type!');
+
             return FALSE;
         }
 
@@ -65,10 +68,12 @@ class numbering extends form
             'nullOption' => FALSE,
             'listAssigned' => TRUE
         );
+
         $data['name'] = '_numbers[assign][]';
 
         // if multiple is empty then unset it
-        if (empty($data['multiple'])) {
+        if (empty($data['multiple']))
+        {
             unset($data['multiple']);
         }
 
@@ -80,12 +85,15 @@ class numbering extends form
 
         // get all the unassigned number of the class types in unassignedTypes
         $options['Unassigned'] = self::getUnassignedNumbersByPool($data['classType']);
+
         unset($data['classType']);
 
         // render a null option if its been set in data
-        if (!empty($data['nullOption'])) {
+        if (!empty($data['nullOption']))
+        {
             array_unshift($options['Unassigned'], __($data['nullOption']));
         }
+
         unset($data['nullOption']);
 
         // the dropdown expects the assigned array in reverse order
@@ -93,184 +101,57 @@ class numbering extends form
 
         // see if there are any posts for this dropdown
         if($post = arr::parse_str($data['name'], $_POST))
+        {
             $selected += $post;
+        }
 
         // remove any attributes the dropdown helper will not understand
         $localAttr = array('additionalTypes', 'class_type');
+
         $data = array_diff_key($data, array_flip($localAttr));
 
         // if we are not listing the assigned numbers in this select
-        if (!$data['listAssigned']) {
+        if (!$data['listAssigned'])
+        {
             $options['Assigned'] = array();
         }
 
         // if we are rendering this as optGroups ensure the markup will be valid
         // otherwise merge the array
-        if ($data['optGroups']) {
+        if ($data['optGroups'])
+        {
             // remove the empty optgroups (illegal markup to have a empty group)
-            if (empty($options['Assigned'])) unset($options['Assigned']);
-            if (empty($options['Unassigned'])) unset($options['Unassigned']);
-        } else {
+            if (empty($options['Assigned']))
+            {
+                unset($options['Assigned']);
+            }
+
+            if (empty($options['Unassigned']))
+            {
+                unset($options['Unassigned']);
+            }
+        } 
+        else
+        {
             // Array merge re-indexs the keys so manually merge
             $assigned = $options['Assigned'];
+
             $options = $options['Unassigned'];
-            foreach($assigned as $key => $number) {
+
+            foreach($assigned as $key => $number)
+            {
                 $options[$key] = $number;
             }
         }
+        
         unset($data['optGroups']);
 
         // use kohana helper to generate the markup
         $layout = form::dropdown($data, $options, $selected, $extra);
+
         $layout .= form::hidden('containsAssigned[]', $data['name']);
 
         return $layout;
-    }
-
-    /**
-     * This will generate a list of all assigned numbers in a pool or list of
-     * pools.  The values of the select option will be the number id.
-     *
-     * Additional Data Options:
-     *  classType  = a single pool type to list or an array of types, if empty
-     *                   all are used.
-     *  optGroups  = Render the select options in optgroups by pool type
-     *  useNames   = Attemps to use the assigned destination name when avaliable
-     *  nullOption = If this is a string then it is used as  the '0' option, or
-     *                   if false then no such option will exist
-     *
-     * @param   string|array  input name or an array of HTML attributes
-     * @param   string        option key that should be selected by default
-     * @param   string        a string to be attached to the end of the attributes
-     * @return  string
-     */
-    public static function numbersDropdown($data, $selected = NULL, $extra = '')
-    {
-        // standardize the $data as an array, strings default to the class_type
-        if ( ! is_array($data))
-        {
-            $data = array('name' => $data);
-        }
-
-        // add in all the defaults if they are not provided
-        $data += array(
-            'nullOption' => 'None',
-            'classType' => FALSE,
-            'optGroups' => TRUE,
-            'useNames' => FALSE,
-            'contextAware' => FALSE
-        );
-
-        // if types was just a string then make it an array
-        if ( !empty($data['classType']) && !is_array($data['classType']))
-        {
-            $data['classType'] = array($data['classType']);
-        }
-
-        // append or insert the class
-        $data = arr::update($data, 'class', ' destination_dropdown');
-
-        // render a null option if its been set in data
-        if (!empty($data['nullOption'])) {
-            $options = array(0 => __($data['nullOption']));
-        } else {
-            $options = array();
-        }
-
-        // check if we should attempt to fill the selected
-        $selected = self::_attemptRePopulate($data['name'], $selected);
-
-        // foreach of the number types build a optgroup
-        $types = self::getPoolTypes();
-        foreach($types as $type) {
-            // skip this we have a list of number types to include and not this
-            if (is_array($data['classType']) && !in_array($type, $data['classType'])) continue;
-
-            // make a user friendly name for the pool name
-            $poolName = str_replace('Number', '', $type);
-
-            if (isset(self::$numbersCache[$type])) {
-                $assignedInPool = self::$numbersCache[$type];
-                if (isset($assignedInPool[$selected .'" class="' .$type])) {
-                    $selected = $selected .'" class="' .$type;
-                }
-            } else {
-                // get a list of all the assigned numbers in this pool
-                $assignedInPool = self::getAssignedNumbersByPool($type);
-
-                // if there are no assigned numbers then skip this pool
-                if (empty($assignedInPool)) continue;
-
-                // TODO: This is a hack to handle numbers that exist in multiple contexts
-                if ($data['contextAware']) {
-                    foreach ($assignedInPool as $key => $number) {
-                        $contexts = self::getContextsByNumber($key);
-                        if (count($contexts) > 1) {
-
-                            reset($contexts);
-                            $contextID = key($contexts);
-                            $contextName = $contexts[$contextID];
-
-                            unset($assignedInPool[$key], $contexts[$contextID]);
-
-                            $assignedInPool[$key .'_' .$contextID] = $number . '@' .$contextName;
-
-                            foreach ($contexts as $contextID => $contextName) {
-                                $assignedInPool[$key .'_' .$contextID] = $number . '@' .$contextName;
-                            }
-                        }
-                    }
-                }
-
-                // for each of the assigned numbers in the pool
-                foreach ($assignedInPool as $key => $number) {
-                    $contexts = self::getContextsByNumber($key);
-
-                    // if we have been asked to use names instead of numbers
-                    if ($data['useNames'])
-                    {
-                        // get the destinations record
-                        $destination = self::getDestinationByNumber($key);
-
-                        // does it have a column called 'name'
-                        if (!empty($destination['name'])) {
-                            // if so then set a select option using the name
-                            $assignedInPool[$key .'" class="' .$type] = $destination['name'] .' (' .$number .')';
-                        } else {
-                            // if not then set a select option using the number
-                            $assignedInPool[$key .'" class="' .$type] = $number;
-                        }
-                    } else {
-                        // set a select option using the number
-                        $assignedInPool[$key .'" class="' .$type] = $number;
-                    }
-
-                    // because we hacked the our class into that for the jquery stuff
-                    // we need to also modify the selected value to match
-                    if ($selected == $key) {
-                        $selected = $key .'" class="' .$type;
-                    }
-
-                    // remove the unmodified value from the array
-                    unset($assignedInPool[$key]);
-                }
-                // This simple cache keeps us from redoing all these queries,
-                // by my measure it saves 4 - 5 seconds on subsequent calls....
-                self::$numbersCache[$type] = $assignedInPool;
-            }
-
-            if ($data['optGroups']) {
-                // if we are are displaying as opgroups then add this as a sub-
-                // array with the poolName as the key
-                $options[$poolName] = $assignedInPool;
-            } else {
-                // if we are not using optGroups merge this into a single array
-                $options = array_merge($options, $assignedInPool);
-            }
-        }
-        unset($data['classType'], $data['optGroups'], $data['useNames'], $data['nullOption'], $data['contextAware']);
-
-        return form::dropdown($data, $options, $selected, $extra);
     }
 
     /**
@@ -318,11 +199,15 @@ class numbering extends form
         $data = arr::update($data, 'class', ' destination_dropdown');
 
         // render a null option if its been set in data
-        if (!empty($data['nullOption'])) {
+        if (!empty($data['nullOption']))
+        {
             $options = array(0 => __($data['nullOption']));
-        } else {
+        } 
+        else
+        {
             $options = array();
         }
+
         unset($data['nullOption']);
 
         // check if we should attempt to fill the selected
@@ -330,14 +215,20 @@ class numbering extends form
 
         // foreach of the number types build a optgroup
         $types = self::getPoolTypes();
-        foreach($types as $type) {
+
+        foreach($types as $type)
+        {
             // skip this we have a list of number types to include and not this
-            if (is_array($data['classType']) && !in_array($type, $data['classType'])) continue;
+            if (is_array($data['classType']) && !in_array($type, $data['classType']))
+            {
+                continue;
+            }
 
             $destinations = self::getDestinationsByPool($type);
 
             // no destinations for this pool, then skip
-            if (!$destinations) {
+            if (!$destinations)
+            {
                 continue;
             }
 
@@ -345,16 +236,24 @@ class numbering extends form
             $poolName = str_replace('Number', '', $type);
 
             $optGroup = array();
-            foreach ($destinations as $destination) {
+
+            foreach ($destinations as $destination)
+            {
                 // replace the key with the destination identifier
                 $key = $destination->identifier();
+
                 // TODO: since we only deal in single column keys flatten this
                 //       but in the future this could cause issues...
                 $key = reset($key);
 
-                if ($data['assigned']) {
+                if ($data['assigned'])
+                {
                     $assigned  = self::getAssignedNumbers($type, $key);
-                    if (empty($assigned)) continue;
+
+                    if (empty($assigned))
+                    {
+                        continue;
+                    }
                 }
 
                 // if we have been asked to use names instead of numbers
@@ -362,36 +261,164 @@ class numbering extends form
                 {
                     // if so then set a select option using the name
                     $optGroup[$key .'" class="' .$type] = $destination['name'];
-                } else {
+                } 
+                else
+                {
                     $optGroup[$key .'" class="' .$type] = $poolName .' ' .$key;
                 }
 
                 // because we hacked the our class into that for the jquery stuff
                 // we need to also modify the selected value to match
-                if ($selected == $key) {
+                if ($selected == $key)
+                {
                     $selected = $key .'" class="' .$type;
                 }
             }
 
-            if (empty($optGroup)) continue;
+            if (empty($optGroup))
+            {
+                continue;
+            }
 
-            if ($data['optGroups']) {
+            if ($data['optGroups'])
+            {
                 // if we are are displaying as opgroups then add this as a sub-
                 // array with the poolName as the key
                 $options[$poolName] = $optGroup;
-            } else {
+            } 
+            else
+            {
                 // if we are not using optGroups merge this into a single array
                 $options = array_merge($options, $optGroup);
             }
         }
-        unset($data['classType']);
-        unset($data['optGroups']);
-        unset($data['assigned']);
+
+        unset($data['classType'], $data['optGroups'], $data['assigned']);
+
+        return form::dropdown($data, $options, $selected, $extra);
+    }
+    
+    /**
+     * This will generate a list of all assigned numbers in a pool or list of
+     * pools.  The values of the select option will be the number id.
+     *
+     * Additional Data Options:
+     *  classType  = a single pool type to list or an array of types, if empty
+     *                   all are used.
+     *  optGroups  = Render the select options in optgroups by pool type
+     *  useNames   = Attemps to use the assigned destination name when avaliable
+     *  nullOption = If this is a string then it is used as  the '0' option, or
+     *                   if false then no such option will exist
+     *
+     * @param   string|array  input name or an array of HTML attributes
+     * @param   string        option key that should be selected by default
+     * @param   string        a string to be attached to the end of the attributes
+     * @return  string
+     */
+    public static function numbersDropdown($data, $selected = NULL, $extra = '')
+    {
+        // standardize the $data as an array, strings default to the class_type
+        if ( ! is_array($data))
+        {
+            $data = array('name' => $data);
+        }
+
+        // add in all the defaults if they are not provided
+        $data += array(
+            'nullOption' => FALSE,
+            'classType' => FALSE,
+            'optGroups' => TRUE,
+            'useNames' => TRUE,
+            'forDependent' => FALSE
+        );
+
+        // if types was just a string then make it an array
+        if ( !empty($data['classType']) && !is_array($data['classType']))
+        {
+            $data['classType'] = array($data['classType']);
+        }
+
+        // append or insert the class
+        $data = arr::update($data, 'class', ' destination_dropdown');
+
+        // render a null option if its been set in data
+        if (!empty($data['nullOption']))
+        {
+            $options = array(0 => __($data['nullOption']));
+        } 
+        else
+        {
+            $options = array();
+        }
+
+        // check if we should attempt to fill the selected
+        $selected = self::_attemptRePopulate($data['name'], $selected);
+
+        $numberTypes = Doctrine::getTable('NumberType')->findAll(Doctrine::HYDRATE_ARRAY);
+
+        foreach($numberTypes as $numberType)
+        {
+            // skip this we have a list of number types to include and not this
+            if (is_array($data['classType']) && !in_array($numberType['class'], $data['classType']))
+            {
+                continue;
+            }
+
+            // make a user friendly name for the pool name
+            $poolName = str_replace('Number', '', $numberType['class']);
+
+            $numbers = Doctrine_Query::create()
+                ->select('n.number_id, n.number, d.name')
+                ->from('Number n, n.' .$poolName .' d')
+                ->whereNotIn('n.foreign_id', array(0, 'NULL'))
+                ->andWhereIn('n.class_type', array($numberType['class']))
+                ->orderBy('number')
+                ->execute(array(), Doctrine::HYDRATE_SCALAR);
+
+            if (empty($numbers))
+            {
+                continue;
+            }
+
+            foreach($numbers as $number)
+            {
+                $text = $number['n_number'];
+
+                if (!empty($number['d_name']) AND $data['useNames'])
+                {
+                    $text = $number['d_name'] .' (' .$text .')';
+                }
+
+                $value = $number['n_number_id'];
+
+                if ($data['forDependent'])
+                {
+                    $value .= '" class="' .$numberType['class'];
+
+                    if ($selected == $number['n_number_id'])
+                    {
+                        $selected = $value;
+                    }
+                }
+
+                if (!$data['optGroups'] OR $data['forDependent'])
+                {
+                     $options[$value] = $text;
+                }
+                else
+                {
+                     $options[$poolName][$value] = $text;
+                }
+            }
+        }
+
+        unset($data['classType'], $data['optGroups'], $data['useNames'], $data['nullOption'], $data['forDependent']);
 
         return form::dropdown($data, $options, $selected, $extra);
     }
 
-    public static function poolsDropdown($data, $selected = NULL, $extra = '') {
+    public static function poolsDropdown($data, $selected = NULL, $extra = '')
+    {
         // standardize the $data as an array, strings default to the class_type
         if ( ! is_array($data))
         {
@@ -401,7 +428,9 @@ class numbering extends form
         // add in all the defaults if they are not provided
         $data += array(
             'nullOption' => 'Select',
-            'classType' => FALSE
+            'classType' => FALSE,
+            'assigned' => TRUE,
+            'forDependent' => FALSE
         );
 
         // if types was just a string then make it an array
@@ -414,11 +443,15 @@ class numbering extends form
         $data = arr::update($data, 'class', ' pools_dropdown');
 
         // render a null option if its been set in data
-        if (!empty($data['nullOption'])) {
+        if (!empty($data['nullOption']))
+        {
             $options = array(0 => __($data['nullOption']));
-        } else {
+        } 
+        else
+        {
             $options = array();
         }
+        
         unset($data['nullOption']);
 
         // check if we should attempt to fill the selected
@@ -426,35 +459,63 @@ class numbering extends form
 
         // foreach of the number pools make an option
         $pools = self::getPoolTypes();
-        foreach($pools as $pool) {
+
+        foreach($pools as $pool_id => $pool)
+        {
             // skip this we have a list of number types to include and not this
-            if (is_array($data['classType']) && !in_array($type, $data['classType'])) continue;
+            if (is_array($data['classType']) && !in_array($pool, $data['classType']))
+            {
+                continue;
+            }
+
+            $numbers = self::getNumbersByPool($pool);
+
+            if (empty($numbers) AND $data['assigned'])
+            {
+                continue;
+            }
 
             // get the vars out of the class ex: 'DeviceNumber' model
             $classVars = get_class_vars($pool);
 
             // see if that model has a var called description
-            if (empty($classVars['description'])) {
+            if (empty($classVars['description']))
+            {
                 // if not then clean up the number pool name and use that
                 $classVars['description'] = str_replace('Number', '', $pool);
             }
 
-            // set a select option with the description or our cleaned up name
-            $options[$pool .'" title="' .$pool] = $classVars['description'];
-        }
-        unset($data['classType']);
+            if ($data['forDependent'])
+            {
+                // set a select option with the description or our cleaned up name
+                $options[$pool_id .'" title="' .$pool] = $classVars['description'];
 
-        // we are hacking the dropdown helper a bit so we need the selected var
-        // to match up with our perceived option value
-        if (!empty($selected)) {
-            $selected = $selected.'" title="' .$selected;
+                // we are hacking the dropdown helper a bit so we need the selected var
+                // to match up with our perceived option value
+                if ($selected == $pool_id OR $selected == $pool)
+                {
+                    $selected = $pool_id .'" title="' .$pool;
+                }
+            }
+            else
+            {
+                // set a select option with the description or our cleaned up name
+                $options[$pool_id] = $classVars['description'];
+            }
+
         }
+
+        unset($data['classType'], $data['forDependent'], $data['assigned']);
 
         return form::dropdown($data, $options, $selected, $extra);
     }
 
-    public static function nextAvaliableLink($bindTo, $title = NULL, $attributes = array(), $javascript = TRUE) {
-        if (empty($bindTo)) return FALSE;
+    public static function nextAvaliableLink($bindTo, $title = NULL, $attributes = array(), $javascript = TRUE)
+    {
+        if (empty($bindTo))
+        {
+            return FALSE;
+        }
 
         // standardize the $data as an array, strings default to the class_type
         if ( ! is_array($attributes) )
@@ -473,21 +534,25 @@ class numbering extends form
         $attributes = arr::update($attributes, 'class', ' nxt_aval_link');
 
         // if there is no title then use the default
-        if (empty($title)) {
+        if (empty($title))
+        {
             $title = 'Next Avaliable Number';
         }
 
         // unless instructed otherwise translate this title
-        if($attributes['translate']) {
+        if($attributes['translate'])
+        {
             $title = __($title);
         }
 
         // if the user is not going to roll their own js do it for them
-        if ($javascript) {
-
+        if ($javascript)
+        {
             // if the user wants to use jgrowl make sure it will be avaliable
             if ($attributes['jgrowl'])
+            {
                 jquery::addPlugin('growl');
+            }
 
             // generate a js script to select the next avaliable number
             $script = '    $("#' .$attributes['id'] .'").bind("click", function(e) {
@@ -509,8 +574,10 @@ class numbering extends form
 
             // if the user wants to use jgrowl add it to our js script
             if ($attributes['jgrowl'])
+            {
                 $script .= '$.jGrowl("' .__('Assigned number') .' " + text, { theme: "success", life: 5000 });
                         ';
+            }
 
             $script .= 'success = true;
                         return false;
@@ -520,7 +587,9 @@ class numbering extends form
 
             // if the user wants to use jgrowl add it to our js script
             if ($attributes['jgrowl'])
+            {
                 $script .= 'if (!success) $.jGrowl("' .__('Unable to find an avaliable number!') .'", { theme: "error", life: 5000 });';
+            }
 
             $script .= "\n" .'    });' ."\n";
 
@@ -529,8 +598,7 @@ class numbering extends form
         }
 
         // dont inlcude the tranlaste in the html attributes
-        unset($attributes['translate']);
-        unset($attributes['jgrowl']);
+        unset($attributes['translate'], $attributes['jgrowl']);
 
         // Parsed URL
         return '<a href="#" ' .html::attributes($attributes) .'><span>' .$title .'</span></a>';
@@ -552,13 +620,17 @@ class numbering extends form
         // TODO: optimize this query, use DQL?
         $options = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
 
-        if (!empty($data['nullOption'])) {
+        if (!empty($data['nullOption']))
+        {
             $nullOption = array('context_id' => 0, 'name' => __($data['nullOption']));
+
             array_unshift($options, $nullOption);
+
             unset($data['nullOption']);
         }
 
-        foreach ($options as $option) {
+        foreach ($options as $option)
+        {
             $contextOptions[$option['context_id']] = $option['name'];
         }
 
@@ -589,7 +661,9 @@ class numbering extends form
             ->execute(array(), Doctrine::HYDRATE_ARRAY);
 
         $types = array();
-        foreach($pools as $pool) {
+
+        foreach($pools as $pool)
+        {
             $types[$pool['number_type_id']] = $pool['class'];
         }
 
@@ -605,9 +679,15 @@ class numbering extends form
      */
     public static function getNumbersByPool($numberType)
     {
-        if (empty($numberType)) return array();
+        if (empty($numberType))
+        {
+            return array();
+        }
 
-        if (!is_array($numberType)) $numberType = array($numberType);
+        if (!is_array($numberType))
+        {
+            $numberType = array($numberType);
+        }
 
         $numbers = Doctrine_Query::create()
             ->select('np.number_id, n.number')
@@ -617,7 +697,9 @@ class numbering extends form
             ->execute(array(), Doctrine::HYDRATE_ARRAY);
 
         $pool = array();
-        foreach($numbers as $number) {
+
+        foreach($numbers as $number)
+        {
             $pool[$number['number_id']] = $number['Number']['number'];
         }
 
@@ -633,9 +715,15 @@ class numbering extends form
      */
     public static function getUnassignedNumbersByPool($numberType)
     {
-        if (empty($numberType)) return array();
+        if (empty($numberType))
+        {
+            return array();
+        }
 
-        if (!is_array($numberType)) $numberType = array($numberType);
+        if (!is_array($numberType))
+        {
+            $numberType = array($numberType);
+        }
 
         $numbers = Doctrine_Query::create()
             ->select('np.number_id, n.number')
@@ -646,7 +734,9 @@ class numbering extends form
             ->execute(array(), Doctrine::HYDRATE_ARRAY);
 
         $unassignedNumbers = array();
-        foreach($numbers as $number) {
+
+        foreach($numbers as $number)
+        {
             $unassignedNumbers[$number['number_id']] = $number['Number']['number'];
         }
 
@@ -662,20 +752,28 @@ class numbering extends form
      */
     public static function getAssignedNumbersByPool($numberType)
     {
-        if (empty($numberType)) return array();
+        if (empty($numberType))
+        {
+            return array();
+        }
 
-        if (!is_array($numberType)) $numberType = array($numberType);
+        if (!is_array($numberType))
+        {
+            $numberType = array($numberType);
+        }
 
         $numbers = Doctrine_Query::create()
             ->select('np.number_id, n.number')
             ->from('NumberPool np, np.Number n, np.NumberType nt')
-            ->whereNotIn('n.foreign_id', array(0, 'NULL'))
+            ->where('(n.foreign_id = ? OR n.foreign_id IS NULL)', array(0))
             ->andwhereIn('n.class_type', $numberType)
             ->orderBy('number')
             ->execute(array(), Doctrine::HYDRATE_ARRAY);
 
         $assignedNumbers = array();
-        foreach($numbers as $number) {
+
+        foreach($numbers as $number)
+        {
             $assignedNumbers[$number['number_id']] = $number['Number']['number'];
         }
 
@@ -691,7 +789,10 @@ class numbering extends form
      */
     public static function getAssignedPoolByNumber($number_id)
     {
-        if (empty($number_id)) return FALSE;
+        if (empty($number_id))
+        {
+            return FALSE;
+        }
 
         $pool = Doctrine_Query::create()
             ->select('n.class_type')
@@ -712,13 +813,18 @@ class numbering extends form
      * @param int the number id
      * @return mixeds a doctrine record object or bool false
      */
-    public static function getDestinationsByPool($numberType) {
+    public static function getDestinationsByPool($numberType)
+    {
         // no number type? NO SOUP FOR YOU!
-        if (empty($numberType)) return array();
+        if (empty($numberType))
+        {
+            return array();
+        }
 
         $class = str_replace('Number', '', $numberType);
 
-        try {
+        try
+        {
             // get this classes table and identifier
             $table = Doctrine::getTable($class);
 
@@ -726,9 +832,12 @@ class numbering extends form
             $records = $table->findAll();
 
             return $records;
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e)
+        {
             // YOU ARE THE WEAKEST LINK, GOODBYE!
             kohana::log('error', 'Unable to get destinations by pool: ' .$e->getMessage());
+            
             return FALSE;
         }
     }
@@ -741,9 +850,13 @@ class numbering extends form
      * @param int the number id
      * @return mixeds a doctrine record object or bool false
      */
-    public static function getDestinationByNumber($number_id) {
+    public static function getDestinationByNumber($number_id)
+    {
         // no number id? NO SOUP FOR YOU!
-        if (empty($number_id)) return FALSE;
+        if (empty($number_id))
+        {
+            return FALSE;
+        }
 
         // get this numbers class_type and foreign_id
         $number = Doctrine_Query::create()
@@ -754,22 +867,30 @@ class numbering extends form
             ->execute(array(), Doctrine::HYDRATE_ARRAY);
 
         // is the number not assigned?
-        if (empty($number[0])) return FALSE;
+        if (empty($number[0]))
+        {
+            return FALSE;
+        }
 
         $class = str_replace('Number', '', $number[0]['class_type']);
 
-        try {
+        try
+        {
             // get this classes table and identifier
             $table = Doctrine::getTable($class);
+
             $identifier = $table->getIdentifier();
 
             // select one record by the identifier and foreign_id
             $record = $table->findOneBy($identifier, $number[0]['foreign_id']);
 
             return $record;
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e)
+        {
             // YOU ARE THE WEAKEST LINK, GOODBYE!
             kohana::log('error', 'Unable to get a numbers destination: ' .$e->getMessage());
+            
             return FALSE;
         }
     }
@@ -795,7 +916,9 @@ class numbering extends form
             ->execute(array(), Doctrine::HYDRATE_ARRAY);
 
         $assignedNumbers = array();
-        foreach($numbers as $number) {
+
+        foreach($numbers as $number)
+        {
             $assignedNumbers[$number['number_id']] = $number['number'];
         }
 
@@ -811,16 +934,17 @@ class numbering extends form
      */
     public static function updateAssignment($class_type = NULL, $foreign_id = NULL, $numbers)
     {
-        if(sizeof($numbers) == 0) {
-        //its probably bad to treat NULLL like an array.  Need a cleaner method
+        if(sizeof($numbers) == 0)
+        {
+            //its probably bad to treat NULLL like an array.  Need a cleaner method
             $numbers = array(); //prevents warning for $newNumbers = array_diff($numbers, $current);
         }
 
         // Cycle through the list of primary keys and update the relevant configuration files on disk based on the changes we just made
-        if (Kohana::config('telephony.diskoutput')) {
-        // Since we have to modify XML as well as update the DB, we just go record by record and make the relevant changes.
-        // First, figure out what we have to do here. What's been changed?
-
+        if (Kohana::config('telephony.diskoutput'))
+        {
+            // Since we have to modify XML as well as update the DB, we just go record by record and make the relevant changes.
+            // First, figure out what we have to do here. What's been changed?
             $query = Doctrine_Query::create()
                 ->select('number_id')
                 ->from('Number')
@@ -830,32 +954,47 @@ class numbering extends form
             $results = $query->execute(array(), Doctrine::HYDRATE_ARRAY);
 
             $current = array();
-            foreach ($results as $result) {
+
+            foreach ($results as $result)
+            {
                 $current[] = $result['number_id'];
             }
 
             // Process newly selected numbers
             $newNumbers = array_diff($numbers, $current);
-            foreach ($newNumbers as $new) {
+
+            foreach ($newNumbers as $new)
+            {
                 Kohana::log('debug', 'Attempting to map number id # ' . $new . ' to ' . $class_type . ' id #' . $foreign_id);
+
                 $number = Doctrine::getTable('Number')->find($new);
+
                 $number->foreign_id = $foreign_id;
+
                 $number->class_type = $class_type;
+
                 $number->save();
             }
 
             // Process removed numbers
             $removedNumbers = array_diff($current, $numbers);
-            foreach ($removedNumbers as $removed) {
+
+            foreach ($removedNumbers as $removed)
+            {
                 Kohana::log('debug', 'Attempting to unmap number id # ' . $removed . ' from ' . $class_type . ' id #' . $foreign_id);
+
                 $number = Doctrine::getTable('Number')->find($removed);
+
                 $number->foreign_id = 0;
+
                 $number->class_type = NULL;
+
                 $number->save();
             }
-        } else {
-        // Since writes to the XML file are not required, we can just update the DB quickly
-
+        } 
+        else
+        {
+            // Since writes to the XML file are not required, we can just update the DB quickly
             $q = Doctrine_Query::create()
                 ->update('Number n')
                 ->set('n.class_type', '?', '')
@@ -872,6 +1011,7 @@ class numbering extends form
                     ->set('n.class_type', '?', $class_type)
                     ->set('n.foreign_id', '?', $foreign_id )
                     ->whereIn('n.number_id', $numbers);
+
                 $result = $q->execute();
             }
         }
@@ -882,8 +1022,12 @@ class numbering extends form
         jquery::addPlugin('dialog');
     }
 
-    public static function getContextsByNumber($number_id) {
-        if (empty($number_id)) return FALSE;
+    public static function getContextsByNumber($number_id)
+    {
+        if (empty($number_id))
+        {
+            return FALSE;
+        }
 
 
         $result = Doctrine_Query::create()
@@ -893,8 +1037,11 @@ class numbering extends form
             ->execute(array(), Doctrine::HYDRATE_ARRAY);
 
         $contexts = array();
-        foreach ($result as $number) {
-            foreach ($number['NumberContext'] as $context) {
+
+        foreach ($result as $number)
+        {
+            foreach ($number['NumberContext'] as $context)
+            {
                 $contexts[$context['Context']['context_id']] = $context['Context']['name'];                
             }
         }

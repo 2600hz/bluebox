@@ -1,9 +1,12 @@
 <style>
-    ul.ring_group_members {font-family:helvetica,arial,sans-serif;margin:0;padding:0;}
-    ul.ring_group_members li {margin:-1px 0 0;padding:5px; list-style:none;border-bottom:1px solid #CCCCCC; border-top:1px solid #CCCCCC; background: #FFFFFF;}
-    ul.ring_group_members li a {text-decoration:none;display:block;padding:0.3em 0.5em;border:1px solid silver;color:#003;background:#fff;}
-    ul.ring_group_members li a:hover {border:1px solid gray;color:#000;background:#efefef}
-    .ring_group_members { margin: 10px; }
+    #ring_group_members { list-style-type: none; margin: 0; padding: 0; width:100%; float:left; margin:10px 0; max-height:225px; }
+    #ring_group_members .ringgroup_member { margin: 0 3px 3px 3px; padding: 0.4em 1.5em; background: #FFFFFF; border:1px solid #CCCCCC; }
+    #ring_group_members .ringgroup_member .sort_handle { position: absolute; margin-left: -1.3em; }
+
+
+    #ring_group_members .ringgroup_member ul { width: 100%; }
+    #ring_group_members .ringgroup_member ul { margin: 0; padding: 0; list-style-type: none; }
+    #ring_group_members .ringgroup_member ul li { display:inline; }
 </style>
 
 <div id="ringergroup_update_header" class="update ringergroup module_header">
@@ -46,7 +49,7 @@
 
     <?php echo form::open_section('Ring Group Member(s)'); ?>
 
-        <div style="height: 225px; padding: 5px; overflow-y: auto; border: 1px solid #CCCCCC;">
+        <div style="padding: 5px; overflow-y: auto; border: 1px solid #CCCCCC;">
 
             <ul id="ring_group_members" class="ring_group_members">
 
@@ -92,10 +95,10 @@
     });
 
     $.each(members, function(index, value) {
-        $('#checkbox_' + value.type + '_' + value.id).parents('li').prependTo($('#ring_group_members'));
+        $('#checkbox_' + value.type + '_' + value.id).parents('.ringgroup_member').prependTo($('#ring_group_members'));
         $('#checkbox_' + value.type + '_' + value.id).attr('checked', true);
     });
 
-    $('#ring_group_members').sortable({ cursor: 'crosshair', delay: 250 });
+    $('#ring_group_members').sortable({ cursor: 'move', cursorAt: 'top', containment: 'parent', tolerance: 'pointer', delay: 250 });
 
 <?php javascript::blockEnd(); ?>
