@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class ContextManager_Controller extends Bluebox_Controller {
-
+class ContextManager_Controller extends Bluebox_Controller
+{
     public $baseModel = 'Context';
 
     public function index()
@@ -29,6 +29,7 @@ class ContextManager_Controller extends Bluebox_Controller {
         );
         $grid->addAction('contextmanager/rebuild', 'Rebuild', array(
                 'arguments' => 'context_id',
+                'attributes' => array('class' => 'qtipAjaxForm')
             )
         );
         $grid->addAction('contextmanager/delete', 'Delete', array(
@@ -69,17 +70,5 @@ class ContextManager_Controller extends Bluebox_Controller {
         $this->returnQtipAjaxForm();
 
         url::redirect(Router_Core::$controller);
-    }
-
-    protected function pre_save(&$object)
-    {
-//        foreach($object['NumberContext'] as $key => &$numberContext)
-//        {
-//            $number = &$numberContext['Number'];
-//
-//            $number->markModified('number');
-//        }
-
-        parent::pre_save($object);
     }
 }

@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class DeviceRelation extends Bluebox_Relation
+class SystemRelation extends Bluebox_Relation
 {
-    protected $baseModelName = 'Device';
+    protected $baseModelName = 'System';
 
     protected $relationType = Doctrine_Relation::ONE;
 

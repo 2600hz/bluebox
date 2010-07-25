@@ -655,6 +655,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted())
         {
+            Event::run('bluebox.updateOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formSave($base)))
             {
                 $this->returnQtipAjaxForm($base);
@@ -674,6 +676,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted(array('submitString' => 'delete')))
         {
+            Event::run('bluebox.deleteOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formDelete($base)))
             {
                 $this->returnQtipAjaxForm(NULL);

@@ -19,13 +19,11 @@ class NumberManager_Plugin extends Bluebox_Plugin
 
         $numberTerminatorTemplates = array();
 
-//        $event_data = Event::$data;
-//
-//        Event::run('numbermanager.collectNumberTerminators', $terminators);
-//
-//        Event::run('numbermanager.collectNumberTerminatorOptions', $numberTerminatorTemplates);
-//
-//        Event::$data = $event_data;
+        $event_data = Event::$data;
+
+        Event::run('numbermanager.collectNumberTerminators', $terminators);
+
+        Event::$data = $event_data;
 
         $terminateOptions = array();
 
@@ -43,6 +41,8 @@ class NumberManager_Plugin extends Bluebox_Plugin
 
         $subview->terminate_action = $terminateOptions['action'];
 
+        $subview->terminators = $terminators;
+
         if ($return)
         {
             return $subview;
@@ -59,7 +59,30 @@ class NumberManager_Plugin extends Bluebox_Plugin
 
         $subview->section = 'number_contexts';
 
-        $subview->contexts = numbermanager::getContexts($this->number);
+        $order = array();
+        
+        foreach($this->number['NumberContext'] as $key => $context)
+        {
+            $order[$context['context_id']] = $key;
+        }
+
+        $contexts = numbermanager::getContexts($this->number);
+
+        $subview->contexts = array();
+
+        foreach($contexts['contexts'] as $key => $context)
+        {
+            $subview->contexts[$context['context_id']] = $context['name'];
+
+            if (isset($order[$context['context_id']]))
+            {
+                continue;
+            }
+
+            $order[$context['context_id']] = count($order);
+        }
+        
+        $subview->order = $order;
 
         $this->views[] = $subview;
     }
@@ -154,7 +177,6 @@ class NumberManager_Plugin extends Bluebox_Plugin
         if (get_parent_class($base) == 'Bluebox_Record')
         {
             $class_type = get_class($base) .'Number';
-
         } 
         else
         {
@@ -234,15 +256,13 @@ class NumberManager_Plugin extends Bluebox_Plugin
 
     protected static function getAssignedNumberTemplate($numberOptionTemplates, $class_type)
     {
-        $assignedNumberTemplate = new View('numbermanager/assignedNumber.mus', array('mustache_template' => FALSE,));
+        $assignedNumberTemplate = new View('numbermanager/assignedNumber.mus', array('mustache_template' => FALSE));
 
         $assignedNumberTemplate->mustache_template = FALSE;
         
         if (!empty($numberOptionTemplates[$class_type]))
         {
-
-            $assignedNumberTemplate->numberOptionTemplate = $numberOptionTemplates[$class_type];
-            
+            $assignedNumberTemplate->numberOptionTemplate = $numberOptionTemplates[$class_type];            
         }
 
         $assignedNumberTemplate = json_encode((string)$assignedNumberTemplate);
