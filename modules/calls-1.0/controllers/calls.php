@@ -66,6 +66,9 @@ class Calls_Controller extends Bluebox_Controller
 
         // Let plugins populate the grid as well
         $this->grid = $grid;
+
+            Kohana::log('debug', print_r($_POST, TRUE));
+
         plugins::views($this);
 
         // Produce a grid in the view
