@@ -109,4 +109,24 @@ class filetree {
     }
 
 
+    public static function file_tree_dir($directory, $directoriesOnly = FALSE, $excludeRegEx = NULL) {
+        $matches = array();
+        $basePath = $directory;
+
+        // Initialize iterator
+        $dir_iterator = new RecursiveDirectoryIterator($directory);
+        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $name => $data) if (preg_match($excludeRegEx, $name) == 0) {
+            $name = str_replace($basePath, '', $name);
+            if ($data->isDir()) {
+                $matches[$name] = $name;
+            } elseif (!$directoriesOnly) {
+                $matches[$name] = $name;
+            }
+        }
+
+        return $matches;
+    }
+
 }
