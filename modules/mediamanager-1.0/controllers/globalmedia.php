@@ -49,15 +49,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
         // Collect a list of paths in the system, to be displayed as a list
         $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:filterPath('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
 
-        // Remember the last path that was clicked on. We use this for uploads and other items.
-        // Why store this as a session var? Prevents people from screwing with paths they aren't supposed to be
-        // able to touch. In this way, we NEVER expose paths directly to our scripts with data from the outside
-        if (isset($_REQUEST['searchString'])) {
-            $_SESSION['globalmedia']['path'] = $_REQUEST['searchString'];
-        } else {
-            unset ($_SESSION['globalmedia']['path']);
-        }
-
         // Build a grid with a hidden device_id, device_type, and add an option for the user to select the display columns
         $this->grid = jgrid::grid($this->baseModel, array(
             'caption' => '&nbsp;',
@@ -213,7 +204,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
     public function add()
     {
-        javascript::add('ajaxupload');
+        //javascript::add('ajaxupload');
         
         $this->view->title = 'Upload Media';
 
@@ -225,6 +216,8 @@ class GlobalMedia_Controller extends Bluebox_Controller
             $this->view->maxUpload =  __('Max file size that can uploaded is limited by post_max_size to ') . $this->bytesToMb($maxPost) .'.  ';
             $this->view->maxUpload .= __('If you attempt to upload something larger than this the page will simply reload.');
         }
+
+        Kohana::log('debug', print_r($_POST, TRUE) . print_r($_FILES, TRUE));
         
         if (isset($_FILES['upload'])) {
             Kohana::log('debug', 'File uploaded. ' . print_r($_FILES, TRUE));
@@ -259,7 +252,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
               case UPLOAD_ERR_OK:
                     $description = (isset($_POST['upload']['description']) ? $_POST['upload']['description'] : '');
-                    $uploadfile = $this->soundPath . $_SESSION['globalmedia']['path'] . '/' . basename($_FILES['upload']['name']);
+                    $uploadfile = $this->soundPath . $_POST['upload']['path'] . '/' . basename($_FILES['upload']['name']);
                   
                     if ($this->upload($_FILES['upload']['tmp_name'], $uploadfile, $this->soundPath, $description, TRUE)) {
                         message::set('Uploaded file', 'success');
@@ -269,7 +262,11 @@ class GlobalMedia_Controller extends Bluebox_Controller
                 default:
                     message::set('Unknown error');
             }
+
+            $this->returnQtipAjaxForm();
         }
+
+        $this->view->soundPath = $this->soundPath;
     }
 
 /*    public function edit($id)
@@ -406,42 +403,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
         }
     }
 
-    private function fileExists($filename)
-    {
-        $q = Doctrine_Query::create()->select('f.file_id')->from('File f')->where('f.name = ? AND f.user_id = ? AND f.path = ?', array(
-            $filename,
-            $_SESSION['user_id'],
-            $this->uploadPath
-        ));
-        if ($q->count() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private function validate()
-    {
-        $files = Validation::factory($_FILES)->add_rules('upload', 'upload::valid', 'upload::required', 'upload::size[' . ini_get('upload_max_filesize') . ']');
-        return $files->validate();
-    }
-
-    private function tobytes($val)
-    {
-        $val = trim($val);
-        $last = strtolower(substr($val, strlen($val / 1) , 1));
-        if ($last == 'g') $val = $val * 1024 * 1024 * 1024;
-        if ($last == 'm') $val = $val * 1024 * 1024;
-        if ($last == 'k') $val = $val * 1024;
-        return $val;
-    }
-    
-    private function bytesToMb($byte)
-    {
-        return $byte / 1048576 . 'Mb';
-    }
-
-    public function qtipAjaxReturn($data) {
+    /*public function qtipAjaxReturn($data) {
         javascript::codeBlock('$(\'.jqgrid_instance\').trigger("reloadGrid");');
-    }
+    }*/
 }

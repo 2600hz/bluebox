@@ -5,16 +5,16 @@
     echo $filetree;
 
     ?>
-        <br/>
-        <a href="#" onClick="clearPath()">Show All</a><br/>
-        <br/>
-        <?php echo html::anchor('globalmedia/scan', 'Rescan Folders', array('class' => 'qtipAjaxForm')); ?>
-        <br/>
+        <p style="margin-top: 10px"><a href="#" onClick="clearPath()">Show All Files</a></p>
+
+        <p style="margin-top: 10px"><?php echo html::anchor('globalmedia/scan', 'Rescan Folders', array('class' => 'qtipAjaxForm')); ?></p>
+        
+        <p style="margin-top: 10px"><?php echo html::anchor('globalmedia/create', 'Create Folder'); ?></p>
     </div>
 
     <div class="topbar">
         <h1>Media Manager</h1>
-        <p>These files are accessible to all users of the system. Last file scan was XX</p>
+        <p>These files are accessible to all users of the system.</p>
     </div>
     
     <div id="grid" style="float:right;width:80%">
@@ -29,8 +29,6 @@
         <?php if (isset($grid)) echo $grid; ?>
 
         <div style="width:100%; margin: 10px;">&nbsp;</div>
-        
-        <div id="upload_button"><B>To upload a file, choose a folder from the left</b></div>
 
     </div>
     
@@ -45,7 +43,6 @@ function filterPath(path) {
     $('#MediaGrid')[0].p.postData.searchString=path;
     $('#MediaGrid').trigger('reloadGrid');
     $('#MediaGrid').setCaption(path);
-    $('div#upload_button').html('<button href="add" class="qtipAjaxForm small_green_button button">Upload new file to ' + path + '</button>');
 }
 
 function clearPath() {
@@ -55,6 +52,5 @@ function clearPath() {
     delete $('#MediaGrid')[0].p.postData.searchString;
     $('#MediaGrid').trigger('reloadGrid');
     $('#MediaGrid').setCaption('');
-    $('div#upload_button').html('To upload a file, choose a folder from the left');
 }
 <?php javascript::blockEnd(); ?>

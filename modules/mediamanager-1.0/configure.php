@@ -50,7 +50,10 @@ class MediaManager_Configure extends Bluebox_Configure
             'summary' => 'Modify and maintain media (sound) files for the entire system',
             'navIcon' => 'assets/img/icons/mainToolsX.png',
             'navBranch' => '/Media/',
-            'navURL' => '/globalmedia/index'
+            'navURL' => '/globalmedia/index',
+            'navSubmenu' => array(
+                'Upload Audio' => '/globalmedia/add'
+            )
         ),
 
         array (
@@ -58,7 +61,10 @@ class MediaManager_Configure extends Bluebox_Configure
             'summary' => 'Modify and maintain media (sound) files for this account',
             'navIcon' => 'assets/img/icons/mainToolsX.png',
             'navBranch' => '/Media/',
-            'navURL' => '/accountmedia/index'
+            'navURL' => '/accountmedia/index',
+            'navSubmenu' => array(
+                'Upload Audio' => '/globalmedia/add'
+            )
         )
     );
 /*
