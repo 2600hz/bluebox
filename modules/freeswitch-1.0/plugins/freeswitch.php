@@ -17,12 +17,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
         'C:\FreeSWITCH',
         'C:\freeswitch'
     );
-
-    public function index()
-    {
-
-    }
-
+    
     /**
      * Setup the subview for the address plugin
      */
@@ -246,6 +241,8 @@ class Freeswitch_Plugin extends Bluebox_Plugin
             
             return false;
         }
+
+        $this->session->set('installer.default_packages', kohana::config('freeswitch.default_packages'));
 
         return true;
     }

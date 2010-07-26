@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core
+ * @author     Darren Schreiber <d@d-man.org>
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 abstract class Bluebox_Controller extends Template_Controller
 {
     const SUBMIT_CONFIRM = 'confirm';
@@ -10,6 +15,8 @@ abstract class Bluebox_Controller extends Template_Controller
      * @var float The bluebox core version
      */
     public static $version = '1.0';
+
+    protected $authBypass = array();
 
     /*************************
     * DATA RELATED SETTINGS *
@@ -65,6 +72,26 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->session->set('ajax.base_method', strtolower(Router::$method));
         }
 
+        // Instantiate internationalization
+        $this->i18n = i18n::instance();
+
+        /**
+         * TODO: This is so nasty...
+         */
+        if (!empty($_POST['lang']))
+        {
+            if (empty(i18n::$langs[$_POST['lang']]))
+            {
+                die();
+            }
+
+            $this->session->set('lang', $_POST['lang']);
+
+            echo i18n::$langs[$_POST['lang']];
+
+            die();
+        }
+
         // Create a static validator, if one does not already exist. By default we populate it with post variables
         // This will hold all errors that occur within Doctrine and provides easy access for the controller to grab those errors
         // Note carefully that this is intentionally a singleton - Doctrine does not otherwise know which controller is associated
@@ -72,9 +99,6 @@ abstract class Bluebox_Controller extends Template_Controller
         // per run of Kohana, we should be OK here. You can also use Kohana's validation class methods here, too.
         // FIXME: This should be moved!!!
         self::$validation = new Validation($_POST);
-
-        //$this->freshInstall();
-        //die();
 
         // Setup anything related to this website's pages rendering
         Event::run('bluebox.setup', $this);
@@ -283,6 +307,11 @@ abstract class Bluebox_Controller extends Template_Controller
         return $this->baseModel;
     }
 
+    public function getAuthBypass()
+    {
+        return $this->authBypass;
+    }
+
     /**
      * Checks for the existance of speciall vars in the post to determine
      * if the page has been submitted and if so weither the action was cancle or
@@ -306,6 +335,10 @@ abstract class Bluebox_Controller extends Template_Controller
             'cancelString' => 'cancel',
             'requestVar' => 'submit'
         );
+
+        //$options['cancelString'] = __($options['cancelString']);
+
+        $options['submitString'] = __($options['submitString']);
 
         // if the requestVar is empty then we will only check for the
         // existance of any post vars
@@ -374,6 +407,16 @@ abstract class Bluebox_Controller extends Template_Controller
             } 
             else
             {
+                if (!empty($this->template->title))
+                {
+                    $this->template->title = __($this->template->title);
+                }
+
+                if (!empty($this->view->title))
+                {
+                    $this->view->title = __($this->view->title);
+                }
+
                 // Add some makers so we now where to place jquery assets
                 $this->template->js .= "\n{js}";
                 $this->template->css .= "\n{css}";
@@ -646,6 +689,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted())
         {
+            Event::run('bluebox.updateOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formSave($base)))
             {
                 $this->returnQtipAjaxForm($base);
@@ -665,6 +710,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted(array('submitString' => 'delete')))
         {
+            Event::run('bluebox.deleteOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formDelete($base)))
             {
                 $this->returnQtipAjaxForm(NULL);
@@ -702,7 +749,7 @@ abstract class Bluebox_Controller extends Template_Controller
         Event::run('bluebox.create_view', $this->view);
     }
 
-    protected function loadBaseModel($id = NULL, $baseModel = NULl)
+    protected function loadBaseModel($id = NULL, $baseModel = NULL)
     {
         if (is_null($baseModel))
         {
@@ -862,8 +909,4 @@ abstract class Bluebox_Controller extends Template_Controller
         // Let things respond to a failed save
         Event::run('bluebox.save_failed', $object);
     }
-}
-
-function __($text) {
-    return $text;
 }

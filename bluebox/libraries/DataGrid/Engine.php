@@ -1,7 +1,11 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
-
-class DataGrid_Engine {
-
+/**
+ * @package    Core/Libraries/DataGrid
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
+class DataGrid_Engine
+{
     private $columns = array();
 
     private $name = NULL;
@@ -52,43 +56,58 @@ class DataGrid_Engine {
 
     public function __get($variable)
     {
-        switch (strtolower($variable)) {
+        switch (strtolower($variable))
+        {
             case 'columns':
                 return $this->columns;
+
             case 'name':
                 return $this->name;
+
             case 'attributes':
                 return $this->attributes;
+
             case 'table':
                 return $this->table;
+
             case 'fields':
                 return $this->fields;
+
             case 'driver':
                 return $this->driver;
+            
             default:
                 if (isset($this->attributes[$variable]))
                 {
                     return $this->attributes[$variable];
                 }
+                
                 return NULL;
         }
     }
 
     public function __isset($variable)
     {
-        switch (strtolower($variable)) {
+        switch (strtolower($variable))
+        {
             case 'columns':
                 return isset($this->columns);
+
             case 'name':
                 return isset($this->name);
+
             case 'attributes':
                 return isset($this->attributes);
+
             case 'table':
                 return isset($this->table);
+
             case 'fields':
                 return isset($this->fields);
+
             case 'driver':
                 return isset($this->driver);
+            
             default:
                 return isset($this->attributes[$attribute]);
         }
@@ -96,19 +115,28 @@ class DataGrid_Engine {
 
     public function __unset($variable)
     {
-        switch (strtolower($variable)) {
+        switch (strtolower($variable))
+        {
             case 'columns':
                 $this->columns = array();
+
                 break;
+
             case 'attributes':
                 $this->attributes = array();
+
                 break;
+
             case 'fields':
                 $this->fields = array();
+
                 break;
+
             case 'driver':
                 $this->driver = NULL;
+
                 break;
+
             default:
                 unset($this->attributes[$attribute]);
         }
@@ -132,14 +160,14 @@ class DataGrid_Engine {
     public function addColumn($content, $displayName = NULL, $options = array())
     {
         $fields = array();
+        
         preg_match_all('/{{(.*?)}}/', $content, $fields);
 
-        if (!empty($fields[1])) {
-
-            foreach($fields[1] as $field) {
-
-                $this->fields[$field] = $field;
-                
+        if (!empty($fields[1]))
+        {
+            foreach($fields[1] as $field)
+            {
+                $this->fields[$field] = $field;   
             }
         }
         
@@ -161,6 +189,7 @@ class DataGrid_Engine {
         {
             case 'table':
                 return $this->renderTable($data);
+
                 break;
 
             case 'skeleton':
@@ -185,22 +214,24 @@ class DataGrid_Engine {
 
     private function renderTemplate() 
     {
-        if (!($this->table instanceof DataGrid_Table)) {
+        if (!($this->table instanceof DataGrid_Table))
+        {
             return NULL;
         }
 
         $header = $this->table->head()->row(array(), TRUE);
+
         $body = $this->table->body()->row(array(), TRUE);
+
         $foot = $this->table->foot()->row(array(), TRUE);
 
-        foreach ($this->columns as $column) {
-
+        foreach ($this->columns as $column)
+        {
             $header->headerCell($column->getContent(), $column->getAttributes('header'));
 
             $body->dataCell($column->getContent(), $column->getAttributes('cell'));
 
             $foot->dataCell($column->getContent(), $column->getAttributes('footer'));
-
         }
 
         $this->table->squareTable();
@@ -210,7 +241,8 @@ class DataGrid_Engine {
 
     private function renderPartialsTemplate()
     {
-        if (!($this->table instanceof DataGrid_Table)) {
+        if (!($this->table instanceof DataGrid_Table))
+        {
             return NULL;
         }
 
@@ -220,14 +252,13 @@ class DataGrid_Engine {
 
         $foot = $this->table->foot->row(array(), TRUE);
 
-        foreach ($this->columns as $column) {
-
+        foreach ($this->columns as $column)
+        {
             $header->headerCell($column->getContent(), $column->getAttributes('header'));
 
             $body->dataCell($column->getContent(), $column->getAttributes('cell'));
 
             $foot->dataCell($column->getContent(), $column->getAttributes('footer'));
-
         }
 
         $template = array(
@@ -246,42 +277,42 @@ class DataGrid_Engine {
 
     private function renderTable($data = array())
     {
-        if (!($this->table instanceof DataGrid_Table)) {
+        if (!($this->table instanceof DataGrid_Table))
+        {
             return NULL;
         }
 
-        if (!isset($data['body'])) {
-
-            if (isset($data['head']) or isset($data['foot'])) {
-                
+        if (!isset($data['body']))
+        {
+            if (isset($data['head']) or isset($data['foot']))
+            {
                 $data['body'] = array();
-
-            } else {
-
-                $data['body'] = $data;
-                
+            } 
+            else
+            {
+                $data['body'] = $data;   
             }
         }
 
         $body = $this->table->body->row(array(), TRUE);
 
-        foreach($this->columns as $column) {
-
+        foreach($this->columns as $column)
+        {
             $columnContent = $column->getContent();
+
             $columnDisplayName = $column->getDisplayName();
 
-            if (!empty($columnDisplayName)) {
-
-                if (!isset($header)) {
+            if (!empty($columnDisplayName))
+            {
+                if (!isset($header))
+                {
                     $header = $this->table->head->row();
                 }
 
                 $header->headerCell($columnDisplayName, $column->getAttributes('header'));
-
             }
 
             $body->dataCell($columnContent, $column->getAttributes('cell'));
-
         }
 
         $this->table->squareTable();
@@ -294,34 +325,32 @@ class DataGrid_Engine {
 
         preg_match_all('/{{(.*?)}}/', $bodyRowTemplate, $fields);
 
-        if (count($fields[1]) > 0) {
-
+        if (count($fields[1]) > 0)
+        {
             $fieldOrder = $fields[0];
             
             $fields = $fields[1];
-
-        } else {
-
-            $fields = array();
-            
+        } 
+        else
+        {
+            $fields = array();   
         }
 
-        foreach ($data['body'] as $rowData) {
-
+        foreach ($data['body'] as $rowData)
+        {
             $search = $replace = array();
 
-            foreach($fields as $field) {
-
+            foreach($fields as $field)
+            {
                 $search[] = '{{' .$field .'}}';
 
-                if (isset($rowData[$field])) {
-
+                if (isset($rowData[$field]))
+                {
                     $replace[] = $rowData[$field];
-
-                } else {
-
-                    $replace[] = '&nbsp;';
-                    
+                }
+                else
+                {
+                    $replace[] = '&nbsp;';   
                 }
             }
             
@@ -335,20 +364,20 @@ class DataGrid_Engine {
 
     private function renderSkeleton($data = array())
     {
-        if (!($this->table instanceof DataGrid_Table)) {
+        if (!($this->table instanceof DataGrid_Table))
+        {
             return NULL;
         }
 
-        if (!isset($data['body'])) {
-
-            if (isset($data['head']) or isset($data['foot'])) {
-
+        if (!isset($data['body']))
+        {
+            if (isset($data['head']) or isset($data['foot']))
+            {
                 $data['body'] = array();
-
-            } else {
-
+            } 
+            else
+            {
                 $data['body'] = $data;
-
             }
         }
 
@@ -357,20 +386,20 @@ class DataGrid_Engine {
         foreach ($this->columns as $column)
         {
             $columnContent = $column->getContent();
+
             $columnDisplayName = $column->getDisplayName();
             
-            if (!empty($columnDisplayName)) {
-
-                if (!isset($header)) {
+            if (!empty($columnDisplayName))
+            {
+                if (!isset($header))
+                {
                     $header = $this->table->head->row();
                 }
 
                 $header->headerCell($columnDisplayName, $column->getAttributes('header'));
-
             }
 
             $body->dataCell('&nbsp;', $column->getAttributes('cell'));
-            
         }
 
         $this->table->squareTable();

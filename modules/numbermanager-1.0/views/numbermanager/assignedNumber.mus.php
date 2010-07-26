@@ -2,7 +2,7 @@
     
     <span style="float:right;">
 
-        <a href="#assign_number_{{number_id}}" class="unassign_number" title="Unassign number" style="padding:5px;">Unassign</a>
+        <a href="#assign_number_{{number_id}}" class="unassign_number" title="Unassign number" style="padding:5px;"><?php echo __('Unassign'); ?></a>
 
     </span>
 

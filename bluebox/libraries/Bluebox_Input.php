@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Libraries/Input
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class Input extends Input_Core
 {
     public function __construct()

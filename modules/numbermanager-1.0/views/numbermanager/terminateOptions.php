@@ -31,20 +31,20 @@
 
         <h3>
             
-            <a href="#" rel="hangup">Hangup</a>
+            <a href="#" rel="hangup"><?php echo __('Hangup'); ?></a>
             
         </h3>
 
         <div style="text-align: center;">
 
-            If this call is not answered hangup.
+            <?php echo __('If this call is not answered hangup.'); ?>
 
         </div>
 
 
         <h3>
 
-            <a href="#" rel="voicemail">Send to Voicemail</a>
+            <a href="#" rel="voicemail"><?php echo __('Send to Voicemail'); ?></a>
 
         </h3>
 
@@ -71,7 +71,7 @@
 
         <div style="text-align: center;">
 
-            If this call is not answered transfer the caller to
+            <?php echo __('If this call is not answered transfer the caller to'); ?>
 
             <?php
                 if (isset($number['dialplan']['terminate']['transfer'])) {
@@ -86,7 +86,7 @@
 
                 echo numbering::poolsDropdown($baseName .'_transfer_class', $selectedClass);
 
-                echo " named ";
+                echo __(' named ');
 
                 echo numbering::numbersDropdown(array(
                     'id' => $baseName .'_targets',
@@ -109,7 +109,7 @@
         }
     ?>
 
-    <input type="hidden" value="<?php echo $action; ?>" name="<?php echo $baseName; ?>[dialplan][terminate][action]" id="<?php echo $baseName; ?>_terminate_action"/>
+    <input type="hidden" value="<?php echo empty($action) ? 'hangup' : $action; ?>" name="<?php echo $baseName; ?>[dialplan][terminate][action]" id="<?php echo $baseName; ?>_terminate_action"/>
 
 <?php echo form::close_section(); ?>
 

@@ -35,7 +35,7 @@ class FreeSwitch_Location_Driver extends FreeSwitch_Base_Driver
     {
         $xml = FreeSwitch::setSection('location');
 
-        $xml->update('/X-PRE-PROCESS[@cmd="set"][@bluebox="location_' .$base['location_id'] . '"]{@data="location_' .$base['location_id'] .'=' .$base['location_id'] .'"}');
+        $xml->update('/X-PRE-PROCESS[@cmd="set"][@bluebox="location_' .$base['location_id'] . '"]{@data="location_' .$base['location_id'] .'=' .$base['domain'] .'"}');
     }
 
     public static function delete($base)

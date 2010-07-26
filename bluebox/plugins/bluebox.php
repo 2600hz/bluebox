@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Bluebox/Plugins
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
+ */
 abstract class Bluebox_Plugin
 {
     protected $name = NULL;
@@ -309,9 +313,13 @@ abstract class Bluebox_Plugin
         // Get the base object
         $this->base = $this->getBaseModelObject();
 
+        kohana::log('debug', 'Attempting to attach plugin data ' .$this->name .' to ' .get_class($this->base));
+
         // If the base object doesnt have a place for plugins we are done
         if (!isset($this->base['plugins']))
         {
+            kohana::log('error', 'Base does not contain the plugins column');
+
             return FALSE;
         }
 

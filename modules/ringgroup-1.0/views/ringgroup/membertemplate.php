@@ -1,15 +1,25 @@
 <li id="member_{{type}}_{{id}}" class="ringgroup_member">
+    
+    <span class="ui-icon ui-icon-arrowthick-2-n-s sort_handle"></span>
 
-    <div style="float: right; margin-top: 10px;" class="field">
+    <ul>
 
-        <label for="checkbox_{{type}}_{{id}}" class="label" id="label_checkbox_{{type}}_{{id}}" style="width:160px; font-weight:normal; margin-top: ">Assign this {{type}}</label>
+        <li>
 
-        <input type="checkbox" class="checkbox input {{type}}" rel="{{type}}" value="{{id}}" name="ringgroup[members][][id]" id="checkbox_{{type}}_{{id}}" style="margin-right:15px;">
+            <span>{{display_name}}</span>
 
-    </div>
+            <span style="color:#666666; font-size: .8em; padding-left: 15px;">{{display_type}}</span>
 
-    <div><span>{{display_name}}</span></div>
+        </li>
 
-    <span style="color:#666666; font-size: .8em; padding-left: 15px;">{{display_type}}</span>
+        <li style="float:right;">
+
+            <label for="checkbox_{{type}}_{{id}}" class="label" id="label_checkbox_{{type}}_{{id}}" style="width:160px; font-weight:normal; margin-top: ">Assign this {{type}}</label>
+
+            <input type="checkbox" class="checkbox input {{type}}" rel="{{type}}" value="{{id}}" name="ringgroup[members][][id]" id="checkbox_{{type}}_{{id}}" style="margin:3px 0 0 15px;">
+
+        </li>
+
+    </ul>
 
 </li>
