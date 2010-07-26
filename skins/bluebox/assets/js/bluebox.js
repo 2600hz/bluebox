@@ -368,4 +368,19 @@ $(document).ready(function () {
     })
     .appendTo(document.body) // Append to the document body
     .hide(); // Hide it initially
+
+    /**
+     * LANGUAGE BAR
+     ***************************************************************/
+    $('#lang').change(function () {
+        $(this).fadeOut('fast', function () { $('#change_lang').fadeIn('fast'); });
+        $.post(document.location.href, { lang: $(this).val() }, function (data) {
+            $('#lang_bar').text('On the next page reload the language will be ' + data);
+            $('#lang_bar').slideDown();
+        });
+    });
+    $('#change_lang').click(function (e) {
+        e.preventDefault();
+        $(this).fadeOut('fast', function () { $('#lang').fadeIn('fast'); });
+    });
 });

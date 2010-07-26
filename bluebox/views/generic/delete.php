@@ -1,6 +1,6 @@
 <div id="<?php echo $baseModel; ?>_delete_header" class="delete <?php echo $baseModel; ?> module_header">
 
-    <h2><?php echo __($title); ?></h2>
+    <h2><?php echo $title; ?></h2>
 
 </div>
 
@@ -12,7 +12,7 @@
 
     <div class="delete_warning">
 
-        <?php echo 'Are you sure you want to delete the ' .$baseModel .' ' .$name .'?'; ?>
+        <?php echo __('Are you sure you want to delete the ' .$baseModel .' ' .$name .'?'); ?>
         
     </div>
 
