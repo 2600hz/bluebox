@@ -5,16 +5,16 @@
     echo $filetree;
 
     ?>
-        <p style="margin-top: 10px"><a href="#" onClick="clearPath()">Show All Files</a></p>
+        <p style="margin-top: 10px"><a href="#" onClick="clearPath()"><?php echo __('Show All Files'); ?></a></p>
 
         <p style="margin-top: 10px"><?php echo html::anchor('globalmedia/scan', 'Rescan Folders', array('class' => 'qtipAjaxForm')); ?></p>
         
-        <p style="margin-top: 10px"><?php echo html::anchor('globalmedia/create', 'Create Folder'); ?></p>
+        <p style="margin-top: 10px"><?php echo html::anchor('globalmedia/createFolder', 'Create Folder'); ?></p>
     </div>
 
     <div class="topbar">
-        <h1>Media Manager</h1>
-        <p>These files are accessible to all users of the system.</p>
+        <h1><?php echo __('Media Manager'); ?></h1>
+        <p><?php echo __('These files are accessible to all users of the system.'); ?></p>
     </div>
     
     <div id="grid" style="float:right;width:80%">

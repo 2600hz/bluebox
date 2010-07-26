@@ -54,7 +54,7 @@ class MediaManager_Configure extends Bluebox_Configure
             'navSubmenu' => array(
                 'Upload Audio' => '/globalmedia/add'
             )
-        ),
+        )/*,
 
         array (
             'navLabel' => 'Custom Media',
@@ -65,7 +65,7 @@ class MediaManager_Configure extends Bluebox_Configure
             'navSubmenu' => array(
                 'Upload Audio' => '/globalmedia/add'
             )
-        )
+        )*/
     );
 /*
     public static function _checkDirectory()

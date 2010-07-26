@@ -208,12 +208,12 @@ class GlobalMedia_Controller extends Bluebox_Controller
         
         $this->view->title = 'Upload Media';
 
-        $maxFilesize = $this->tobytes(ini_get('upload_max_filesize'));
-        $maxPost = $this->tobytes(ini_get('post_max_size'));
+        $maxFilesize = ini_get('upload_max_filesize');
+        $maxPost = ini_get('post_max_size');
         if ($maxFilesize <= $maxPost) {
-            $this->view->maxUpload =  __('Max file size that can uploaded is limited by upload_max_filesize to ') . $this->bytesToMb($maxFilesize);
+            $this->view->maxUpload =  __('Max file size that can uploaded is limited by upload_max_filesize to ') . $maxFilesize;
         } else {
-            $this->view->maxUpload =  __('Max file size that can uploaded is limited by post_max_size to ') . $this->bytesToMb($maxPost) .'.  ';
+            $this->view->maxUpload =  __('Max file size that can uploaded is limited by post_max_size to ') . $maxPost .'.  ';
             $this->view->maxUpload .= __('If you attempt to upload something larger than this the page will simply reload.');
         }
 
@@ -393,14 +393,18 @@ class GlobalMedia_Controller extends Bluebox_Controller
         }
     }
 
-    public function createFolder($path) {
-        /* check if folder exists */
-        if (!is_dir($this->uploadPath)) {
-            if (!filesystem::createDirectory($this->uploadPath)) {
-                message::set('The path ' . $this->uploadPath . 'does not exist and could not be created!');
-                return false;
+    public function createFolder($path = NULL) {
+        if (isset($_POST['path'])) {
+            /* check if folder exists */
+            if (!is_dir($this->uploadPath)) {
+                if (!filesystem::createDirectory($this->uploadPath)) {
+                    message::set('The path ' . $this->uploadPath . 'does not exist and could not be created!');
+                    return false;
+                }
             }
         }
+        
+        $this->view->soundPath = $this->soundPath;
     }
 
     /*public function qtipAjaxReturn($data) {
