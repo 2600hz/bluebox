@@ -188,20 +188,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
         die();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public function add()
     {
         //javascript::add('ajaxupload');
@@ -220,7 +206,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
         Kohana::log('debug', print_r($_POST, TRUE) . print_r($_FILES, TRUE));
         
         if (isset($_FILES['upload'])) {
-            Kohana::log('debug', 'File uploaded. ' . print_r($_FILES, TRUE));
             switch ($_FILES['upload']['error']) {
                 case UPLOAD_ERR_INI_SIZE:
                     message::set('The uploaded file exceeds the upload_max_filesize directive in php.ini');
@@ -268,52 +253,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
         $this->view->soundPath = $this->soundPath;
     }
-
-/*    public function edit($id)
-    {
-        $this->view->title = 'Edit Media';
-        $file = Doctrine::getTable('File')->find($id);
-        if (!$file) {
-            // Send any errors back to the index
-            message::set('Unable to locate file id ' . $id, array(
-                'redirect' => Router::$controller
-            ));
-            return TRUE;
-        }
-        if ($this->submitted() && isset($_POST['mediamanager']['description'])) {
-            $file->description = $_POST['mediamanager']['description'];
-            if ($file->save()) {
-                message::set('File updated', array(
-                    'type' => 'success',
-                    'redirect' => Router::$controller
-                ));
-            }
-        }
-        $this->view->mediamanager = array('description' => $file->description);
-    }
-
-    public function preview($id)
-    {
-        stylesheet::add('mediamanager', 40);
-        $this->view->title = 'Preview Media';
-        $this->view->url = url::site('mediamanager/listen/' . $id);
-    }
- 
-    public function listen($id)
-    {
-        $file = Doctrine::getTable('File')->find($id);
-        $fullPath = $file->path . $file->name;
-        $name = $file->name;
-        $mime = $file->type;
-        header(sprintf('Content-type: %s', $mime));
-        readfile($fullPath);
-        die();
-    }
-
-    public function delete($id)
-    {
-        $this->stdDelete($id);
-    }*/
 
     private function upload($tmpfile, $destfile, $basePath, $description = '', $replace = false)
     {
