@@ -193,16 +193,16 @@ class FsDomDocument extends DOMDocument
      */
     public function setAttributeValue($xpath, $attributename = 'value', $value)
     {
-        $xpath = $this->preUpdate($xpath);
+        $search = $this->preUpdate($xpath);
 
         $xp = new DOMXPath($this);
 
         if (defined('XPATH_DEBUG'))
         {
-            Kohana::log('debug', "Search Query Is: $xpath");
+            Kohana::log('debug', "Search Query Is: $search");
         }
 
-        $elements = $xp->query($xpath);
+        $elements = $xp->query($search);
 
         if ($elements->length > 0)
         {
