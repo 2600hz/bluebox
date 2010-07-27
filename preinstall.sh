@@ -1,7 +1,7 @@
 #!/bin/bash
 
 fUsage () {
-    echo "Usage: $0 [--webuser=${webuser-guess}] [--log=/dev/null]"
+    echo "Usage: $0 -y [--webuser=www] [--softswitch_dir=/usr/local/freeswitch/conf/]"
     exit 1
 }
 
@@ -22,6 +22,11 @@ fWelcome() {
 fConfirmYes() {
     echo -n "$1? "
 
+    if [ ! -z $accept_all ]; then
+        echo
+        return 1
+    fi
+
     read ans
 
     case "$ans" in
@@ -33,6 +38,11 @@ fConfirmYes() {
 
 fConfirmNo() {
     echo -n "$1? "
+
+    if [ ! -z $accept_all ]; then
+        echo
+        return 0
+    fi
 
     read ans
 
@@ -99,6 +109,8 @@ fSetWebUser() {
     # This was for MAC, not sure if it is needed
     [ `uname` = 'Darwin' ] && webuser_guess='www'
 
+    [ ! -z $webuser ] && webuser_guess=$webuser
+
     echo
     echo "WEB USER"
     echo "---------------------------------------------------------"
@@ -106,12 +118,17 @@ fSetWebUser() {
     echo "the permissions on certain folder/files."
     echo -n "Web user name [$webuser_guess]? "
 
-    read ans
-
-    if [ -z $ans ]; then
+    if [ ! -z $accept_all ]; then
         webuser="$webuser_guess"
+        echo
     else
-        webuser="$ans"
+        read ans
+
+        if [ -z $ans ]; then
+            webuser="$webuser_guess"
+        else
+            webuser="$ans"
+        fi
     fi
 }
 
@@ -151,12 +168,6 @@ fUpdateBlueboxPerm() {
 
     echo "# chmod -R g+w upload/"
     chmod -R g+w upload/
-
-    #chgrp -R $webuser modules/freeswitch-1.0/config/
-    #chmod -R a+w modules/freeswitch-1.0/config/
-
-    #chgrp -R $webuser modules/asterisk-1.0/config/
-    #chmod -R a+w modules/asterisk-1.0/config/
 }
 
 fUpdateSwitchPerm() {
@@ -168,6 +179,8 @@ fUpdateSwitchPerm() {
 
     [ -d '/etc/asterisk/' ] && softswitch_guess="/etc/asterisk"
 
+    [ ! -z $softswitch_dir ] && softswitch_guess=$softswitch_dir
+
     echo
     echo "SOFTSWITCH PRIVILEGES"
     echo "---------------------------------------------------------"
@@ -175,12 +188,17 @@ fUpdateSwitchPerm() {
     echo "directory so we can update its permissions."
     echo -n "Softswitch conf dir [$softswitch_guess]? "
 
-    read ans
-
-    if [ -z $ans ]; then
-        softswitch_dir="$softswitch_guess"
+    if [ ! -z $accept_all ]; then
+       softswitch_dir="$softswitch_guess"
+       echo
     else
-        softswitch_dir="$ans"
+        read ans
+
+        if [ -z $ans ]; then
+            softswitch_dir="$softswitch_guess"
+        else
+            softswitch_dir="$ans"
+        fi
     fi
 
     echo "# chgrp -R $webuser $softswitch_dir/*"
@@ -208,11 +226,32 @@ fUpdateOdbcPerm() {
 }
 
 cd `dirname $0`
+while [ -n "$*" ]; do
+    case "x$1" in   
+        x--webuser=*)
+            webuser=`echo "$1"|cut -d= -sf2`
+            ;;
+        x--softswitch_dir=*)
+            softswitch_dir=`echo "$1"|cut -d= -sf2`
+            ;;
+        x-y)
+            accept_all=1
+            ;;
+        x--help)
+            fUsage
+            ;;         
+        *)
+            fUsage
+            ;;
+    esac
+    shift
+done
+
 
 fWelcome
 
 fCheckSELinux
-[ -z $webuser ] && fSetWebUser
+fSetWebUser
 fUpdateBlueboxPerm
 fUpdateSwitchPerm
 
