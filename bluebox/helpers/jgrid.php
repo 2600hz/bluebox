@@ -95,6 +95,7 @@ class jgrid
         $this->jquery['caption'] = self::_i18n($this->jquery['caption']);
         // I dont want the user to change this
         $this->jquery['postData']['gridName'] = $this->gridName;
+        $this->jquery['cellLayout'] = 21;
     }
     /**
      * This is a factory for constructing a new grid instance
