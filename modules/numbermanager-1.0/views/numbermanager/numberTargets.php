@@ -59,7 +59,7 @@
                         <?php
                             if (!empty($target['quick_add']))
                             {
-                                echo html::anchor($target['quick_add'] ,'<span>Add New ' .$target['display_name'] .'</span>', array('class' => 'qtipAjaxForm'));
+                                echo html::anchor($target['quick_add'] ,'<span>' .__('Add New ' .$target['display_name']) .'</span>', array('class' => 'qtipAjaxForm'));
                             }
                         ?>
                         
@@ -105,9 +105,9 @@
 
 <?php javascript::codeBlock(NULL, FALSE); ?>
 
-function selectDestination(class, foreignId)
+function selectDestination(class_type, foreignId)
 {
-    $('#number_target_selector .radio.' + class + '[value=' + foreignId + ']').attr('checked', true);
+    $('#number_target_selector .radio.' + class_type + '[value=' + foreignId + ']').attr('checked', true);
 
     $('#number_target_selector .radio:checked').each( function () {
 

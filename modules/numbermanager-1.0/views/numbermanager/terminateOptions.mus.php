@@ -8,41 +8,26 @@
 
         <h3>
             
-            <a href="#" rel="hangup">Hangup</a>
+            <a href="#" rel="hangup"><?php echo __('Hangup'); ?></a>
             
         </h3>
 
         <div style="text-align: center;">
 
-            If this call is not answered hangup.
+            <?php echo __('If this call is not answered hangup.'); ?>
 
         </div>
 
+        <?php
+            foreach($terminators as $terminator)
+            {
+                echo new View($terminator, array('terminate' => $terminate, 'mustache_template' => FALSE));
+            }
+        ?>
 
         <h3>
 
-            <a href="#" rel="voicemail">Send to Voicemail</a>
-
-        </h3>
-
-        <div style="text-align: center;">
-
-            If this call is not answered direct the caller to the voicemail box 
-
-            <?php
-                echo form::dropdown(
-                    'number{{number_id}}[dialplan][terminate][voicemail]',
-                    Voicemails::provideNumberTerminators(),
-                    isset($terminate['voicemail']) ? $terminate['voicemail'] : NULL
-                );
-            ?>
-
-        </div>
-
-
-        <h3>
-
-            <a href="#" rel="transfer">Transfer</a>
+            <a href="#" rel="transfer"><?php echo __('Transfer'); ?></a>
 
         </h3>
 
@@ -50,30 +35,31 @@
 
             <div>
             
-                If this call is not answered transfer the caller to
+                <?php echo __('If this call is not answered transfer the caller to'); ?>
                 
             </div>
 
             <?php
-                if (isset($terminate['transfer'])) {
+                $selectedClass = NULL;
 
+                if (isset($terminate['transfer']))
+                {
                     $selectedClass = numbering::getAssignedPoolByNumber($terminate['transfer']);
-
-                } else {
-
-                    $selectedClass = NULL;
-
                 }
+                
+                echo numbering::poolsDropdown(array(
+                        'name' => 'number{{number_id}}_transfer_class',
+                        'forDependent' => TRUE
+                    ),
+                    $selectedClass
+                );
 
-                echo numbering::poolsDropdown('number{{number_id}}_transfer_class', $selectedClass);
-
-                echo ' named ';
+                echo __(' named ');
 
                 echo numbering::numbersDropdown(array(
                     'id' => 'number{{number_id}}_targets',
                     'name' => 'number{{number_id}}[dialplan][terminate][transfer]',
-                    'useNames' => TRUE,
-                    'optGroups' => FALSE
+                    'forDependent' => TRUE
                 ), isset($terminate['transfer']) ? $terminate['transfer'] : NULL);
             ?>
 

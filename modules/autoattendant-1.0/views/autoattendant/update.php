@@ -42,7 +42,7 @@
             <div id="audio_prompt" class="prompt">
                 <?php echo form::label('autoattendant[registry][file_id]', 'Select a file');?>
                 <?php //echo FileManager::dropdown('autoattendant[registry][file_id]', '', array('audio'));?>
-                <?php echo html::anchor('accountmedia/add', 'Upload a new recording', array('class' => 'button qtipAjaxForm'));?>
+                <?php echo html::anchor('globalmedia/add', 'Upload a new recording', array('class' => 'button qtipAjaxForm'));?>
             </div>
 
         </div>

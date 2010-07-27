@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Libraries/Package
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class Package_Catalog_Datastore extends Package_Catalog
 {
     public static function import(&$metadata)
@@ -14,17 +18,23 @@ class Package_Catalog_Datastore extends Package_Catalog
         {
             $metadata['models'] = array();
         }
-        
-        $package = Doctrine::getTable('Package')->findOneByBasedir($metadata['basedir']);
 
-        if (!$package)
+        try
         {
-            return;
+            $package = Doctrine::getTable('Package')->findOneByBasedir($metadata['basedir']);
+
+            if (!$package)
+            {
+                return;
+            }
+
+            $metadata['status'] = $package['status'];
+
+            $metadata['datastore_id'] = $package['package_id'];
         }
-
-        $metadata['status'] = $package['status'];
-
-        $metadata['datastore_id'] = $package['package_id'];
+        catch(Exception $e)
+        {
+        }
     }
 
     public static function export(&$metadata)

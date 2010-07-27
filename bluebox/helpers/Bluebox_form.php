@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Helpers/Form
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 class form extends form_Core
 {
     /**
@@ -501,7 +505,7 @@ class form extends form_Core
             unset($data['help']);
         }
 
-        $data['for'] = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $data['for']), '_');
+        $data['for'] = trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['for']), '_');
 
         // Call the parent
         $result = parent::label($data, $text, $extra);
@@ -1251,6 +1255,6 @@ class form extends form_Core
      */
     protected function _i18n($value)
     {
-        return $value;
+        return __($value);
     }
 }

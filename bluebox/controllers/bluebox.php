@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core
+ * @author     Darren Schreiber <d@d-man.org>
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ */
 abstract class Bluebox_Controller extends Template_Controller
 {
     const SUBMIT_CONFIRM = 'confirm';
@@ -9,7 +14,9 @@ abstract class Bluebox_Controller extends Template_Controller
     /**
      * @var float The bluebox core version
      */
-    public static $version = '3.0';
+    public static $version = '1.0';
+
+    protected $authBypass = array();
 
     /*************************
     * DATA RELATED SETTINGS *
@@ -65,6 +72,26 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->session->set('ajax.base_method', strtolower(Router::$method));
         }
 
+        // Instantiate internationalization
+        $this->i18n = i18n::instance();
+
+        /**
+         * TODO: This is so nasty...
+         */
+        if (!empty($_POST['lang']))
+        {
+            if (empty(i18n::$langs[$_POST['lang']]))
+            {
+                die();
+            }
+
+            $this->session->set('lang', $_POST['lang']);
+
+            echo i18n::$langs[$_POST['lang']];
+
+            die();
+        }
+
         // Create a static validator, if one does not already exist. By default we populate it with post variables
         // This will hold all errors that occur within Doctrine and provides easy access for the controller to grab those errors
         // Note carefully that this is intentionally a singleton - Doctrine does not otherwise know which controller is associated
@@ -72,9 +99,6 @@ abstract class Bluebox_Controller extends Template_Controller
         // per run of Kohana, we should be OK here. You can also use Kohana's validation class methods here, too.
         // FIXME: This should be moved!!!
         self::$validation = new Validation($_POST);
-
-        //$this->freshInstall();
-        //die();
 
         // Setup anything related to this website's pages rendering
         Event::run('bluebox.setup', $this);
@@ -270,7 +294,7 @@ abstract class Bluebox_Controller extends Template_Controller
 
         $this->deleteOnSubmit($this->$base);
 
-        $this->prepareDeleteView();
+        $this->prepareDeleteView(NULL, $id);
     }
 
     /**
@@ -281,6 +305,11 @@ abstract class Bluebox_Controller extends Template_Controller
     public function getBaseModel()
     {
         return $this->baseModel;
+    }
+
+    public function getAuthBypass()
+    {
+        return $this->authBypass;
     }
 
     /**
@@ -306,6 +335,10 @@ abstract class Bluebox_Controller extends Template_Controller
             'cancelString' => 'cancel',
             'requestVar' => 'submit'
         );
+
+        //$options['cancelString'] = __($options['cancelString']);
+
+        $options['submitString'] = __($options['submitString']);
 
         // if the requestVar is empty then we will only check for the
         // existance of any post vars
@@ -374,6 +407,16 @@ abstract class Bluebox_Controller extends Template_Controller
             } 
             else
             {
+                if (!empty($this->template->title))
+                {
+                    $this->template->title = __($this->template->title);
+                }
+
+                if (!empty($this->view->title))
+                {
+                    $this->view->title = __($this->view->title);
+                }
+
                 // Add some makers so we now where to place jquery assets
                 $this->template->js .= "\n{js}";
                 $this->template->css .= "\n{css}";
@@ -575,7 +618,9 @@ abstract class Bluebox_Controller extends Template_Controller
         }
 
         // Import any post vars with the key of this model into the object
-        $object->fromArray($this->input->post(strtolower($baseClass), array()));
+        $formData = $this->input->post(strtolower($baseClass), array());
+
+        $object->fromArray($formData);
 
         // Save data and all relations
         try
@@ -644,6 +689,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted())
         {
+            Event::run('bluebox.updateOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formSave($base)))
             {
                 $this->returnQtipAjaxForm($base);
@@ -663,6 +710,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted(array('submitString' => 'delete')))
         {
+            Event::run('bluebox.deleteOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formDelete($base)))
             {
                 $this->returnQtipAjaxForm(NULL);
@@ -678,10 +727,10 @@ abstract class Bluebox_Controller extends Template_Controller
         }
     }
 
-    protected function createView()
+    protected function createView($baseModel = NULL, $forceDelete = NULL)
     {
         // Overload the update view
-        if (strcasecmp(Router::$method, 'delete') == 0)
+        if (($forceDelete) or (strcasecmp(Router::$method, 'delete') == 0 and $forceDelete !== FALSE))
         {
             $this->template->content = new View('generic/delete');
         }
@@ -690,29 +739,39 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->template->content = new View(Router::$controller . '/update');
         }
 
-        $this->view->title = ucfirst(Router::$method) .' ' .ucfirst($this->baseModel);
+        if (is_null($baseModel))
+        {
+            $baseModel = ucfirst($this->baseModel);
+        }
+
+        $this->view->title = ucfirst(Router::$method) .' ' .$baseModel;
 
         Event::run('bluebox.create_view', $this->view);
     }
 
-    protected function loadBaseModel($id = NULL)
+    protected function loadBaseModel($id = NULL, $baseModel = NULL)
     {
-        // Short hand for the baseModel
-        $base = strtolower($this->baseModel);
+        if (is_null($baseModel))
+        {
+            $baseModel = $this->baseModel;
+        }
 
+        // Short hand for the baseModel
+        $base = strtolower($baseModel);
+        
         if (is_null($id))
         {
-            $this->$base = new $this->baseModel();
+            $this->$base = new $baseModel();
         }
         else
         {
-            $this->$base = Doctrine::getTable($this->baseModel)->find($id);
+            $this->$base = Doctrine::getTable($baseModel)->find($id);
 
             // Was anything retrieved? If no, this may be an invalid request
             if (!$this->$base)
             {
                 // Send any errors back to the index
-                message::set('Unable to locate ' .ucfirst($this->baseModel) .' id ' .$id .'!');
+                message::set('Unable to locate ' .ucfirst($baseModel) .' id ' .$id .'!');
 
                 $this->returnQtipAjaxForm(NULL);
 
@@ -725,9 +784,14 @@ abstract class Bluebox_Controller extends Template_Controller
         Event::run('bluebox.load_base_model', $this->$base);
     }
 
-    protected function prepareUpdateView()
+    protected function prepareUpdateView($baseModel = NULL)
     {
-        $base = strtolower($this->baseModel);
+        if (is_null($baseModel))
+        {
+            $baseModel = $this->baseModel;
+        }
+        
+        $base = strtolower($baseModel);
 
         // Allow our location object to be seen by the view
         $this->view->$base = $this->$base;
@@ -738,12 +802,17 @@ abstract class Bluebox_Controller extends Template_Controller
         plugins::views($this);
     }
 
-    protected function prepareDeleteView()
+    protected function prepareDeleteView($baseModel = NULL, $id = 0)
     {
-        $base = strtolower($this->baseModel);
+        if (is_null($baseModel))
+        {
+            $baseModel = $this->baseModel;
+        }
+
+        $base = strtolower($baseModel);
         
         // Set the vars that the generic delete will be expecting
-        $this->view->baseModel = strtolower($this->baseModel);
+        $this->view->baseModel = strtolower($baseModel);
 
         if (isset($this->{$base}['name']))
         {
@@ -840,98 +909,4 @@ abstract class Bluebox_Controller extends Template_Controller
         // Let things respond to a failed save
         Event::run('bluebox.save_failed', $object);
     }
-
-    
-    public function freshInstall()
-    {
-        // Get the doctrine overlord
-        $manager = Doctrine_Manager::getInstance();
-        $conn = $manager->getCurrentConnection();
-        try {
-            // See if we can connect to the DB
-            $conn->connect();
-        } catch(Doctrine_Connection_Exception $e) {
-            // We could connect earlier, hmmm....
-            try {
-                Doctrine::createDatabases();
-            } catch(Exception $e) {
-                // We cant resolve this issue without the user
-                message::set('Unable to establish a connection to '
-                    .$this->session->get('installer.dbName')
-                    .'! <div class="error_details">' . $e->getMessage() . '</div>'
-                );
-                return false;
-            }
-        }
-
-        // See if the DB has any tables in it
-        $tables = $conn->import->listTables();
-
-        if (!empty($tables)) {
-            // Yup, there are tables in our soon to be fresh install db, remove them
-            try {
-                $dsn = $conn->getOption('dsn');
-                $dsn = $manager->parsePdoDsn($dsn);
-                $tmpConn = $conn->getTmpConnection($dsn);
-                $conn->close();
-                $tmpConn->export->dropDatabase($dsn['dbname']);
-                $tmpConn->export->createDatabase($dsn['dbname']);
-                $manager->closeConnection($tmpConn);
-                $conn->connect();
-            } catch(Exception $e) {
-                // We cant resolve this issue without the user
-                message::set('Unable to recreate database '
-                    .$this->session->get('installer.dbName')
-                    .'! <div class="error_details">' . $e->getMessage() . '</div>'
-                );
-                return false;
-            }
-        }
-
-        // Add in the core tables (only core!)
-        try {
-            $models = Doctrine::loadModels(APPPATH . 'models/', Doctrine::MODEL_LOADING_CONSERVATIVE);
-            Doctrine::createTablesFromModels();
-           // foreach($models as $model) Kohana::log('debug', 'INSTALLER::Create core table ' . $model);
-        } catch(Exception $e) {
-            message::set('Unable to create core tables!'
-                .'<div class="error_details">' . $e->getMessage() . '</div>'
-            );
-            return false;
-        }
-
-        // For each core table see if there is an initialization routine and run it
-        $initMethods = get_class_methods('Bluebox_Initialize');
-        $initMethods = array_filter($initMethods, array(
-            $this,
-            '_filterInitMethods'
-        ));
-
-        // For each method found run it and build a results array with the result
-        foreach($initMethods as $initMethod) {
-            try {
-                call_user_func(array(
-                    'Bluebox_Initialize',
-                    $initMethod
-                ));
-                Kohana::log('debug', 'Core table ' .$initMethod . ' complete');
-                } catch(Exception $e) {
-                    Kohana::log('error', 'Core table ' .$initMethod . ' failed! ' . $e->getMessage());
-                    message::set('Unable to initialize core table!'
-                        .'<div class="error_details">' . $e->getMessage() . '</div>'
-                    );
-                    return false;
-                }
-        }
-    }
-
-    private function _filterInitMethods($var)
-    {
-        return strstr($var, 'initialize');
-    }
-    
-}
-
-function __($text) {
-    return $text;
 }

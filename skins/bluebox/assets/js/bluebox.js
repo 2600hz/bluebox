@@ -34,7 +34,7 @@ function qtipAjaxForm(link) {
             width: 550,
             padding: '8px',
             title: {
-                'background-color': '#72a400',
+                'background-color': '#005F80',
                 color: '#ffffff',
                 padding: '3px 10px 5px 10px',
                 'font-size': '110%'
@@ -42,7 +42,7 @@ function qtipAjaxForm(link) {
             border: {
                 width: 8,
                 radius: 4,
-                color: '#72a400'
+                color: '#005F80'
             }
         },
         api: {
@@ -270,7 +270,7 @@ $(document).ready(function () {
                     width: 550,
                     padding: '8px',
                     title: {
-                        'background-color': '#72a400',
+                        'background-color': '#005F80',
                         color: '#ffffff',
                         padding: '3px 10px 5px 10px',
                         'font-size': '110%'
@@ -278,7 +278,7 @@ $(document).ready(function () {
                     border: {
                         width: 8,
                         radius: 4,
-                        color: '#72a400'
+                        color: '#005F80'
                     }
                 }
             });
@@ -320,7 +320,7 @@ $(document).ready(function () {
                 style: {
                     padding: '8px',
                     title: {
-                        'background-color': '#72a400',
+                        'background-color': '#005F80',
                         color: '#ffffff',
                         padding: '3px 10px 5px 10px',
                         'font-size': '110%'
@@ -328,7 +328,7 @@ $(document).ready(function () {
                     border: {
                         width: 8,
                         radius: 4,
-                        color: '#72a400'
+                        color: '#005F80'
                     }
                 }
             });
@@ -353,6 +353,7 @@ $(document).ready(function () {
     .hide(); // Hide it initially
 
     /**
+<<<<<<< HEAD
      * DRIVES THE DESTINATION SELECTOR
      ***************************************************************/
     $('.destination_select').each(function() {
@@ -394,7 +395,7 @@ $(document).ready(function () {
                 width: 700,
                 padding: '8px',
                 title: {
-                    'background-color': '#72a400',
+                    'background-color': '#005F80',
                     color: '#ffffff',
                     padding: '3px 10px 5px 10px',
                     'font-size': '110%'
@@ -402,13 +403,15 @@ $(document).ready(function () {
                 border: {
                     width: 8,
                     radius: 4,
-                    color: '#72a400'
+                    color: '#005F80'
                 }
             }
         });
     });
 
     /**
+=======
+>>>>>>> origin/master
      * QTIP MODAL BACKDROP
      ***************************************************************/
     $('<div id="qtip-blanket">')
@@ -424,4 +427,19 @@ $(document).ready(function () {
     })
     .appendTo(document.body) // Append to the document body
     .hide(); // Hide it initially
+
+    /**
+     * LANGUAGE BAR
+     ***************************************************************/
+    $('#lang').change(function () {
+        $(this).fadeOut('fast', function () { $('#change_lang').fadeIn('fast'); });
+        $.post(document.location.href, { lang: $(this).val() }, function (data) {
+            $('#lang_bar').text('On the next page reload the language will be ' + data);
+            $('#lang_bar').slideDown();
+        });
+    });
+    $('#change_lang').click(function (e) {
+        e.preventDefault();
+        $(this).fadeOut('fast', function () { $('#lang').fadeIn('fast'); });
+    });
 });

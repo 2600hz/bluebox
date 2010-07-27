@@ -1,8 +1,18 @@
+<?php
+    $netmask = array();
+    for ($i = 32; $i > 0; $i--) {
+        $netmask[$i] = '/' . $i;
+    }
+?>
+
 <div id="netlistmanager_update_header" class="clmanager module_header">
-    <h2><div class="helptip"></div><?php echo __($title); ?></h2>
+
+    <h2><?php echo __($title); ?></h2>
+
 </div>
 
 <div id="netlistmanager_update_form" class="update netlistmanager">
+    
     <?php echo form::open(); ?>
 
     <?php echo form::open_section('Network List Information'); ?>
@@ -36,7 +46,7 @@
     <?php
         echo form::label('allow_range', '...Or Add a New Range:');
         echo form::input('allow_range_in', '');
-        echo form::dropdown('allow_range_mask', array('32' => '/32', '24' => '/24'));
+        echo form::dropdown('allow_range_mask', $netmask);
         echo form::button('add_allow_btn', 'Add');
     ?>
     </div>
@@ -56,21 +66,30 @@
     <?php
         echo form::label('deny_range', '...Or Add a New Range:');
         echo form::input('deny_range_in', '');
-        echo form::dropdown('deny_range_mask', array('32' => '/32', '24' => '/24'));
+        echo form::dropdown('deny_range_mask', $netmask);
         echo form::button('add_deny_btn', 'Add');
     ?>
     </div>
 
     <?php echo form::close_section(); ?>
 
-    <?php if (isset($views)) echo subview::renderAsSections($views); ?>
+    <?php
+        if (isset($views))
+        {
+            echo subview::renderAsSections($views);
+        }
+    ?>
 
     <div class="buttons form_bottom">
+
         <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
+
         <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
+        
     </div>
 
     <?php echo form::close(); ?>
+    
 </div>
 
 <?php jquery::addPlugin(array('asmselect', 'dragdrop', 'sortable', 'ipaddress')); ?>

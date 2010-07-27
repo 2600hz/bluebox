@@ -1,5 +1,4 @@
-<?php
-defined('SYSPATH') or die('No direct access allowed.');
+<?php defined('SYSPATH') or die('No direct access allowed.');
 /*
 * Bluebox Modular Telephony Software Library / Application
 *
@@ -31,105 +30,68 @@ defined('SYSPATH') or die('No direct access allowed.');
 class TrunkManager_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'Trunk';
-    protected $writable = array(
-        'name',
-        'server',
-        'class_type',
-        'context_id'
-    );
-    public $supportedTypes = array();
+    
+    public $supportedTrunkTypes = array();
+
     public function index()
     {
         $this->template->content = new View('generic/grid');
-        // Build a grid with a hidden trunk_id, trunk info, and add an option for the user to select the display columns
-        $this->grid = jgrid::grid('Trunk', array(
-            'caption' => 'Trunks/Gateways',
-            'multiselect' => true
-        ))->add('trunk_id', 'ID', array(
-            'hidden' => true,
-            'key' => true
-        ))->add('name', 'Trunk Name')->add('class_type', 'Type', array(
-            'width' => '50',
-            'search' => false,
-        ))->navButtonAdd('Columns', array(
-            'onClickButton' => 'function () {  $(\'#{table_id}\').setColumns(); }',
-            'buttonimg' => url::base() . 'assets/css/jqGrid/table_insert_column.png',
-            'title' => 'Show/Hide Columns',
-            'noCaption' => true,
-            'position' => 'first'
-        ))->addAction('trunkmanager/edit', 'Edit Trunk', array(
-            'arguments' => 'trunk_id',
-            'width' => '120'
-        ))->addAction('trunkmanager/delete', 'Delete Trunk', array(
-            'arguments' => 'trunk_id',
-            'width' => '120'
-        ))->navGrid(array(
-            'del' => true
-        ));
-        // dont foget to let the plugins add to the grid!
+
+        // Setup the base grid object
+        $grid = jgrid::grid($this->baseModel, array(
+                'caption' => 'Trunks/Gateways',
+            )
+        );
+
+        // Add the base model columns to the grid
+        $grid->add('trunk_id', 'ID', array(
+                'hidden' => true,
+                'key' => true
+            )
+        );
+        $grid->add('name', 'Trunk Name');
+        $grid->add('type', 'Type', array(
+                'width' => '50',
+                'search' => false,
+            )
+        );
+
+        // Add the actions to the grid
+        $grid->addAction('trunkmanager/edit', 'Edit', array(
+                'arguments' => 'trunk_id'
+            )
+        );
+        $grid->addAction('trunkmanager/delete', 'Delete', array(
+                'arguments' => 'trunk_id'
+            )
+        );
+
+        // Let plugins populate the grid as well
+        $this->grid = $grid;
         plugins::views($this);
-        // Produces the grid markup or JSON, respectively
+
+        // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
     }
-    public function add()
+
+    public function prepareUpdateView()
     {
-        // Use the edit view here, too
-        $this->view->title = 'Add a Trunk';
+        parent::prepareUpdateView();
 
-        $this->trunk = new Trunk();
-        // get trunk related form data
-        $frmDataTrunk = $this->input->post('trunk');
-        // check if we have a class type
-        if (!empty($frmDataTrunk['class_type'])) {
-
-            $this->trunk = new $frmDataTrunk['class_type'];
-            $this->trunk->class_type = $frmDataTrunk['class_type'];
-            // TODO: This code needs review. We should really be able to use the same view.
-            $this->view = new View('trunkmanager/edit');
-            $this->view->title = 'Add a Trunk';
-            
-            // Are we supposed to be saving stuff? (received a form post?)
-            if (!empty($_POST['edit_form']) && $this->submitted()) {
-                if ($this->formSave($this->trunk)) {
-                    netlists::addToTrunkAuto($this->trunk);
-                    url::redirect(Router_Core::$controller);
-                }
-            }
-        }
-        // Allow our trunk object to be seen by the view
-        $this->view->trunk = $this->trunk;
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
-        $this->view->supportedTypes = $this->supportedTypes;
+        $this->view->supportedTrunkTypes = $this->supportedTrunkTypes;
     }
-    public function edit($id)
+
+    protected function save_succeeded(&$object)
     {
-        $this->view->title = 'Edit Trunk';
+        netlists::addToTrunkAuto($object);
         
-        $this->trunk = Doctrine::getTable('Trunk')->find($id);
-        // Was anything retrieved? If no, this may be an invalid request
-        if (!$this->trunk) {
-            $error = i18n('Unable to locate trunk id %1$d!', $id)->sprintf()->s();
-            message::set($error, array(
-                'translate' => false,
-                'redirect' => Router::$controller . '/index'
-            ));
-            return true;
-        }
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
-            if ($this->formSave($this->trunk)) {
-                netlists::addToTrunkAuto($this->trunk);
-                url::redirect(Router_Core::$controller);
-            }
-        }
-        // Allow our trunk object to be seen by the view
-        $this->view->trunk = $this->trunk;
-        // dont foget to let the plugins add to the grid!
-        plugins::views($this);
+        parent::save_succeeded($object);
     }
-    public function delete($id = NULL)
+
+    protected function delete_succeeded(&$object)
     {
-        $this->stdDelete($id);
+        netlists::removeTrunkFromAuto($object);
+
+        parent::delete_succeeded($object);
     }
 }

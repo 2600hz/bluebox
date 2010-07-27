@@ -38,15 +38,14 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
     {
         $xml = Telephony::getDriver()->xml;
 
-        // Add any "global" hooks that come before the processing of any numbers (this is per context)
-        dialplan::start('context_' .$base['context_id']);
-
         // Reference to our XML document, context and extension. Creates the extension & context if does not already exist
         $xml = FreeSwitch::createExtension('number_' .$base['Number']['number_id'], 'main', 'context_' .$base['context_id']);
 
         // Does this number go anywhere?
         if ($base['Number']['class_type'])
         {
+            kohana::log('debug', 'FreeSWITCH -> ADDING NUMBER ' .$base['Number']['number'] .' (' .$base['Number']['number_id'] .') TO CONTEXT ' .$base['context_id']);
+
             // Dialplans are a bit different - we don't want to keep anything that is currently in an extension, in the event it's totally changed
             $xml->deleteChildren();
 
@@ -56,9 +55,24 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
             // Now that the extension and condition fields are created for this number, set our root to inside the condition
             $xml->setXmlRoot($xml->getXmlRoot() . '/condition[@field="destination_number"][@expression="^' .$base['Number']['number'] . '$"]');
 
+            $dialplan = $base['Number']['dialplan'];
+
             // Add an extension-specific prenumber items
             // Note that unlike other dialplan adds, this one assumes you're already in the right spot in the XML document for the add
             dialplan::preNumber($base['Number']);
+
+            if (!empty($dialplan['terminate']['action']))
+            {
+                switch($dialplan['terminate']['action'])
+                {
+                    case 'transfer':
+                        $xml->update('/action[@application="set"][@bluebox="settingEndBridge"][@data="hangup_after_bridge=true"]');
+
+                        $xml->update('/action[@application="set"][@bluebox="settingFail"][@data="continue_on_fail=true"]');
+
+                        break;
+                }
+            }
 
             // Add related final destination XML
             $destinationDriverName = Telephony::getDriverName() .'_' .substr($base['Number']['class_type'], 0, strlen($base['Number']['class_type']) - 6) .'_Driver';
@@ -81,22 +95,61 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
             // Add an anti-action / failure route for this dialplan
             // Note that unlike other dialplan adds, this one assumes you're already in the right spot in the XML document for the add
             dialplan::postNumber($base['Number']);
+
+            if (!empty($dialplan['terminate']['action']))
+            {
+                switch($dialplan['terminate']['action'])
+                {
+                    case 'transfer':
+                        if($transfer = fs::getTransferToNumber($dialplan['terminate']['transfer']))
+                        {
+                            $xml->update('/action[@application="transfer"][@data="' .$transfer .'"]');
+                        }
+                        else
+                        {
+                            $xml->update('/action[@application="hangup"]');
+                        }
+
+                        break;
+                    case 'hangup':
+                        $xml->update('/action[@application="hangup"]');
+                    
+                        break;
+                }
+            }
         } 
         else
         {
+            kohana::log('debug', 'FreeSWITCH -> REMOVING NUMBER ID ' .$base['Number']['number_id'] .' FROM CONTEXT ' .$base['context_id']);
+
             $xml->deleteNode();
         }
-
-        // Add any "global" hooks that come after the processing of any numbers (this is per context)
-        dialplan::end('context_' .$base['context_id']);
     }
 
     public static function delete($base)
     {
+        $identifier = $base->identifier();
+
+        $context_id = $base['context_id'];
+
+        if (!empty($identifier['context_id']))
+        {
+            $context_id = $identifier['context_id'];
+        }
+
+        $number_id = $base['number_id'];
+
+        if (!empty($identifier['number_id']))
+        {
+            $number_id = $identifier['number_id'];
+        }
+
+        kohana::log('debug', 'FreeSWITCH -> REMOVING NUMBER ID ' .$number_id .' FROM CONTEXT ' .$context_id);
+
         $xml = Telephony::getDriver()->xml;
 
         // Reference to our XML document & context
-        $xml->setXmlRoot(sprintf('//document/section[@name="dialplan"]/context[@name="context_' .$base['context_id'] . '"]/extension[@name="%s"]', 'main_number_' .$base['Number']['number_id']));
+        $xml->setXmlRoot(sprintf('//document/section[@name="dialplan"]/context[@name="context_%s"]/extension[@name="%s"]', $context_id, 'main_number_' .$number_id));
 
         $xml->deleteNode();
     }
