@@ -1,4 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
+
 class Timezone_Configure extends Bluebox_Configure
 {
     public static $version = 1.0;
