@@ -241,14 +241,13 @@ class GlobalMedia_Controller extends Bluebox_Controller
                   
                     if ($this->upload($_FILES['upload']['tmp_name'], $uploadfile, $this->soundPath, $description, TRUE)) {
                         message::set('Uploaded file', 'success');
+                        
                     }
                     break;
 
                 default:
                     message::set('Unknown error');
             }
-
-            $this->returnQtipAjaxForm();
         }
 
         $this->view->soundPath = $this->soundPath;
@@ -297,7 +296,9 @@ class GlobalMedia_Controller extends Bluebox_Controller
             } else {
                 Kohana::log('debug', 'SKIPPED DB UPDATE - Nothing to update on ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
             }
+                message::set('Successfully updated audio file in the system.');
 
+                url::redirect(Router_Core::$controller . '/index');
         } else {
             // NEW FILE! Do lots of stuff
 
@@ -329,21 +330,36 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
             $mediaFile->save();
 
+            message::set('Successfully added audio file to the system.');
+
+            url::redirect(Router_Core::$controller . '/index');
         }
     }
 
-    public function createFolder($path = NULL) {
-        if (isset($_POST['path'])) {
-            /* check if folder exists */
-            if (!is_dir($this->uploadPath)) {
-                if (!filesystem::createDirectory($this->uploadPath)) {
-                    message::set('The path ' . $this->uploadPath . 'does not exist and could not be created!');
-                    return false;
-                }
+    public function create() {
+        if (isset($_POST['path']) and isset($_POST['newfolder'])) {
+            if ($this->createFolder($this->soundPath . $_POST['path'] . '/' . $_POST['newfolder'])) {
+                message::set('Folder created.');
+
+                url::redirect(Router_Core::$controller . '/index');
+            } else {
+                message::set('The path ' . $_POST['path'] . ' does not exist and could not be created!');
             }
         }
-        
+
+        plugins::views($this);
+
         $this->view->soundPath = $this->soundPath;
+    }
+
+    /**
+     * Helper function to create a directory if it doesn't exist.
+     * @param <type> $path Path to dir to create
+     * @return <type>
+     */
+    private function createFolder($path) {
+        /* check if folder exists */
+        return (is_dir($path) or filesystem::createDirectory($path));
     }
 
     /*public function qtipAjaxReturn($data) {

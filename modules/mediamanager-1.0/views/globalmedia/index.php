@@ -9,7 +9,7 @@
 
         <p style="margin-top: 10px"><?php echo html::anchor('globalmedia/scan', 'Rescan Folders', array('class' => 'qtipAjaxForm')); ?></p>
         
-        <p style="margin-top: 10px"><?php echo html::anchor('globalmedia/createFolder', 'Create Folder'); ?></p>
+        <p style="margin-top: 10px"><?php echo html::anchor('globalmedia/create', 'Create Folder'); ?></p>
     </div>
 
     <div class="topbar">
