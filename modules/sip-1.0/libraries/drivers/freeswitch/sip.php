@@ -25,6 +25,20 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/params/param[@name="dial-string"]{@value="' . '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}"}');
 
+            if ($base['context_id'] > 0)
+            {
+                $xml->update('/variables/variable[@name="user_context"]{@value="context_' .$base['context_id'] . '"}');
+
+                 // In most cases, the call transfer context should match the default context
+                $xml->update('/variables/variable[@name="force_transfer_context"]{@value="context_' .$base['context_id'] . '"}');
+            }
+            else
+            {
+                $xml->deleteNode('/variables/variable[@name="user_context"]');
+
+                $xml->deleteNode('/variables/variable[@name="force_transfer_context"]');
+            }
+
             $xml->update('/variables/variable[@name="toll_allow"]{@value="domestic"}');
 
             $xml->update('/variables/variable[@name="accountcode"]{@value="' .$sip['username'] .'"}');

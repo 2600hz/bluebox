@@ -59,7 +59,7 @@
                         <?php
                             if (!empty($target['quick_add']))
                             {
-                                echo html::anchor($target['quick_add'] ,'<span>Add New ' .$target['display_name'] .'</span>', array('class' => 'qtipAjaxForm'));
+                                echo html::anchor($target['quick_add'] ,'<span>' .__('Add New ' .$target['display_name']) .'</span>', array('class' => 'qtipAjaxForm'));
                             }
                         ?>
                         

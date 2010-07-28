@@ -59,7 +59,30 @@ class NumberManager_Plugin extends Bluebox_Plugin
 
         $subview->section = 'number_contexts';
 
-        $subview->contexts = numbermanager::getContexts($this->number);
+        $order = array();
+        
+        foreach($this->number['NumberContext'] as $key => $context)
+        {
+            $order[$context['context_id']] = $key;
+        }
+
+        $contexts = numbermanager::getContexts($this->number);
+
+        $subview->contexts = array();
+
+        foreach($contexts['contexts'] as $key => $context)
+        {
+            $subview->contexts[$context['context_id']] = $context['name'];
+
+            if (isset($order[$context['context_id']]))
+            {
+                continue;
+            }
+
+            $order[$context['context_id']] = count($order);
+        }
+        
+        $subview->order = $order;
 
         $this->views[] = $subview;
     }

@@ -26,7 +26,7 @@ The FreeSWITCH PHP/ESL module is avaliable and loaded.
 <?php endif; ?>
 
 == HELP ==
-Use the buttons below to send requests directly to FreeSWITCH. You can get help and more information in the IRC channel #bluebox-dev on irc.freenod.net.
+Use the buttons below to send requests directly to FreeSWITCH. You can get help and more information in the IRC channel #2600hz on irc.freenod.net.
 
     </textarea>
     <hr />

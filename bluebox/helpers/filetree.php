@@ -85,7 +85,7 @@ class filetree {
                                             $subTree = self::php_file_tree_dir("$directory/$this_file", $return_link ,$extensions, $excludeRegEx, false, $depthDir . $this_file . '/');
                                             if (!$subTree) {
                                                 $link = $return_link;
-                                                $link = str_replace("[link]", $depthDir . urlencode($this_file) . '/', $return_link);
+                                                $link = str_replace("[link]", $depthDir . urlencode($this_file), $return_link);
                                             }
 
                                             // Add current element
@@ -108,5 +108,25 @@ class filetree {
             return $php_file_tree;
     }
 
+
+    public static function file_tree_dir($directory, $directoriesOnly = FALSE, $excludeRegEx = NULL) {
+        $matches = array();
+        $basePath = $directory;
+
+        // Initialize iterator
+        $dir_iterator = new RecursiveDirectoryIterator($directory);
+        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+
+        foreach ($iterator as $name => $data) if (preg_match($excludeRegEx, $name) == 0) {
+            $name = str_replace($basePath, '', $name);
+            if ($data->isDir()) {
+                $matches[$name] = $name;
+            } elseif (!$directoriesOnly) {
+                $matches[$name] = $name;
+            }
+        }
+
+        return $matches;
+    }
 
 }

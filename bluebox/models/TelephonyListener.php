@@ -38,7 +38,7 @@ class TelephonyListener extends Doctrine_EventListener
             if ($base)
             {
                 Kohana::log('debug', 'Telephony -> Instantiated our telephony driver to handle new transaction');
-                
+
                 Telephony::setDriver(Kohana::config('telephony.driver'));
 
                 TelephonyListener::$changedModels = array();
@@ -52,7 +52,7 @@ class TelephonyListener extends Doctrine_EventListener
         // THIS IS WHERE WE UPDATE VIA THE SWITCH-SPECIFIC DRIVER!
         if (Kohana::config('telephony.driver') && Kohana::config('telephony.diskoutput'))
         {
-            if (!empty(self::$changedModels)) 
+            if (!empty(self::$changedModels))
             {
                 Kohana::log('debug', 'Telephony -> Creating config from saved models in memory.');
 
@@ -63,11 +63,11 @@ class TelephonyListener extends Doctrine_EventListener
                     if (!empty($change['baseModel']))
                     {
                         Bluebox_Record::setBaseSaveObject($change['baseModel']);
-                    } 
+                    }
                     else
                     {
                         Kohana::log('alert', 'Telephony -> The record ' . get_class($change['record']) . ' did not have the baseModel set!');
-                        
+
                         continue;
                     }
 
@@ -75,17 +75,17 @@ class TelephonyListener extends Doctrine_EventListener
                     {
                         case 'update':
                         case 'insert':
-                            Telephony::set($change['record']);
+                            Telephony::set($change['record'], $change['identifier']);
 
                             break;
 
                         case 'delete':
-                            Telephony::delete($change['record']);
+                            Telephony::delete($change['record'], $change['identifier']);
 
                             break;
 
                         default:
-                            Kohana::log('debug', 'An unknown action (' . $change['action'] . ') was performed on model ' . get_class($change['record']));
+                            Kohana::log('debug', 'An unknown action (' . $change['action'] . ') was performed on model ' .get_class($change['record']));
 
                             break;
                     }

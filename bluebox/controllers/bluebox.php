@@ -72,6 +72,26 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->session->set('ajax.base_method', strtolower(Router::$method));
         }
 
+        // Instantiate internationalization
+        $this->i18n = i18n::instance();
+
+        /**
+         * TODO: This is so nasty...
+         */
+        if (!empty($_POST['lang']))
+        {
+            if (empty(i18n::$langs[$_POST['lang']]))
+            {
+                die();
+            }
+
+            $this->session->set('lang', $_POST['lang']);
+
+            echo i18n::$langs[$_POST['lang']];
+
+            die();
+        }
+
         // Create a static validator, if one does not already exist. By default we populate it with post variables
         // This will hold all errors that occur within Doctrine and provides easy access for the controller to grab those errors
         // Note carefully that this is intentionally a singleton - Doctrine does not otherwise know which controller is associated
@@ -316,6 +336,10 @@ abstract class Bluebox_Controller extends Template_Controller
             'requestVar' => 'submit'
         );
 
+        //$options['cancelString'] = __($options['cancelString']);
+
+        $options['submitString'] = __($options['submitString']);
+
         // if the requestVar is empty then we will only check for the
         // existance of any post vars
         if (!empty($options['requestVar']))
@@ -383,6 +407,16 @@ abstract class Bluebox_Controller extends Template_Controller
             } 
             else
             {
+                if (!empty($this->template->title))
+                {
+                    $this->template->title = __($this->template->title);
+                }
+
+                if (!empty($this->view->title))
+                {
+                    $this->view->title = __($this->view->title);
+                }
+
                 // Add some makers so we now where to place jquery assets
                 $this->template->js .= "\n{js}";
                 $this->template->css .= "\n{css}";
@@ -655,6 +689,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted())
         {
+            Event::run('bluebox.updateOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formSave($base)))
             {
                 $this->returnQtipAjaxForm($base);
@@ -674,6 +710,8 @@ abstract class Bluebox_Controller extends Template_Controller
     {
         if ($action = $this->submitted(array('submitString' => 'delete')))
         {
+            Event::run('bluebox.deleteOnSubmit', $action);
+
             if (($action == self::SUBMIT_CONFIRM) AND ($this->formDelete($base)))
             {
                 $this->returnQtipAjaxForm(NULL);
@@ -871,8 +909,4 @@ abstract class Bluebox_Controller extends Template_Controller
         // Let things respond to a failed save
         Event::run('bluebox.save_failed', $object);
     }
-}
-
-function __($text) {
-    return $text;
 }

@@ -1,3 +1,10 @@
+<?php
+    $netmask = array();
+    for ($i = 32; $i > 0; $i--) {
+        $netmask[$i] = '/' . $i;
+    }
+?>
+
 <div id="netlistmanager_update_header" class="clmanager module_header">
 
     <h2><?php echo __($title); ?></h2>
@@ -39,7 +46,7 @@
     <?php
         echo form::label('allow_range', '...Or Add a New Range:');
         echo form::input('allow_range_in', '');
-        echo form::dropdown('allow_range_mask', array('32' => '/32', '24' => '/24'));
+        echo form::dropdown('allow_range_mask', $netmask);
         echo form::button('add_allow_btn', 'Add');
     ?>
     </div>
@@ -59,7 +66,7 @@
     <?php
         echo form::label('deny_range', '...Or Add a New Range:');
         echo form::input('deny_range_in', '');
-        echo form::dropdown('deny_range_mask', array('32' => '/32', '24' => '/24'));
+        echo form::dropdown('deny_range_mask', $netmask);
         echo form::button('add_deny_btn', 'Add');
     ?>
     </div>

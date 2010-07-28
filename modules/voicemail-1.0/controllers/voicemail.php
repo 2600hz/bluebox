@@ -23,7 +23,6 @@ class Voicemail_Controller extends Bluebox_Controller
         $grid->add('name', 'Mailbox Name');
         $grid->add('mailbox', 'Mailbox');
         $grid->add('email_address', 'Email', array(
-                'align' => 'center',
                 'callback' => array(
                     'function' => array($this, '_showEmail'),
                     'arguments' =>  array('registry')

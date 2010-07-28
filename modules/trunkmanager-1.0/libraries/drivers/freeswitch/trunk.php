@@ -55,7 +55,7 @@ class FreeSwitch_Trunk_Driver extends FreeSwitch_Base_Driver
 
             if (empty($interface) OR $interface != $oldInterface)
             {
-                $xml = FreeSwitch::setSection('trunk', 'sipinterface_' .$oldInterface, 'trunk_' . $trunk['trunk_id']);
+                $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$oldInterface, 'trunk_' . $trunk['trunk_id']);
 
                 $xml->deleteNode();
             }
