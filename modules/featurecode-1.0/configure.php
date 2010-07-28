@@ -17,11 +17,11 @@ class FeatureCode_Configure extends Bluebox_Configure
     );
     public static $navIcon = 'assets/img/icons/mainSettingsX.png';
     public static $navLabel = 'Feature Codes';
-    public static $navBranch = '/Destinations/';
+    public static $navBranch = '/Applications/';
     public static $navURL = 'featurecode/index';
 
     public static $navSubmenu = array(
         'Search Feature Codes' => '/featurecode/index'
-        ,'Add Feature Codes' => '/featurecode/add'
+        ,'Add Feature Codes' => '/featurecode/create'
     );
 }

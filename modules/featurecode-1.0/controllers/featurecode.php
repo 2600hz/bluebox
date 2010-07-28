@@ -79,7 +79,7 @@ class FeatureCode_Controller extends Bluebox_Controller {
     $this->view->grid = $this->grid->produce();
   }
 
-  public function add() {
+  public function create() {
     javascript::add('editarea/edit_area_full.js');
     javascript::add('featurecode.js');
     stylesheet::add('featurecode.css');

@@ -1,27 +1,32 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver {
-  public static function set($obj) {
-  }
-
-  public static function delete($obj) {
-  }
-
-  public static function dialplan($obj) {
-    foreach ( self::$dialplanSections as $section ) {
-      self::createExtensionSection($obj, $section);
-    }
-  }
-
-  protected static function createExtensionSection($obj, $section) {
-    kohana::log('debug', 'createExtensionSection ' . $section . ': FC_id(' . $obj->feature_code_id . ')');
-
-    if ( empty($obj->registry[$section]) ) {
-      kohana::log('debug', 'createExtensionSection: No section found. ');
-      return;
+    public static function set($obj) {
     }
 
-    $xml = FreeSWITCH::createExtension('featurecode_' . $obj->feature_code_id, $section);
-    $xml->replaceWithXml($obj->registry[$section]);
-  }
+    public static function delete($obj) {
+    }
+
+    public static function dialplan($number) {
+        $xml = Telephony::getDriver()->xml;
+
+        $destination = $number['Destination'];
+
+        $xml->replaceWithXml($destination['registry']['main']);
+    }
+
+    public static function conditioning()
+    {
+        self::generateXml('conditioning');
+    }
+
+    protected static function generateXml($section) {
+        $features = Doctrine::getTable('FeatureCode')->findAll(Doctrine::HYDRATE_ARRAY);
+        if ($features) foreach ($features as $feature) if (isset($feature['registry'][$section])) {
+            Kohana::log('debug', 'Generating section ' . $section . ' for feature code ' . $feature[feature_code_id]);
+            $xml = FreeSWITCH::createExtension('feature_code_' . $feature['feature_code_id']);
+
+            $xml->replaceWithXml($feature['registry'][$section]);
+        }
+    }
 }
