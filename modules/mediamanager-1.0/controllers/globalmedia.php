@@ -32,8 +32,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
     protected $knownTypes = array('mp3', 'wav', 'ogg');
 
-    protected $soundPath = "/usr/local/freeswitch/sounds/";
-
     public function __construct()
     {
         parent::__construct();
@@ -47,7 +45,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
         stylesheet::add('php_file_tree.css');
 
         // Collect a list of paths in the system, to be displayed as a list
-        $this->view->filetree = filetree::php_file_tree($this->soundPath, "javascript:filterPath('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
+        $this->view->filetree = filetree::php_file_tree(Media::getAudioPath(), "javascript:filterPath('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
 
         // Build a grid with a hidden device_id, device_type, and add an option for the user to select the display columns
         $this->grid = jgrid::grid($this->baseModel, array(
@@ -107,7 +105,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
     public function scan() {
         // TODO: Make this run
         
-        MediaScanner::scan($this->soundPath, $this->knownTypes);
+        MediaScanner::scan(Media::getAudioPath(), $this->knownTypes);
     }
 
     public function details($mediaId) {
@@ -117,18 +115,18 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
     private function locateFile($media, $sampleRate = NULL) {
-        $file = $this->soundPath . $media['file'];
+        $file = Media::getAudioPath() . $media['file'];
 
         // See if the file exists. If not, try adding sample rates to the path
         if (!file_exists($file)) {
             $found = FALSE;
-            $file = $this->soundPath . dirname($media['file']) . '/' . $sampleRate . '/' . basename($media['file']);
+            $file = Media::getAudioPath() . dirname($media['file']) . '/' . $sampleRate . '/' . basename($media['file']);
 
             if (($sampleRate) and (file_exists($file))) {
                 $found = TRUE;
             } else {
                 if (isset($media['registry']['rates'])) foreach ((array)$media['registry']['rates'] as $rate) {
-                    $file = $this->soundPath . dirname($media['file']) . '/' . $rate . '/' . basename($media['file']);
+                    $file = Media::getAudioPath() . dirname($media['file']) . '/' . $rate . '/' . basename($media['file']);
                     if (file_exists($file)) {
                         $found = TRUE;
                         continue;
@@ -237,9 +235,9 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
               case UPLOAD_ERR_OK:
                     $description = (isset($_POST['upload']['description']) ? $_POST['upload']['description'] : '');
-                    $uploadfile = $this->soundPath . $_POST['upload']['path'] . '/' . basename($_FILES['upload']['name']);
+                    $uploadfile = Media::getAudioPath() . $_POST['upload']['path'] . '/' . basename($_FILES['upload']['name']);
                   
-                    if ($this->upload($_FILES['upload']['tmp_name'], $uploadfile, $this->soundPath, $description, TRUE)) {
+                    if ($this->upload($_FILES['upload']['tmp_name'], $uploadfile, Media::getAudioPath(), $description, TRUE)) {
                         message::set('Uploaded file', 'success');
                         
                     }
@@ -250,7 +248,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
             }
         }
 
-        $this->view->soundPath = $this->soundPath;
+        $this->view->soundPath = Media::getAudioPath();
     }
 
     private function upload($tmpfile, $destfile, $basePath, $description = '', $replace = false)
@@ -338,7 +336,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
     public function create() {
         if (isset($_POST['path']) and isset($_POST['newfolder'])) {
-            if ($this->createFolder($this->soundPath . $_POST['path'] . '/' . $_POST['newfolder'])) {
+            if ($this->createFolder(Media::getAudioPath() . $_POST['path'] . '/' . $_POST['newfolder'])) {
                 message::set('Folder created.');
 
                 url::redirect(Router_Core::$controller . '/index');
@@ -349,7 +347,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
         plugins::views($this);
 
-        $this->view->soundPath = $this->soundPath;
+        $this->view->soundPath = Media::getAudioPath();
     }
 
     /**
