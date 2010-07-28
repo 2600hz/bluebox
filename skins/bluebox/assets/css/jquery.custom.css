@@ -58,7 +58,7 @@
 .ui-jqgrid tr.jqgrow td {
     border-right:0 !important;
     border-bottom:1px solid #EEEED7 !important;
-    padding: 2px 4px;
+    padding: 2px 10px;
 }
 .ui-jqgrid .action_seperator {
     color:#005f80;
@@ -157,4 +157,8 @@ form.form .field .asmList {
 
 .ui-widget {
     font-size: 11px;
+}
+
+body .ui-jqgrid .ui-jqgrid-htable th {
+    padding: 0 5px;
 }
