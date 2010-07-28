@@ -1,21 +1,14 @@
 <?php
 
 class Media {
-    public static function dropdown()
-    {
-       $files = self::ls($filter);
-        $options = array(0 => __('Select'));
-
-        return form::dropdown($data, $options, $selected, $extra);
-
-    }
-
     public static function files()
     {
         $q = Doctrine_Query::create()->select('f.mediafile_id, f.file, f.description')->from('MediaFile f');
 
         $result = $q->execute(array(), Doctrine::HYDRATE_ARRAY);
 
+        $files = array();
+        
         foreach ($result as $file) {
             $files[$file['mediafile_id']] = $file['file'] . ' (' . substr($file['description'], 0, 30) . (strlen($file['description']) > 30 ? '...' : '') . ')';
         }
