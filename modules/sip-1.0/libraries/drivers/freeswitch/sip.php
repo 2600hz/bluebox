@@ -39,6 +39,8 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
                 $xml->deleteNode('/variables/variable[@name="force_transfer_context"]');
             }
 
+            $xml->update('/variables/variable[@name="user_originated"]{@value="true"}');
+
             $xml->update('/variables/variable[@name="toll_allow"]{@value="domestic"}');
 
             $xml->update('/variables/variable[@name="accountcode"]{@value="' .$sip['username'] .'"}');
