@@ -63,7 +63,8 @@ class NumberManager_Controller extends Bluebox_Controller
             )
         );
         $grid->addAction('numbermanager/rebuild', 'Rebuild', array(
-                'arguments' => 'number_id'
+                'arguments' => 'number_id',
+                'attributes' => array('class' => 'qtipAjaxForm')
             )
         );
         $grid->addAction('numbermanager/delete', 'Delete', array(
@@ -90,6 +91,8 @@ class NumberManager_Controller extends Bluebox_Controller
             $this->number->save();
 
             message::set('Number ' .$this->number['number'] .' dialplan rebuild complete!', 'success');
+
+            parent::save_succeeded($this->number);
         }
         catch (Exception $e)
         {
