@@ -80,7 +80,7 @@ class Numbers
             {
                 if (isset($_POST['number' .$number['number_id']]['registry']))
                 {
-                    Kohana::log('debug', 'Updating registry for number ' .$number['number'] .' (' .$number['number_id'] .')');
+                    //Kohana::log('debug', 'Updating registry for number ' .$number['number'] .' (' .$number['number_id'] .')');
 
                     $base['Number'][$key]['registry'] = arr::merge(
                             $number['registry'],
@@ -90,7 +90,7 @@ class Numbers
 
                 if (isset($_POST['number' .$number['number_id']]['dialplan']))
                 {
-                    Kohana::log('debug', 'Updating dialplan for number ' .$number['number'] .' (' .$number['number_id'] .')');
+                    //Kohana::log('debug', 'Updating dialplan for number ' .$number['number'] .' (' .$number['number_id'] .')');
 
                     $base['Number'][$key]['dialplan'] = arr::merge(
                             $number['dialplan'],
@@ -144,7 +144,7 @@ class Numbers
 
             if (isset($_POST['number' .$number_id]['registry']))
             {
-                Kohana::log('debug', 'Updating registry for number ' .$newNumber['number'] .' (' .$number_id .')');
+                //Kohana::log('debug', 'Updating registry for number ' .$newNumber['number'] .' (' .$number_id .')');
 
                 $newNumber['registry'] = arr::merge(
                         $newNumber['registry'],
@@ -154,7 +154,7 @@ class Numbers
 
             if (isset($_POST['number' .$number_id]['dialplan']))
             {
-                Kohana::log('debug', 'Updating dialplan for number ' .$newNumber['number'] .' (' .$number_id .')');
+                //Kohana::log('debug', 'Updating dialplan for number ' .$newNumber['number'] .' (' .$number_id .')');
 
                 $newNumber['dialplan'] = arr::merge(
                         $newNumber['dialplan'],
