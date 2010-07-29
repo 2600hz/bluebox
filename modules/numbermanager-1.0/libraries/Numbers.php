@@ -68,6 +68,11 @@ class Numbers
 
         foreach ($numbers as $key => $number)
         {
+            if (empty($number['number_id']))
+            {
+                continue;
+            }
+            
             if (empty($_POST['numbers']['assigned'][$number['number_id']]))
             {
                 Kohana::log('debug', 'Disassociate number ' .$number['number'] .' (' .$number['number_id'] .') from ' .str_replace('Number', '', $base['Number'][$key]['class_type']) .' ' .$base['Number'][$key]['foreign_id']);
