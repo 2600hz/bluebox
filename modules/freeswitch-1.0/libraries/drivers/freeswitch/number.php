@@ -38,18 +38,30 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
     public static function set($obj)
     {
         // Go create the number related stuff for each context it is assigned to
-        if ($obj->NumberContext) foreach ($obj->NumberContext as $context)
+        if ($obj->NumberContext)
         {
-            FreeSwitch_NumberContext_Driver::set($context);
+            foreach ($obj->NumberContext as $context)
+            {
+                // Add any "global" hooks that come before the processing of any numbers (this is per context)
+                dialplan::start('context_' .$context['context_id']);
+
+                FreeSwitch_NumberContext_Driver::set($context);
+
+                // Add any "global" hooks that come after the processing of any numbers (this is per context)
+                dialplan::end('context_' .$context['context_id']);
+            }
         }
     }
 
     public static function delete($obj)
     {
         // Remove the number from all contexts that is belongs to
-        if ($obj->NumberContext) foreach ($obj->NumberContext as $context)
+        if ($obj->NumberContext)
         {
-            FreeSwitch_NumberContext_Driver::delete($context);
+            foreach ($obj->NumberContext as $context)
+            {
+                FreeSwitch_NumberContext_Driver::delete($context);
+            }
         }
     }
 }

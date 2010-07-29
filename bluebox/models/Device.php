@@ -16,6 +16,7 @@ class Device extends Bluebox_Record
         // COLUMN DEFINITIONS
         $this->hasColumn('device_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('user_id', 'integer', 11, array('unsigned' => true));
+        $this->hasColumn('context_id', 'integer', 11, array('unsigned' => true));
         $this->hasColumn('name', 'string', 100, array('default' => '', 'notnull' => true, 'notblank' => true));
         $this->hasColumn('type', 'string', 50, array('default' => 'SipDevice'));
     }

@@ -71,7 +71,7 @@ class FreeSwitch extends Telephony_Driver
         'directory' => '//document/section[@name="directory"]',
         'dialplan' => '//document/section[@name="dialplan"]/context[@name="%s"]/extension[@name="%s"][@continue="true"]/condition[@field="destination_number"][@expression="%s"]',
         'modules' => '//document/section[@name="configuration"]/configuration[@name="modules.conf"]/modules',
-        'netlist' => '//document/section[@name="configuration"]/configuration[@name="acl.conf"]/network-lists/list[@name="net_list_%s"][@default="%s"]',
+        'netlist' => '//document/section[@name="configuration"]/configuration[@name="acl.conf"]/network-lists/list[@name="net_list_%s"]',
         'conferences' => '//document/section[@name="configuration"]/configuration[@name="conference.conf"]',
         'conference_profile' => '//document/section[@name="configuration"]/configuration[@name="conference.conf"]/profiles/profile[@name="conference_%s"]',
         'sofia' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]',
@@ -361,23 +361,31 @@ class FreeSwitch extends Telephony_Driver
     public function commit()
     {
         // Activate any changed settings on the switch, live
-//        if (!Bluebox_Installer::is_installing()) {
-//            if (class_exists('EslManager', TRUE) && (self::$dirty or self::$aclDirty or self::$sofiaDirty)) {
-//                $esl = new EslManager();
-//                if (self::$dirty) {
-//                    $esl->reloadxml();
-//                }
-//
-//                if (self::$aclDirty) {
-//                    $esl->reloadacl();
-//                }
-//
-//                // NOTE: Sofia reload must come after reloadxml, and also note that sofia reload implies trunk reload so this is an elseif
-//                if (self::$sofiaDirty) {
-//                    $esl->reload('mod_sofia');
-//                }
-//            }
-//        }
+        if (!Bluebox_Installer::is_installing())
+        {
+            if (class_exists('EslManager', TRUE) && (self::$dirty or self::$aclDirty or self::$sofiaDirty))
+            {
+                $esl = new EslManager();
+
+                if (self::$dirty)
+                {
+                    $esl->reloadxml();
+                }
+
+                if (self::$aclDirty)
+                {
+                    $esl->reloadacl();
+                }
+
+                // NOTE: Sofia reload must come after reloadxml,
+                // and also note that sofia reload implies trunk
+                // reload so this is an elseif
+                if (self::$sofiaDirty)
+                {
+                    $esl->reload('mod_sofia');
+                }
+            }
+        }
 
         self::$dirty = FALSE;
 
@@ -478,6 +486,10 @@ class FreeSwitch extends Telephony_Driver
                 return FALSE;
             }
         }
+        else
+        {
+            self::$instance->currentContext = $context;
+        }
 
         if (!$section)
         {
@@ -489,6 +501,10 @@ class FreeSwitch extends Telephony_Driver
             {
                 $section = 'main';  // For regular desinations, add main_ to them by default
             }
+        }
+        else
+        {
+            self::$instance->currentSection = $section;
         }
 
         // Reference to our XML document & context
@@ -587,18 +603,21 @@ class FreeSwitch extends Telephony_Driver
 
         foreach ($paths as $path)
         {
-            foreach (Kohana::config('freeswitch.filemap') as $key => $options) if (isset($options['filename']))
+            foreach (Kohana::config('freeswitch.filemap') as $key => $options) 
             {
-                if (strpos($path, $options['query']) !== FALSE)
+                if (isset($options['filename']))
                 {
-                    // See if this is already in memory
-                    if (!isset($this->sectionsUsed[$key]))
+                    if (strpos($path, $options['query']) !== FALSE)
                     {
-                        $this->sectionsUsed[$key] = TRUE;
+                        // See if this is already in memory
+                        if (!isset($this->sectionsUsed[$key]))
+                        {
+                            $this->sectionsUsed[$key] = TRUE;
 
-                        Kohana::log('debug', 'FreeSWITCH -> For query ' . $path . ' we\'re loading ' . $options['filename']);
+                            Kohana::log('debug', 'FreeSWITCH -> For query ' . $path . ' we\'re loading ' . $options['filename']);
 
-                        Telephony::load($options);
+                            Telephony::load($options);
+                        }
                     }
                 }
             }

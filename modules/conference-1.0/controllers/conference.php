@@ -22,25 +22,21 @@ class Conference_Controller extends Bluebox_Controller
         );
         $grid->add('name', 'Name');
         $grid->add('registry', 'Record?', array(
-                'align' => 'center',
                 'callback' => array($this, '_showRecord')
             )
         );
         $grid->add('pins', 'Has Pin?', array(
-                'align' => 'center',
                 'callback' => array($this, '_hasPin')
             )
         );
 
         // Add the actions to the grid
         $grid->addAction('conference/edit', 'Edit', array(
-                'arguments' => 'conference_id',
-                'width' => '120'
+                'arguments' => 'conference_id'
             )
         );
         $grid->addAction('conference/delete', 'Delete', array(
-                'arguments' => 'conference_id',
-                'width' => '20'
+                'arguments' => 'conference_id'
             )
         );
 
@@ -82,7 +78,18 @@ class Conference_Controller extends Bluebox_Controller
 
     public function _hasPin($pins)
     {
-        return empty($pins) ? 'No' : 'Yes';
+        if (!empty($pins) AND is_array($pins))
+        {
+            foreach($pins as $pin)
+            {
+                if (!empty($pin))
+                {
+                    return 'Yes';
+                }
+            }
+        }
+
+        return 'No';
     }
 
     public function qtipAjaxReturn($data)

@@ -16,6 +16,18 @@
             echo form::input('conference[name]');
         ?>
         </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'conference[pins][0]',
+                    'hint' => 'Leave blank for no pin'
+                ),
+                'Pin:'
+            );
+            echo form::input('conference[pins][0]');
+        ?>
+        </div>
     
     <?php echo form::close_section(); ?>
 
@@ -31,7 +43,7 @@
         <div class="field">
         <?php
             echo form::label('conference[registry][moh_type]', 'Pre-Conference Music');
-            echo form::dropdown('conference[registry][moh_type]');
+            echo form::dropdown('conference[registry][moh_type]', array('local_stream://moh' => 'Music On Hold', 'silence' => 'Silence'));
         ?>
         </div>
 

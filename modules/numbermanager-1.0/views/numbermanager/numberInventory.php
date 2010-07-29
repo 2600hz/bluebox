@@ -26,7 +26,7 @@
 
         <?php endforeach; ?>
 
-        <li><a href="#assign_new_number"><span>Add Assignment</span></a></li>
+        <li><a href="#assign_new_number"><span><?php echo __('Add Assignment'); ?></span></a></li>
 
     </ul>
 
@@ -47,7 +47,7 @@
 
             <div style="text-align: right; padding-bottom: 5px;" class="avaliable_numbers_quick_add">
 
-                <?php echo html::anchor('/numbermanager/create/' .$class_type ,'<span>Add New Number</span>', array('class' => 'qtipAjaxForm')); ?>
+                <?php echo html::anchor('/numbermanager/create/' .$class_type ,'<span>' .__('Add New Number') .'</span>', array('class' => 'qtipAjaxForm')); ?>
 
             </div>
 

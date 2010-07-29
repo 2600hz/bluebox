@@ -52,11 +52,11 @@
 }
 #navCategories li:hover {
     color:white;
-    background:#75A51F;
+    background:#005f80;
 }
 #navCategories li.current_category {
     color:white;
-    background:#75A51F;
+    background:#005f80;
 }
 
 /* Layout for the modules list

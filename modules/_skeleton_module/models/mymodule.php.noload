@@ -1,0 +1,47 @@
+<?php defined('SYSPATH') or die('No direct access allowed.');
+/**
+ * @author Your Name <your@email.org>
+ * @license Your License
+ * @package _Skeleton
+ */
+
+class MyModule extends Bluebox_Record
+{
+    function setTableDefinition()
+    {
+        $this->hasColumn('my_module_id', 'integer', 11, array('primary' => true, 'unsigned' => true, 'autoincrement' => true));
+        $this->hasColumn('mydatafield1', 'integer', 11);
+        $this->hasColumn('mydatafield2', 'string', 200, array('notnull' => true, 'notblank' => true));
+        $this->hasColumn('someothermodel_id', 'integer', 11, array('unsigned' => true));        
+    }
+
+    public function setUp()
+    {
+        /*
+        * Relationships
+        */
+        $this->hasOne('SomeOtherModel', array('local' => 'someothermodel_id',
+                'foreign'  => 'someothermodel_id'));
+
+        /*
+        * Behaviors
+        */
+        // Gives plugins a column to attach their data to this module (column
+        // called pluings) and a generic place for data we add that doesnt need
+        // to be indexed (column called registry)
+        $this->actAs('GenericStructure');
+        
+        // Keep track of timestamps on records in this table
+        $this->actAs('Timestampable');
+
+        // Trigger our softswitch driver,
+        // example libraries/drivers/freeswitch/<model name>.php
+        // when this is saved
+        $this->actAs('TelephonyEnabled');
+
+        // Support multitenancy by filtering this table by the users account_id
+        $this->actAs('MultiTenant');
+
+        // other really neat behaviors exists!
+    }
+}

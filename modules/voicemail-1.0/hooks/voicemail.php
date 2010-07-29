@@ -4,8 +4,8 @@
 
     Event::add('numbermanager.collectNumberTargets', array('Voicemails', 'provideNumberTargets'));
 
-    Event::add('numbermanager.collectNumberTerminators', array('Voicemails', 'provideNumberTerminators'));
+    Event::add('numbermanager.collectNumberTerminators', array('Voicemails', 'provideNumberTerminator'));
 
-    //dialplan::register('Voicemail', 'prenumber');
+    dialplan::register('Voicemail', 'prenumber');
     
-    //dialplan::register('Voicemail', 'postnumber');
+    dialplan::register('Voicemail', 'postnumber');

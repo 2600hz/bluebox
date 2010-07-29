@@ -11,30 +11,56 @@ class TelephonyRecordListener extends Doctrine_Record_Listener
     {
         $invoker =& $event->getInvoker();
 
-        if (isset(TelephonyListener::$changedModels[$invoker->getOid()]))
-        {
-            return;
-        }
-
-        if ((get_parent_class($invoker) == 'Bluebox_Record') or (get_parent_class($invoker) == 'Doctrine_Record'))
-        {
-            $modelName = get_class($invoker);
-        } 
-        else
-        {
-            $modelName = get_parent_class($invoker);
-        }
-
         $baseModel = Bluebox_Record::getBaseTransactionObject();
-        
+
         $identifier = $invoker->identifier();
 
-        $identifier = implode(', ', $identifier);
-
-        Kohana::log('debug', 'Telephony -> Queuing update of ' .get_class($invoker) .'(' .$modelName .') ' .$identifier .' with OID ' .$invoker->getOid() .' on base model ' .get_class($baseModel));
-
         // We do this because we can't set configs until we have saved all related models that may have an auto increment!
-        TelephonyListener::$changedModels[$invoker->getOid()] = array('action' => 'update', 'record' => &$invoker, 'baseModel' => $baseModel);
+        TelephonyListener::$changedModels[$invoker->getOid()] = array('action' => 'update', 'record' => &$invoker, 'baseModel' => $baseModel, 'identifier' => $identifier);
+
+        $checkFor = get_class($invoker) .'Number';
+
+        if (!class_exists($checkFor))
+        {
+            return TRUE;
+        }
+
+        if (isset($invoker['Number'][0]))
+        {
+            foreach($invoker['Number'] as &$number)
+            {
+                if (! ($number instanceof Bluebox_Record))
+                {
+                    continue;
+                }
+
+                $identifier = $number->identifier();
+
+                $OID = $number->getOid();
+
+                if (empty(TelephonyListener::$changedModels[$OID]))
+                {
+                    kohana::log('debug', 'Marking associated Number ' .implode(', ', $identifier) .' (' .$number['number'] .')  as dirty on updated model ' .get_class($invoker));
+                }
+
+                // We do this because we can't set configs until we have saved all related models that may have an auto increment!
+                TelephonyListener::$changedModels[$OID] = array('action' => 'update', 'record' => &$number, 'baseModel' => $baseModel, 'identifier' => $identifier);
+            }
+        }
+        else if ($invoker['Number'] instanceof Bluebox_Record)
+        {
+            $identifier = $invoker['Number']->identifier();
+
+            $OID = $invoker['Number']->getOid();
+
+            if (empty(TelephonyListener::$changedModels[$OID]))
+            {
+                kohana::log('debug', 'Marking associated Number ' .implode(', ', $identifier) .' (' .$invoker['Number']['number'] .') as dirty on updated model ' .get_class($invoker));
+            }
+
+            // We do this because we can't set configs until we have saved all related models that may have an auto increment!
+            TelephonyListener::$changedModels[$OID] = array('action' => 'update', 'record' => &$invoker['Number'], 'baseModel' => $baseModel, 'identifier' => $identifier);
+        }
     }
 
     /**
@@ -46,30 +72,12 @@ class TelephonyRecordListener extends Doctrine_Record_Listener
     {
         $invoker =& $event->getInvoker();
 
-        if (isset(TelephonyListener::$changedModels[$invoker->getOid()]))
-        {
-            return;
-        }
-
-        if ((get_parent_class($invoker) == 'Bluebox_Record') or (get_parent_class($invoker) == 'Doctrine_Record'))
-        {
-            $modelName = get_class($invoker);
-        } 
-        else
-        {
-            $modelName = get_parent_class($invoker);
-        }
-        
         $baseModel = Bluebox_Record::getBaseTransactionObject();
 
         $identifier = $invoker->identifier();
 
-        $identifier = implode(', ', $identifier);
-
-        Kohana::log('debug', 'Telephony -> Queuing insert of ' .get_class($invoker) .'(' .$modelName .') ' .$identifier .' with OID ' .$invoker->getOid() .' on base model ' .get_class($baseModel));
-
         // We do this because we can't set configs until we have saved all related models that may have an auto increment!
-        TelephonyListener::$changedModels[$invoker->getOid()] = array('action' => 'insert', 'record' => &$invoker, 'baseModel' => $baseModel);
+        TelephonyListener::$changedModels[$invoker->getOid()] = array('action' => 'insert', 'record' => &$invoker, 'baseModel' => $baseModel, 'identifier' => $identifier);
     }
 
     /**
@@ -81,29 +89,11 @@ class TelephonyRecordListener extends Doctrine_Record_Listener
     {
         $invoker =& $event->getInvoker();
 
-        if (isset(TelephonyListener::$changedModels[$invoker->getOid()]))
-        {
-            return;
-        }
-
-        if ((get_parent_class($invoker) == 'Bluebox_Record') or (get_parent_class($invoker) == 'Doctrine_Record'))
-        {
-            $modelName = get_class($invoker);
-        } 
-        else
-        {
-            $modelName = get_parent_class($invoker);
-        }
-        
         $baseModel = Bluebox_Record::getBaseTransactionObject();
 
         $identifier = $invoker->identifier();
 
-        $identifier = implode(', ', $identifier);
-
-        Kohana::log('debug', 'Telephony -> Queuing delete of ' .get_class($invoker) .'(' .$modelName .') ' .$identifier .' with OID ' .$invoker->getOid() .' on base model ' .get_class($baseModel));
-
         // We do this because we can't set configs until we have saved all related models that may have an auto increment!
-        TelephonyListener::$changedModels[$invoker->getOid()] = array('action' => 'delete', 'record' => &$invoker, 'baseModel' => $baseModel);
+        TelephonyListener::$changedModels[$invoker->getOid()] = array('action' => 'delete', 'record' => &$invoker, 'baseModel' => $baseModel, 'identifier' => $identifier);
     }
 }

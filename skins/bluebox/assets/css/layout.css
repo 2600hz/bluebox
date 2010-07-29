@@ -31,10 +31,10 @@ html, body {
     line-height:1.4;
 }
 a {
-    color:#75A51F;
+    color:#005f80;
 }
 a:visited {
-    color:#75A51F;
+    color:#005f80;
 }
 
 
@@ -95,6 +95,24 @@ a:visited {
     padding:0px 25px 25px;
 }
 
+h1 {
+    color:#005F80;
+    font-size:16px;
+    font-weight:bold;
+}
+
+h2 {
+    color:#005F80;
+    font-size:14px;
+    font-weight:bold;
+}
+
+h3 {
+    color:#005F80;
+    font-weight:bold;
+}
+
+
 /* Footer styles
 -------------------------------------------------------------- */
 .footer {
@@ -107,6 +125,9 @@ a:visited {
     padding:0 10px;
 }
 
+
+/*
+// I believe these are old?
 #destination_selector_choices {
     float:left;
     width:100%;
@@ -167,3 +188,4 @@ a:visited {
     height: 80px;
     text-indent:1000px;
 }
+*/

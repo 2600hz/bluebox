@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Bluebox/Libraries/Validation
+ * @author     Darren Schreiber
+ * @license    Mozilla Public License (MPL)
+ */
 class Validation extends Validation_Core
 {
     /**

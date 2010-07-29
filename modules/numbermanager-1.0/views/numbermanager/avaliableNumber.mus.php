@@ -2,7 +2,9 @@
 
     <div style="float: right; margin-top: 10px;" class="field">
 
-        <label for="avaliable_number_{{number_id}}" class="label" id="label_avaliable_number" style="width:160px; font-weight:normal; margin-top: ">Assign this number</label>
+        <label for="avaliable_number_{{number_id}}" class="label" id="label_avaliable_number" style="width:160px; font-weight:normal; margin-top: ">
+            <?php echo __('Assign this number'); ?>
+        </label>
 
         <input type="checkbox" class="checkbox input" value="{{number_id}}" name="numbers[unused][]" id="avaliable_number_{{number_id}}" style="margin-right:15px;">
 

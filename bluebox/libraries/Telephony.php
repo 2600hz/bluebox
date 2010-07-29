@@ -1,11 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * Telephony Driver interface for Bluebox
- *
- * @author Darren Schreiber <d@d-man.org>
- * @license MPL
- * @package TCAPI
- * @subpackage Core
+ * @package    TCAPI
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
  */
 class Telephony
 {
@@ -20,6 +17,8 @@ class Telephony
      */
     public static $driver = NULL;
 
+    public static $identifier = NULL;
+
     /**
      * The driver name to use
      * @var string Driver name to use
@@ -32,7 +31,7 @@ class Telephony
         {
             Telephony::setDriver(Kohana::config('telephony.driver'));
         }
-        
+
         return self::$driverName;
     }
 
@@ -48,6 +47,11 @@ class Telephony
         }
 
         return self::$driver;
+    }
+
+    public static function getIdentifier()
+    {
+        return self::$identifier;
     }
 
     /**
@@ -74,115 +78,18 @@ class Telephony
         }
         else
         {
-            Kohana::log('debug', 'Telephony -> Telephony driver `' .self::$driverName .'` does not exist, ignoring');
+            Kohana::log('debug', 'Telephony -> Driver `' .self::$driverName .'` does not exist, ignoring');
 
             // This class check and NULL return added by KAnderson
             // specificly because during install this class doesnt exists yet...
             self::$driver = NULL;
-            
+
             return self::$driver;
         }
 
     }
 
-    public static function set($obj)
-    {
-        $success = FALSE;
-
-        // Sanity check
-        if (!is_object($obj))
-        {
-            return FALSE;
-        }
-
-        // Initialize telephony driver / check if already initialized
-        $driver = self::getDriver();
-
-        $driverName = get_class($driver);
-        
-        // If no driver is set, just return w/ FALSE.
-        if (!$driver)
-        {
-            return FALSE;
-        }
-
-        // Support for column aggregation automagically as well as special handling of dialplan/numbers
-        if ((get_parent_class($obj) != 'Doctrine_Record') and (get_parent_class($obj) != 'Bluebox_Record')) 
-        {
-            $objectName = get_parent_class($obj);
-        }
-        else
-        {
-            $objectName = get_class($obj);
-        }
-
-        $modelDriverName = $driverName .'_' .$objectName .'_Driver';
-
-        // Does the [Doctrine] object we were just passed contain a relevant driver? If so, call it's driver method
-        if (class_exists($modelDriverName, TRUE))
-        {
-            // Get base model to give to the set() routine, for reference
-            $base = Bluebox_Record::getBaseTransactionObject();
-
-            $identifier = $obj->identifier();
-
-            $identifier = implode(', ', $identifier);
-
-            // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
-            // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
-            // TODO: wrap the eval in a try...catch we need this detail logging for the time being but this will need to be addressed or re-thrown */
-            try
-            {
-                Kohana::log('debug', 'Telephony -> Updating information from ' .get_class($obj) .'(' .$objectName .') ' .$identifier .' with OID ' .$obj->getOid() .' on base model ' .get_class($base));
-                
-                kohana::log('debug', 'EVAL ' . $modelDriverName . '::set($obj, $base);');
-
-                $success = eval('return ' . $modelDriverName . '::set($obj, $base);');
-            } 
-            catch (Exception $e)
-            {
-                Kohana::log('error', 'Telephony -> Eval exception: "' . $objectName . '". ' . $e->getMessage());
-            }
-
-            if (!empty($obj['plugins']))
-            {
-                foreach ($obj['plugins'] as $name => $data)
-                {
-                    $pluginName = ucfirst($name);
-
-                    $pluginDriverName = $driverName .'_' .$pluginName .'_Driver';
-
-                    if (!class_exists($pluginDriverName))
-                    {
-                        continue;
-                    }
-
-                    Kohana::log('debug', 'Telephony -> Updating information from plugin ' .$pluginName .' on ' .$objectName .' ' .$identifier);
-
-                    try
-                    {
-                        kohana::log('debug', 'EVAL ' . $pluginDriverName . '::set($obj, $base);');
-
-                        $success = eval('return ' . $pluginDriverName . '::set($obj, $base);');
-                    }
-                    catch (Exception $e)
-                    {
-                        Kohana::log('error', 'Telephony -> Eval exception: "' . $pluginName . '". ' . $e->getMessage());
-                    }
-                }
-            }
-        } 
-        else
-        {
-            Kohana::log('debug', 'Telephony -> No driver for model "' . $objectName . '" for our telephony configuration...');
-        }
-
-        Kohana::log('debug', 'Telephony -> Done updating information from model "' . $objectName . '".');
-
-        return $success;
-    }
-
-    public static function delete($obj)
+    public static function set($obj, $identifier = NULL)
     {
         $success = FALSE;
 
@@ -207,37 +114,40 @@ class Telephony
         if ((get_parent_class($obj) != 'Doctrine_Record') and (get_parent_class($obj) != 'Bluebox_Record'))
         {
             $objectName = get_parent_class($obj);
+
+            Kohana::log('debug', 'Telephony -> Updating information from ' .$objectName .' (' .get_class($obj) .') ' .implode(', ', $identifier) .' with OID ' .$obj->getOid());
         }
         else
         {
             $objectName = get_class($obj);
+
+            Kohana::log('debug', 'Telephony -> Updating information from ' .$objectName .' ' .implode(', ', $identifier) .' with OID ' .$obj->getOid());
         }
 
-        $modelDriverName = self::$driverName . '_' . $objectName . '_Driver';
+        $modelDriverName = $driverName .'_' .$objectName .'_Driver';
 
         // Does the [Doctrine] object we were just passed contain a relevant driver? If so, call it's driver method
         if (class_exists($modelDriverName, TRUE))
         {
+            self::$identifier = $identifier;
+
             // Get base model to give to the set() routine, for reference
             $base = Bluebox_Record::getBaseTransactionObject();
 
-            $identifier = $obj->identifier();
-
-            $identifier = implode(', ', $identifier);
-            
+            // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
+            // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
+            // TODO: wrap the eval in a try...catch we need this detail logging for the time being but this will need to be addressed or re-thrown */
             try
             {
-                Kohana::log('debug', 'Telephony -> Deleting information from ' .get_class($obj) .'(' .$objectName .') ' .$identifier .' with OID ' .$obj->getOid() .' on base model ' .get_class($base));
+                kohana::log('debug', 'Telephony -> EVAL ' . $modelDriverName . '::set($obj, $base);');
 
-                kohana::log('debug', 'EVAL ' . $modelDriverName . '::delete($obj, $base);');
-
-                $success = eval('return ' . $modelDriverName . '::delete($obj, $base);');
+                $success = eval('return ' . $modelDriverName . '::set($obj, $base);');
             }
             catch (Exception $e)
             {
                 Kohana::log('error', 'Telephony -> Eval exception: "' . $objectName . '". ' . $e->getMessage());
             }
-            
+
             if (!empty($obj['plugins']))
             {
                 foreach ($obj['plugins'] as $name => $data)
@@ -248,6 +158,106 @@ class Telephony
 
                     if (!class_exists($pluginDriverName))
                     {
+                        Kohana::log('debug', 'Telephony -> No telephony plugin driver for set of "' . $objectName . '" records...');
+
+                        continue;
+                    }
+
+                    Kohana::log('debug', 'Telephony -> Updating information from plugin ' .$pluginName .' on ' .$objectName .' ' .implode(', ', $identifier));
+
+                    try
+                    {
+                        kohana::log('debug', 'Telephony -> EVAL ' . $pluginDriverName . '::set($obj, $base);');
+
+                        $success = eval('return ' . $pluginDriverName . '::set($obj, $base);');
+                    }
+                    catch (Exception $e)
+                    {
+                        Kohana::log('error', 'Telephony -> Eval exception: "' . $pluginName . '". ' . $e->getMessage());
+                    }
+                }
+            }
+
+            self::$identifier = NULL;
+        }
+        else
+        {
+            Kohana::log('debug', 'Telephony -> No telephony module driver for set of "' . $objectName . '" records...');
+        }
+
+        Kohana::log('debug', 'Telephony -> Done updating information from model "' . $objectName . '".');
+
+        return $success;
+    }
+
+    public static function delete($obj, $identifier)
+    {
+        $success = FALSE;
+
+        // Sanity check
+        if (!is_object($obj))
+        {
+            return FALSE;
+        }
+
+        // Initialize telephony driver / check if already initialized
+        $driver = self::getDriver();
+
+        $driverName = get_class($driver);
+
+        // If no driver is set, just return w/ FALSE.
+        if (!$driver)
+        {
+            return FALSE;
+        }
+
+        // Support for column aggregation automagically as well as special handling of dialplan/numbers
+        if ((get_parent_class($obj) != 'Doctrine_Record') and (get_parent_class($obj) != 'Bluebox_Record'))
+        {
+            $objectName = get_parent_class($obj);
+
+            Kohana::log('debug', 'Telephony -> Deleting information from ' .$objectName .' (' .get_class($obj) .') ' .implode(', ', $identifier) .' with OID ' .$obj->getOid());
+        }
+        else
+        {
+            $objectName = get_class($obj);
+
+            Kohana::log('debug', 'Telephony -> Deleting information from ' .$objectName .' ' .implode(', ', $identifier) .' with OID ' .$obj->getOid());
+        }
+
+        $modelDriverName = self::$driverName . '_' . $objectName . '_Driver';
+
+        // Does the [Doctrine] object we were just passed contain a relevant driver? If so, call it's driver method
+        if (class_exists($modelDriverName, TRUE))
+        {
+            self::$identifier = $identifier;
+
+            // Get base model to give to the set() routine, for reference
+            $base = Bluebox_Record::getBaseTransactionObject();
+
+            try
+            {
+                kohana::log('debug', 'Telephony -> EVAL ' . $modelDriverName . '::delete($obj, $base);');
+
+                $success = eval('return ' . $modelDriverName . '::delete($obj, $base);');
+            }
+            catch (Exception $e)
+            {
+                Kohana::log('error', 'Telephony -> Eval exception: "' . $objectName . '". ' . $e->getMessage());
+            }
+
+            if (!empty($obj['plugins']))
+            {
+                foreach ($obj['plugins'] as $name => $data)
+                {
+                    $pluginName = ucfirst($name);
+
+                    $pluginDriverName = $driverName .'_' .$pluginName .'_Driver';
+
+                    if (!class_exists($pluginDriverName))
+                    {
+                        Kohana::log('debug', 'Telephony -> No telephony plugin driver for delete of "' . $objectName . '" records...');
+
                         continue;
                     }
 
@@ -255,7 +265,7 @@ class Telephony
 
                     try
                     {
-                        kohana::log('debug', 'EVAL ' . $pluginDriverName . '::delete($obj, $base);');
+                        kohana::log('debug', 'Telephony -> EVAL ' . $pluginDriverName . '::delete($obj, $base);');
 
                         $success = eval('return ' . $pluginDriverName . '::delete($obj, $base);');
                     }
@@ -266,10 +276,11 @@ class Telephony
                 }
             }
 
+            self::$identifier = NULL;
         }
         else
         {
-            Kohana::log('debug', 'Telephony -> No driver for model "' . $objectName . '" for our telephony configuration...');
+            Kohana::log('debug', 'Telephony -> No telephony module driver for delete of "' . $objectName . '" records...');
         }
 
         Kohana::log('debug', 'Telephony -> Done deleting information from model "' . $objectName . '".');
@@ -298,7 +309,7 @@ class Telephony
         {
             return FALSE;
         }
-            
+
         $driver->load($options);
     }
 
@@ -315,7 +326,7 @@ class Telephony
         {
             return FALSE;
         }
-        
+
         $driver->save($options);
     }
 
@@ -331,7 +342,7 @@ class Telephony
         }
 
         // Go reload the config in memory on the switch
-        $driver->commit();            
+        $driver->commit();
     }
 
     public static function reset()
@@ -342,7 +353,7 @@ class Telephony
         {
             return FALSE;
         }
-        
+
         $driver->reset();
     }
 }

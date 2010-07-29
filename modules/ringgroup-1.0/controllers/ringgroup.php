@@ -7,7 +7,7 @@ class RingGroup_Controller extends Bluebox_Controller
     public function __construct()
     {
         parent::__construct();
-        
+
         javascript::add('mustache');
     }
 
@@ -29,29 +29,22 @@ class RingGroup_Controller extends Bluebox_Controller
         );
         $grid->add('name', 'Ring Group Name');
         $grid->add('strategy', 'Strategy', array(
-                'align' => 'center',
                 'callback' => array($this, '_showStrategy')
             )
         );
-        $grid->add('memberCount', 'Members', array(
+        $grid->add('members', 'Members', array(
                 'search' => false,
-                'align' => 'center',
-                'callback' => array(
-                    'function' => array($this, '_countMembers'),
-                    'arguments' => array('ring_group_id')
-                )
+                'callback' => array($this, '_countMembers')
             )
         );
 
         // Add the actions to the grid
         $grid->addAction('ringgroup/edit', 'Edit', array(
-                'arguments' => 'ring_group_id',
-                'width' => '120'
+                'arguments' => 'ring_group_id'
             )
         );
         $grid->addAction('ringgroup/delete', 'Delete', array(
-                'arguments' => 'ring_group_id',
-                'width' => '20'
+                'arguments' => 'ring_group_id'
             )
         );
 
@@ -63,26 +56,9 @@ class RingGroup_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
-    public function _countMembers($cell, $ring_group_id) {
-        return 0;
-        $rows = Doctrine::getTable('RingGroupMember')->findByRingGroupId($ring_group_id);
-
-        $members = '';
-        foreach($rows as $row)
-        {
-            $device = Doctrine::getTable('Device')->findOneByDeviceId($row['device_id']);
-            if ($device)
-            {
-                $members .= '<p>' .$device->name .' (Device)</p>';
-            }
-        }
-
-        if (empty($members))
-        {
-            return count($rows->toArray());
-        } else {
-            return "<a title='Ring Group Members' tooltip='" .$members ."' class='addInfo' href='#'>" .count($rows->toArray()) .'</a>';
-        }
+    public function _countMembers($members)
+    {
+        return count($members);
     }
 
     public function _showStrategy($cell)

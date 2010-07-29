@@ -44,7 +44,7 @@ class Provisioner_Plugin extends Bluebox_Plugin
     public function removeLine()
     {
         // What are we working with here?
-        $base = Event::$data;
+        $base = $this->getBaseModelObject();
 
         if (empty($base['device_id']))
             return FALSE;	// Nothing to do here.
@@ -94,7 +94,7 @@ class Provisioner_Plugin extends Bluebox_Plugin
     public function removeAllLines()
     {
         // What are we working with here?
-        $base = Event::$data;
+        $base = $this->getBaseModelObject();
 
         // While the field may be defined by an app or another module, it may not be populated! Double-check
         if (empty($base))

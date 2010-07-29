@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-
+/**
+ * @package    Core/Helpers/Dialplan
+ * @author     Darren Schreiber <d@d-man.org>
+ * @license    Mozilla Public License (MPL)
+ */
 class dialplan
 {
     protected static $dialplanSections = array();
@@ -107,5 +111,7 @@ class dialplan
 
         // 7. Any final things to do? Play a goodbye message? A survey? Write a special log? etc.
         $driver->postExecute($context);
+
+        $driver->catchAll($context);
     }
 }

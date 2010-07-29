@@ -17,12 +17,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
         'C:\FreeSWITCH',
         'C:\freeswitch'
     );
-
-    public function index()
-    {
-
-    }
-
+    
     /**
      * Setup the subview for the address plugin
      */
@@ -67,6 +62,8 @@ class Freeswitch_Plugin extends Bluebox_Plugin
         $subview->esl_port = $this->session->get('installer.esl_port', Kohana::config('freeswitch.ESLPort'));
 
         $subview->esl_auth = $this->session->get('installer.esl_auth', Kohana::config('freeswitch.ESLAuth'));
+
+        $subview->audio_root = $this->session->get('installer.audio_root', Kohana::config('freeswitch.audio_root'));
 
         // Get a list of existing sip_profiles and warn the user that these will be deleted
         $sipProfiles = glob(rtrim($subview->cfg_root, '/') . '/sip_profiles/*.xml', GLOB_MARK);
@@ -114,6 +111,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
         // This array maps the telephony returns to the telephony file
         $telephonyOptions = array(
             'cfg_root' => rtrim($this->session->get('installer.cfg_root'), '/'),
+            'audio_root' => rtrim($this->session->get('installer.audio_root'), '/'),
             'ESLHost' => $this->session->get('installer.esl_host'),
             'ESLPort' => $this->session->get('installer.esl_port'),
             'ESLAuth' => $this->session->get('installer.esl_auth')
@@ -123,6 +121,13 @@ class Freeswitch_Plugin extends Bluebox_Plugin
         {
             message::set('Unable to access directory <pre>' .$telephonyOptions['cfg_root'] .'</pre>');
             
+            return false;
+        }
+
+        if ( ! is_dir($telephonyOptions['audio_root']))
+        {
+            message::set('Unable to access directory <pre>' .$telephonyOptions['audio_root'] .'</pre>');
+
             return false;
         }
 
@@ -246,6 +251,8 @@ class Freeswitch_Plugin extends Bluebox_Plugin
             
             return false;
         }
+
+        $this->session->set('installer.default_packages', kohana::config('freeswitch.default_packages'));
 
         return true;
     }
