@@ -3,7 +3,7 @@
     <div class="field">
     <?php
         echo form::label('timezone[timezone]', 'Timezone');
-        echo form::timezones('timezone[timezone]', $timezone['timezone']);
+        echo timezone::dropdown('timezone[timezone]', empty($timezone['timezone']) ? NULL : $timezone['timezone'] );
     ?>
     </div>
 
