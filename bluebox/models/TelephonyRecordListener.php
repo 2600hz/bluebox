@@ -25,7 +25,7 @@ class TelephonyRecordListener extends Doctrine_Record_Listener
             return TRUE;
         }
 
-        if (!isset($invoker['Number'][0]))
+        if (isset($invoker['Number'][0]))
         {
             foreach($invoker['Number'] as &$number)
             {
