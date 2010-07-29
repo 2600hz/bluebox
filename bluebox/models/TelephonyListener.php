@@ -56,6 +56,12 @@ class TelephonyListener extends Doctrine_EventListener
             {
                 Kohana::log('debug', 'Telephony -> Creating config from saved models in memory.');
 
+                foreach (self::$changedModels as $change)
+                {
+                    Kohana::log('debug', 'Telephony -> Preparing to generate configurartion from ' .$change['action'] .' of '
+                            .get_class($change['record']) .' ' .implode(', ', $change['identifier']) .' with OID ' .$change['record']->getOid() .' on base model ' .get_class($change['baseModel']));
+                }
+
                 // Figure out what models were touched and either set or delete based on the action that was done to them
                 // NOTE: Make sure this occurs in the same order it occurred via Doctrine's transaction
                 foreach (self::$changedModels as $change)
