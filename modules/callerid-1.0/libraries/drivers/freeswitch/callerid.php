@@ -100,6 +100,11 @@ class FreeSwitch_CallerId_Driver extends FreeSwitch_Base_Driver
             return;
         }
 
+        if ($number['Destination'] instanceof Device)
+        {
+            return;
+        }
+
         if (!empty($number['Destination']['plugins']['callerid']['internal_name']))
         {
             $internal_name = $number['Destination']['plugins']['callerid']['internal_name'];
