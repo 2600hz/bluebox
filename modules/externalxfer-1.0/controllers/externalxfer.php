@@ -1,142 +1,117 @@
-<?php
-/**
- * ExternalXfer_Controller.php - ExternalXfer Controller
- *
- * Allows you to transfer calls to an external SIP URI or trunk/phone number combination
- *
- * @author Darren Schreiber
- * @license MPL
- * @package Bluebox
- * @subpackage ExternalXfer
- */
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
 class ExternalXfer_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'ExternalXfer';
-    protected $writable = array(
-        'name',
-        'xml',
-        'description'
-    );
 
     public function index()
     {
         $this->template->content = new View('generic/grid');
-        // Buidl a grid with a hidden device_id, device_type, and add an option for the user to select the display columns
-        $this->grid = jgrid::grid($this->baseModel, array(
-            'caption' => 'External Destination',
-            'multiselect' => true
-        ))->add('feautre_code_id', 'ID', array(
-            'hidden' => true,
-            'key' => true
-        ))->add('name', 'Name', array(
-            'width' => '200',
-            'search' => false,
-        ))->add('description', 'Description', array(
-            'width' => '300',
-            'search' => false,
-        ))->navButtonAdd('Columns', array(
-            'onClickButton' => 'function () {  $(\'#{table_id}\').setColumns(); }',
-            'buttonimg' => url::base() . 'assets/css/jqGrid/table_insert_column.png',
-            'title' => 'Show/Hide Columns',
-            'noCaption' => true,
-            'position' => 'first'
-        ))->addAction('externalxfer/edit', 'Edit', array(
-            'arguments' => 'external_xfer_id',
-            'width' => '120'
-        ))->addAction('externalxfer/delete', 'Delete', array(
-            'arguments' => 'external_xfer_id',
-            'width' => '120'
-        ))->navGrid(array(
-            'del' => true
-        ));
-        // dont foget to let the plugins add to the grid!
+
+        // Setup the base grid object
+        $grid = jgrid::grid($this->baseModel, array(
+                'caption' => 'External Destination'
+            )
+        );
+
+        // Add the base model columns to the grid
+        $grid->add('external_xfer_id', 'ID', array(
+                'hidden' => true,
+                'key' => true
+            )
+        );
+        $grid->add('name', 'Name');
+        $grid->add('description', 'Description');
+
+        // Add the actions to the grid
+        $grid->addAction('externalxfer/edit', 'Edit', array(
+                'arguments' => 'external_xfer_id'
+            )
+        );
+        $grid->addAction('externalxfer/delete', 'Delete', array(
+                'arguments' => 'external_xfer_id'
+            )
+        );
+
+        // Let plugins populate the grid as well
+        $this->grid = $grid;
         plugins::views($this);
-        // Produces the grid markup or JSON
+
+        // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
     }
 
-    public function add()
+    protected function prepareUpdateView($baseModel = NULL)
     {
-        $this->template->content = new View(Router::$controller . '/update');
-        $this->view->title = ucfirst(Router::$method) .' External Destination';
-        $this->externalXfer = new ExternalXfer();
+        $route_types = array();
 
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
-            if ($this->formSave($this->externalXfer)) {
-                url::redirect(Router_Core::$controller);
+        $trunkList = array();
+
+        $interfaceList = array();
+
+        if (class_exists('Trunk'))
+        {
+            $trunks = Doctrine::getTable('Trunk')->findAll(Doctrine::HYDRATE_ARRAY);
+
+            foreach($trunks as $trunk)
+            {
+                $trunkList[$trunk['trunk_id']] = $trunk['name'];
             }
-        }
-        $tmp = Doctrine::getTable('Trunk')->findAll(Doctrine::HYDRATE_ARRAY);
-        $this->view->trunks = array();
-        foreach ($tmp as $trunk) {
-            $this->view->trunks[$trunk['trunk_id']] = $trunk['name'];
-        }
 
-        if (class_exists('SipInterface', TRUE)) {
-            $tmp = Doctrine::getTable('SipInterface')->findAll(Doctrine::HYDRATE_ARRAY);
-            $this->view->interfaces = array();
-            foreach ($tmp as $interface) {
-                $this->view->interfaces[$interface['sipinterface_id']] = $interface['name'];
+            if (!empty($trunkList))
+            {
+                $route_types[ExternalXfer::TYPE_TRUNK] = 'via Trunk';
             }
         }
 
-        // Allow our device object to be seen by the view
-        $this->view->externalXfer = $this->externalXfer;
+        if (class_exists('SipInterface'))
+        {
+            $interfaces = Doctrine::getTable('SipInterface')->findAll(Doctrine::HYDRATE_ARRAY);
 
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
+            foreach($interfaces as $interface)
+            {
+                $interfaceList[$interface['sipinterface_id']] = $interface['name'];
+            }
+
+            if (!empty($interfaceList))
+            {
+                $route_types[ExternalXfer::TYPE_SIP] = 'via SIP URI';
+            }
+        }
+
+        if (empty($route_types))
+        {
+            message::set('No Trunk or Sip Interfaces avaliable to route external destinations through!');
+
+            $this->returnQtipAjaxForm(NULL);
+
+            url::redirect(Router_Core::$controller);
+        }
+
+        $this->view->trunks = $trunkList;
+
+        $this->view->interfaces = $interfaceList;
+
+        $this->view->route_types = $route_types;
+
+        parent::prepareUpdateView($baseModel);
     }
 
-    public function edit($id = NULL)
+    public function qtipAjaxReturn($data)
     {
-        $this->template->content = new View(Router::$controller . '/update');
-        $this->view->title = ucfirst(Router::$method) .' External Destination';
-        $this->externalXfer = Doctrine::getTable('ExternalXfer')->find($id);
+        if (!empty($data['external_xfer_id']))
+        {
+            $object['numbermanager'] = array(
+                'object_name' => $data['name'],
+                'object_description' => 'External Transfer',
+                'object_number_type' => 'ExternalXferNumber',
+                'object_id' =>  $data['external_xfer_id'],
+                'short_name' => 'externalxfer'
+            );
 
-        // Was anything retrieved? If no, this may be an invalid request
-        if (!$this->externalXfer) {
-            // Send any errors back to the index
-            $error = i18n('Unable to locate External Destination id %1$d!', $id)->sprintf()->s();
-            message::set($error, array(
-                'translate' => false,
-                'redirect' => Router::$controller . '/index'
-            ));
-            return true;
+            Event::run('ajax.updateobject', $object);
         }
 
-        if ($this->submitted()) {
-            // Force rebuild of dialplan for these numbers
-            $this->externalXfer->_dirtyNumbers = array('type' => 'ExternalXferNumber', 'id' => 'external_xfer_id');
-
-            if ($this->formSave($this->externalXfer)) {
-                url::redirect(Router_Core::$controller);
-            }
-        }
-
-        $tmp = Doctrine::getTable('Trunk')->findAll(Doctrine::HYDRATE_ARRAY);
-        $this->view->trunks = array();
-        foreach ($tmp as $trunk) {
-            $this->view->trunks[$trunk['trunk_id']] = $trunk['name'];
-        }
-
-        if (class_exists('SipInterface', TRUE)) {
-            $tmp = Doctrine::getTable('SipInterface')->findAll(Doctrine::HYDRATE_ARRAY);
-            $this->view->interfaces = array();
-            foreach ($tmp as $interface) {
-                $this->view->interfaces[$interface['sipinterface_id']] = $interface['name'];
-            }
-        }
-
-        // Allow our destination object to be seen by the view
-        $this->view->externalxfer = $this->externalXfer;
-
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
-    }
-
-    public function delete($id)
-    {
-        $this->stdDelete($id);
+        parent::qtipAjaxReturn($data);
     }
 }

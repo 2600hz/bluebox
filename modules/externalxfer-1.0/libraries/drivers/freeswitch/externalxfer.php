@@ -28,39 +28,78 @@
  * @package Bluebox
  * @subpackage ExternalXfer
  */
-class FreeSwitch_ExternalXfer_Driver extends FreeSwitch_Base_Driver {
-    public static function set($obj) {
+class FreeSwitch_ExternalXfer_Driver extends FreeSwitch_Base_Driver
+{
+    public static function set($obj)
+    {
 
     }
 
-    public static function delete($obj) {
+    public static function delete($obj)
+    {
         
     }
 
-    public static function dialplan()
+    public static function dialplan($number)
     {
         $xml = Telephony::getDriver()->xml;
-        kohana::log('debug', 'Saving external destination to dialplan');
-        $timeout = (isset($obj->options['timeout']) ? $obj->options['timeout'] : 30);
 
-        if ($obj->ExternalXfer->route_type == 1) {
-            $dialstring = 'sofia/';
-        } else {
-            $dialstring = 'sofia/';
+        $destination = $number['Destination'];
+
+        if ($destination instanceof ExternalXfer)
+        {
+            $numberOptions = fs::getNumberOptions($number);
+
+            switch($destination['route_type'])
+            {
+                case ExternalXfer::TYPE_SIP:
+
+                    if (empty($destination['route_details']['interface']) OR empty($destination['route_details']['sipuri']))
+                    {
+                        
+                    }
+
+                    $dialstring = 'sofia/sipinterface_' .$destination['route_details']['interface'] .'/' .$destination['route_details']['sipuri'];
+
+                    break;
+                    
+                case ExternalXfer::TYPE_TRUNK:
+                    
+                    if (empty($destination['route_details']['trunk']) OR empty($destination['route_details']['number']))
+                    {
+
+                    }
+
+                    $dialstring = 'sofia/gateway/trunk_' .$destination['route_details']['trunk'] .'/' .$destination['route_details']['number'];
+                    
+                    break;
+            }
+
+            $dialstring = str_replace(array('/', '@'), array('\/', '\@'), $dialstring);
+
+            if (empty($dialstring))
+            {
+                return;
+            }
+
+            $xml->update('/action[@application="set"][@bluebox="settingTimeout"]{@data="call_timeout=' .$numberOptions['timeout'] .'"}');
+
+            $xml->update('/action[@application="set"][@bluebox="settingRing"]{@data="ringback=' . $numberOptions['ringtype'] . '"}');
+
+            $xml->update('/action[@application="set"][@bluebox="settingRingXfer"]{@data="transfer_ringback=' . $numberOptions['ringtype'] . '"}');
+
+            if (!empty($destination['plugins']['callerid']['internal_name']))
+            {
+                $xml->update('/action[@application="export"][@bluebox="sipCalleeIdName"]{@data="sip_callee_id_name=' .$destination['plugins']['callerid']['internal_name'] .'"}');
+            }
+            else
+            {
+                $xml->update('/action[@application="export"][@bluebox="sipCalleeIdName"]{@data="sip_callee_id_name=' .$destination['name'] .'"}');
+            }
+
+            $xml->update('/action[@application="export"][@bluebox="sipCalleeIdNumber"]{@data="sip_callee_id_number=' .$number['number'] .'"}');
+
+            $xml->update('/action[@application="bridge"]{@data="' .$dialstring .'"}');
         }
-
-        $xml->update('/action[@application="set"][@bluebox="hangup_after_bridge"]{@data="hangup_after_bridge=true"}');
-        $xml->update('/action[@application="set"][@bluebox="continue_on_fail"]{@data="continue_on_fail=true"}');
-        $xml->update('/action[@application="set"][@bluebox="call_timeout"]{@data="call_timeout=' . $timeout . '"}');
-        $xml->update('/action[@application="bridge"]{@data="{' . $dialstring . '}"}');
-
-        // Nobody answered?
-        // Grab the destination we're routing to. We don't care which context we end up in per say, as long as it's the right destination.
-        // TODO: Handle contexts better?
-        //if (!empty($obj->options['fallback_number_id']) and $obj->options['fallback_number_context']) {
-        //    $context = $obj->RingGroup->FallbackNumber->NumberContext[0]->context_id;
-        //    $xml->update('/action[@application="transfer"]{@data="' . $obj->RingGroup->FallbackNumber->number . ' XML context_' . $context. '"}');
-        //}
-
     }
 }

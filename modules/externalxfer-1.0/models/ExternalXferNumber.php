@@ -32,9 +32,8 @@
  * @package Bluebox
  * @subpackage Core
  */
-
-
-class ExternalXferNumber extends Number {
+class ExternalXferNumber extends Number
+{
     public static $description = 'ExternalXfer';
 
     public function setUp()
@@ -49,15 +48,15 @@ class ExternalXferNumber extends Number {
         // Relate the conference (conference_id) with a generic number identifier (foreign_id) in the Number class.
         // Note carefully that this only works because this model is related to Number
         // The Number class has some "magic" that auto relates the class
-        $this->hasOne('ExternalXfer', array('local'   => 'foreign_id',
-                                          'foreign' => 'external_xfer_id',
-                                          'owningSide' => FALSE));
+        $this->hasOne('ExternalXfer as Destination', array('local'   => 'foreign_id', 'foreign' => 'external_xfer_id'));
 
         // Add relation on the other side, too, including all extended models that may have already loaded
         foreach (get_declared_classes() as $class)
         {
-            if (is_subclass_of($class, 'Number') or ($class == 'Number')) {
+            if (is_subclass_of($class, 'Number') or ($class == 'Number'))
+            {
                 $deviceTable = Doctrine::getTable($class);
+
                 $deviceTable->bind(array('ExternalXfer', array('local' => 'foreign_id', 'foreign' => 'external_xfer_id')), Doctrine_Relation::ONE);
             }
         }
@@ -65,4 +64,3 @@ class ExternalXferNumber extends Number {
         $this->actAs('TelephonyEnabled');
     }
 }
-

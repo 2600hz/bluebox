@@ -1,3 +1,5 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
-plugins::register('destinations/selector', 'view', array('ExternalXfer_Plugin', 'selector'));
+    Event::add('numbermanager.collectNumberOptions', array('ExternalXfers', 'provideNumberOptions'));
+    
+    Event::add('numbermanager.collectNumberTargets', array('ExternalXfers', 'provideNumberTargets'));
