@@ -26,9 +26,9 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/action[@application="set"][@bluebox="settingTimeout"]{@data="call_timeout=' .$numberOptions['timeout'] .'"}');
 
-            $xml->update('/action[@application="set"][@bluebox="settingRing"]{@data="ringback=${' . $numberOptions['ringtype'] . '}"}');
+            $xml->update('/action[@application="set"][@bluebox="settingRing"]{@data="ringback=' . $numberOptions['ringtype'] . '"}');
 
-            $xml->update('/action[@application="set"][@bluebox="settingRingXfer"]{@data="transfer_ringback=${' . $numberOptions['ringtype'] . '}"}');
+            $xml->update('/action[@application="set"][@bluebox="settingRingXfer"]{@data="transfer_ringback=' . $numberOptions['ringtype'] . '"}');
 
             if (!empty($destination['plugins']['callerid']['internal_name']))
             {

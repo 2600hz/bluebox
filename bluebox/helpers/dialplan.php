@@ -111,5 +111,7 @@ class dialplan
 
         // 7. Any final things to do? Play a goodbye message? A survey? Write a special log? etc.
         $driver->postExecute($context);
+
+        $driver->catchAll($context);
     }
 }
