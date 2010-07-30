@@ -83,7 +83,7 @@ class Odbc_Controller extends Bluebox_Controller
         if ($this->submitted()) {
             $_POST['odbc']['port'] = $this->getPort();
             if ($this->formSave($this->odbc)) {
-                url::redirect(Router_Core::$controller . '/update/' . $this->odbc->odbc_id);
+                url::redirect(Router_Core::$controller . '/index');
             }
         }
         plugins::views($this);

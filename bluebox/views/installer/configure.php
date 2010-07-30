@@ -65,7 +65,7 @@
         <div class="field">
         <?php
             echo form::label('defaultTimeZone', 'Default Timezone');
-            echo form::timezones('defaultTimeZone', $defaultTimeZone);
+            echo timezone::dropdown('defaultTimeZone', $defaultTimeZone);
         ?>
         </div>
 

@@ -7,6 +7,13 @@
         ?>
         </div>
 
+        <div class="field">
+        <?php
+            echo form::label('audio_root', 'Global Sound File Directory:');
+            echo form::input('audio_root');
+        ?>
+        </div>
+
     <?php echo form::close_section(); ?>
 
     <?php echo form::open_section('Event Socket'); ?>

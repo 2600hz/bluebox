@@ -13,18 +13,20 @@ class fs
 
         $numberOptions += array(
             'ignoreFWD' => FALSE,
-            'ringtype' => 'us-ring',
+            'ringtype' => '${us-ring}',
             'timeout' => 30
         );
 
         switch ($numberOptions['ringtype'])
         {
-            case 'us-ring':
-                break;
             case 'moh':
+                $numberOptions['ringtype'] = 'local_stream:\/\/moh';
+
                 break;
+
+            case 'us-ring':
             default:
-                $numberOptions['ringtype'] = 'us-ring';
+                $numberOptions['ringtype'] = '${us-ring}';
         }
 
         return $numberOptions;

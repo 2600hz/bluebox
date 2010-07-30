@@ -111,11 +111,20 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
                         }
 
                         break;
+
+                    case 'continue':
+                        break;
+
                     case 'hangup':
+                    default:
                         $xml->update('/action[@application="hangup"]');
                     
                         break;
                 }
+            }
+            else
+            {
+                $xml->update('/action[@application="hangup"]');
             }
         } 
         else

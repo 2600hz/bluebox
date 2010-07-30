@@ -221,7 +221,7 @@ class FsDomDocument extends DOMDocument
 
             $this->set($create);
 
-            $elements = $xp->query($xpath);
+            $elements = $xp->query($search);
             
             return $elements->item(0)->setAttribute($attributename, $value);
         }

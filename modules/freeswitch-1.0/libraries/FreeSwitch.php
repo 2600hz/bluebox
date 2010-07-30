@@ -487,6 +487,10 @@ class FreeSwitch extends Telephony_Driver
                 return FALSE;
             }
         }
+        else
+        {
+            self::$instance->currentContext = $context;
+        }
 
         if (!$section)
         {
@@ -498,6 +502,10 @@ class FreeSwitch extends Telephony_Driver
             {
                 $section = 'main';  // For regular desinations, add main_ to them by default
             }
+        }
+        else
+        {
+            self::$instance->currentSection = $section;
         }
 
         // Reference to our XML document & context

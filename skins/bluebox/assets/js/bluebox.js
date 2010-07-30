@@ -34,7 +34,7 @@ function qtipAjaxForm(link) {
             width: 550,
             padding: '8px',
             title: {
-                'background-color': '#72a400',
+                'background-color': '#005F80',
                 color: '#ffffff',
                 padding: '3px 10px 5px 10px',
                 'font-size': '110%'
@@ -42,7 +42,7 @@ function qtipAjaxForm(link) {
             border: {
                 width: 8,
                 radius: 4,
-                color: '#72a400'
+                color: '#005F80'
             }
         },
         api: {
@@ -270,7 +270,7 @@ $(document).ready(function () {
                     width: 550,
                     padding: '8px',
                     title: {
-                        'background-color': '#72a400',
+                        'background-color': '#005F80',
                         color: '#ffffff',
                         padding: '3px 10px 5px 10px',
                         'font-size': '110%'
@@ -278,7 +278,7 @@ $(document).ready(function () {
                     border: {
                         width: 8,
                         radius: 4,
-                        color: '#72a400'
+                        color: '#005F80'
                     }
                 }
             });
@@ -320,7 +320,7 @@ $(document).ready(function () {
                 style: {
                     padding: '8px',
                     title: {
-                        'background-color': '#72a400',
+                        'background-color': '#005F80',
                         color: '#ffffff',
                         padding: '3px 10px 5px 10px',
                         'font-size': '110%'
@@ -328,7 +328,7 @@ $(document).ready(function () {
                     border: {
                         width: 8,
                         radius: 4,
-                        color: '#72a400'
+                        color: '#005F80'
                     }
                 }
             });
@@ -353,6 +353,65 @@ $(document).ready(function () {
     .hide(); // Hide it initially
 
     /**
+<<<<<<< HEAD
+     * DRIVES THE DESTINATION SELECTOR
+     ***************************************************************/
+    $('.destination_select').each(function() {
+
+        var contentLoadedOnce = false;
+        $(this).qtip({
+            content: {
+                title: {
+                    text: 'Select a Destination...'
+                },
+                url: '../../destinations/selector/' + this.id + '/' + $(this).attr('numberId')
+            },
+            position: {
+                target: $(document.body),
+                corner: 'center'
+            },
+            show: {
+                when: 'click', // Show it on click
+                solo: true // And hide all other tooltips
+            },
+            hide: {
+                when: 'unfocus'
+            },
+            api: {
+                beforeShow: function(){
+                    if (!contentLoadedOnce) {
+                        contentLoadedOnce = true;
+                    } else {
+                        this.loadContent(this.options.content.url, this.options.content.data, this.options.content.method);
+                    }
+                     $('#qtip-blanket').fadeIn(this.options.show.effect.length);
+                },                
+                beforeHide: function () {
+                    $('#qtip-blanket').fadeOut(this.options.hide.effect.length);
+                    this.elements.content.html(this.options.content.text);
+                },
+            },
+            style: {
+                width: 700,
+                padding: '8px',
+                title: {
+                    'background-color': '#005F80',
+                    color: '#ffffff',
+                    padding: '3px 10px 5px 10px',
+                    'font-size': '110%'
+                },
+                border: {
+                    width: 8,
+                    radius: 4,
+                    color: '#005F80'
+                }
+            }
+        });
+    });
+
+    /**
+=======
+>>>>>>> origin/master
      * QTIP MODAL BACKDROP
      ***************************************************************/
     $('<div id="qtip-blanket">')

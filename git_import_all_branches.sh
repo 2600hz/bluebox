@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# @package    Dev Tools
+# @author     K Anderson <bitbashing@gmail.com>
+# @license    Mozilla Public License (MPL)
+
 lBranch="`git branch`"
 
 git branch -r | while read rBranch ; do
