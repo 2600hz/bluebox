@@ -18,6 +18,7 @@ class Calls extends Bluebox_Record
         $this->hasColumn('hangup_cause', 'string', 100, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('channel_name', 'string', 100, array('notnull' => true));
         $this->hasColumn('bridge_channel', 'string', 100, array('notnull' => true));
+        $this->hasColumn('custom_fields', 'array', 10000, array('default' => array()));
 
         $this->index('calls_index', array(
             'fields' => array(

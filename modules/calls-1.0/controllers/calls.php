@@ -75,6 +75,12 @@ class Calls_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
+    public function view($id) {
+
+        plugins::views($this);
+
+    }
+
     public function downloadAsCsv($startDate, $endDate, $otherStuff) {
         // Actual download processing (after Csv is selected)
     }
@@ -120,10 +126,10 @@ class Calls_Controller extends Bluebox_Controller
             }
         }
 
-        foreach ($call['registry'] as $field => $value)
-        {
-            $callDetail .= '<tr><th>' . $field . '</th><td>' . $value .'</td></tr>';
-        }
+//        foreach ($call['custom_fields'] as $field => $value)
+//        {
+//            $callDetail .= '<tr><th>' . $field . '</th><td>' . $value .'</td></tr>';
+//        }
 
         $callDetail .= '</table>';
 

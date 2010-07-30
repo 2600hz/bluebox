@@ -66,7 +66,7 @@ class ProcessLog {
                             $extracdr[$callRecord[$field]] = $callRecord[$field+1];
                        }
                     }
-                    $corecdr['registry'] = $extracdr;
+                    $corecdr['custom_fields'] = $extracdr;
                     $insertCall->synchronizeWithArray($corecdr);
 
                     try {
