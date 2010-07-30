@@ -11,32 +11,34 @@ class VoicemailManager
 	
 	}
 	
-	public static function getList($mailbox, $domain)
+
+	public static function getList($user, $domain)
 	{
-		
+
+		//@TODO 10 second cache?
 		$eslManager = new EslManager();
-		//foreach mailbox
-                $xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $eslManager->getResponse($eslManager->api(sprintf('vm_list %s@%s xml', $mailbox, $domain)));
-		
+		$xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $eslManager->getResponse($eslManager->api(sprintf('vm_list %s@%s xml', $user, $domain)));
+
 		$idx = array('created_epoch', 'read_epoch', 'username', 'domain', 'path', 'uuid', 'cid-name', 'cid-number');
 
 		$xml = simplexml_load_string($xml);
-	
+
 		$voicemails = array();
-	
+
 		foreach($xml as $voicemail)
 		{
 			$tmp = array();
-			
+
 			foreach($idx as $header)
 			{
 				$tmp[$header] = $voicemail->$header;
 			}
-			
-			$voicemails[] = $tmp;
+
+
+
+			$voicemails[(string)$voicemail->uuid] = $tmp;
 		}
 		return $voicemails;
-		
 	}
 	
 	public static function markRead()
@@ -88,4 +90,11 @@ class VoicemailManager
 		$result = $eslManager->getResponse($eslManager->api($inject));
                 return $result;
         }
+
+        public static function delete($user, $domain, $uuid)
+	{
+		//vm_delete,<id>@<domain>[/profile] [<uuid>],vm_delete,mod_voicemail
+		$eslManager = new EslManager();
+		$eslManager->getResponse($eslManager->api(sprintf('vm_delete %s@%s %s', $user, $domain, $uuid)));
+	}
 }

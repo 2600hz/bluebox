@@ -31,48 +31,67 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 
 
 
-    public function listen($uuid) {
-        $vm = VoicemailManager::init();
-        $file = $vm->getPath($uuid);
-        //$vm->markMessageRead($uuid);
-        header("Content-type: audio/wav");
-        header('Content-Length: '.filesize($file));
-        readfile($file);
-        die();
-    }
+	public function delete($domain, $mailbox, $uuid)
+	{
+		$this->auto_render = FALSE;
+		
+		$domain = 'voicemail_1';
+		$voicemails = VoicemailManager::delete($mailbox, $domain, $uuid);
+		url::redirect(url::site('voicemailviewer'));
+	}
 
-    public function download($uuid = null) {
-        $vm = VoicemailManager::init();
-        $file = $vm->getPath($uuid);
-        $filename = $vm->getDownloadFilename($uuid);
-        header("Content-type: audio/wav");
-        header('Content-Disposition: attachment; filename="' . $filename . '.wav"');
-        header('Content-Length: '.filesize($file));
-        readfile($file);
-        die();
-    }
+	public function listen($domain, $mailbox, $uuid)
+	{
+		$this->auto_render = FALSE;
 
-    private function archive($path, $description = '', $user_id = null) {
 
-    }
+		$voicemails = VoicemailManager::getList($mailbox, $domain);
 
-    private function showMessages($list) {
+		$file = $voicemails[$uuid]['path'];
 
-        $html = '<table width="100%">';
-        //$idx = array('created_epoch', 'read_epoch', 'username', 'domain', 'path', 'uuid', 'cid-name', 'cid-number');
-        $html .= '<tr><th>Received</th><th>Name</th><th>Number</th></tr>';
-        foreach($list as $message) {
-            $html .= '<tr>';
-            $html .= '<td>' . date('h:i:s a m/d/Y', (int)$message['created_epoch']) .'</td>';
-            $html .= '<td>' . $message['cid-name'] .'</td>';
-            $html .= '<td>' . $message['cid-number'] .'</td>';
-            $html .= '</tr>';
-        }
+		header("Content-type: audio/wav");
+		header('Content-Length: '.filesize($file));
+		readfile($file);
+		die();
+	}
 
-        $html .= '<table>';
+	public function download($domain, $mailbox, $uuid)
+	{
 
-        return $html;
-    }
+		header("Content-type: audio/wav");
+		header('Content-Disposition: attachment; filename="' . $filename . '.wav"');
+		header('Content-Length: '.filesize($file));
+		readfile($file);
+		die();
+	}
+
+	private function showMessages($list)
+	{
+
+		$html = '<table width="100%">';
+		//$idx = array('created_epoch', 'read_epoch', 'username', 'domain', 'path', 'uuid', 'cid-name', 'cid-number');
+		$html .= '<tr><th>Received</th><th>Mailbox</th><th>Caller Name</th><th>Caller Number</th><th>Actions</th></tr>';
+		foreach($list as $message)
+		{
+			$listenURL = url::site('voicemailviewer/listen/'. $message['domain'].'/'.$message['username']) . '/';
+			$deleteURL = url::site('voicemailviewer/delete/'. $message['domain'].'/'.$message['username']) . '/';
+
+
+			$html .= '<tr id="message_' . $message['uuid'] . '">';
+                            $html .= '<td>' . date('h:i:s a m/d/Y', (int)$message['created_epoch']) .'</td>';
+                            $html .= '<td>'. $message['username'] . '</td>';
+                            $html .= '<td>' . $message['cid-name'] .'</td>';
+                            $html .= '<td>' . $message['cid-number'] .'</td>';
+                            $html .= '<td>' . html::anchor($deleteURL . $message['uuid'], 'Delete') .'</td>';
+			$html .= '</tr>';
+;
+			$html.= '<tr><td>.</td><td colspan="4"><audio controls="controls" preload="none" src="' . $listenURL . $message['uuid'] . '">Install FireFox or Chrome</audio></td></tr>';
+		}
+
+		$html .= '<table>';
+
+		return $html;
+	}
 
     /**
      *
