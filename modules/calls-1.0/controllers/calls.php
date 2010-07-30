@@ -60,12 +60,13 @@ class Calls_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
-    public function download() {
+    public function download($start = NULL, $end = NULL) {
         // Download a CDR
 
         // Setup the base grid object
         $grid = jgrid::grid($this->baseModel, array(
-                'caption' => 'Calls'
+                'gridName' => 'calldownload',
+                'caption' => 'Export Preview'
             )
         )
         // Add the base model columns to the grid
@@ -80,6 +81,14 @@ class Calls_Controller extends Bluebox_Controller
         ->add('duration', 'Length')
         ->add('hangup_cause', 'Call End Cause');
 
+        if( ! is_null($start)) {
+            $grid->andWhere('start_stamp >', "'" . $start . "'");
+        }
+
+        if( ! is_null($end)) {
+            $grid->andWhere('end_stamp <', "'" . $end . "'");
+        }
+
         // Let plugins populate the grid as well
         $this->grid = $grid;
 
@@ -92,7 +101,12 @@ class Calls_Controller extends Bluebox_Controller
     }
 
     public function view($id) {
- 
+
+
+        if ($this->submitted()) {
+            url::redirect(Router_Core::$controller);
+        }
+
         $base = strtolower($this->baseModel);
 
         $this->createView(); 

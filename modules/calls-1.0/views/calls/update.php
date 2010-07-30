@@ -38,8 +38,7 @@
 
     <div class="buttons form_bottom">
 
-        <?php echo html::anchor('calls','Done',array('class' => 'save small_green_button')); ?>
-
+        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Done'); ?>
     </div>
 
     <?php echo form::close(); ?>
