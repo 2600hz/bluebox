@@ -4,6 +4,22 @@ class Calls_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'Calls';
 
+    public $coreFields = array(
+            'uuid' => 'Unique ID',
+            'accountcode' => 'Account Code',
+            'caller_id_number' => 'Caller ID Number',
+            'destination_number' => 'Desitnation',
+            'context' => 'Context',
+            'duration' => 'Duration Seconds',
+            'start_stamp' => 'Start',
+            'answer_stamp' => 'Answered',
+            'end_stamp' => 'End',
+            'billsec' => 'Billable Seconds',
+            'hangup_cause' => 'Call End Cause',
+            'channel_name' => 'Src Channel',
+            'bridge_channel' => 'Dest Chanel'
+        );
+
 
     public function index()
     {
@@ -76,8 +92,18 @@ class Calls_Controller extends Bluebox_Controller
     }
 
     public function view($id) {
+ 
+        $base = strtolower($this->baseModel);
 
-        plugins::views($this);
+        $this->createView(); 
+
+        $this->loadBaseModel($id);
+
+        $this->prepareUpdateView();
+
+        $this->view->title = 'Call Detail';
+
+        $this->view->coreFields = $this->coreFields;
 
     }
 
@@ -92,28 +118,13 @@ class Calls_Controller extends Bluebox_Controller
     public function import() {
         // Manually import a CDR
         ProcessLog::importLogs();
+        url::redirect(Router_Core::$controller);
     }
 
     public function _showCall($NULL, $calls_id)
     {
 
-        $coreFields = array(
-            'uuid' => 'Unique ID',
-            'accountcode' => 'Account Code',
-            'caller_id_number' => 'Caller ID Number',
-            'destination_number' => 'Desitnation',
-            'context' => 'Context',
-            'duration' => 'Duration Seconds',
-            'start_stamp' => 'Start',
-            'answer_stamp' => 'Answered',
-            'end_stamp' => 'End',
-            'billsec' => 'Billable Seconds',
-            'hangup_cause' => 'Call End Cause',
-            'channel_name' => 'Src Channel',
-            'bridge_channel' => 'Dest Chanel'
-        );
-
-
+        $coreFields = $this->coreFields;
 
         $call = Doctrine::getTable('Calls')->find($calls_id)->toArray();
 
