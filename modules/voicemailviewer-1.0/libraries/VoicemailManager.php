@@ -6,7 +6,13 @@ class VoicemailManager
 		$eslManager = new EslManager();
 		$count = $eslManager->getResponse($eslManager->api(sprintf('vm_boxcount %s@%s|all', $mailbox, $domain)));
 		$count = explode(':', $count);
-		$count = array('new' => $count[0], 'saved' => $count[1], 'new-urgent' => $count[2], 'saved-urgent' => $count[3]);
+
+                if(sizeof($count) != 4)  {
+                    $count = array('new' => 'No Mailbox Defined!', 'saved' => '', 'new-urgent' => '', 'saved-urgent' => '');
+                } else {
+                    $count = array('new' => $count[0], 'saved' => $count[1], 'new-urgent' => $count[2], 'saved-urgent' => $count[3]);
+                }
+
 		return $count;
 	
 	}
@@ -33,8 +39,6 @@ class VoicemailManager
 			{
 				$tmp[$header] = $voicemail->$header;
 			}
-
-
 
 			$voicemails[(string)$voicemail->uuid] = $tmp;
 		}
@@ -82,7 +86,6 @@ class VoicemailManager
         public static function blast($mailbox, $domain, $file)
         {
             //voicemail_inject,[group=]<box> <sound_file> [<cid_num>] [<cid_name>],voicemail_inject,mod_voicemail
-
                 
 		$inject = sprintf('voicemail_inject %s@%s %s %s %s', $mailbox, $domain, $file, '4000', 'Voicemail');
                 

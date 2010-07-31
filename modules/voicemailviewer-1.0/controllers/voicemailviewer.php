@@ -23,7 +23,7 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 
         $count = '';
         $list = '';
-
+        // ghetto multibox support
         foreach($mailboxes as $mailbox) {
 
             $count  .= $this->showCount(VoicemailManager::getCount($mailbox, $domain));
@@ -70,23 +70,24 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 
     private function showMessages($list) {
 
-        $html = '<table width="100%">';
+       $html = '<table width="100%" class="ui-widget ui-jqgrid">';
         //$idx = array('created_epoch', 'read_epoch', 'username', 'domain', 'path', 'uuid', 'cid-name', 'cid-number');
         $html .= '<tr><th>Received</th><th>Mailbox</th><th>Caller Name</th><th>Caller Number</th><th>Actions</th></tr>';
         foreach($list as $message) {
             $listenURL = url::site('voicemailviewer/listen/'. $message['domain'].'/'.$message['username']) . '/';
             $deleteURL = url::site('voicemailviewer/delete/'. $message['domain'].'/'.$message['username']) . '/';
+            $downloadURL = url::site('voicemailviewer/download/'. $message['domain'].'/'.$message['username']) . '/';
 
 
             $html .= '<tr id="message_' . $message['uuid'] . '">';
-            $html .= '<td>' . date('h:i:s a m/d/Y', (int)$message['created_epoch']) .'</td>';
-            $html .= '<td>'. $message['username'] . '</td>';
-            $html .= '<td>' . $message['cid-name'] .'</td>';
-            $html .= '<td>' . $message['cid-number'] .'</td>';
-            $html .= '<td>' . html::anchor($deleteURL . $message['uuid'], 'Delete') .'</td>';
+                $html .= '<td>' . date('h:i:s a m/d/Y', (int)$message['created_epoch']) .'</td>';
+                $html .= '<td>'. $message['username'] . '</td>';
+                $html .= '<td>' . $message['cid-name'] .'</td>';
+                $html .= '<td>' . $message['cid-number'] .'</td>';
+                $html .= '<td>' . html::anchor($deleteURL . $message['uuid'], 'Delete') .' |  ' . html::anchor($downloadURL . $message['uuid'], 'Download') . '</td>';
             $html .= '</tr>';
             ;
-            $html.= '<tr><td>.</td><td colspan="4"><audio controls="controls" preload="none" src="' . $listenURL . $message['uuid'] . '">Install FireFox or Chrome</audio></td></tr>';
+            $html.= '<tr><td>&nbsp;</td><td colspan="4"><audio controls="controls" preload="none" src="' . $listenURL . $message['uuid'] . '">Install FireFox or Chrome</audio></td></tr>';
         }
 
         $html .= '<table>';
