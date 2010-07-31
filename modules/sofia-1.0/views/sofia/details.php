@@ -1,1 +1,3 @@
-<?php echo $modelContents;
+<?php
+//var_dump(SofiaManager::getRegistrationGlob());
+echo $modelContents;

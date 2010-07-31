@@ -58,11 +58,9 @@ class SofiaManager {
 
         $sipRegCache = $cache->get('cache_' . $SIPInterface);
 
-        $sipRegCache = FALSE;
-
         if(!$sipRegCache) {
 
-            echo 'ok';
+            Kohana::log('info', 'Using cached registration');
 
             $eslManager = new EslManager();
             
