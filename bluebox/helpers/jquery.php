@@ -221,6 +221,9 @@ class jquery
         ),
         'autoGrow' => array(
             'js' => 'jquery.autoGrowInput.js'
+        ),
+        'uiCSS' => array(
+            'css' => 'ui.all.css'
         )
     );
     /**
