@@ -1,4 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
+
 class Odbc_Configure extends Bluebox_Configure
 {
     public static $version = 1.0;
@@ -18,7 +19,7 @@ class Odbc_Configure extends Bluebox_Configure
     public static $navURL = 'odbc/index';
     public static $navSubmenu = array(
         'Search Connections' => '/odbc/index',
-        'Add Connection' => '/odbc/add',
+        'Add Connection' => '/odbc/create',
         'Update Connection' => array(
             'url' => '/odbc/update',
             'disabled' => TRUE
