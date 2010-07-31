@@ -5,8 +5,17 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver
     public static function set($autoattendant)
     {
         $xml = FreeSwitch::setSection('autoattendant', $autoattendant['auto_attendant_id']);
-        
-        switch($autoattendant['registry']['type'])
+
+        if (empty($autoattendant['registry']['mediafile_id']) OR !class_exists('Media'))
+        {
+            $type = 'tty';
+        }
+        else
+        {
+            $type = $autoattendant['registry']['type'];
+        }
+
+        switch($type)
         {
             case 'audio':
 
