@@ -558,14 +558,16 @@ abstract class Bluebox_Controller extends Template_Controller
             // Success - optionally set a delete message
             if (is_null($deleteMessage))
             {
-                message::set(get_class($object) . ' removed!', array(
-                    'type' => 'success'
+                $displayName = inflector::humanizeModelName(get_class($object));
+
+                message::set($displayName . ' removed!', array(
+                    'type' => 'info'
                 ));
             } 
             else if (!empty($deleteMessage))
             {
                 message::set($deleteMessage, array(
-                    'type' => 'success'
+                    'type' => 'info'
                 ));
             }
 
@@ -643,7 +645,9 @@ abstract class Bluebox_Controller extends Template_Controller
             // Success - optionally set a save message
             if (is_null($saveMessage))
             {
-                message::set(get_class($object) . ' saved!', array(
+                $displayName = inflector::humanizeModelName(get_class($object));
+
+                message::set($displayName .' saved!', array(
                     'type' => 'success'
                 ));
             } 
