@@ -74,9 +74,9 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
         //$idx = array('created_epoch', 'read_epoch', 'username', 'domain', 'path', 'uuid', 'cid-name', 'cid-number');
         $html .= '<tr><th>Received</th><th>Mailbox</th><th>Caller Name</th><th>Caller Number</th><th>Actions</th></tr>';
         foreach($list as $message) {
-            $listenURL = url::site('voicemailviewer/listen/'. $message['domain'].'/'.$message['username']) . '/';
-            $deleteURL = url::site('voicemailviewer/delete/'. $message['domain'].'/'.$message['username']) . '/';
-            $downloadURL = url::site('voicemailviewer/download/'. $message['domain'].'/'.$message['username']) . '/';
+            $listenURL = url::site('/voicemailviewer/listen/'. $message['domain'].'/'.$message['username']) . '/';
+            $deleteURL = url::site('/voicemailviewer/delete/'. $message['domain'].'/'.$message['username']) . '/';
+            $downloadURL = url::site('/voicemailviewer/download/'. $message['domain'].'/'.$message['username']) . '/';
 
 
             $html .= '<tr id="message_' . $message['uuid'] . '">';
