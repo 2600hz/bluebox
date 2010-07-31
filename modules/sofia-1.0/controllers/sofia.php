@@ -27,8 +27,9 @@ class Sofia_Controller extends Bluebox_Controller {
        
  
         //$idx = array('call-id', 'user', 'contact', 'agent', 'status', 'host', 'network-ip', 'network-port', 'sip-auth-user', 'sip-auth-realm', 'mwi-account');
-        $idx = array('user', 'contact', 'sip-auth-user', 'host', 'network-ip', 'network-port');
-        $html = sprintf('<h1>sipinterface_%s</h1>', 'asdfasdfasdf'); //$registrations['interface']
+        $idx = array('user', 'contact', 'sip-auth-user', 'host', 'network-ip', 'network-port', 'interface');
+
+        $html = '';
         $html .= '<table width="100%" class="ui-widget">';
 
         $html .= '<tr class="ui-jqgrid-hdiv">';

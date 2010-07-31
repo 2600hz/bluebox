@@ -4,7 +4,11 @@ class VoicemailManager
 	public static function getCount($mailbox, $domain)
 	{
 		$eslManager = new EslManager();
-		$count = $eslManager->getResponse($eslManager->api(sprintf('vm_boxcount %s@%s|all', $mailbox, $domain)));
+
+                $cmd = sprintf('vm_boxcount %s@%s|all', $mailbox, $domain);
+                Kohana::log('info','ESL: ' . $cmd);
+
+		$count = $eslManager->getResponse($eslManager->api($cmd));
 		$count = explode(':', $count);
 
                 if(sizeof($count) != 4)  {
@@ -23,7 +27,11 @@ class VoicemailManager
 
 		//@TODO 10 second cache?
 		$eslManager = new EslManager();
-		$xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $eslManager->getResponse($eslManager->api(sprintf('vm_list %s@%s xml', $user, $domain)));
+		$cmd = sprintf('vm_list %s@%s xml', $user, $domain);
+                
+                Kohana::log('info','ESL: ' . $cmd);
+                
+                $xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $eslManager->getResponse($eslManager->api($cmd));
 
 		$idx = array('created_epoch', 'read_epoch', 'username', 'domain', 'path', 'uuid', 'cid-name', 'cid-number');
 

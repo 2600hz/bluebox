@@ -58,7 +58,12 @@ class SofiaManager {
 
         $sipRegCache = $cache->get('cache_' . $SIPInterface);
 
+        $sipRegCache = FALSE;
+
         if(!$sipRegCache) {
+
+            echo 'ok';
+
             $eslManager = new EslManager();
             
             $cmd = 'sofia xmlstatus profile ' . $SIPInterface;
@@ -75,7 +80,9 @@ class SofiaManager {
 
             foreach($registrations['registration'] as $r) // cast to array from stl
             {
-                $result[] = (array)$r;
+                $r = (array)$r;
+                $r['interface'] = $SIPInterface;
+                $result[] = $r;
             }
 
             return $result;
