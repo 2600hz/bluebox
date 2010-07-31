@@ -14,7 +14,7 @@ class inflector extends inflector_Core
             $modelName = get_class($modelName);
         }
 
-        $modelName = preg_replace('/([A-Z])/', ' $1', lcfirst($modelName));
+        $modelName = preg_replace('/([A-Z])/', ' $1', self::lcfirst($modelName));
 
         // Remove garbage
         $modelName = trim($modelName);
@@ -64,15 +64,15 @@ class inflector extends inflector_Core
 
         // Set the cache and return
         return ucfirst(self::$cache[$key] = $modelName);
+    }
 
+    public static function lcfirst($str)
+    {
+        if ( false === function_exists('lcfirst') )
+        {
+            return (string)(strtolower(substr($str,0,1)).substr($str,1));
+        }
 
-
-
-
-
-
-
-
-        return inflector::plural($modelName, $count);
+        return lcfirst( $str );
     }
 }
