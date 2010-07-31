@@ -21,6 +21,19 @@ class FreeSwitch_Timezone_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/variables/variable[@name="timezone"]{@value="' . str_replace('/', '\/', $timezone['timezone']) . '"}');
         }
+        else if ($base instanceof Voicemail)
+        {
+            if (empty($base['plugins']['timezone']))
+            {
+                return;
+            }
+
+            $timezone = $base['plugins']['timezone'];
+
+            $xml = FreeSwitch::setSection('user', 'voicemail_' .$base['account_id'], $base['voicemail_id']);
+
+            $xml->update('/variables/variable[@name="timezone"]{@value="' . str_replace('/', '\/', $timezone['timezone']) . '"}');
+        }
     }
 
     public static function delete($base)
@@ -39,6 +52,19 @@ class FreeSwitch_Timezone_Driver extends FreeSwitch_Base_Driver
             $domain = '$${location_' .$base['User']['location_id'] .'}';
 
             $xml = FreeSwitch::setSection('user', $domain, $base['device_id']);
+
+            $xml->deleteNode('/variables/variable[@name="timezone"]');
+        }
+        else if ($base instanceof Voicemail)
+        {
+            if (empty($base['plugins']['timezone']))
+            {
+                return;
+            }
+
+            $timezone = $base['plugins']['timezone'];
+
+            $xml = FreeSwitch::setSection('user', 'voicemail_' .$base['account_id'], $base['voicemail_id']);
 
             $xml->deleteNode('/variables/variable[@name="timezone"]');
         }

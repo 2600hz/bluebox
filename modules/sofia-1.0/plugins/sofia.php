@@ -20,13 +20,24 @@ class Sofia_Plugin extends Bluebox_Plugin
 
     public function _showStatus($null, $plugins, $location_id)
     {
-        if (empty($plugins['sip']))
+        if (empty($plugins['sip']['username']) OR empty($location_id))
         {
-            return;
+            return 'Unknown';
         }
 
-        $sip = $plugins['sip'];
-        return SofiaManager::isDeviceActive($sip['username'], locations::getLocationDomain($location_id));
-        //return $sip['username'] .'@' .locations::getLocationDomain($location_id);
+        try
+        {
+            $username = $plugins['sip']['username'];
+
+            $domain = locations::getLocationDomain($location_id);
+
+            return SofiaManager::isDeviceActive($username, $domain);
+        }
+        catch(Exception $e)
+        {
+            kohana::log('error', 'Unable to determine the status of ' .$username .': ' .$e->getMessage());
+        }
+
+        return 'Unknown';
     }
 }
