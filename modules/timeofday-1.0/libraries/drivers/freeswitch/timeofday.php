@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class FreeSwitch_TimeOfDay_Driver extends FreeSwitch_Base_Driver {
-
+class FreeSwitch_TimeOfDay_Driver extends FreeSwitch_Base_Driver
+{
     public static function set($timeOfDay)
     {
 
@@ -69,7 +69,7 @@ class FreeSwitch_TimeOfDay_Driver extends FreeSwitch_Base_Driver {
 
         $xml->update('/condition[@wday="' .$wday .'"]{@minute-of-day="' .$time .'"}');
 
-        if($action = fs::getTransfer($destination['during_number_id']))
+        if($action = fs::getTransferToNumber($destination['during_number_id']))
         {
             $action = str_replace('transfer ', '', $action);
 
@@ -80,7 +80,7 @@ class FreeSwitch_TimeOfDay_Driver extends FreeSwitch_Base_Driver {
             $xml->update('/condition[@wday="' .$wday .'"]/action[@application="hangup"]');
         }
 
-        if ($antiAction = fs::getTransfer($destination['outside_number_id']))
+        if ($antiAction = fs::getTransferToNumber($destination['outside_number_id']))
         {
             $antiAction = str_replace('transfer ', '', $antiAction);
             
