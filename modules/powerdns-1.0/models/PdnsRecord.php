@@ -13,7 +13,7 @@ class PdnsRecord extends Bluebox_Record {
         $this->hasColumn('name', 'string', 255, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('type', 'string', 6, array('default' => 'A'));
         $this->hasColumn('content', 'string', 255, array('notnull' => true, 'notblank' => true));
-        $this->hasColumn('ttl', 'integer', 11, array('unsigned' => true, 'default' => 7200));
+        $this->hasColumn('ttl', 'integer', 11, array('unsigned' => true, 'default' => 600));
         $this->hasColumn('prio', 'integer', 11, array('unsigned' => true, 'default' => 0));
         $this->hasColumn('change_date', 'integer', 11, array('unsigned' => true, 'default' => 0));
     }

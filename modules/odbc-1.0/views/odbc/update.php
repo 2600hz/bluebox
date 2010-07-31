@@ -1,5 +1,7 @@
 <div id="odbc_update_header" class="update odbc module_header">
-    <h2><?php echo __($title); ?></h2>
+
+    <h2><?php echo $title; ?></h2>
+
 </div>
 
 <div id="odbc_update_form" class="update odbc">

@@ -190,7 +190,7 @@ class EslManager
                 break;
 
             case 'reload':
-                array_unshift($arguments, 'api', 'reload', '-f');
+                array_unshift($arguments, 'bgapi', 'reload', '-f');
                 return  $esl->sendRecv(implode(' ', $arguments));
                 break;
 
