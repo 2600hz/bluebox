@@ -529,24 +529,30 @@ class FsDomDocument extends DOMDocument
 
     public function replaceWithXml($newXml, $query = '')
     {
-        // Create the base if it doesn't already exist. Delete all children of the base
-        $query = $this->preUpdate($query);
-        
-        $this->set($query);
-
-        $this->deleteChildren($query);
-
-        // Grab an XPath pointer to the query we just ran
-        $xp = new DOMXPath($this);
-
-        $base = $xp->query($query);
-
-        // Create a new XML fragment and append it to wherever $query pointed to
-        $newXmlFragment = $xmlDoc->createDocumentFragment();
+        // Create a new XML fragment
+        $newXmlFragment = $this->createDocumentFragment();
 
         $newXmlFragment->appendXML($newXml);
 
-        $base->item(0)->appendChild($newXmlFragment);
+
+        Kohana::log('debug', 'Start XML Replace');
+        // Create the base if it doesn't already exist. Delete all children of the base
+        //$query = $this->preUpdate($query);
+        Kohana::log('debug', 'Looking for $query (create it if missing)');
+        $base = $this->set($query);
+
+        // Delete anything already there
+        $this->deleteChildren($query);
+
+        // Grab an XPath pointer to the query we just ran
+        /*$xp = new DOMXPath($this);
+
+        $base = $xp->query($query);*/
+
+        // Append it to wherever the query pointed us to
+        $base->appendChild($newXmlFragment);
+
+        Kohana::log('debug', 'End XML Replace');
     }
 
 

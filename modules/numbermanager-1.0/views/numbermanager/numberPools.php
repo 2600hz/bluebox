@@ -1,7 +1,7 @@
 <?php echo form::open_section('Number Pools'); ?>
 
     <p>
-        <?php echo __('Number pools allow you to keep similar types of numbers grouped together.
+        <?php echo __('Used to signify what this number can be used for. Number pools allow you to keep similar types of numbers grouped together.
         For example, you can block out 2XXX for Devices, 30XX for Auto-Attendants, 31XX for Ring Groups, etc.
         Check the boxes below to specify what types of features can be assigned to this number.'); ?>
     </p>
@@ -14,7 +14,12 @@
 
                 <div class="field">
 
-                    <?php echo form::label('numberType_' .$numberType['number_type_id'], $numberType['class']); ?>
+                    <?php 
+                        echo form::label(
+                            'numberType_' .$numberType['number_type_id'],
+                            inflector::humanizeModelName(str_replace('Number', '', $numberType['class']))
+                        );
+                    ?>
 
                     <?php
                         echo form::checkbox(array(

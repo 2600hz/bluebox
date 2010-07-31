@@ -1,6 +1,6 @@
 <div id="timeofday_update_header" class="txt-center update timeofday module_header">
 
-    <h2><?php $title; ?></h2>
+    <h2><?php echo $title; ?></h2>
 
 </div>
 
@@ -92,17 +92,20 @@
                 <span id="time_range_text">On Moday through Friday between the hours of 07:00 and 17:00,<br /> route calls to a</span>
 
                 <?php
-                    if (isset($timeofday['during_number_id'])) {
-
+                    if (isset($timeofday['during_number_id']))
+                    {
                         $selectedClass = numbering::getAssignedPoolByNumber($timeofday['during_number_id']);
-
-                    } else {
-
+                    }
+                    else
+                    {
                         $selectedClass = NULL;
-
                     }
 
-                    echo numbering::poolsDropdown('during_class_type', $selectedClass);
+                    echo numbering::poolsDropdown(array(
+                            'name' => 'during_class_type',
+                            'forDependent' => TRUE
+                        ), $selectedClass
+                    );
 
                     echo " named ";
 
@@ -111,11 +114,10 @@
                         'name' => 'timeofday[during_number_id]',
                         'useNames' => TRUE,
                         'optGroups' => FALSE,
-                        //'contextAware' => TRUE
+                        'forDependent' => TRUE
                     ), isset($timeofday['during_number_id']) ? $timeofday['during_number_id'] : NULL);
 
                     jquery::addQuery('#timeofday_during')->dependent('{ parent: \'during_class_type\', group: \'common_class\' }');
-
                 ?>
 
             </div>
@@ -129,17 +131,20 @@
                 During all other times route calls to a
 
                 <?php
-                    if (isset($timeofday['outside_number_id'])) {
-
+                    if (isset($timeofday['outside_number_id']))
+                    {
                         $selectedClass = numbering::getAssignedPoolByNumber($timeofday['outside_number_id']);
-
-                    } else {
-
+                    }
+                    else
+                    {
                         $selectedClass = NULL;
-
                     }
 
-                    echo numbering::poolsDropdown('outside_class_type', $selectedClass);
+                    echo numbering::poolsDropdown(array(
+                            'name' => 'outside_class_type',
+                            'forDependent' => TRUE
+                        ), $selectedClass
+                    );
 
                     echo " named ";
 
@@ -148,11 +153,10 @@
                         'name' => 'timeofday[outside_number_id]',
                         'useNames' => TRUE,
                         'optGroups' => FALSE,
-                        //'contextAware' => TRUE
+                        'forDependent' => TRUE
                     ), isset($timeofday['outside_number_id']) ? $timeofday['outside_number_id'] : NULL);
 
                     jquery::addQuery('#timeofday_outside')->dependent('{ parent: \'outside_class_type\', group: \'common_class\' }');
-
                 ?>
 
             </div>

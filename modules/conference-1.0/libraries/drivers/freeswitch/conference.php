@@ -52,6 +52,8 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
 
         $destination = $number['Destination'];
 
+        $xml->update('/action[@application="export"][@data="hold_music=silence"]');
+
         $xml->update('/action[@application="answer"]');
 
         // Pause for a second on answer, to avoid audio clipping

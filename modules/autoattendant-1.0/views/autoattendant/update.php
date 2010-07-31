@@ -40,9 +40,9 @@
         <div class="field">
 
             <div id="audio_prompt" class="prompt">
-                <?php echo form::label('autoattendant[registry][file_id]', 'Select a file');?>
-                <?php //echo FileManager::dropdown('autoattendant[registry][file_id]', '', array('audio'));?>
-                <?php echo html::anchor('globalmedia/add', 'Upload a new recording', array('class' => 'button qtipAjaxForm'));?>
+                <?php echo form::label('autoattendant[registry][mediafile_id]', 'Select a file');?>
+                <?php echo form::dropdown('autoattendant[registry][mediafile_id]', Media::files()) ;?>
+                <?php //echo html::anchor('globalmedia/add', 'Upload a new recording', array('class' => 'button qtipAjaxForm'));?>
             </div>
 
         </div>
@@ -63,13 +63,16 @@
         <div class="field">
             <?php echo form::label('autoattendant[digit_timeout]', 'Inter-Digit Timeout:'); ?>
             <?php echo form::input('autoattendant[digit_timeout]'); ?>
-            <?php //javascript::codeBlock('$("#autoattendant_digit_timeout").spinner({max: 10, min: 1});'); ?>
         </div>
 
         <div class="field">
             <?php echo form::label('autoattendant[timeout]', 'No Entry Timeout:'); ?>
             <?php echo form::input('autoattendant[timeout]'); ?>
-            <?php //javascript::codeBlock('$("#autoattendant_timeout").spinner({max: 10, min: 1});'); ?>
+        </div>
+
+        <div class="field">
+            <?php echo form::label('autoattendant[registry][max-failures]', 'Max Retries:'); ?>
+            <?php echo form::input('autoattendant[registry][max-failures]', empty($autoattendant['registry']['max-failures']) ? 3 : $autoattendant['registry']['max-failures']); ?>
         </div>
 
     <?php echo form::close_section(); ?>

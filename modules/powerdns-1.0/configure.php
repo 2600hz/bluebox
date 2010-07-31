@@ -18,7 +18,7 @@ class PowerDns_Configure extends Bluebox_Configure
     public static $navURL = 'powerdns/index';
     public static $navSubmenu = array(
         'Search Domains' => '/powerdns/index',
-        'Add Domain' => '/powerdns/add',
+        'Add Domain' => '/powerdns/create',
         'Edit Domain' => array(
             'url' => '/powerdns/edit',
             'disabled' => TRUE

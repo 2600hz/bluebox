@@ -11,10 +11,10 @@ $config['default_packages'] = array(
     // Modules
     'contextmanager',
     'locationmanager',
-    //'mediamanager',
+    'mediamanager',
     'numbermanager',
     'trunkmanager',
-    //'autoattendant',
+    'autoattendant',
     'conference',
     'devicemanager',
     'ringgroup',
@@ -26,7 +26,8 @@ $config['default_packages'] = array(
     'callerid',
     'simpleroute',
     'sip',
-
+    'timezone',
+    
     // Freeswitch
     'esl',
     'mediaoption',
@@ -34,6 +35,7 @@ $config['default_packages'] = array(
     'netlistmanager',
     'odbc',
     'sipinterface',
+    'externalxfer',
     //'sofia',
     'xmleditor',
 );
@@ -43,6 +45,8 @@ $config['ESLPort'] = '8021';
 $config['ESLAuth'] = 'ClueCon';
 
 $config['cfg_root'] = '/usr/local/freeswitch/conf';
+
+$config['audio_root'] = '/usr/local/freeswitch/sounds';
 
 $config['filemap'][0] = array (
     // Where do the files go for this feature? Note, if you end with a / and set the id key

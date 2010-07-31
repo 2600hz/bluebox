@@ -411,7 +411,7 @@ abstract class Bluebox_Controller extends Template_Controller
                 {
                     $this->template->title = __($this->template->title);
                 }
-
+                
                 if (!empty($this->view->title))
                 {
                     $this->view->title = __($this->view->title);
@@ -558,7 +558,9 @@ abstract class Bluebox_Controller extends Template_Controller
             // Success - optionally set a delete message
             if (is_null($deleteMessage))
             {
-                message::set(get_class($object) . ' removed!', array(
+                $displayName = inflector::humanizeModelName(get_class($object));
+
+                message::set($displayName . ' removed!', array(
                     'type' => 'success'
                 ));
             } 
@@ -643,7 +645,9 @@ abstract class Bluebox_Controller extends Template_Controller
             // Success - optionally set a save message
             if (is_null($saveMessage))
             {
-                message::set(get_class($object) . ' saved!', array(
+                $displayName = inflector::humanizeModelName(get_class($object));
+
+                message::set($displayName .' saved!', array(
                     'type' => 'success'
                 ));
             } 
@@ -744,7 +748,7 @@ abstract class Bluebox_Controller extends Template_Controller
             $baseModel = ucfirst($this->baseModel);
         }
 
-        $this->view->title = ucfirst(Router::$method) .' ' .$baseModel;
+        $this->view->title = ucfirst(Router::$method) .' ' .inflector::humanizeModelName($baseModel);
 
         Event::run('bluebox.create_view', $this->view);
     }

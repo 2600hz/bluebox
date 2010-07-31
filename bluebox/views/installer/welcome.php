@@ -1,7 +1,7 @@
-<?php echo form::open_section('About Bluebox'); ?>
+<?php echo form::open_section('About ' . kohana::config('core.product_name')); ?>
     <p>
     <?php
-        echo __('Bluebox provides a modular approach to traditional telephony systems. Instead of pre-determined configuration screens and business logic, Bluebox allows you to install Applications and Plug-ins to custom tailor the system\'s behavior to your needs.');
+        echo __(kohana::config('core.product_name') . ' provides a modular approach to traditional telephony systems. Instead of pre-determined configuration screens and business logic, Bluebox allows you to install Applications and Plug-ins to custom tailor the system\'s behavior to your needs.');
     ?>
     </p>
 <?php echo form::close_section(); ?>
@@ -11,7 +11,7 @@
     <?php if (empty($results)) : ?>
         <p>
         <?php
-            echo __('No errors were detected with your installation envirionment. This system should be capable of running ' .kohana::config('core.product_name'));
+            echo __('No errors were detected with your installation envirionment. This system should be capable of running ' . Kohana::config('core.product_name'));
         ?>
         </p>
     <?php else : ?>

@@ -1,5 +1,5 @@
 <div id="powerdns_add_header" class="add powerdns module_header">
-    <h2><?php echo __($title); ?></h2>
+    <h2><?php echo $title; ?></h2>
 </div>
 
 <div id="powerdns_add_form" class="add powerdns">

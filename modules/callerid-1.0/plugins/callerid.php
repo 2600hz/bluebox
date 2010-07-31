@@ -14,4 +14,24 @@ class CallerId_Plugin extends Bluebox_Plugin
 
         return TRUE;
     }
+
+    public function update_ext()
+    {
+        if (!$this->viewSetup())
+        {
+            return FALSE;
+        }
+
+        if (!$this->loadViewData())
+        {
+            return FALSE;
+        }
+
+        $this->subview->hide_internal = TRUE;
+
+        if (!$this->addSubView())
+        {
+            return FALSE;
+        }
+    }
 }
