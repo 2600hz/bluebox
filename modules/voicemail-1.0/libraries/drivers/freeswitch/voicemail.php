@@ -91,7 +91,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
             $xml->update('/action[@application="set"][@data="skip_instructions=true"]');
         }
         
-        $xml->update('/action[@application="voicemail"]{@data="default voicemail_' .$destination['account_id'] .' ' .$destination['mailbox'] .'"}');
+        $xml->update('/action[@application="voicemail"]{@data="default ' . $domain . ' ' . $destination['mailbox'] .'"}');
 
         $xml->update('/action[@application="hangup"]');
     }
@@ -158,7 +158,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
         $domain = 'voicemail_' .$destination['account_id'];
 
-        $xml->update('/action[@application="voicemail"]{@data="default voicemail_' .$destination['account_id'] .' ' .$voicemail['mailbox'] .'"}');
+        $xml->update('/action[@application="voicemail"]{@data="default ' . $domain .' ' .$voicemail['mailbox'] .'"}');
 
         $xml->update('/action[@application="hangup"]');
     }
