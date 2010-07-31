@@ -3,28 +3,30 @@
 class Sofia_Plugin extends Bluebox_Plugin
 {
     protected $name = 'sofia';
-    
+
     public function index()
     {
-        $this->grid->add('Sofia/status', 'Status', array(
+        $this->grid->add('sofia_status', 'Status', array(
                 'align' => 'center',
                 'search' => false,
                 'sortable' => false,
                 'callback' => array(
-                    'function' => array($this, 'status'),
-                    'arguments' => array('Sip/username', 'User/last_name')
+                    'function' => array($this, '_showStatus'),
+                    'arguments' => array('plugins', 'User/location_id')
                 )
             )
         );
     }
-    
-    public function status($cell, $username = NULL)
+
+    public function _showStatus($null, $plugins, $location_id)
     {
-        $row = Doctrine::getTable('SipRegistrations')->findOneBySipUser($username);
-        if (!empty($row['status'])) {
-            return $row['status'];
-        } else {
-            return 'Offline';
+        if (empty($plugins['sip']))
+        {
+            return;
         }
+
+        $sip = $plugins['sip'];
+        return SofiaManager::isDeviceActive($sip['username'], locations::getLocationDomain($location_id));
+        //return $sip['username'] .'@' .locations::getLocationDomain($location_id);
     }
 }

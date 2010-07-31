@@ -4,9 +4,19 @@ class VoicemailManager
 	public static function getCount($mailbox, $domain)
 	{
 		$eslManager = new EslManager();
-		$count = $eslManager->getResponse($eslManager->api(sprintf('vm_boxcount %s@%s|all', $mailbox, $domain)));
+
+                $cmd = sprintf('vm_boxcount %s@%s|all', $mailbox, $domain);
+                Kohana::log('info','ESL: ' . $cmd);
+
+		$count = $eslManager->getResponse($eslManager->api($cmd));
 		$count = explode(':', $count);
-		$count = array('new' => $count[0], 'saved' => $count[1], 'new-urgent' => $count[2], 'saved-urgent' => $count[3]);
+
+                if(sizeof($count) != 4)  {
+                    $count = array('new' => 'No Mailbox Defined!', 'saved' => '', 'new-urgent' => '', 'saved-urgent' => '');
+                } else {
+                    $count = array('new' => $count[0], 'saved' => $count[1], 'new-urgent' => $count[2], 'saved-urgent' => $count[3]);
+                }
+
 		return $count;
 	
 	}
@@ -17,7 +27,11 @@ class VoicemailManager
 
 		//@TODO 10 second cache?
 		$eslManager = new EslManager();
-		$xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $eslManager->getResponse($eslManager->api(sprintf('vm_list %s@%s xml', $user, $domain)));
+		$cmd = sprintf('vm_list %s@%s xml', $user, $domain);
+                
+                Kohana::log('info','ESL: ' . $cmd);
+                
+                $xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $eslManager->getResponse($eslManager->api($cmd));
 
 		$idx = array('created_epoch', 'read_epoch', 'username', 'domain', 'path', 'uuid', 'cid-name', 'cid-number');
 
@@ -33,8 +47,6 @@ class VoicemailManager
 			{
 				$tmp[$header] = $voicemail->$header;
 			}
-
-
 
 			$voicemails[(string)$voicemail->uuid] = $tmp;
 		}
@@ -82,7 +94,6 @@ class VoicemailManager
         public static function blast($mailbox, $domain, $file)
         {
             //voicemail_inject,[group=]<box> <sound_file> [<cid_num>] [<cid_name>],voicemail_inject,mod_voicemail
-
                 
 		$inject = sprintf('voicemail_inject %s@%s %s %s %s', $mailbox, $domain, $file, '4000', 'Voicemail');
                 
