@@ -65,6 +65,11 @@
     min-width: 30px;
 }
 
+.auto_attendant input#autoattendant_registry_max_failures {
+    width: 30px;
+    min-width: 30px;
+}
+
 .auto_attendant input#autoattendant_description {
     width:600px;
 }
