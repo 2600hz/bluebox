@@ -24,7 +24,7 @@
  * @author     ##NAME## <##EMAIL##>
  * @version    SVN: $Id: Builder.php 5925 2009-06-22 21:27:17Z jwage $
  */
-abstract class SipDialogs extends Bluebox_Record
+class SipDialogs extends Bluebox_Record
 {
     public function setTableDefinition()
     {
