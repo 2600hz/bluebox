@@ -17,6 +17,7 @@ class Context extends Bluebox_Record
         $this->hasColumn('context_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('name', 'string', 40, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('locked', 'boolean', NULL, array('default' => false));
+        $this->hasColumn('account_id', 'integer', 11, array('unsigned' => true));
     }
 
     /**
@@ -25,6 +26,7 @@ class Context extends Bluebox_Record
     public function setUp()
     {
         // RELATIONSHIPS
+        $this->hasOne('Account', array('local' => 'account_id', 'foreign' => 'account_id'));
         $this->hasMany('NumberContext', array('local' => 'context_id', 'foreign' => 'context_id', 'cascade' => array('delete')));
 
         // BEHAVIORS
