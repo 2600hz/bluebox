@@ -1,4 +1,8 @@
 <!-- start here, see phpdoc style comments in  bb/libraries/drivers/telelphony.php -->
+<?php
+    $registry = $featurecode['registry'];
+?>
+
 <div id="feature_code_update_header" class="update feature_code module_header">
 
     <h2><?php echo $title; ?></h2>
@@ -32,9 +36,9 @@
 
     <?php echo form::open_section('XML Sections'); ?>
 
-    <?php foreach ( $featurecode['registry'] as $section => $xml ): ?>
+    <?php foreach ( FreeSwitch::getDialplanSections() as $section ): ?>
 
-        <div id="<?php echo $section; ?>-xml" class="used section-<?php echo ( strlen($xml) > 0 ? '' : 'no' ) ?>xml">
+        <div id="<?php echo $section; ?>-xml" class="used section-<?php echo ( isset($registry[$section]) ? '' : 'no' ) ?>xml">
 
           <div>
 
@@ -45,7 +49,7 @@
           </div>
 
 <textarea class="section-editor" id="featurecode_registry_<?php echo $section; ?>" name="featurecode[registry][<?php echo $section; ?>]">
-<?php echo $featurecode['registry'][$section]; ?>
+<?php echo (isset($registry[$section]) ? $registry[$section] : ''); ?>
 </textarea>
 
         </div>
@@ -56,9 +60,9 @@
 
     <?php echo form::open_section('Add XML Sections'); ?>
 
-    <?php foreach ( $featurecode['registry'] as $section => $xml ): ?>
+    <?php foreach ( FreeSwitch::getDialplanSections() as $section): ?>
 
-        <div id="<?php echo $section; ?>-empty" class="unused section-<?php echo ( strlen($xml) > 0 ? '' : 'un' ) ?>used">
+        <div id="<?php echo $section; ?>-empty" class="unused section-<?php echo ( isset($registry[$section]) ? '' : 'un' ) ?>used">
 
           <span style="font-weight: bold">+</span>
 

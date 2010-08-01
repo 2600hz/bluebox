@@ -4,22 +4,7 @@ class FeatureCode extends Bluebox_Record
 {
     public function construct()
     {
-        if ( ! empty($this->registry) )
-        {
-            return;
-        }
-
-        $registry = array();
-
-        $sections = FreeSwitch::getDialplanSections();
-
-        foreach($sections as $section)
-        {
-            // no xml defined by default
-            $registry[$section] = '';
-        }
-
-        $this->registry = $registry;
+        return (array) $this->registry;
     }
 
     /**
