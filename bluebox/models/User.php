@@ -78,10 +78,97 @@ class User extends Bluebox_Record
      */
     public function setPassword($password)
     {
-        if ($password) {
+        if ($password)
+        {
             // We need to tmp provide an un-hashed pwd string for validation
             $this->unHashedPassword = $password;
+            
             return $this->_set('password', Auth::instance()->hash_password($password));
+        }
+    }
+
+    public function preValidate(Doctrine_Event $event)
+    {
+        $user = input::instance()->post('user', array());
+
+        $record = &$event->getInvoker();
+
+        $errorStack = $this->getErrorStack();
+
+        $validation = Bluebox_Controller::$validation;
+
+        if (!isset($user['username']) AND isset($user['email_address']))
+        {
+            $record['username'] = $user['email_address'];
+        }
+
+        if (!empty($user['create_password']))
+        {
+            $record['password'] = $user['create_password'];
+        }
+
+        if (Router::$method == 'create')
+        {
+            if (empty($user['create_password']))
+            {
+                $validation->add_error('user[create_password]', 'Please provide a password');
+
+                $errorStack->add('password', 'notblank');
+            }
+
+            if (empty($user['confirm_password']))
+            {
+                $validation->add_error('user[confirm_password]', 'Please confirm your password');
+
+                $errorStack->add('password', 'noconfirm');
+            }
+
+            if ($user['confirm_password'] !== $user['create_password'])
+            {
+                $validation->add_error('user[confirm_password]', 'Password does not match');
+
+                $errorStack->add('password', 'nomatch');
+            }
+
+        }
+        else if (!empty($user['create_password']))
+        {
+            if (empty($user['confirm_password']))
+            {
+                $validation->add_error('user[confirm_password]', 'Please confirm your password');
+
+                $errorStack->add('password', 'noconfirm');
+            }
+
+            if ($user['confirm_password'] !== $user['create_password'])
+            {
+                $validation->add_error('user[confirm_password]', 'Password does not match');
+
+                $errorStack->add('password', 'nomatch');
+            }
+        }
+
+        $enforce = Kohana::config('core.pwd_complexity');
+
+        if (empty($enforce) || empty($user['create_password']))
+        {
+            return TRUE;
+        }
+
+        // at least one digit
+        if (!preg_match('/[0-9]{1,}/', $user['create_password']))
+        {
+            $validation->add_error('user[create_password]', 'Password must contain digits and letters');
+
+            $errorStack->add('password', 'nocomplexity');
+        }
+
+        // at least one character
+        if (!preg_match('/[A-Za-z]{1,}/', $user['create_password']))
+        {
+            $validation->add_error('user[create_password]', 'Password must contain digits and letters');
+
+            $errorStack->add('password', 'nocomplexity');
         }
     }
 }
