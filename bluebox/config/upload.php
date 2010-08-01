@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-$config['directory'] = '/home/james/local/git/bluebox/upload';
+$config['directory'] = DOCROOT.'upload';
  
 $config['create_directories'] = TRUE;
  
