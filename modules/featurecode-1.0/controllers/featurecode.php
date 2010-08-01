@@ -94,7 +94,7 @@ class FeatureCode_Controller extends Bluebox_Controller
             {
                 kohana::log('debug', 'Section: ' . $section . ' Empty XML');
 
-                $cleaned[$section] = '';
+                unset($cleaned[$section]);
 
                 continue;
             }
@@ -103,7 +103,7 @@ class FeatureCode_Controller extends Bluebox_Controller
             {
                 if ( $dom->loadXML(trim($xml)) )
                 {
-                    $cleaned[$section] = $dom->saveXML();
+                    $cleaned[$section] = trim(str_replace('<?xml version="1.0"?>', '', $dom->saveXML()));
 
                     kohana::log('debug', 'Section: ' . $section . ' Cleaned XML: ' . $dom->saveXML());
 

@@ -87,7 +87,7 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
 
                     $xml = FreeSWITCH::createExtension('feature_code_' . $feature['feature_code_id']);
 
-                    //$xml->replaceWithXml($feature['registry'][$section]);
+                    $xml->replaceWithXml($feature['registry'][$section]);
                 }
             }
         }

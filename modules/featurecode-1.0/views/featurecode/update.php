@@ -44,11 +44,9 @@
 
           </div>
 
-          <textarea class="section-editor" id="featurecode_registry_<?php echo $section; ?>" name="featurecode[registry][<?php echo $section; ?>]">
-
-            <?php echo $featurecode['registry'][$section]; ?>
-
-          </textarea>
+<textarea class="section-editor" id="featurecode_registry_<?php echo $section; ?>" name="featurecode[registry][<?php echo $section; ?>]">
+<?php echo $featurecode['registry'][$section]; ?>
+</textarea>
 
         </div>
 
