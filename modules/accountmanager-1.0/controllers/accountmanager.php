@@ -52,6 +52,25 @@ class AccountManager_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
+    public function create()
+    {
+        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        {
+            message::set('You are not authorized to add an account!');
+
+            $this->returnQtipAjaxForm(NULL);
+
+            url::redirect(Router::$controller);
+        }
+        else
+        {
+            $this->session->delete('multitenant_account_id');
+        }
+        
+        parent::create();
+    }
+
+
     public function edit($id = NULL)
     {
         if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
