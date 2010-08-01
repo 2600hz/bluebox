@@ -141,16 +141,6 @@ class MultiTenantRecordListener extends Doctrine_Record_Listener
     {
         $query = $event->getQuery();
 
-        $from = $query->getDqlPart('from');
-
-        // This allows the auth module to select users, regardless of the account
-        if ($from = 'User dctrn_find' AND empty(users::$user['account_id']))
-        {
-            kohana::log('debug', 'Skipping preDqlSelect for the user auth');
-
-            return;
-        }
-
         $q = &$event->getQuery();
 
         $q->andWhere('account_id = ' .$this->getUserId());
