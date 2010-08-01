@@ -133,4 +133,13 @@ class UserManager_Controller extends Bluebox_Controller
         
         parent::qtipAjaxReturn($data);
     }
+
+    protected function prepareUpdateView($baseModel = NULL)
+    {
+        $this->view->password = isset($_POST['user']['create_password']) ? $_POST['user']['create_password'] : '';
+
+        $this->view->confirm_password = isset($_POST['user']['confirm_password']) ? $_POST['user']['confirm_password'] : '';
+
+        parent::prepareUpdateView($baseModel);
+    }
 }
