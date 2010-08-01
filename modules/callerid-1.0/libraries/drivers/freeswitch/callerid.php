@@ -88,4 +88,65 @@ class FreeSwitch_CallerId_Driver extends FreeSwitch_Base_Driver
 
         $xml->update($condition .'/action[@application="set"][@data="effective_caller_id_number=${internal_caller_id_number}"]');
     }
+
+    public static function preNumber()
+    {
+        $number = Event::$data;
+        
+        $xml = Telephony::getDriver()->xml;
+                
+        if (empty($number['Destination']['plugins']['callerid']))
+        {
+            return;
+        }
+
+        if ($number['Destination'] instanceof Device)
+        {
+            return;
+        }
+
+        if (!empty($number['Destination']['plugins']['callerid']['internal_name']))
+        {
+            $internal_name = $number['Destination']['plugins']['callerid']['internal_name'];
+
+            $xml->update('/action[@application="set"][@bluebox="callerid_internal_name"][@data="effective_caller_id_name=' .$internal_name .'"]');
+        }
+        else
+        {
+            $xml->deleteNode('/action[@application="set"][@bluebox="callerid_internal_name"]');
+        }
+
+        if (!empty($number['Destination']['plugins']['callerid']['internal_number']))
+        {
+            $internal_number = $number['Destination']['plugins']['callerid']['internal_number'];
+
+            $xml->update('/action[@application="set"][@bluebox="callerid_internal_number"][@data="effective_caller_id_number=' .$internal_number .'"]');
+        }
+        else
+        {
+            $xml->deleteNode('/action[@application="set"][@bluebox="callerid_internal_number"]');
+        }
+
+        if (!empty($number['Destination']['plugins']['callerid']['external_name']))
+        {
+            $external_name = $number['Destination']['plugins']['callerid']['external_name'];
+
+            $xml->update('/action[@application="set"][@bluebox="callerid_external_name"][@data="effective_caller_id_name=' .$external_name .'"]');
+        }
+        else
+        {
+            $xml->deleteNode('/action[@application="set"][@bluebox="callerid_external_name"]');
+        }
+
+        if (!empty($number['Destination']['plugins']['callerid']['external_number']))
+        {
+            $external_number = $number['Destination']['plugins']['callerid']['external_number'];
+
+            $xml->update('/action[@application="set"][@bluebox="callerid_external_number"][@data="effective_caller_id_number=' .$external_number .'"]');
+        }
+        else
+        {
+            $xml->deleteNode('/action[@application="set"][@bluebox="callerid_external_number"]');
+        }
+    }
 }

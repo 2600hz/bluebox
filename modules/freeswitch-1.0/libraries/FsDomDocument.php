@@ -193,16 +193,16 @@ class FsDomDocument extends DOMDocument
      */
     public function setAttributeValue($xpath, $attributename = 'value', $value)
     {
-        $xpath = $this->preUpdate($xpath);
+        $search = $this->preUpdate($xpath);
 
         $xp = new DOMXPath($this);
 
         if (defined('XPATH_DEBUG'))
         {
-            Kohana::log('debug', "Search Query Is: $xpath");
+            Kohana::log('debug', "Search Query Is: $search");
         }
 
-        $elements = $xp->query($xpath);
+        $elements = $xp->query($search);
 
         if ($elements->length > 0)
         {
@@ -221,7 +221,7 @@ class FsDomDocument extends DOMDocument
 
             $this->set($create);
 
-            $elements = $xp->query($xpath);
+            $elements = $xp->query($search);
             
             return $elements->item(0)->setAttribute($attributename, $value);
         }
@@ -529,24 +529,30 @@ class FsDomDocument extends DOMDocument
 
     public function replaceWithXml($newXml, $query = '')
     {
-        // Create the base if it doesn't already exist. Delete all children of the base
-        $query = $this->preUpdate($query);
-        
-        $this->set($query);
-
-        $this->deleteChildren($query);
-
-        // Grab an XPath pointer to the query we just ran
-        $xp = new DOMXPath($this);
-
-        $base = $xp->query($query);
-
-        // Create a new XML fragment and append it to wherever $query pointed to
-        $newXmlFragment = $xmlDoc->createDocumentFragment();
+        // Create a new XML fragment
+        $newXmlFragment = $this->createDocumentFragment();
 
         $newXmlFragment->appendXML($newXml);
 
-        $base->item(0)->appendChild($newXmlFragment);
+
+        Kohana::log('debug', 'Start XML Replace');
+        // Create the base if it doesn't already exist. Delete all children of the base
+        //$query = $this->preUpdate($query);
+        Kohana::log('debug', 'Looking for $query (create it if missing)');
+        $base = $this->set($query);
+
+        // Delete anything already there
+        $this->deleteChildren($query);
+
+        // Grab an XPath pointer to the query we just ran
+        /*$xp = new DOMXPath($this);
+
+        $base = $xp->query($query);*/
+
+        // Append it to wherever the query pointed us to
+        $base->appendChild($newXmlFragment);
+
+        Kohana::log('debug', 'End XML Replace');
     }
 
 

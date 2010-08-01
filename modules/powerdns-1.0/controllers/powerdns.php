@@ -4,9 +4,8 @@
  *
  * @author K Anderson
  */
-class PowerDns_Controller extends Bluebox_Controller {
-    public $writable = array('name', 'type', 'content', 'ttl', 'prio');
-
+class PowerDns_Controller extends Bluebox_Controller
+{
     protected $baseModel = 'PdnsDomain';
 
     protected $recordTypes = array(
@@ -80,119 +79,131 @@ class PowerDns_Controller extends Bluebox_Controller {
         $this->view->grid = $this->grid->produce();
     }
 
-    public function countRecords($cell, $domain_id) {
+    public function countRecords($cell, $domain_id)
+    {
         $row = Doctrine::getTable('PdnsRecord')->findByDomainId($domain_id);
+        
         return count($row->toArray());
     }
 
-    public function add()
+    protected function createView($baseModel = NULL, $forceDelete = NULL)
     {
         // Overload the update view
-        $this->view->title = 'Add Domain';
-
-        $this->pdnsDomain = new $this->baseModel();
+        if (($forceDelete) or (strcasecmp(Router::$method, 'delete') == 0 and $forceDelete !== FALSE))
+        {
+            $this->template->content = new View('generic/delete');
+        }
+        else if (strcasecmp(Router::$method, 'create') == 0)
+        {
+            $this->template->content = new View(Router::$controller . '/add');
+        }
+        else
+        {
+            $this->template->content = new View(Router::$controller . '/edit');
+        }
         
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
-
-            if (!empty($_POST['pdnsdomain']['soa']['primary']) && !empty($_POST['pdnsdomain']['soa']['hostmaster'])) {
-                $soaRecord = array();
-
-                $soaRecord['name'] = $_POST['pdnsdomain']['name'];
-                $soaRecord['type'] = 'SOA';
-                $soaRecord['content'] = $_POST['pdnsdomain']['soa']['primary'] .' ' .$_POST['pdnsdomain']['soa']['hostmaster'] .' 0';
-
-                $records = array('PdnsRecord' => array($soaRecord));
-                $this->pdnsDomain->synchronizeWithArray($records);
-
-
-            }
-
-            if ($this->formSave($this->pdnsDomain)) {
-                url::redirect(Router_Core::$controller);
-            }
+        if (is_null($baseModel))
+        {
+            $baseModel = ucfirst($this->baseModel);
         }
 
-        // Allow our location object to be seen by the view
-        $this->view->pdnsdomain = $this->pdnsDomain;
+        $this->view->title = ucfirst(Router::$method) .' ' .inflector::humanizeModelName($baseModel);
 
-        if (!empty($_POST['pdnsdomain']['soa']['primary'])) {
-            $this->view->primary = $_POST['pdnsdomain']['soa']['primary'];
-        } else {
-             $this->view->primary = '';
-        }
-        if (!empty($_POST['pdnsdomain']['soa']['hostmaster'])) {
-            $this->view->hostmaster = $_POST['pdnsdomain']['soa']['hostmaster'];
-        } else {
-            $this->view->hostmaster = '';
-        }
-
-
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
+        Event::run('bluebox.create_view', $this->view);
     }
 
-    public function edit($id = NULL)
+    protected function save_prepare(&$object)
     {
-        // Overload the update view
-        $this->view->title = 'Edit Domain';
+        if (!empty($_POST['pdnsdomain']['soa']['primary']) && !empty($_POST['pdnsdomain']['soa']['hostmaster']))
+        {
+            $soaRecord = array();
 
-        $this->pdnsDomain = Doctrine::getTable($this->baseModel)->find($id);
-        // Was anything retrieved? If no, this may be an invalid request
-        if (!$this->pdnsDomain) {
-            // Send any errors back to the index
-            $error = i18n('Unable to locate domain id %1$d!', $id)->sprintf()->s();
-            message::set($error, array('translate' => false, 'redirect' => Router::$controller));
-            return true;
+            $soaRecord['name'] = $_POST['pdnsdomain']['name'];
+
+            $soaRecord['type'] = 'SOA';
+
+            $soaRecord['content'] = $_POST['pdnsdomain']['soa']['primary'] .' ' .$_POST['pdnsdomain']['soa']['hostmaster'] .' 0';
+
+            $records = array('PdnsRecord' => array($soaRecord));
+
+            $object->synchronizeWithArray($records);
         }
-
-        // Are we supposed to be saving stuff? (received a form post?)
-        if ($this->submitted()) {
+        else
+        {
             $records = $this->input->post('pdnsrecord', array());
 
-            foreach ($records as $key => $record) {
-                if ($record['type'] == 'SOA') {
+            foreach ($records as $key => $record)
+            {                
+                if ($record['type'] == 'SOA')
+                {
                     $records[$key]['name'] = $_POST['pdnsdomain']['name'];
-                } else {
+                }
+                else
+                {
+                    if (empty($record['name']))
+                    {
+                        unset($records[$key]);
+
+                        continue;
+                    }
+
                     $records[$key]['name'] .= '.' .$_POST['pdnsdomain']['name'];
                 }
 
-                if (empty($record['prio'])) {
+                if (empty($record['prio']))
+                {
                     $records[$key]['prio'] = 0;
                 }
 
-                if (empty($record['ttl'])) {
-                    $records[$key]['ttl'] = 7200;
+                if (empty($record['ttl']))
+                {
+                    $records[$key]['ttl'] = 600;
                 }
             }
-            
-            // sync the group members with the group
-            $this->pdnsDomain->PdnsRecord->synchronizeWithArray($records);
 
-            if ($this->formSave($this->pdnsDomain)) {
-                url::redirect(Router_Core::$controller);
-            }
+            // sync the group members with the group
+            $object->PdnsRecord->synchronizeWithArray($records);
+        }
+
+        parent::save_prepare($object);
+    }
+
+    protected function prepareUpdateView($baseModel = NULL)
+    {
+        if (!empty($_POST['pdnsdomain']['soa']['primary']))
+        {
+            $this->view->primary = $_POST['pdnsdomain']['soa']['primary'];
+        }
+        else
+        {
+             $this->view->primary = '';
+        }
+
+        if (!empty($_POST['pdnsdomain']['soa']['hostmaster']))
+        {
+            $this->view->hostmaster = $_POST['pdnsdomain']['soa']['hostmaster'];
+        }
+        else
+        {
+            $this->view->hostmaster = '';
         }
 
         // populate the keys
         $records = array();
-        foreach ($this->pdnsDomain->PdnsRecord as $record) {
+
+        foreach ($this->pdnsdomain->PdnsRecord as $record)
+        {
             $record = $record->toArray();
-            $record['name'] = str_replace('.' .$this->pdnsDomain['name'], '', $record['name']);
+
+            $record['name'] = str_replace('.' .$this->pdnsdomain['name'], '', $record['name']);
+
             $records[$record['id']] = $record;
         }
-        $this->view->records = $records;
 
-        // Allow our location object to be seen by the view
-        $this->view->pdnsdomain = $this->pdnsDomain;
+        $this->view->records = $records;
+        
         $this->view->recordTypes = $this->recordTypes;
         
-        // Execute plugin hooks here, after we've loaded the core data sets
-        plugins::views($this);
-    }
-
-    public function delete($id = NULL)
-    {
-        $this->stdDelete($id);
+        parent::prepareUpdateView($baseModel);
     }
 }

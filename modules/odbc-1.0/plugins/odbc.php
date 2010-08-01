@@ -22,94 +22,20 @@
  * @package Bluebox
  * @subpackage Odbc
  */
-
-
-
 class Odbc_Plugin extends Bluebox_Plugin
 {
     protected $preloadModels = array('OdbcMap');
 
-    public function add()
+    protected $name = 'odbc';
+
+    protected function viewSetup()
     {
-        // Not yet!
-    }
+        $this->subview = new View('odbc/associate');
 
-    public function update()
-    {
-        $subview = new View('odbc/manage');
-        $subview->tab = 'Store in ODBC?';
-        $subview->section = 'ODBC';
+        $this->subview->tab = 'main';
 
-        // What are we working with here?
-        $base = $this->getBaseModelObject();
+        $this->subview->section = 'general';
 
-        // While the field may be defined by an app or another module, it may not be populated! Double-check
-        if (!$base) {
-            return FALSE;	// Nothing to do here.
-        }
-
-        // check if there is an odbcMap for this interface, otherwise populate with dummy values....
-        if (!empty($base['OdbcMap']['odbc_id'])) {
-            // Populate form data with whatever our database record has
-            $subview->odbcmap = $base->OdbcMap->toArray();
-            $subview->enable_odbc = !empty($base->OdbcMap->odbc_id);
-        } else {
-            $subview->odbcmap = array('odbc_id' => 0);
-            $subview->enable_odbc = FALSE;
-        }
-
-        // If we are coming from a previous form field/post, we want to repopulate the previous field entries again on this page so
-        // that errors/etc. can be corrected, rather then lost.
-        if (isset($this->repopulateForm)) {
-            $subview->odbcmap = arr::overwrite($subview->odbcmap, $this->repopulateForm['odbcmap']);
-        }
-
-        $this->views[] = $subview;
-    }
-
-    public function save()
-    {
-        // What are we working with here?
-        $base = $this->getBaseModelObject();
-
-        // While the field may be defined by an app or another module, it may not be populated! Double-check
-        if (!$base)
-            return FALSE;	// Nothing to do here.
-
-        // if the enabled_odbc check mark is not present then do not
-        // add odbc support, and if it is there remove it.
-        if(empty($_POST['odbcmap']['enable_odbc'])) {
-            if ($base->relatedExists('OdbcMap')) {
-                $base->refreshRelated('OdbcMap');
-                unset($base->OdbcMap);
-            }
-            return TRUE;
-        }
-
-        // if odbc support is enabled create a new mapping if one doesnt exist
-        if ((!$base->OdbcMap) or (!$base->OdbcMap->odbcmap_id)) {
-            if (get_parent_class($base) == 'Bluebox_Record') {
-                $class = get_class($base) . 'OdbcMap';
-            } else {
-                $class = get_parent_class($base) . 'OdbcMap';
-            }
-            
-            if (class_exists($class, TRUE)) {
-                $base->OdbcMap = new $class();
-            } else {
-                // No class that extends this plug-in - do nothing
-                return FALSE;
-            }
-        }
-
-        $form = $this->input->post('odbcmap');
-        $fieldNames = array('odbc_id');
-
-        // Only map fields that don't have relations, for "safety"
-        foreach ($fieldNames as $fieldName) {
-            if (isset($form[$fieldName])) {
-                $base->OdbcMap->$fieldName = $form[$fieldName];
-            }
-        }
+        return TRUE;
     }
 }

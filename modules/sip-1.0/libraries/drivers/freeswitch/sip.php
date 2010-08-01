@@ -25,6 +25,22 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/params/param[@name="dial-string"]{@value="' . '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}"}');
 
+            if ($base['context_id'] > 0)
+            {
+                $xml->update('/variables/variable[@name="user_context"]{@value="context_' .$base['context_id'] . '"}');
+
+                 // In most cases, the call transfer context should match the default context
+                $xml->update('/variables/variable[@name="force_transfer_context"]{@value="context_' .$base['context_id'] . '"}');
+            }
+            else
+            {
+                $xml->deleteNode('/variables/variable[@name="user_context"]');
+
+                $xml->deleteNode('/variables/variable[@name="force_transfer_context"]');
+            }
+
+            $xml->update('/variables/variable[@name="user_originated"]{@value="true"}');
+
             $xml->update('/variables/variable[@name="toll_allow"]{@value="domestic"}');
 
             $xml->update('/variables/variable[@name="accountcode"]{@value="' .$sip['username'] .'"}');
@@ -61,17 +77,30 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
                     $xml->update('/param[@name="password"]{@value="TCAPI_User"}');
                 }
 
+                // Route calls with no specific DID info to an inbound number
+                if (!empty($plugins['sip']['inbound'])) {
+                    $xml->update('/param[@name="extension"]{@value="' .$plugins['sip']['inbound'] .'"}');
+                } else {
+                    $xml->deleteNode('/param[@name="extension"]');
+                }
+
+                // Force a specific contact username in the contact header
                 if(!empty($plugins['sip']['contact']))
                 {
-                    $xml->update('/settings/param[@name="extension"]{@value="' .$plugins['sip']['contact'] .'"}');
-
-                    $xml->update('/settings/param[@name="extension-in-contact"]{@value="true"}');
+                    $xml->update('/param[@name="extension-in-contact"]{@value="' . $plugins['sip']['contact'] . '"}');
                 }
                 else
                 {
-                    $xml->deleteNode('/settings/param[@name="extension"]');
+                    $xml->deleteNode('/param[@name="extension-in-contact"]');
+                }
 
-                    $xml->deleteNode('/settings/param[@name="extension-in-contact"]');
+                // Add auto_to_user support, allowing DID to be in a different spot
+                if (!empty($plugins['sip']['to_user'])) {
+                    $xml->update('/param[@name="auto_to_user"]{@value="true"}');
+                }
+                else
+                {
+                    $xml->deleteNode('/param[@name="auto_to_user"]');
                 }
             }
         }

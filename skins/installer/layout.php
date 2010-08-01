@@ -23,7 +23,7 @@
                 ?>
                 |
                 <?php
-                    echo html::anchor('http://bluebox.org/v3/wiki', __('Wiki'), array(
+                    echo html::anchor('http://www.2600hz.org', __('Wiki'), array(
                         'title' => 'Find answers on the wiki for common problems.',
                         'target' => '_blank'
                     ));
@@ -36,9 +36,9 @@
             <!-- Logo for the page -->
             <div id="logo_container">
             <?php
-                echo html::image('skins/installer/assets/img/logo2.png', array(
-                    'alt' => 'Bluebox v3 Let freedom ring!',
-                ));
+                //echo html::image('skins/installer/assets/img/logo2.png', array(
+                //    'alt' => 'Bluebox v3 Let freedom ring!',
+                //));
             ?>
             </div>
 
@@ -46,7 +46,7 @@
 
             <div class="bluebox_desc">
             <?php
-                echo __('Modular Telephony Software Framework and Application');
+                echo __('Our free software. Your next voip system.');
             ?>
             </div>
             <?php message::render(NULL, array('growl' => FALSE, 'html' => TRUE)); ?>

@@ -52,7 +52,7 @@ class locations
 
         if($location)
         {
-            return $location->domain;
+            return $location['domain'];
         }
     }   
 }
