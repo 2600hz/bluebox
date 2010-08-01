@@ -1,42 +1,25 @@
-<div id="my_module_update_header" class="update my_module module_header">
+<?php echo form::open_section('Phone Provisioner'); ?>
 
-    <h2><?php echo $title; ?></h2>
-
-</div>
-
-<div id="my_module_update_form" class="txt-left form my_module update">
-
-    <?php echo form::open(); ?>
-
-    <?php echo form::open_section('My Module'); ?>
-
-        <div class="field">
-            <?php echo form::label('mymodule[mydatafield1]', 'Field 1:'); ?>
-            <?php echo form::input('mymodule[mydatafield1]'); ?>
-        </div>
-
-        <div class="field">
-            <?php echo form::label('mymodule[mydatafield2]', 'Field 2:'); ?>
-            <?php echo form::input('mymodule[mydatafield2]'); ?>
-        </div>
-
-    <?php echo form::close_section(); ?>
-
+    <div class="field">
     <?php
-        if (isset($views))
-        {
-            echo subview::renderAsSections($views);
-        }
+        echo form::label('provisioner[type]', 'Phone Type:');
+        echo form::input('provisioner[type]');
     ?>
-
-    <div class="buttons form_bottom">
-
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-
     </div>
 
-    <?php echo form::close(); ?>
+    <div class="field">
+    <?php
+        echo form::label('provisioner[model]', 'Phone Model:');
+        echo form::dropdown('provisioner[model]', array('GXP2000', 'GXP2020'));
+    ?>
+    </div>
 
-</div>
+    <div class="field">
+    <?php
+        echo html::anchor('provisioner/configure', 'Configure Phone', array('class' => 'qtipAjaxForm'));
+    ?>
+    </div>
+
+
+
+<?php echo form::close_section(); ?>

@@ -10,9 +10,9 @@
  *      require you to repair you module via the package manager.
  * ============================================================================
  */
-class MyProvisioner_1_0_Configure extends Bluebox_Configure
+class Provisioner_1_1_Configure extends Bluebox_Configure
 {
-    public static $version = 1.0;
+    public static $version = 1.1;
     public static $packageName = 'provisioner';
     public static $author = 'Andrew Nagy';
     public static $vendor = 'The 159';
