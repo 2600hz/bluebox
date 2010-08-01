@@ -19,15 +19,14 @@
   </div>
   <?php echo form::close_section(); ?>
 
-  <?php echo form::open_section('Unused Sections'); ?>
-  <?php foreach ( $this->featureCode->registry as $section => $xml ): ?>
-    <div id="<?php echo $section; ?>-empty" class="unused section-<?php echo ( strlen($xml) > 0 ? '' : 'un' ) ?>used">
-      <span style="font-weight: bold">+</span><span><?php echo ucfirst($section) ?></span>
-    </div>    
-  <?php endforeach; ?>
-  <?php echo form::close_section(); ?>
-
-  <?php echo form::open_section('Sections'); ?>
+    <?php
+        if (isset($views))
+        {
+            echo subview::renderAsSections($views, array('number_inventory'));
+        }
+    ?>
+    
+  <?php echo form::open_section('XML Sections'); ?>
     <?php foreach ( $this->featureCode->registry as $section => $xml ): ?>
     <div id="<?php echo $section; ?>-xml" class="used section-<?php echo ( strlen($xml) > 0 ? '' : 'no' ) ?>xml">
       <div>
@@ -41,6 +40,14 @@
       ><?php echo $this->featureCode->registry[$section]; ?></textarea>
     </div>    
     <?php endforeach; ?>
+  <?php echo form::close_section(); ?>
+
+  <?php echo form::open_section('Add XML Sections'); ?>
+  <?php foreach ( $this->featureCode->registry as $section => $xml ): ?>
+    <div id="<?php echo $section; ?>-empty" class="unused section-<?php echo ( strlen($xml) > 0 ? '' : 'un' ) ?>used">
+      <span style="font-weight: bold">+</span><span><?php echo ucfirst($section) ?></span>
+    </div>
+  <?php endforeach; ?>
   <?php echo form::close_section(); ?>
 
   <div class="buttons form_bottom">
