@@ -12,37 +12,20 @@
 
         <div class="field">
         <?php
-            echo form::label('account[name]', 'Account Name:');
+            echo form::label('account[name]', 'Name:');
             echo form::input('account[name]');
         ?>
         </div>
-    
-    <?php echo form::close_section(); ?>
-    
-    <?php echo form::open_section('Account Status'); ?>
+
         <div class="field">
         <?php
-            echo form::label('account[type]', 'Account Type:');
+            echo form::label('account[type]', 'Type:');
             echo form::dropdown('account[type]', Account::$types);
         ?>
         </div>
 
-        <div class="field">
-        <?php
-            echo form::label('account[status]', 'Account Active:');
-            echo form::checkbox('account[status]');
-        ?>
-        </div>
-
-        <div class="field">
-        <?php
-            echo form::label('account[registry][allow_login]', 'Allow Web Login:');
-            echo form::checkbox('account[registry][allow_login]');
-        ?>
-        </div>
-
     <?php echo form::close_section(); ?>
-
+    
     <?php
         if (isset($views))
         {
