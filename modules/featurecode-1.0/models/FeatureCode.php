@@ -1,4 +1,5 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
 class FeatureCode extends Bluebox_Record
 {
     public function construct()
@@ -27,10 +28,7 @@ class FeatureCode extends Bluebox_Record
     public function setTableDefinition()
     {
         // COLUMN DEFINITIONS
-        $this->hasColumn('feature_code_id', 'integer', 11, array('unsigned' => TRUE
-                     ,'notnull' => TRUE
-                     ,'primary' => TRUE
-                     ,'autoincrement' => TRUE));
+        $this->hasColumn('feature_code_id', 'integer', 11, array('unsigned' => TRUE , 'notnull' => TRUE , 'primary' => TRUE, 'autoincrement' => TRUE));
         $this->hasColumn('name', 'string', 80, array('notnull' => TRUE, 'minlength' => 2));
         $this->hasColumn('description', 'string', 512);
         // section-specific XML is stored in the $registry, provided by the GenericStructure behaviour

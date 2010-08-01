@@ -28,7 +28,8 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
        // $xml->replaceWithXml($destination['registry']['prenumber']);
     }
 
-    public static function postNumber($number) {
+    public static function postNumber($number)
+    {
         
     }
 
