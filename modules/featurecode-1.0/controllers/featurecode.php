@@ -90,6 +90,8 @@ class FeatureCode_Controller extends Bluebox_Controller
 
             $dom->formatOutput = FALSE;
 
+            $cleaned = array();
+
             if ( strlen(trim($xml)) == 0 )
             {
                 kohana::log('debug', 'Section: ' . $section . ' Empty XML');

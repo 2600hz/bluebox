@@ -81,13 +81,15 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
         {
             foreach ($features as $feature)
             {
+                $xml = FreeSWITCH::createExtension('feature_code_' . $feature['feature_code_id']);
+
                 if (isset($feature['registry'][$section]))
                 {
                     Kohana::log('debug', 'Generating section ' . $section . ' for feature code ' . $feature['feature_code_id']);
 
-                    $xml = FreeSWITCH::createExtension('feature_code_' . $feature['feature_code_id']);
-
                     $xml->replaceWithXml($feature['registry'][$section]);
+                } else {
+                    $xml->deleteNode();
                 }
             }
         }
