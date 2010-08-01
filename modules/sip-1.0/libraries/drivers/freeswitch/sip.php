@@ -80,7 +80,9 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
                 // Route calls with no specific DID info to an inbound number
                 if (!empty($plugins['sip']['inbound'])) {
                     $xml->update('/param[@name="extension"]{@value="' .$plugins['sip']['inbound'] .'"}');
-                } else {
+                } else if (!empty($plugins['sip']['to_user'])) {
+                    $xml->update('/param[@name="extension"]{@value="auto_to_user"}');
+		} else {
                     $xml->deleteNode('/param[@name="extension"]');
                 }
 
@@ -95,13 +97,13 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
                 }
 
                 // Add auto_to_user support, allowing DID to be in a different spot
-                if (!empty($plugins['sip']['to_user'])) {
-                    $xml->update('/param[@name="auto_to_user"]{@value="true"}');
-                }
-                else
-                {
+                //if (!empty($plugins['sip']['to_user'])) {
+                //    $xml->update('/param[@name="auto_to_user"]{@value="true"}');
+               // }
+               // else
+               // {
                     $xml->deleteNode('/param[@name="auto_to_user"]');
-                }
+               // }
             }
         }
     }
