@@ -14,6 +14,11 @@ class AccountManager_Controller extends Bluebox_Controller
             )
         );
 
+        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        {
+            $grid->where('account_id = ', users::$user['account_id']);
+        }
+
         // Add the base model columns to the grid
         $grid->add('account_id', 'ID', array(
                 'hidden' => true,
@@ -49,14 +54,42 @@ class AccountManager_Controller extends Bluebox_Controller
 
     public function edit($id = NULL)
     {
-        $this->session->set('multitenant_account_id', $id);
+        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        {
+            if (users::$user['account_id'] != $id)
+            {
+                message::set('You are not authorized to manage that account!');
 
+                $this->returnQtipAjaxForm(NULL);
+
+                url::redirect(Router::$controller);
+            }
+        }
+        else
+        {
+            $this->session->set('multitenant_account_id', $id);
+        }
+        
         parent::edit($id);
     }
 
     public function delete($id = NULL)
     {
-        $this->session->set('multitenant_account_id', $id);
+        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        {
+            if (users::$user['account_id'] != $id)
+            {
+                message::set('You are not authorized to delete that account!');
+
+                $this->returnQtipAjaxForm(NULL);
+
+                url::redirect(Router::$controller);
+            }
+        }
+        else
+        {
+            $this->session->set('multitenant_account_id', $id);
+        }
 
         parent::delete($id);
     }
