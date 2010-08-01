@@ -472,6 +472,20 @@ class FreeSwitch extends Telephony_Driver
         return self::$instance->xml; 
     }
 
+    /**
+     * Create an empty <extension> section in the current dialplan.
+     * Note that in addition to passing in a name, we prefix the currently in-memory section name
+     * to help with organizing dialplan priorities. We also put this extension into the current context.
+     *
+     * If you want to change or set the context, you can pass them in as optional params or permanently
+     * change them via setContext() and setSection()
+     *
+     * @param string $extensionName Name of the extension we're creating
+     * @param string $section Section to add this extension to
+     * @param string $context Dialplan context we're adding to
+     * @return FsDomDocument Return the FsDomDocument
+     */
+
     public static function createExtension($extensionName, $section = NULL, $context = NULL, array $options = array())
     {
         if (!$context)
