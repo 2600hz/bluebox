@@ -10,8 +10,6 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/params/param[@name="sip-forbid-register"]{@value="true"}');
 
-            $xml->update('/params/param[@name="vm-disk-quota"]{@value="1800"}');
-
             $xml->update('/params/param[@name="vm-password"]{@value="' . $base['password'] . '"}');
 
             $xml->update('/params/param[@name="vm-message-ext "]{@value="' . $base['audio_format'] . '"}');
@@ -63,14 +61,11 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         }
         else if($base instanceof Device)
         {
-
             $voicemail = $base['plugins']['voicemail'];
 
             $domain = '$${location_' .$base['User']['location_id'] .'}';
 
             $xml = FreeSwitch::setSection('user', $domain, $base['device_id']);
-
-
 
             if (empty($base['plugins']['voicemail']['mwi_box']))
             {
@@ -198,12 +193,8 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         {
             return;
         }
-
-        $destination = $number['Destination'];
-
-        $domain = 'voicemail_' .$destination['account_id'];
-
-        $xml->update('/action[@application="voicemail"]{@data="default ' . $domain .' ' .$voicemail['mailbox'] .'"}');
+        
+        $xml->update('/action[@application="voicemail"]{@data="default voicemail_' .$voicemail['account_id'] .' ' .$voicemail['mailbox'] .'"}');
 
         $xml->update('/action[@application="hangup"]');
     }
