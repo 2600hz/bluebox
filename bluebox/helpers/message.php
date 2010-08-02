@@ -170,6 +170,8 @@ class message
             {
                 if ( $options['growl']=== TRUE || (is_array($options['growl']) && in_array($flashMessage['type'], $options['growl'])))
                 {
+                    Event::run('bluebox.message_growl', $flashMessage['text']);
+
                     $flashMessage['text'] = str_replace('\'', '\\\'', $flashMessage['text']);
 
                     $growl[] = str_replace($search, $flashMessage, $options['growlTemplate']);
@@ -179,9 +181,12 @@ class message
             // if we are generating a html markup then do so
             if (!empty($options['html']))
             {
-                if ( $options['html']=== TRUE || (is_array($options['html']) && in_array($flashMessage['type'], $options['html']))) {
-                    $flashMessage['text'] .= str_replace('"' , '\'', self::renderHelp());
-                    
+                if ( $options['html']=== TRUE || (is_array($options['html']) && in_array($flashMessage['type'], $options['html'])))
+                {
+                    Event::run('bluebox.message_html', $flashMessage['text']);
+
+                    $flashMessage['text'] = str_replace('"' , '\'', $flashMessage['text']);
+
                     $html[] = str_replace($search, $flashMessage, $options['htmlTemplate']);
                 }
             }
