@@ -26,7 +26,9 @@ class Installer_Controller extends Bluebox_Controller
         // System Modules
         'accountmanager',
         'usermanager',
-        'rosetta'
+        'rosetta',
+        'errorreporter',
+        'dashboard'
     );
 
     /**
