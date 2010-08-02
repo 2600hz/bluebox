@@ -1,10 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * AsteriskManager_Exception.php - AsteriskManager_Exception class
- * Created on Oct 6, 2009
- *
- * @author Karl Anderson
- * @license LGPL
+ * @package    Asterisk
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
-class AsteriskManager_Exception extends Exception {
+class AsteriskManager_Exception extends Exception
+{
+
 }

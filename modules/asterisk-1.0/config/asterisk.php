@@ -6,10 +6,14 @@ $config['default_packages'] = array(
     'locationmanager',
     'numbermanager',
     'devicemanager',
-
-
+    'mediamanager',
+    'conference',
+    'autoattendant',
+    'ringgroup',
+    'voicemail',
 
     // Plugins
+    'address',
     'sip',
 
 
@@ -18,33 +22,13 @@ $config['default_packages'] = array(
 
 
     // Modules
-//    
-//    
-//    'mediamanager',
 //    'trunkmanager',
-//    'autoattendant',
-//    'conference',
-//    'ringgroup',
 //    'timeofday',
-//    'voicemail',
-//
+//    
 //    // Plugins
-//    'address',
 //    'callerid',
 //    'simpleroute',
-//    'sip',
 //    'timezone',
-//
-//    // Freeswitch
-//    'esl',
-//    'mediaoption',
-//    'multitenant',
-//    'netlistmanager',
-//    'odbc',
-//    'sipinterface',
-//    'externalxfer',
-//    //'sofia',
-//    'xmleditor',
 );
 
 /*

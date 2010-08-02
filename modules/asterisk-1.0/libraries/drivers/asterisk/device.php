@@ -22,11 +22,13 @@ class Asterisk_Device_Driver extends Asterisk_Base_Driver
 
         $destination = $number['Destination'];
 
+        $numberOptions = astrsk::getNumberOptions($number);
+
         if ($destination instanceof Device)
         {
             if (!empty($destination['plugins']['sip']['username']))
             {
-                $doc->add('Dial(SIP/' .$destination['plugins']['sip']['username'] .')');
+                $doc->add('Dial(SIP/' .$destination['plugins']['sip']['username'] .',' .$numberOptions['timeout'] .')');
             }
         }
     }

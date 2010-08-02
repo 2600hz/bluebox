@@ -54,7 +54,7 @@ class astrsk
             return false;
         }
         
-        return sprintf("%s, %s, 1", $context, $n['number']);
+        return sprintf("%s,%s,1", $context, $n['number']);
     }
 
     public static function getContextOfNumber($number_id)

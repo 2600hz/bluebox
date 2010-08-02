@@ -44,31 +44,25 @@ class Asterisk_NumberContext_Driver extends Asterisk_Base_Driver
             // also creates a dummy [number_X] section
             // NOTE: This also sets a pointer in memory for the preNumber, actual dialplan and postNumber routines to use
             // too add their "stuff" to this dialplan entry
-            $doc->createDestination($base['context_id'], $base['Number']['number_id'], $base['Number']['number']);
+            //$doc->createDestination($base['context_id'], $base['Number']['number_id'], $base['Number']['number']);
+
+            $doc->createDialplanExtension($base['context_id'], $base['Number']['number_id'], $base['Number']['number']);
+
+            // Make sure the extensions list for this context exists
+            $doc->createContext('extensions.conf', 'extensions_' .$base['context_id'], $base['Number']['number']);
+
+            // Delete any existing references to this particular extension number in the extensions list
+            $doc->deleteDialplanExtension($base['context_id'], $base['Number']['number']);
+
+            // Add a NoOp at the top of all numbers
+            $doc->add('NoOp', 1, array('replace' => TRUE));
 
             // Add an extension-specific prenumber items
             // Note that unlike other dialplan adds, this one assumes you're already in the right spot in the number_X section
             dialplan::preNumber($base['Number']);
 
-            // Add related final destination XML
-            $destinationDriverName = Telephony::getDriverName() .'_' .substr($base['Number']['class_type'], 0, strlen($base['Number']['class_type']) - 6) .'_Driver';
-
-              Kohana::log('debug', 'Asterisk -> Looking for destination driver ' .$destinationDriverName);
-
-            // Is there a driver?
-            if (class_exists($destinationDriverName, TRUE)) 
-            {
-                // Logging
-                Kohana::log('debug', 'Asterisk -> Adding information for destination ' .$base['Number']['number_id'] .' from model "' .get_class($base['Number']) .'" to our telephony configuration...');
-
-                // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
-                // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
-                kohana::log('debug', 'Asterisk -> EVAL ' .$destinationDriverName .'::dialplan($base->Number);');
-                
-                // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
-                // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
-                $success = eval('return ' . $destinationDriverName . '::dialplan($base->Number);');
-            }
+            // Replace nay matching extension definitions
+            $doc->add('GoSub(number_' .$base['Number']['number_id'] . ',${EXTEN},1)', NULL, array('replace' => TRUE));
 
             // Add a failure route for this dialplan
             // Note that unlike other dialplan adds, this one assumes you're already in the right spot in the dialplan
@@ -92,7 +86,7 @@ class Asterisk_NumberContext_Driver extends Asterisk_Base_Driver
 
                     case 'continue':
                         $doc->add('Return');
-                    
+
                         break;
 
                     case 'hangup':
@@ -107,6 +101,29 @@ class Asterisk_NumberContext_Driver extends Asterisk_Base_Driver
                 $doc->add('Hangup');
             }
 
+            $doc->createContext('extensions.conf', 'number_' .$base['Number']['number_id'], NULL, array('replace' => TRUE));
+
+            // Add related final destination XML
+            $destinationDriverName = Telephony::getDriverName() .'_' .substr($base['Number']['class_type'], 0, strlen($base['Number']['class_type']) - 6) .'_Driver';
+
+              Kohana::log('debug', 'Asterisk -> Looking for destination driver ' .$destinationDriverName);
+
+            // Is there a driver?
+            if (class_exists($destinationDriverName, TRUE)) 
+            {
+                // Logging
+                Kohana::log('debug', 'Asterisk -> Adding information for destination ' .$base['Number']['number_id'] .' from model "' .get_class($base['Number']) .'" to our telephony configuration...');
+
+                // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
+                // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
+                kohana::log('debug', 'Asterisk -> EVAL ' .$destinationDriverName .'::dialplan($base->Number);');
+                
+                // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
+                // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
+                $success = eval('return ' . $destinationDriverName . '::dialplan($base->Number);');
+            }
+
+            $doc->add('Return');
 
             return TRUE;
         } 

@@ -29,6 +29,8 @@ class Asterisk_Number_Driver extends Asterisk_Base_Driver
             // Remove the destination itself, fully. Despite this being called create, an empty context gets deleted automagically at save time
             kohana::log('debug', 'Number id ' .$obj['number_id'] .' is no longer in use in any context, deleteing!');
             
+            $doc = Telephony::getDriver()->doc;
+
             $doc->deleteContext('extensions.conf', 'number_' . $obj['number_id']);
         }
     }
