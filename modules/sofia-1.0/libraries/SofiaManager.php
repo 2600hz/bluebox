@@ -1,4 +1,4 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 /*
  * FreePBX Modular Telephony Software Library / Application
  *
@@ -24,42 +24,50 @@
  *
  *
 */
-
-
-
-class SofiaManager {
+class SofiaManager
+{
     /*
      * Check to see if a device is registered on the switch
     */
-    public static function isDeviceActive($user, $domain) {
+    public static function isDeviceActive($user, $domain)
+    {
         $registraions = self::getRegistrationGlob();
-        foreach($registraions as $registration) {
+
+        foreach($registraions as $registration)
+        {
+            if (empty($registration['user']))
+            {
+                continue;
+            }
+
             $device = explode('@', $registration['user']);
 
             $deviceUser = $device[0];
+
             $deviceDomain = $device[1];
 
-            if($deviceUser == $user && $deviceDomain == $domain) {
-                return '<b>Registered</b>';
 
+            if($deviceUser == $user && $deviceDomain == $domain)
+            {
+                return '<b>Registered</b>';
             }
         }
 
         return 'Unknown';
-
     }
 
     /*
      * Get registrations for a switch
      * @param string $SIPInterface Name of SIP interface
     */
-    public static function getRegistrations($SIPInterface) {
+    public static function getRegistrations($SIPInterface)
+    {
         $cache = Cache::instance();
 
         $sipRegCache = $cache->get('cache_' . $SIPInterface);
 
-        if(!$sipRegCache) {
-
+        if(!$sipRegCache)
+        {
             Kohana::log('info', 'Using cached registration');
 
             $eslManager = new EslManager();
@@ -79,29 +87,37 @@ class SofiaManager {
             foreach($registrations['registration'] as $r) // cast to array from stl
             {
                 $r = (array)$r;
+
                 $r['interface'] = $SIPInterface;
+
                 $result[] = $r;
             }
 
             return $result;
-        } else {
-
+        } 
+        else
+        {
             return $sipRegCache;
         }
     }
 
-    public static function getSIPInterfaces() {
+    public static function getSIPInterfaces()
+    {
         $interfaces = Doctrine::getTable('SipInterface')->findAll();
 
         $interfaceArr = array();
 
-        if($interfaces) {
-            foreach($interfaces as $interface) {
+        if($interfaces)
+        {
+            foreach($interfaces as $interface)
+            {
                 $interfaceArr[$interface->sipinterface_id] = 'sipinterface_' . $interface->sipinterface_id; // all sip interfaces start with sipinterface_
             }
-            return $interfaceArr;
 
-        } else {
+            return $interfaceArr;
+        }
+        else
+        {
             throw new Exception('Failed to find SIP interfaces');
         }
     }
@@ -110,13 +126,17 @@ class SofiaManager {
      * Scan for all interfaces and put all registrations into a datastructure we can use in Bluebox
     */
 
-    public static function getRegistrationGlob() {
+    public static function getRegistrationGlob()
+    {
         $interfaces = self::getSIPInterfaces();
+
         $registrationGlobArr = array();
 
-        foreach($interfaces as $interface) {
+        foreach($interfaces as $interface)
+        {
             $registrationGlobArr = array_merge($registrationGlobArr, self::getRegistrations($interface));
         }
+
         return $registrationGlobArr;
     }
 }

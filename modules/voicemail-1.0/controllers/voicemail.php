@@ -77,5 +77,27 @@ class Voicemail_Controller extends Bluebox_Controller
         
         return '';
     }
+
+    protected function save_succeeded(&$object)
+    {
+        $numbers = Doctrine::getTable('Number')->findAll();
+
+        foreach ($numbers as $number)
+        {
+            if (empty($number['dialplan']['terminate']['voicemail']))
+            {
+                continue;
+            }
+
+            if ($number['dialplan']['terminate']['voicemail'] != $object['voicemail_id'])
+            {
+                continue;
+            }
+
+            $number->save();
+        }
+
+        parent::save_succeeded($object);
+    }
 }
 

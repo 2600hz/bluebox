@@ -120,7 +120,11 @@ class users
         {
             $userEmail = $authentic->get_user();
 
+            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
             self::$user = Doctrine::getTable('User')->findOneByEmailAddress($userEmail);
+
+            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
             if (!empty(self::$user['account_id']))
             {

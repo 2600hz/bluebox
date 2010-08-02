@@ -94,9 +94,13 @@ class AutoAttendant_Controller extends Bluebox_Controller
                 continue;
             }
 
+            $displayName = str_replace('Number', '', $numberType['class']);
+
+            $displayName = inflector::humanizeModelName($displayName);
+
             $numberingOptions['number_pools'][] = array(
                 'value' => $numberType['class'],
-                'text' => $numberType['class']
+                'text' => $displayName
             );
             
             foreach($numbers as $number)

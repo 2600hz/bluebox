@@ -11,10 +11,10 @@ $config['default_packages'] = array(
     // Modules
     'contextmanager',
     'locationmanager',
-    //'mediamanager',
+    'mediamanager',
     'numbermanager',
     'trunkmanager',
-    //'autoattendant',
+    'autoattendant',
     'conference',
     'devicemanager',
     'ringgroup',
@@ -26,7 +26,8 @@ $config['default_packages'] = array(
     'callerid',
     'simpleroute',
     'sip',
-
+    'timezone',
+    
     // Freeswitch
     'esl',
     'mediaoption',
@@ -34,6 +35,7 @@ $config['default_packages'] = array(
     'netlistmanager',
     'odbc',
     'sipinterface',
+    'externalxfer',
     //'sofia',
     'xmleditor',
 );
