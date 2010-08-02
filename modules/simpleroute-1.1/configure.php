@@ -31,7 +31,6 @@ class SimpleRoute_1_1_Configure extends Bluebox_Configure
         )
     );
     
-
     public function postInstall()
     {
         $outboundPatterns = kohana::config('simpleroute.outbound_patterns');
@@ -76,5 +75,10 @@ class SimpleRoute_1_1_Configure extends Bluebox_Configure
 
             $simpleRoute->save();
         }
+    }
+
+    public function migrate()
+    {
+        Doctrine::createTablesFromArray(array('SimpleRoute'));
     }
 }
