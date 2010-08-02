@@ -128,7 +128,11 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         // Turn off session timers, they are irritating and cause all sorts of issues
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
 
-        $xml->update('/settings/param[@name="user-agent-string"][@value="Configured by TCAPI"]');
+        // Enable compact headers by default. With all the Codecs FS now supports we see lots of
+        // bad behavior re: UDP packets that are too large and get fragmented
+        $xml->update('/settings/param[@name="enable-compact-headers"]{@value="true"}');
+
+        $xml->update('/settings/param[@name="user-agent-string"][@value="Configured by 2600hz"]');
 
         if ($aclList = netlists::getListName($sipinterface['nat_net_list_id']))
         {

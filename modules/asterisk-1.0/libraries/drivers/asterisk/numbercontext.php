@@ -1,30 +1,24 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * number.php - Asterisk Number driver
- *
- * Creates the basic context and dialplan extensions for all phone numbers in the system, and calls the correct methods to add
- * their number-related tasks to the specific number being generated.
- *
- * @author K Anderson
- * @license LGPL
- * @package Asterisk
- * @subpackage Asterisk_Driver
+ * @package    Asterisk
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
 class Asterisk_NumberContext_Driver extends Asterisk_Base_Driver
 {
     /**
      * Indicate we support Asterisk with this SIP Device and provide code to save SIP device specific settings
      */
-    public static function set($obj)
+    public static function set($base)
     {
-        kohana::log('debug', 'Create a context dialplan for id ' .$obj->context_id);
+        kohana::log('debug', 'Asterisk -> Create a context dialplan for id ' .$base['context_id']);
 
         $doc = Telephony::getDriver()->doc;
 
         // Create the context we're going to start routing at. This just does pre-call setup routines
         // In Asterisk land this ensures a [context_X] exists and has, at minimum, a NoOp() at the top
         // and a GoSub to our actual list of available numbers
-        $doc->createRoutableContext($obj->context_id);
+        $doc->createRoutableContext($base['context_id']);
 
         // THE ABOVE TWO LINES SHOULD RESULT IN:
         // [context_1]
@@ -41,64 +35,131 @@ class Asterisk_NumberContext_Driver extends Asterisk_Base_Driver
         // THAT'S IT. It will delete and recreate the context_1 section but not destinations_1. This LOGIC belongs elsewhere, NOT HERE.
 
         // Does this number go anywhere?
-        if ($obj->Number->class_type) {
-            // Prepare to update or create this context  <-- This really should go in a lumped-together function
-            //Asterisk::createContext('context_' .$obj->Number->location_id .'_' .$obj->context_id, $obj->Number->number);
-
-            // Add this numbers dialplan into the appropriate context
-            //Asterisk::add('Goto(main_number_' . $obj->Number->number_id . ',${EXTEN},1)');
-
+        if ($base['Number']['class_type'])
+        {
+            $dialplan = $base['Number']['dialplan'];
+            
             // Create the exten => 3000,Goto(number_X)  or whatever in the [destinations] list so we can actually reach this guy via the current context
             // This also sets some internal variable that tracks our current number and context (for use by the next few items) and
             // also creates a dummy [number_X] section
             // NOTE: This also sets a pointer in memory for the preNumber, actual dialplan and postNumber routines to use
             // too add their "stuff" to this dialplan entry
-            //Asterisk::createExtension('context_' . $obj->Number->location_id . '_' . $obj->context_id, $obj->Number->number_id, 'Goto(main_number_' . $obj->Number->number_id . ',${EXTEN},1)');
-            $doc->createDestination($obj->context_id, $obj->Number->number_id, $obj->Number->number);
+            //$doc->createDestination($base['context_id'], $base['Number']['number_id'], $base['Number']['number']);
+
+            $doc->createDialplanExtension($base['context_id'], $base['Number']['number_id'], $base['Number']['number']);
+
+            // Make sure the extensions list for this context exists
+            $doc->createContext('extensions.conf', 'extensions_' .$base['context_id'], $base['Number']['number']);
+
+            // Delete any existing references to this particular extension number in the extensions list
+            $doc->deleteDialplanExtension($base['context_id'], $base['Number']['number']);
+
+            // Add a NoOp at the top of all numbers
+            $doc->add('NoOp', 1, array('replace' => TRUE));
 
             // Add an extension-specific prenumber items
             // Note that unlike other dialplan adds, this one assumes you're already in the right spot in the number_X section
-            dialplan::preNumber($obj->Number);
+            dialplan::preNumber($base['Number']);
 
-            // Add related final destination XML
-            $destinationDriverName = Telephony::getDriverName() . '_' . substr($obj->Number->class_type, 0, strlen($obj->Number->class_type) - 6) . '_Driver';
-
-            Kohana::log('debug', 'Looking for destination driver ' . $destinationDriverName);
-
-            // Is there a driver?
-            if (class_exists($destinationDriverName, TRUE)) {
-                // Logging
-                Kohana::log('debug', 'Adding information for destination ' . $obj->Number->number_id . ' from model "' . get_class($obj->Number) . '" to our telephony configuration...');
-
-                // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
-                // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
-                $success = eval('return ' . $destinationDriverName . '::dialplan($obj->Number);');
-            }
+            // Replace nay matching extension definitions
+            $doc->add('GoSub(number_' .$base['Number']['number_id'] . ',${EXTEN},1)', NULL, array('replace' => TRUE));
 
             // Add a failure route for this dialplan
             // Note that unlike other dialplan adds, this one assumes you're already in the right spot in the dialplan
-            dialplan::postNumber($obj->Number);
+            dialplan::postNumber($base['Number']);
+
+            if (!empty($dialplan['terminate']['action']))
+            {
+                switch($dialplan['terminate']['action'])
+                {
+                    case 'transfer':
+                        if($transfer = astrsk::getTransferToNumber($dialplan['terminate']['transfer']))
+                        {
+                            $doc->add('Goto(' .$transfer .')');
+                        }
+                        else
+                        {
+                            $doc->add('Hangup');
+                        }
+
+                        break;
+
+                    case 'continue':
+                        $doc->add('Return');
+
+                        break;
+
+                    case 'hangup':
+                    default:
+                        $doc->add('Hangup');
+
+                        break;
+                }
+            }
+            else
+            {
+                $doc->add('Hangup');
+            }
+
+            $doc->createContext('extensions.conf', 'number_' .$base['Number']['number_id'], NULL, array('replace' => TRUE));
+
+            // Add related final destination XML
+            $destinationDriverName = Telephony::getDriverName() .'_' .substr($base['Number']['class_type'], 0, strlen($base['Number']['class_type']) - 6) .'_Driver';
+
+              Kohana::log('debug', 'Asterisk -> Looking for destination driver ' .$destinationDriverName);
+
+            // Is there a driver?
+            if (class_exists($destinationDriverName, TRUE)) 
+            {
+                // Logging
+                Kohana::log('debug', 'Asterisk -> Adding information for destination ' .$base['Number']['number_id'] .' from model "' .get_class($base['Number']) .'" to our telephony configuration...');
+
+                // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
+                // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
+                kohana::log('debug', 'Asterisk -> EVAL ' .$destinationDriverName .'::dialplan($base->Number);');
+                
+                // Drivers are always singletons, and are responsible for persistenting data for their own config generation via static vars
+                // TODO: Change this for PHP 5.3, which doesn't require eval(). Don't change this until all the cool kids are on PHP 5.3*/
+                $success = eval('return ' . $destinationDriverName . '::dialplan($base->Number);');
+            }
 
             $doc->add('Return');
 
             return TRUE;
-        } else {
-            // Number doesn't go anywhere - delete it altogether.
-            $doc->deleteDialplanExtension($obj->context_id, $obj->Number->number);
-        }
-        return FALSE;
-        // Add any "global" hooks that come after the processing of any numbers (this is per context)
-        // In Asterisk land, this ensures a Gosub(destinations_X) followed by any hangup/post-call event hook stuff
-        //  NOTE: NO LONGER NEEDED - DONE in Asterisk::createRoutableContext
-        //  dialplan::end('context_' . $obj->context_id);
+        } 
+        else
+        {
+            kohana::log('debug', 'Asterisk -> REMOVING NUMBER ID ' .$base['Number']['number_id'] .' FROM CONTEXT ' .$base['context_id']);
 
+            // Number doesn't go anywhere - delete it altogether.
+            $doc->deleteDialplanExtension($base['context_id'], $base['Number']['number']);
+        }
+
+        return FALSE;
     }
 
-    public static function delete($obj)
+    public static function delete($base)
     {
-        // Create a dummy/empty extension. This effectively will delete the extension.
+        $identifier = $base->identifier();
+
+        $context_id = $base['context_id'];
+
+        if (!empty($identifier['context_id']))
+        {
+            $context_id = $identifier['context_id'];
+        }
+
+        $number_id = $base['number_id'];
+
+        if (!empty($identifier['number_id']))
+        {
+            $number_id = $identifier['number_id'];
+        }
+
+        kohana::log('debug', 'Asterisk -> REMOVING NUMBER ID ' .$number_id .' FROM CONTEXT ' .$context_id);
+
         $doc = Telephony::getDriver()->doc;
 
-        $doc->deleteDialplanExtension($obj->context_id, $obj->Number->number);
+        $doc->deleteDialplanExtension($context_id, $base['Number']['number']);
     }
 }

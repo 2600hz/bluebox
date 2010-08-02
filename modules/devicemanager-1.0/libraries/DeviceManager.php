@@ -41,11 +41,27 @@ class DeviceManager
         {
             if (!empty($device['plugins']['sip']))
             {
-                $bridge  = 'user/';
+                switch(Telephony::getDriverName())
+                {
+                    case 'Asterisk':
+                        $bridge  = 'SIP/';
 
-                $bridge .= $device['plugins']['sip']['username'];
+                        $bridge .= $device['plugins']['sip']['username'];
+                        
+                        break;
 
-                $bridge .= '@$${location_' .$device['User']['location_id'] .'}';
+                    case 'FreeSwitch':
+                        $bridge  = 'user/';
+
+                        $bridge .= $device['plugins']['sip']['username'];
+
+                        $bridge .= '@$${location_' .$device['User']['location_id'] .'}';
+
+                        break;
+
+                    default:
+                        continue 2;
+                }
 
                 $member = array(
                     'bridge' => $bridge,

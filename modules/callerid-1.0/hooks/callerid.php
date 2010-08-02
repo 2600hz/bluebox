@@ -2,7 +2,7 @@
 
     dialplan::register('CallerId', 'conditioning');
 
-        dialplan::register('CallerId', 'prenumber');
+    dialplan::register('CallerId', 'prenumber');
 
     plugins::register('devicemanager/create', 'view', array('CallerId_Plugin', 'update'));
 

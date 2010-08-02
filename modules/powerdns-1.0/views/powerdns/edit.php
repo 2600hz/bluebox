@@ -1,8 +1,11 @@
 <div id="powerdns_edit_header" class="edit powerdns module_header">
-    <h2><span class="helptip"></span><?php echo __($title); ?></h2>
+
+    <h2><?php echo $title; ?></h2>
+    
 </div>
 
 <div id="powerdns_edit_form" class="txt-left form powerdns edit">
+    
     <?php echo form::open(); ?>
 
     <?php echo form::open_section('Domain'); ?>

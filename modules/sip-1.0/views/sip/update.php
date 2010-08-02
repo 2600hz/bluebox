@@ -52,4 +52,22 @@
         ?>
         </div>
 
+    <?php if (isset($trunk_options)): ?>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'sip[to_user]',
+                    'hint' => 'Use custom to_user header for DID detection',
+                    'help' => 'Some providers send calls to the username you registered as and provide the DID that is being called via an alternate header. If you find that calls from outside providers are not reaching your system with the correct phone number, try enabling this setting.'
+                ),
+                'Use SIP To-User'
+            );
+            echo form::checkbox('sip[to_user]');
+        ?>
+        </div>
+
+    <?php endif; ?>
+
+
 <?php echo form::close_section(); ?>

@@ -3,14 +3,14 @@
     <div class="field">
     <?php
         echo form::label('user[first_name]', 'First Name:');
-        echo form::input('user[first_name]');
+        echo form::input('user[first_name]', isset($user['first_name']) ? $user['first_name'] : 'Account');
     ?>
     </div>
 
     <div class="field">
     <?php
         echo form::label('user[last_name]', 'Last Name:');
-        echo form::input('user[last_name]');
+        echo form::input('user[last_name]', isset($user['last_name']) ? $user['last_name'] : 'Admin');
     ?>
     </div>
 

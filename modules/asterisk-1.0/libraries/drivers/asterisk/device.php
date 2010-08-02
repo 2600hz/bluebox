@@ -1,31 +1,35 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * device.php - Asterisk Device driver
- *
- * Allows for a number to terminate at a device directly
- *
- * @author Karl Anderson
- * @license LGPL
- * @package Asterisk_Driver
+ * @package    Asterisk
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
  */
-class Asterisk_Device_Driver extends Asterisk_Base_Driver {
-    public static function set($obj)
+class Asterisk_Device_Driver extends Asterisk_Base_Driver
+{
+    public static function set($number)
     {
 
     }
 
-    public static function delete($obj)
+    public static function delete($number)
     {
-        
+
     }
 
-    public static function dialplan($obj)
+    public static function dialplan($number)
     {
         $doc = Telephony::getDriver()->doc;
-        
-        if ($obj->Device->class_type == 'SipDevice') {
-            Doctrine::initializeModels('SipDevice');
-            $doc->add('Dial(SIP/' . $obj->Device->Sip->username .')');
+
+        $destination = $number['Destination'];
+
+        $numberOptions = astrsk::getNumberOptions($number);
+
+        if ($destination instanceof Device)
+        {
+            if (!empty($destination['plugins']['sip']['username']))
+            {
+                $doc->add('Dial(SIP/' .$destination['plugins']['sip']['username'] .',' .$numberOptions['timeout'] .')');
+            }
         }
     }
 }
