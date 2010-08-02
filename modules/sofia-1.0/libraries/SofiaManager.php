@@ -84,7 +84,7 @@ class SofiaManager
 
             $result = array();
 
-            foreach($registrations['registration'] as $r) // cast to array from stl
+            if (isset($registrations['registration'])) foreach($registrations['registration'] as $r) // cast to array from stl
             {
                 $r = (array)$r;
 
