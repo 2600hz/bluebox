@@ -1,13 +1,14 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
 class FeatureCodeManager
 {
-    public static function addFeatureCode($number, $xml) {
-
+    public static function addFeatureCode($number, $xml)
+    {
     }
 
-    public static function removeFeatureCode($feature_code_id) {
-        $featureCode = new FeatureCode();
-        
+    public static function removeFeatureCode($feature_code_id)
+    {
+        $featureCode = new FeatureCode();    
     }
 
     public static function provideNumberTargets()
@@ -34,5 +35,3 @@ class FeatureCodeManager
         );
     }
 }
-
-
