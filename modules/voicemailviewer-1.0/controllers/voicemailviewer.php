@@ -2,6 +2,7 @@
 
 class VoicemailViewer_Controller extends Bluebox_Controller {
     public $domain;
+     protected $authBypass = array('service');
 
     public function index() {
         $user = users::$user;
@@ -49,6 +50,11 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
         $voicemails = VoicemailManager::getList($mailbox, $domain);
         $file = $voicemails[$uuid]['path'];
 
+        if(!file_exists($file)) {
+            Kohana::log('error', 'Can\'t access file: '  . $file);
+            return;
+        }
+
         header("Content-type: audio/wav");
         header('Content-Length: '.filesize($file));
         readfile($file);
@@ -60,6 +66,12 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 
         $voicemails = VoicemailManager::getList($mailbox, $domain);
         $file = $voicemails[$uuid]['path'];
+
+        if(!file_exists($file)) {
+            Kohana::log('error', 'Can\'t access file: '  . $file);
+            return;
+        }
+
 
         header("Content-type: audio/wav");
         header('Content-Disposition: attachment; filename="voicemail.wav"');
@@ -127,6 +139,12 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
                 }
             }
         }
+    }
+
+    public function service($key = NULL)
+    {
+        Kohana::log('info', 'Incoming email');
+
     }
 
 }

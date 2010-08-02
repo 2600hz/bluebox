@@ -13,7 +13,7 @@ class Sofia_Controller extends Bluebox_Controller {
         $interfaces = SofiaManager::getSIPInterfaces();
 
 
-        foreach($interfaces as $sipinterface_id => $interface) {
+        if ($interfaces) foreach($interfaces as $sipinterface_id => $interface) {
 
             $html .= $this->showRegistrations(SofiaManager::getRegistrations($interface));
         }
@@ -41,11 +41,11 @@ class Sofia_Controller extends Bluebox_Controller {
         $html .= '</tr>';
 
 
-        foreach($registrations as $registration) {
+        if ($registrations) foreach($registrations as $registration) {
             
             $html .= '<tr>';
             foreach($idx as $var) {
-                $html .= '<td>' . $registration[$var] . '</td>';
+                $html .= '<td>' . (isset($registration[$var]) ? $registration[$var] : '') . '</td>';
             }
             $html .= '</tr>';
 
