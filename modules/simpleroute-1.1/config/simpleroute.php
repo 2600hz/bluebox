@@ -49,9 +49,7 @@
 $config['outbound_patterns'][] = array(
     'name' => '10-digit US',
     'patterns' => array(
-        '1?(NPA NXX XXXX)',
-        '411',
-        '611'
+        '1?(NPA NXX XXXX)'
     )
 );
 
@@ -65,9 +63,15 @@ $config['outbound_patterns'][] = array(
 $config['outbound_patterns'][] = array(
     'name' => 'Emergency Services (911)',
     'patterns' => array(
-        '911'
+        '(911)'
     )
 );
 
+$config['outbound_patterns'][] = array(
+    'name' => 'Information Services (411)',
+    'patterns' => array(
+        '(411)'
+    )
+);
 // this allows dialing without the default area code
 //$config['outbound_patterns']['short'] = '1?(NXX XXXX)';
