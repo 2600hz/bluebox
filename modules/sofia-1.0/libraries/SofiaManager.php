@@ -80,11 +80,12 @@ class SofiaManager
 
             $xml = simplexml_load_string($xml);
 
-            $registrations = (array)$xml->registrations;
+            $registrations = $xml->registrations->registration;
+            //var_dump((array)$registrations);
 
             $result = array();
 
-            if (isset($registrations['registration'])) foreach($registrations['registration'] as $r) // cast to array from stl
+            foreach($registrations as $r) // cast to array from stl
             {
                 $r = (array)$r;
 
@@ -93,7 +94,7 @@ class SofiaManager
                 $result[] = $r;
             }
 
-            return $result;
+            return $result;  //array ('user' => 'blah', '')
         } 
         else
         {
