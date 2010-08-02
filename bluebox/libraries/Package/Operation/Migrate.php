@@ -21,11 +21,6 @@ class Package_Operation_Migrate extends Package_Operation
 
         $from = $from['identifier'];
 
-        if ($package['status'] != Package_Manager::STATUS_INSTALLED)
-        {
-            throw new Package_Operation_Exception('Migrate is not a sane operation for a package with status ' .$package['status']);
-        }
-
         kohana::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
 
         Package_Operation_Verify::exec($identifier);

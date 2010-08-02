@@ -38,7 +38,7 @@ class Package_Operation
                 break;            
 
             case Package_Manager::OPERATION_MIGRATE:
-                $agent = Package_Operation_Migrate;
+                $agent = new Package_Operation_Migrate;
 
                 break;
 
