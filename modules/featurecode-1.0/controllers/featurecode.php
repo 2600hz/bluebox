@@ -86,13 +86,13 @@ class FeatureCode_Controller extends Bluebox_Controller
 
         libxml_use_internal_errors(TRUE);
 
+        $cleaned = array();
+
         foreach ( $object['registry'] as $section => $xml )
         {
             $dom = new DOMDocument('1.0');
 
             $dom->formatOutput = FALSE;
-
-            $cleaned = array();
 
             if ( strlen(trim($xml)) == 0 )
             {
@@ -105,7 +105,7 @@ class FeatureCode_Controller extends Bluebox_Controller
 
             try
             {
-                if ( $dom->loadXML(trim($xml)) )
+                if ( $dom->loadXML('<root>' . trim($xml) . '</root>') )
                 {
                     $cleaned[$section] = trim(str_replace('<?xml version="1.0"?>', '', $dom->saveXML()));
 
