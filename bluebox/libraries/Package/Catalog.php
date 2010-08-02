@@ -6,6 +6,8 @@
  */
 class Package_Catalog
 {
+    protected static $remote = TRUE;
+
     protected static $catalog;
 
     protected static $packageList;
@@ -44,19 +46,22 @@ class Package_Catalog
                 = &self::$catalog[$metadata['identifier']];
         }
 
-        $remoteCatalog = Package_Catalog_Remote::queryRepositories();
-
-        foreach($remoteCatalog as $identifier => $metadata)
+        if (self::$remote)
         {
-            if (!empty(self::$catalog[$identifier]))
+            $remoteCatalog = Package_Catalog_Remote::queryRepositories();
+
+            foreach($remoteCatalog as $identifier => $metadata)
             {
-                continue;
+                if (!empty(self::$catalog[$identifier]))
+                {
+                    continue;
+                }
+
+                self::$catalog[$identifier] = $metadata;
+
+                self::$packageList[$metadata['packageName']][Package_Manager::STATUS_UNINSTALLED][$identifier]
+                    = &self::$catalog[$identifier];
             }
-
-            self::$catalog[$identifier] = $metadata;
-
-            self::$packageList[$metadata['packageName']][Package_Manager::STATUS_UNINSTALLED][$identifier]
-                = &self::$catalog[$identifier];
         }
         
         self::findAvaliableMigrations();
@@ -194,6 +199,16 @@ class Package_Catalog
         }
 
         return $package['configure_instance'] = new $package['configure_class'];
+    }
+
+    public static function disableRemote()
+    {
+        self::$remote = FALSE;
+    }
+
+    public static function enableRemote()
+    {
+        self::$remote = TRUE;
     }
 
     protected static function init()
