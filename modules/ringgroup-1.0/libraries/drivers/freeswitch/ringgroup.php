@@ -34,7 +34,6 @@ class FreeSwitch_RingGroup_Driver extends FreeSwitch_Base_Driver
 
         }
         
-
         $numberOptions = fs::getNumberOptions($number);
 
         $xml->update('/action[@application="set"][@bluebox="settingTimeout"]{@data="call_timeout=' .$numberOptions['timeout'] .'"}');
