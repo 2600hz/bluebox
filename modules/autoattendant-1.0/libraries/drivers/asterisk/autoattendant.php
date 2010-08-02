@@ -32,7 +32,7 @@ class Asterisk_AutoAttendant_Driver extends Asterisk_Base_Driver
 
         foreach ($autoattendant['keys'] as $key)
         {
-            if (empty($key['digits']))
+            if (!isset($key['digits']))
             {
                 continue;
             }
