@@ -83,7 +83,9 @@ class FeatureCode_Controller extends Bluebox_Controller
     protected function pre_save(&$object)
     {
         $errors = array();
-        
+
+        libxml_use_internal_errors(TRUE);
+
         foreach ( $object['registry'] as $section => $xml )
         {
             $dom = new DOMDocument('1.0');
