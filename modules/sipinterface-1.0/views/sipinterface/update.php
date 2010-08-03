@@ -86,6 +86,15 @@
         ?>
         </div>
 
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][compact_headers]',
+                                   'help' => 'Use SIP-compliant compact headers. Useful to fix broken UDP, where the packets are exceeding the size the router allows'
+                                   ), 'Use Compact Headers:');
+            echo form::checkbox('sipinterface[registry][compact_headers]');
+        ?>
+        </div>
+
     <?php echo form::close_section(); ?>
     
     <?php echo form::open_section('Network Lists'); ?>

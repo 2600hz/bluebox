@@ -130,7 +130,11 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         // Enable compact headers by default. With all the Codecs FS now supports we see lots of
         // bad behavior re: UDP packets that are too large and get fragmented
-        $xml->update('/settings/param[@name="enable-compact-headers"]{@value="true"}');
+        if (isset($sipinterface['registry']['compact_headers']) and ($sipinterface['registry']['compact_headers'])) {
+            $xml->update('/settings/param[@name="enable-compact-headers"]{@value="true"}');
+        } else {
+            $xml->deleteNode('/settings/param[@name="enable-compact-headers"]');
+        }
 
         $xml->update('/settings/param[@name="user-agent-string"][@value="Configured by 2600hz"]');
 
