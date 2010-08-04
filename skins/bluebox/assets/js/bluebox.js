@@ -264,7 +264,7 @@ $(document).ready(function () {
                     }
                 },
                 show: {
-                    solo: true // And hide all other tooltips
+                    solo: false
                 },
                 style: {
                     width: 550,
