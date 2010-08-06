@@ -175,7 +175,7 @@ fFixSoundsPerms() {
 
     [ -d '/usr/local/freeswitch/sounds/' ] && sounddir_guess="/usr/local/freeswitch/sounds"
 
-    [ -d '/opt/freeswitch/conf/' ] && sounddir_guess="/opt/freeswitch/conf"
+    [ -d '/opt/freeswitch/sounds/' ] && sounddir_guess="/opt/freeswitch/sounds"
 
     echo
     echo "SOUND FILE PRIVILEGES"
