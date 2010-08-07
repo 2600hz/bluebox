@@ -6,8 +6,6 @@
  */
 class ErrorReporter_Controller extends Bluebox_Controller
 {
-    protected static $errorCollector = 'http://172.16.1.183/collect_errors.php';
-
     public function inform($hash = NULL)
     {
         $error = $this->session->get($hash, '');
@@ -127,13 +125,17 @@ class ErrorReporter_Controller extends Bluebox_Controller
 
         try
         {
-            $this->do_post_request(self::$errorCollector, $report);
+            $errorCollector = Kohana::config('errorreporter.collector');
+
+            $this->do_post_request($errorCollector, $report);
         }
         catch (Exception $e)
         {
             message::set($e->getMessage());
 
             $this->returnQtipAjaxForm(NULL);
+
+            return FALSE;
         }
 
         return TRUE;
@@ -143,6 +145,7 @@ class ErrorReporter_Controller extends Bluebox_Controller
     {
         $params = array('http' => array(
             'method' => 'POST',
+            'timeout' => 5,
             'content' => http_build_query($data),
             'header'  => "Content-type: application/x-www-form-urlencoded\r\n"
 //            'header'  => sprintf("Authorization: Basic %s\r\n", base64_encode($username.':'.$password)).
@@ -151,7 +154,7 @@ class ErrorReporter_Controller extends Bluebox_Controller
 
         $context = stream_context_create($params);
 
-        $ret = file_get_contents($url, FALSE, $context);
+        $ret = @file_get_contents($url, FALSE, $context);
 
         if ($ret === FALSE)
         {
