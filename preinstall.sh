@@ -196,6 +196,8 @@ fFixSoundsPerms() {
         fi
     fi
 
+    [ -z "$sound_dir" -o ! -d "$sound_dir" ] && return 0
+
     echo "# chgrp -R $webuser $sound_dir/*"
     chgrp -R $webuser $sound_dir/*
 
@@ -204,8 +206,6 @@ fFixSoundsPerms() {
 }
 
 fUpdateSwitchPerm() {
-    softswitch_guess="/tmp"
-
     [ -d '/usr/local/freeswitch/conf/' ] && softswitch_guess="/usr/local/freeswitch/conf"
 
     [ -d '/opt/freeswitch/conf/' ] && softswitch_guess="/opt/freeswitch/conf"
@@ -233,6 +233,8 @@ fUpdateSwitchPerm() {
             softswitch_dir="$ans"
         fi
     fi
+
+    [ -z "$softswitch_dir" -o ! -d "$softswitch_dir" ] && return 0
 
     echo "# chgrp -R $webuser $softswitch_dir/*"
     chgrp -R $webuser $softswitch_dir/*
