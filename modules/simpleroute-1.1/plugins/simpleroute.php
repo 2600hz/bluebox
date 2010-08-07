@@ -41,4 +41,23 @@ class SimpleRoute_Plugin extends Bluebox_Plugin
 
         parent::addSubView();
     }
+
+    protected function validate($data, $validator)
+    {
+        if (isset($data['caller_id_number']))
+        {
+            if (preg_match('/[^0-9]/', $data['caller_id_number']))
+            {
+                $validator->add_error('simpleroute[caller_id_number]', 'Please provide only numbers');
+            }
+        }
+
+        if (isset($data['area_code']))
+        {
+            if (preg_match('/[^0-9]/', $data['area_code']))
+            {
+                $validator->add_error('simpleroute[area_code]', 'Please provide only numbers');
+            }
+        }
+    }
 }
