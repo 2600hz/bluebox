@@ -102,7 +102,7 @@ class Sip_Plugin extends Bluebox_Plugin
                 continue;
             }
             
-            if ((empty($base['device_id'])) or ($base['device_id'] == $device['device_id'])) 
+            if ($base['device_id'] == $device['device_id']) 
             {
                 continue;
             }
