@@ -52,7 +52,5 @@ class CallerId_Plugin extends Bluebox_Plugin
                 $validator->add_error('callerid[external_number]', 'Please provide only numbers');
             }
         }
-
-        return TRUE;
     }
 }
