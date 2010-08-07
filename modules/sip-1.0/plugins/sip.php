@@ -96,7 +96,5 @@ class Sip_Plugin extends Bluebox_Plugin
                 }
             }
         }
-        
-        return TRUE;
     }
 }
