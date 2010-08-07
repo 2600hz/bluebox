@@ -361,7 +361,7 @@ abstract class Bluebox_Plugin
             array($this->name => $this->pluginData)
         );
 
-        if(!$this->validate($this->pluginData, $validator) OR $errorCount != count($validator->errors()))
+        if($this->validate($this->pluginData, $validator) === FALSE OR $errorCount != count($validator->errors()))
         {
             return FALSE;
         }
