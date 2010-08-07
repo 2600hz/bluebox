@@ -82,4 +82,26 @@ class Conference extends Bluebox_Record
         $this->actAs('TelephonyEnabled');
         $this->actAs('MultiTenant');
     }
+
+    public function preValidate(Doctrine_Event $event)
+    {
+        $record = &$event->getInvoker();
+        
+        $errorStack = $this->getErrorStack();
+
+        $validator = Bluebox_Controller::$validation;
+
+        foreach ($record['pins'] as $key => $pin)
+        {
+            if (!empty($pin))
+            {
+                if (preg_match('/[^0-9]/', $pin))
+                {
+                    $validator->add_error('conference[pins][' .$key .']', 'Please provide only numbers');
+
+                    $errorStack->add('password', 'digitsonly');
+                }
+            }
+        }
+    }
 }
