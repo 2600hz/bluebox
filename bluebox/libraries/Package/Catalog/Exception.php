@@ -17,6 +17,6 @@ class Package_Catalog_Exception extends Package_Exception
             Package_Catalog_Message::set($message, 'error', $code);
         }
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code);
     }
 }

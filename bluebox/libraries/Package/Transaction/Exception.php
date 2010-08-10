@@ -17,6 +17,6 @@ class Package_Transaction_Exception extends Package_Exception
             Package_Operation_Message::set($message, 'error', $code);
         }
 
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code);
     }
 }
