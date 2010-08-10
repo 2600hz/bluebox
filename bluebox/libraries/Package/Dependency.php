@@ -34,8 +34,12 @@ class Package_Dependency
 
                         if (self::compareVersion($dependency['version'], $condition))
                         {
-                            kohana::log('debug', 'dependency restriction, ' .$package['packageName'] .' can not be installed with ' .$name .' version ' .$condition);
-                            
+                            Package_Message::log('debug', 'dependency restriction, ' .$package['packageName'] .' can not be installed with ' .$name .' version ' .$condition);
+
+                            Package_Message::set($package['displayName'] .' version ' .$package['version'] .' can not be installed with ' .$dependency['displayName'] .' version ' .$dependency['version'], 'error', $identifier);
+
+                            Package_Message::set($dependency['displayName'] .' conflicts with ' .$package['displayName'], 'alert', $dependency['identifier']);
+
                             $failures['not'][$name] = $condition;
                         }
                     }
@@ -64,11 +68,15 @@ class Package_Dependency
                         {
                             continue 2;
                         }
-                        
+
+                        Package_Message::set($dependency['displayName'] .' is part of a series of packages, one of which must be installed for ' .$package['displayName'], 'info', $dependency['identifier']);
+
                         $failed[$name] = $condition;
                     }
 
-                    kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' requires one to be installed -> ' .implode(', ', $failed));
+                    Package_Message::log('debug', 'dependency restriction ' .$package['packageName'] .' requires one to be installed -> ' .implode(', ', $failed));
+
+                    Package_Message::set($package['displayName'] .' version ' .$package['version'] .' requires one of the following to be install: ' .implode(', ', $failed), 'error', $identifier);
 
                     $failures['or'] += $failed;
                     
@@ -84,7 +92,9 @@ class Package_Dependency
                         }
                         catch(Exception $e)
                         {
-                            kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions .' but it isnt installed');
+                            Package_Message::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions .' but it is not installed');
+
+                            Package_Message::set($package['displayName'] .' version ' .$package['version'] .' requires ' .ucfirst($requirement) .' but it is not avaliable', 'error', $identifier);
 
                             $failures['missing'][$requirement] = $conditions;
 
@@ -94,7 +104,9 @@ class Package_Dependency
 
                     if (!self::compareVersion($dependency['version'], $conditions))
                     {
-                        kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions);
+                        Package_Message::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions);
+
+                        Package_Message::set($package['displayName'] .' version ' .$package['version'] .' requires ' .$dependency['displayName'] .' version ' .$dependency['version'] .' but it is not avaliable', 'error', $identifier);
 
                         $failures['incompatible'][$requirement] = $conditions;
                     }
@@ -117,7 +129,9 @@ class Package_Dependency
 
         if (!empty($package['denyRemoval']))
         {
-            kohana::log('debug', 'denyRemoval flag set on package ' .$package['packageName']);
+            Package_Message::log('debug', 'denyRemoval flag set on package ' .$package['packageName']);
+
+            Package_Message::set($package['displayName'] .' is not eligible for removal', 'error', $identifier);
 
             throw new Package_Dependency_Exception('Package is not eligible for removal');
         }
@@ -130,7 +144,11 @@ class Package_Dependency
         {
             if ($dependentPackage = Package_Catalog::getInstalledPackage($dependent))
             {
-                kohana::log('debug', 'dependency restriction ' .$package['packageName'] .' is being used by ' .$dependent .' version ' . $dependentPackage['version']);
+                Package_Message::log('debug', 'dependency restriction ' .$package['packageName'] .' is being used by ' .$dependent .' version ' . $dependentPackage['version']);
+
+                Package_Message::set($package['displayName'] .' is being used by ' .$dependentPackage['displayName'] .' version ' . $dependentPackage['version'], 'error', $identifier);
+
+                Package_Message::set($dependentPackage['displayName'] .' is using ' .$package['displayName'], 'alert', $dependentPackage['identifier']);
 
                 $failures['indispensable'][$dependent] = $dependentPackage['version'];
             }

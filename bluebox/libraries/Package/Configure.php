@@ -42,7 +42,7 @@ abstract class Package_Configure
      * Used in module listings to brief the user to the purpose of the module
      * @var string
      */
-    public static $summary = 'This is a module for Bluebox.';
+    public static $summary = 'This is a generic package.';
 
     /**
      * The full description of the module, used to provide users with more details
@@ -146,29 +146,7 @@ abstract class Package_Configure
      */
     public function install($package = NULL)
     {
-        $package = Package_Catalog::getPackageByIdentifier($package);
-
-        // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)
-        // Note that we do this because Postgers & Doctrine don't like our polymorphic class extensions and try to create the same
-        // tables twice.
-        $models = array();
-
-        if (!empty($package['models']))
-        {
-            foreach($package['models'] as $className)
-            {
-                if ((get_parent_class($className) == 'Bluebox_Record') or (get_parent_class($className) == 'Doctrine_Record'))
-                {
-                    $models[] = $className;
-                }
-            }
-        }
-
-        // If this package has any models of it's own (not extensions) then create the tables!
-        if (!empty($models))
-        {
-            Doctrine::createTablesFromArray($models);
-        }
+        $this->noMethodMethod(__FUNCTION__);
     }
 
     /**
@@ -261,138 +239,7 @@ abstract class Package_Configure
      */
     public function uninstall($package = NULL)
     {
-        $package = Package_Catalog::getPackageByIdentifier($package);
-
-        $tables = array();
-
-        // Get the doctrine overlord
-        try
-        {
-            $conn = Doctrine_Manager::connection();
-        }
-        catch(Exception $e)
-        {
-            Kohana::log('error', 'Uninstall unable to get the overlord!');
-
-            return 'Unable to connect to the database!';
-        }
-
-        // For each of this modules models loop through all of their rows and delete them
-        // This will ensure any relationships are broken safely, but is a brute force approach...
-        $models = $package['models'];
-
-        foreach($models as $model)
-        {
-            try
-            {
-                $table = Doctrine::getTable($model);
-
-                $tableName = $table->getOption('tableName');
-
-                $declaringClass = $table->getOption('declaringClass');
-            }
-            catch(Exception $e)
-            {
-                Kohana::log('debug', 'Uninstall skipping model ' . $model . ', doesnt seem to have a doctrine table.');
-
-                continue;
-            }
-
-            if (!$conn->import->tableExists($tableName))
-            {
-                continue;
-            }
-
-            if (!in_array($declaringClass->name, $models))
-            {
-                Kohana::log('alert', 'UNINSTALL REMOVING ' . $package['packageName'] . ' FROM TABLE ' . $model);
-
-                $rows = Doctrine_Query::create()->from($model . ' t')->execute();
-
-                foreach($rows as $row)
-                {
-                    $row->class_type = null;
-
-                    $row->foreign_id = null;
-
-                    $row->save();
-                }
-
-                continue;
-            }
-            else
-            {
-                Kohana::log('alert', 'UNINSTALL TRUNCATING TABLE: ' . $tableName);
-
-                $rows = $table->findAll();
-
-                foreach($rows as $row)
-                {
-                    $row->delete();
-                }
-
-                $tables[] = $tableName;
-            }
-
-            $relations = array_keys($table->getRelations());
-
-            foreach($relations as $relation)
-            {
-                $related = Doctrine::getTable($relation);
-
-                $relatedTable = $related->getOption('tableName');
-
-                $relatedClass = $related->getOption('declaringClass');
-
-                if (empty($relatedClass) || in_array($relatedClass, $models))
-                {
-                    $tables[] = $relatedTable;
-                }
-            }
-        }
-
-        if (!empty($tables))
-        {
-            $tables = array_unique($tables);
-
-            $removeCount = count($tables);
-
-            $errorCount = ($removeCount * $removeCount) + $removeCount;
-
-            while (!empty($tables))
-            {
-                foreach($tables as $key => $drop)
-                {
-                    if (!$conn->import->tableExists($drop))
-                    {
-                        unset($tables[$key]);
-
-                        continue;
-                    }
-
-                    try
-                    {
-                        $conn->export->dropTable($drop);
-
-                        Kohana::log('alert', 'UNINSTALL DROPING TABLE: ' . $drop);
-
-                        unset($tables[$key]);
-                    }
-                    catch(Exception $e)
-                    {
-                    }
-                }
-
-                $errorCount = $errorCount - 1;
-
-                if ($errorCount < 0)
-                {
-                    Kohana::log('error', 'Uninstall unable to resolve drop table order!');
-
-                    return 'Unable to resolve drop table order!';
-                }
-            }
-        }
+        $this->noMethodMethod(__FUNCTION__);
     }
 
     public function postUninstall()
@@ -446,6 +293,6 @@ abstract class Package_Configure
     {
         $class = str_replace('_Configure', '', get_class($this));
 
-        Kohana::log('debug', "$class doesn't have a $method method");
+        Package_Message::log('debug', "$class doesn't have a $method method");
     }
 }

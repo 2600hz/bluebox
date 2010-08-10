@@ -16,12 +16,12 @@ class Package_Operation_Migrate extends Package_Operation
 
         if(empty($from))
         {
-            throw new Package_Operation_Exception('Migrate could not determine the package that is being updated');
+            throw new Package_Operation_Exception('Migrate could not determine the package that is being updated', $identifier);
         }
 
         $from = $from['identifier'];
 
-        kohana::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
+        Package_Message::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
 
         Package_Operation_Verify::exec($identifier);
     }

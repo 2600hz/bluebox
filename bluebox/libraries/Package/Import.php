@@ -13,7 +13,7 @@ class Package_Import
 
     public static function package($path)
     {
-        kohana::log('debug', 'Attempting to import package ' .$path);
+        Package_Message::log('debug', 'Attempting to import package ' .$path);
 
         $filename = basename($path);
         
@@ -34,34 +34,34 @@ class Package_Import
             switch ($error)
             {
                 case ZIPARCHIVE::ER_EXISTS:
-                    throw new Package_Import_Exception('Package archive already exists', $error);
+                    throw new Package_Import_Exception('Package archive already exists: ' .$error);
 
                 case ZIPARCHIVE::ER_INCONS:
-                    throw new Package_Import_Exception('Consistency check on the package archive failed', $error);
+                    throw new Package_Import_Exception('Consistency check on the package archive failed: ' .$error);
 
                 case ZIPARCHIVE::ER_INVAL:
-                    throw new Package_Import_Exception('Invalid argument while opening package archive', $error);
+                    throw new Package_Import_Exception('Invalid argument while opening package archive: ' .$error);
 
                 case ZIPARCHIVE::ER_MEMORY:
-                    throw new Package_Import_Exception('Memory allocation failure while opening package archive', $error);
+                    throw new Package_Import_Exception('Memory allocation failure while opening package archive: ' .$error);
 
                 case ZIPARCHIVE::ER_NOENT:
-                    throw new Package_Import_Exception('Could not locate package archive', $error);
+                    throw new Package_Import_Exception('Could not locate package archive: ' .$error);
 
                 case ZIPARCHIVE::ER_NOZIP:
-                    throw new Package_Import_Exception('Package archive is not a zip', $error);
+                    throw new Package_Import_Exception('Package archive is not a zip: ' .$error);
 
                 case ZIPARCHIVE::ER_OPEN:
-                    throw new Package_Import_Exception('Cant open package archive', $error);
+                    throw new Package_Import_Exception('Cant open package archive: ' .$error);
 
                 case ZIPARCHIVE::ER_READ:
-                    throw new Package_Import_Exception('Package archive read error', $error);
+                    throw new Package_Import_Exception('Package archive read error: ' .$error);
 
                 case ZIPARCHIVE::ER_SEEK:
-                    throw new Package_Import_Exception('Package archive seek error', $error);
+                    throw new Package_Import_Exception('Package archive seek error: ' .$error);
 
                 default:
-                    throw new Package_Import_Exception('Unknown error while opening package archive', $error);
+                    throw new Package_Import_Exception('Unknown error while opening package archive: ' .$error);
             }
         }
 
@@ -72,7 +72,7 @@ class Package_Import
             throw new Package_Import_Exception('Import path `' .$importPath .'` already exists');
         }
 
-        kohana::log('debug', 'Extracting package archive to ' .$importPath);
+        Package_Message::log('debug', 'Extracting package archive to ' .$importPath);
 
         if (!@$zip->extractTo($importPath))
         {
@@ -81,7 +81,19 @@ class Package_Import
         
         $zip->close();
 
+        kohana::log('debug', 'Dynamically adding `' .$importPath .'` to kohana');
+
+        $loadedModules = Kohana::config('core.modules');
+
+        $modules = array_unique(array_merge($loadedModules, array($importPath)));
+
+        Kohana::config_set('core.modules', $modules);
+
+        Package_Catalog::disableRemote();
+
         Package_Catalog::buildCatalog();
+
+        Package_Catalog::enableRemote();
 
         return $importPath;
     }

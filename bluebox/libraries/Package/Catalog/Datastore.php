@@ -43,13 +43,13 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if (!$package)
         {
-            kohana::log('debug', 'Creating new package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir']);
+            Package_Message::log('debug', 'Creating new package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir']);
 
             $package = new Package();
         }
         else
         {
-            kohana::log('debug', 'Updating package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir'] .' (' .$package['package_id'] .')');
+            Package_Message::log('debug', 'Updating package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir'] .' (' .$package['package_id'] .')');
         }
         
         $registryIgnoreKeys = array_flip(array(
@@ -101,7 +101,7 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if ($package)
         {
-            kohana::log('debug', 'Remove package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir'] .' (' .$package['package_id'] .')');
+            Package_Message::log('debug', 'Remove package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir'] .' (' .$package['package_id'] .')');
 
             $package->delete();
         }
@@ -121,7 +121,7 @@ class Package_Catalog_Datastore extends Package_Catalog
                 continue;
             }
 
-            Kohana::log('debug', 'Adding ' . $model . ' to NumberType');
+            Package_Message::log('debug', 'Adding ' . $model . ' to NumberType');
 
             try
             {
@@ -129,7 +129,7 @@ class Package_Catalog_Datastore extends Package_Catalog
 
                 if (!$numberType)
                 {
-                    Kohana::log('debug', 'Could not find ' . $model . ' in NumberType, adding as new number type');
+                    Package_Message::log('debug', 'Could not find ' . $model . ' in NumberType, adding as new number type');
 
                     $numberType = new NumberType();
 
@@ -163,7 +163,7 @@ class Package_Catalog_Datastore extends Package_Catalog
                 continue;
             }
 
-            Kohana::log('debug', 'Removing ' . $model . ' from NumberType after package uninstall');
+            Package_Message::log('debug', 'Removing ' . $model . ' from NumberType after package uninstall');
 
             try
             {
