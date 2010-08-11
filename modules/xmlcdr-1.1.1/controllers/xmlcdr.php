@@ -31,8 +31,8 @@
  * @package _Skeleton
  */
 class Xmlcdr_Controller extends Bluebox_Controller {
-   protected $authBypass = array('service');
-   protected $baseModel = 'Xmlcdr';
+    protected $authBypass = array('service');
+    protected $baseModel = 'Xmlcdr';
 
     public function  index() {
 
@@ -41,47 +41,44 @@ class Xmlcdr_Controller extends Bluebox_Controller {
         // Setup the base grid object
         $grid = jgrid::grid($this->baseModel, array(
                 'caption' => 'Caller Detail Records'
-            )
+                )
         );
 
         // Add the base model columns to the grid
         $grid->add('xml_cdr_id', 'ID', array(
                 'hidden' => true,
                 'key' => true
-            )
+                )
         );
         $grid->add('direction', 'Direction', array(
                 'width' => '120'
-            )
+                )
         );
         $grid->add('caller_id_name', 'Caller Name', array(
                 'width' => '250'
-            )
+                )
         );
         $grid->add('caller_id_number', 'Caller Number', array(
                 'width' => '250'
-            )
+                )
         );
         $grid->add('destination_number', 'Destination', array(
                 'width' => '250'
-            )
+                )
         );
 
         $grid->add('start_stamp', 'Start', array(
                 'width' => '250'
-            )
+                )
         );
-        $grid->add('duration', 'Duration', array(
-                'width' => '250'
-            )
-        );
+        $grid->add('duration', 'Duration', array('callback' => array($this, 'formatDuration')));
 
 
 
         // Add the actions to the grid
         $grid->addAction('xmlcdr/details', 'Details', array(
                 'arguments' => 'xml_cdr_id'
-            )
+                )
         );
 
 
@@ -96,8 +93,7 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
     }
 
-    public function details($xml_cdr_id)
-    {
+    public function details($xml_cdr_id) {
 
 
         $xmlcdr = Doctrine::getTable('Xmlcdr')->findOneBy('xml_cdr_id', $xml_cdr_id);
@@ -111,7 +107,7 @@ class Xmlcdr_Controller extends Bluebox_Controller {
             <tr><td>Caller Name: </td><td>{$xmlcdr->caller_id_number}</td></tr>
             <tr><td>Direction: </td><td>{$xmlcdr->direction}</td></tr>
             </table>
-            ";
+                ";
 
 
 
@@ -132,6 +128,42 @@ class Xmlcdr_Controller extends Bluebox_Controller {
             Kohana::log('error', $error);
 
         }
+    }
+
+
+
+
+    private function formatDuration ($sec, $padHours = false) {
+
+        $hms = "";
+
+        // there are 3600 seconds in an hour, so if we
+        // divide total seconds by 3600 and throw away
+        // the remainder, we've got the number of hours
+        $hours = intval(intval($sec) / 3600);
+
+        // add to $hms, with a leading 0 if asked for
+        $hms .= ($padHours)
+                ? str_pad($hours, 2, "0", STR_PAD_LEFT). ':'
+                : $hours. ':';
+
+        // dividing the total seconds by 60 will give us
+        // the number of minutes, but we're interested in
+        // minutes past the hour: to get that, we need to
+        // divide by 60 again and keep the remainder
+        $minutes = intval(($sec / 60) % 60);
+
+        // then add to $hms (with a leading 0 if needed)
+        $hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT). ':';
+
+        // seconds are simple - just divide the total
+        // seconds by 60 and keep the remainder
+        $seconds = intval($sec % 60);
+
+        // add to $hms, again with a leading 0 if needed
+        $hms .= str_pad($seconds, 2, "0", STR_PAD_LEFT);
+
+        return $hms;
     }
 
 }
