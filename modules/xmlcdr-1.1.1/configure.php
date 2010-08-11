@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * @author Your Name <your@email.org>
- * @license Your License
- * @package _Skeleton
+ * @author Michael Phillips
+ * @license MPL
+ * @package  xmlcdr
  *
  * ============================================================================
  * NOTE: You must rename this file 'configure.php' or the package manager will
@@ -10,15 +10,15 @@
  *      require you to repair you module via the package manager.
  * ============================================================================
  */
-class Xmlcdr_1_1_Configure extends Bluebox_Configure
+class Xmlcdr_1_1_1_Configure extends Bluebox_Configure
 {
-    public static $version = 1.1;
+    public static $version = '1.1.1';
     public static $packageName = 'XML CDR';
     public static $author = 'Michael Phillips';
     public static $vendor = 'Michael Phillips';
     public static $license = 'MPL';
-    public static $summary = 'xmlcdr ';
-    public static $description = 'xmlcdr';
+    public static $summary = 'Caller Detail Records via XMLCURL ';
+    public static $description = 'View caller records in a tablular format.';
     public static $default = FALSE;
     public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
