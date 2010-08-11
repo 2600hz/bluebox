@@ -67,12 +67,9 @@ class Xmlcdr_Controller extends Bluebox_Controller {
                 )
         );
 
-        $grid->add('start_stamp', 'Start', array(
-                'width' => '250'
-                )
-        );
+        $grid->add('start_stamp', 'Start', array('width' => 250, 'callback' => array($this, 'formatDate')));
         $grid->add('duration', 'Duration', array('callback' => array($this, 'formatDuration')));
-
+        //$grid->add('uuid', 'Recording', array('callback' => array($this, 'playLink')));
 
 
         // Add the actions to the grid
@@ -98,22 +95,73 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
         $xmlcdr = Doctrine::getTable('Xmlcdr')->findOneBy('xml_cdr_id', $xml_cdr_id);
 
-        $idx = array('caller_id_name');
+        $idx = array(
+                'Caller Name' => 'caller_id_name',
+                'Caller Number' => 'caller_id_number',
+                'Direction' => 'direction',
+                'Desintation Number' => 'destination_number',
+                'User Name' => 'user_name',
+                'Context' => 'context',
+                'Start' => 'start_stamp',
+                'Answer' => 'answer_stamp',
+                'End' => 'end_stamp',
+                'Duration' => 'duration',
+                'Billable Seconds' => 'billsec',
+                'Hangup Cause' => 'hangup_cause',
+                'UUID' => 'uuid',
+                'B-Leg UUID' =>  'bleg_uuid',
+                'Account Code' => 'accountcode',
+                'Domain Name' => 'domain_name',
+                'User Context' => 'user_context',
+                'Read Codec' => 'read_codec',
+                'Write Codec' => 'write_codec',
+                'Dailed Domain' => 'dialed_domain',
+                'Dailed User' => 'dialed_user'
+        );
 
+        $details = '<h3>CDR</h3>';
+        $details .= '<table>';
+        foreach($idx as $k => $p) {
+            $details .=  "<tr><td width=\"300px\">{$k}</td><td>{$xmlcdr->$p}</td></tr>\n";
+        }
 
-        $details = "
-            <table>
-            <tr><td>Caller Name: </td><td>{$xmlcdr->caller_id_name}</td></tr>
-            <tr><td>Caller Name: </td><td>{$xmlcdr->caller_id_number}</td></tr>
-            <tr><td>Direction: </td><td>{$xmlcdr->direction}</td></tr>
-            </table>
-                ";
+        $details .= '</table>';
+
+        $details .= '<h3>Listen</h3>';
+        $details .= $this->playLink($xmlcdr->uuid);
 
 
 
         $this->template->content = new View('xmlcdr/details');
         $this->template->content->details = $details;
     }
+
+
+    public function playLink($uuid) {
+
+        return sprintf('<audio src="%s%s" controls="controls">No audio tag suport</audio>',  url::site('xmlcdr/listen/' . $uuid),  '.wav');
+        
+    }
+
+    public function listen( $uuid) {
+        $this->auto_render = FALSE;
+
+        $basePath = '/usr/local/freeswitch/recordings/';
+
+        $file = $basePath . $uuid;
+        
+         
+        if(!file_exists($file)) {
+            Kohana::log('error', 'Can\'t access file: '  . $file);
+            return;
+        }
+
+        header("Content-type: audio/wav");
+        header('Content-Length: '.filesize($file));
+        readfile($file);
+        die();
+    }
+
 
     public function service($key = NULL) {
         $this->auto_render = FALSE;
@@ -131,9 +179,13 @@ class Xmlcdr_Controller extends Bluebox_Controller {
     }
 
 
+    public function formatDate($date) {
+        $dt = new DateTime($date);
+        return $dt->format('m/d/Y h:i:s a');
+    }
 
 
-    private function formatDuration ($sec, $padHours = false) {
+    public function formatDuration ($sec, $padHours = false) {
 
         $hms = "";
 
