@@ -84,7 +84,7 @@ class AutoAttendant_Controller extends Bluebox_Controller
             $numbers = Doctrine_Query::create()
                 ->select('n.number_id, n.number, d.name')
                 ->from('Number n, n.' .str_replace('Number', '', $numberType['class']) .' d')
-                ->whereNotIn('n.foreign_id', array(0, 'NULL'))
+                ->where('(n.foreign_id=? OR n.foreign_id IS NULL)',0)
                 ->andWhereIn('n.class_type', array($numberType['class']))
                 ->orderBy('number')
                 ->execute(array(), Doctrine::HYDRATE_SCALAR);
