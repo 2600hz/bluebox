@@ -53,7 +53,7 @@ class SipInterface_Controller extends Bluebox_Controller
             )
         );
         $grid->add('port', 'Port');
-        $grid->add('Context/name', 'Default Context');
+        //$grid->add('Context/name', 'Default Context');
 
         // Add the actions to the grid
         $grid->addAction('sipinterface/edit', 'Edit', array(
