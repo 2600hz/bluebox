@@ -217,9 +217,4 @@ class message
         // if the user wants the results then give it to them
         return compact('growl', 'html');
     }
-
-    public static function renderHelp()
-    {
-        return html::anchor('support/request_help', 'Help!', array('class' => 'support_help qtipAjaxForm', 'style' => 'float:right;'));
-    }
 }
