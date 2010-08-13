@@ -34,13 +34,28 @@ class Xmlcdr_Controller extends Bluebox_Controller {
     protected $authBypass = array('service');
     protected $baseModel = 'Xmlcdr';
 
+    private function getBasePath() {
+        return '/usr/local/freeswitch/recordings/';
+    }
+
+    private function getRecordingExtension() {
+        return '.wav';
+    }
+
+    private function getFile($uuid) {
+        return $this->getBasePath() . $uuid . $this->getRecordingExtension();
+    }
+
+
     public function  index() {
 
         $this->template->content = new View('generic/grid');
 
         // Setup the base grid object
         $grid = jgrid::grid($this->baseModel, array(
-                'caption' => 'Caller Detail Records'
+                'caption' => 'Caller Detail Records',
+                'sortname' => 'x.start_stamp',
+                'sortorder' => 'desc'
                 )
         );
 
@@ -59,11 +74,13 @@ class Xmlcdr_Controller extends Bluebox_Controller {
                 )
         );
         $grid->add('caller_id_number', 'Caller Number', array(
-                'width' => '250'
+                'width' => '250',
+                'callback' => array($this, 'formatNumber')
                 )
         );
         $grid->add('destination_number', 'Destination', array(
-                'width' => '250'
+                'width' => '250',
+                'callback' => array($this, 'formatNumber')
                 )
         );
 
@@ -128,9 +145,12 @@ class Xmlcdr_Controller extends Bluebox_Controller {
         $details .= '</table>';
 
         $details .= '<h3>Listen</h3>';
-        $details .= $this->playLink($xmlcdr->uuid);
-
-
+        
+        if(file_exists($this->getFile($xmlcdr->uuid))) {
+            $details .= $this->playLink($xmlcdr->uuid);
+        } else {
+            $details .= 'No file found';
+        }
 
         $this->template->content = new View('xmlcdr/details');
         $this->template->content->details = $details;
@@ -139,18 +159,14 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
     public function playLink($uuid) {
 
-        return sprintf('<audio src="%s%s" controls="controls">No audio tag suport</audio>',  url::site('xmlcdr/listen/' . $uuid),  '.wav');
-        
+        return sprintf('<audio src="%s" controls="controls">No audio tag suport</audio>',  url::site('xmlcdr/listen/' . $uuid));
+
     }
 
     public function listen( $uuid) {
         $this->auto_render = FALSE;
-
-        $basePath = '/usr/local/freeswitch/recordings/';
-
-        $file = $basePath . $uuid;
         
-         
+        $file = $this->getFile($uuid);
         if(!file_exists($file)) {
             Kohana::log('error', 'Can\'t access file: '  . $file);
             return;
@@ -216,6 +232,11 @@ class Xmlcdr_Controller extends Bluebox_Controller {
         $hms .= str_pad($seconds, 2, "0", STR_PAD_LEFT);
 
         return $hms;
+    }
+
+    public function formatNumber($number)
+    {
+        return numbermanager::formatNumber($number);
     }
 
 }
