@@ -38,6 +38,18 @@ class GlobalMedia_Controller extends Bluebox_Controller
         $this->uploadPath = Kohana::config('upload.directory') . "/" . $this->session->get('user_id') . "/";
     }
 
+    /*public function temp()
+    {
+        $descriptions = MediaScanner::scanXml();
+        var_dump($descriptions);
+        $fp = fopen(MODPATH . '/mediamanager-1.0/audio_descriptions.ini', 'w');
+        foreach ($descriptions as $key => $value) {
+            fputs($fp, '"' . $key . '","' . $value . "\"\n");
+        }
+        fclose($fp);
+        exit();
+    }*/
+
     public function index()
     {
         $this->template->content = new View('globalmedia/index');
