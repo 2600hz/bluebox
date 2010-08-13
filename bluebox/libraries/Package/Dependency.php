@@ -106,7 +106,7 @@ class Package_Dependency
                     {
                         Package_Message::log('debug', 'dependency restriction ' .$package['packageName'] .' requires ' .$requirement .' version ' .$conditions);
 
-                        Package_Message::set($package['displayName'] .' version ' .$package['version'] .' requires ' .$dependency['displayName'] .' version ' .$dependency['version'] .' but it is not avaliable', 'error', $identifier);
+                        Package_Message::set($package['displayName'] .' version ' .$package['version'] .' requires ' .$dependency['displayName'] .' version ' . $conditions .' but it is not avaliable', 'error', $identifier);
 
                         $failures['incompatible'][$requirement] = $conditions;
                     }
