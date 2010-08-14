@@ -1,5 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-class Freeswitch_1_1_Configure extends Bluebox_Configure
+class Freeswitch_1_0_1_Configure extends Bluebox_Configure
 {
     public static $version = 1.0.1;
     public static $packageName = 'freeswitch';
