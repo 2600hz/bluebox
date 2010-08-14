@@ -26,8 +26,13 @@
  */
 echo $details;
 
-if (isset($views)) {
-    echo subview::renderAsSections($views);
-}
-
 ?>
+  <?php
+        if (isset($views))
+        {
+            echo 'good';
+            echo subview::renderAsSections($views);
+        }
+echo 'bad';
+    ?>
+

@@ -34,19 +34,6 @@ class Xmlcdr_Controller extends Bluebox_Controller {
     protected $authBypass = array('service');
     protected $baseModel = 'Xmlcdr';
 
-    private function getBasePath() {
-        return '/usr/local/freeswitch/recordings/';
-    }
-
-    private function getRecordingExtension() {
-        return '.wav';
-    }
-
-    private function getFile($uuid) {
-        return $this->getBasePath() . $uuid . $this->getRecordingExtension();
-    }
-
-
     public function  index() {
 
         $this->template->content = new View('generic/grid');
@@ -109,7 +96,6 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
     public function details($xml_cdr_id) {
 
-
         $xmlcdr = Doctrine::getTable('Xmlcdr')->findOneBy('xml_cdr_id', $xml_cdr_id);
 
         $idx = array(
@@ -136,6 +122,8 @@ class Xmlcdr_Controller extends Bluebox_Controller {
                 'Dailed User' => 'dialed_user'
         );
 
+        $this->xmlcdr = $xmlcdr;
+
         $details = '<h3>CDR</h3>';
         $details .= '<table>';
         foreach($idx as $k => $p) {
@@ -144,38 +132,15 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
         $details .= '</table>';
 
-        $details .= '<h3>Listen</h3>';
-        
-        if(file_exists($this->getFile($xmlcdr->uuid))) {
-            $details .= $this->playLink($xmlcdr->uuid);
-        } else {
-            $details .= 'No file found';
-        }
 
-        $this->template->content = new View('xmlcdr/details');
-        $this->template->content->details = $details;
-    }
+        $this->view->details = $details;
 
+        // Execute plugin hooks here, after we've loaded the core data sets
 
-    public function playLink($uuid) {
+        Event::run('bluebox.create_view', $this->view);
 
-        return sprintf('<audio src="%s" controls="controls">No audio tag suport</audio>',  url::site('xmlcdr/listen/' . $uuid));
+        plugins::views($this);
 
-    }
-
-    public function listen( $uuid) {
-        $this->auto_render = FALSE;
-        
-        $file = $this->getFile($uuid);
-        if(!file_exists($file)) {
-            Kohana::log('error', 'Can\'t access file: '  . $file);
-            return;
-        }
-
-        header("Content-type: audio/wav");
-        header('Content-Length: '.filesize($file));
-        readfile($file);
-        die();
     }
 
 

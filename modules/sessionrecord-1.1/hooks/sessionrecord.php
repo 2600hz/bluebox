@@ -2,3 +2,5 @@
 
     dialplan::register('SessionRecord', 'conditioning');
 
+    plugins::register('xmlcdr/details', 'view', array('SessionRecord_Plugin', 'update'));
+

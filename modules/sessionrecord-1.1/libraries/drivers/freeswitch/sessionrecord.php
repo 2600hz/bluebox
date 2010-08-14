@@ -14,7 +14,6 @@ class FreeSwitch_SessionRecord_Driver extends FreeSwitch_Base_Driver
     public static function conditioning()
     {
 
-        Kohana::log('debug', 'got here');
         $xml = FreeSWITCH::createExtension('sessionrecord');
 
         $condition = '/condition[@field="destination_number"][@expression="^.+$"]';
