@@ -1,9 +1,3 @@
-<?php
-echo $count;
-?>
+<?= $vms_grid ?>
 <hr />
-<?php
-echo $list;
-?>
-
-
+<?= $list_grid ?>

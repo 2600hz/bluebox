@@ -14,10 +14,10 @@ class Package_Operation_Install extends Package_Operation
 
         if ($package['status'] != Package_Manager::STATUS_UNINSTALLED)
         {
-            throw new Package_Operation_Exception('Install is not a sane operation for a package with status ' .$package['status']);
+            throw new Package_Operation_Exception('Install is not a sane operation for a package with status ' .$package['status'], $identifier);
         }
 
-        kohana::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
+        Package_Message::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
 
         Package_Operation_Verify::exec($identifier);
     }

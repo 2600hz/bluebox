@@ -83,7 +83,11 @@
 
                 <?php if (!empty($numberOptions[$numberType])): ?>
                 
-                    <?php echo new View($numberOptions[$numberType], $registry); ?>
+                    <?php
+                        $registry['number_id'] = '_' .strtolower(str_replace('Number', '', $numberType));
+                        
+                        echo new View($numberOptions[$numberType], $registry);
+                    ?>
 
                 <?php endif; ?>
 

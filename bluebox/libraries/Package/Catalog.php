@@ -38,7 +38,7 @@ class Package_Catalog
 
             Package_Catalog_Datastore::import($metadata);
 
-            //kohana::log('debug', 'Catalog added ' .str_replace(DOCROOT, '', $filepath) .' as ' .$metadata['packageName'] .' version ' .$metadata['version'] . ' identified by ' .$metadata['identifier']);
+            //Package_Message::log('debug', 'Catalog added ' .str_replace(DOCROOT, '', $filepath) .' as ' .$metadata['packageName'] .' version ' .$metadata['version'] . ' identified by ' .$metadata['identifier']);
 
             self::$catalog[$metadata['identifier']] = $metadata;
 

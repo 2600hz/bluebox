@@ -217,7 +217,7 @@ class NumberManager_Plugin extends Bluebox_Plugin
         $numbers['avaliable'] = Doctrine_Query::create()
             ->select('np.number_type_id, nt.class, n.*')
             ->from('NumberPool np, np.Number n, np.NumberType nt')
-            ->whereIn('n.foreign_id', array(0, 'NULL'))
+            ->where('(n.foreign_id = ? OR n.foreign_id IS NULL)', array(0))
             ->andwhereIn('nt.class', array($class_type))
             ->orderBy('number')
             ->execute(array(), Doctrine::HYDRATE_ARRAY);

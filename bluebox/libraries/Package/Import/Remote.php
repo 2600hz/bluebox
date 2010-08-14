@@ -21,7 +21,7 @@ class Package_Import_Remote
         {
             if ($overwrite)
             {
-                kohana::log('debug', 'Removing existing archive ' .$filepath);
+                Package_Message::log('debug', 'Removing existing archive ' .$filepath);
 
                 unlink($filepath);
             }
@@ -30,8 +30,6 @@ class Package_Import_Remote
                 return $filepath;
             }
         }
-
-        kohana::log('debug', 'Retrieving package archive from ' .$URL);
 
         if (!@file_put_contents($filepath, file_get_contents($URL)))
         {

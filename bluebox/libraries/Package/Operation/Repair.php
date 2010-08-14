@@ -8,7 +8,7 @@ class Package_Operation_Repair extends Package_Operation
 {
     public function validate($identifier)
     {
-        kohana::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
+        Package_Message::log('debug', 'Package management executing Package_Operation_Verify::exec(' .$identifier .')');
 
         // TODO: If this failes find unistall all dependent packages
         Package_Operation_Verify::exec($identifier);

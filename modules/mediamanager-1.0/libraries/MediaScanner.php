@@ -26,9 +26,15 @@ class MediaScanner {
             $knownFiles[$result['mediafile_id']] = $result['file'];
         }
 
-        // Scan for "known" files on disk. This is FreeSWITCH specific atm.
-        // TODO: Fix this. Download it from the web?
-        $descriptions = self::scanXml();
+        // TODO: Fix this. Download descriptions from the web?
+        if (file_exists(MODPATH . 'mediamanager-1.0' . DIRECTORY_SEPARATOR . 'audio_descriptions.ini')) {
+            $fp = fopen(MODPATH . 'mediamanager-1.0' . DIRECTORY_SEPARATOR . 'audio_descriptions.ini', 'r');
+            while ($row = fgetcsv($fp)) {
+                $descriptions[$row[0]] = $row[1];
+            }
+        } else {
+            $descriptions = array();
+        }
 
         /*
          * Now compare what we know with what we find on disk and add any new stuff
@@ -97,10 +103,9 @@ class MediaScanner {
         }
 
         Kohana::log('debug', 'Finished scanning sound files in ' . $soundPath);
-        flush();exit();
     }
 
-    public static function scanXml() {
+    /*public static function scanXml() {
         $xml = simplexml_load_file('/usr/local/src/freeswitch/docs/phrase/phrase_en.xml');
         $knownFiles = self::processXml($xml, '/usr/local/freeswitch/sounds/');
         // Need to write this out
@@ -120,5 +125,5 @@ class MediaScanner {
         }
 
         return $knownFiles;
-    }
+    }*/
 }

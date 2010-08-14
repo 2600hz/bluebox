@@ -25,6 +25,24 @@ class PackageManager_Controller extends Bluebox_Controller
         $this->view->messages = $messages;
 
         $this->view->catalog = Package_Manager::getDisplayList();
+
+        $messages = Package_Message::get();
+
+        if (is_array($messages))
+        {
+            $this->view->messages = $messages;
+        }
+        else
+        {
+            $this->view->messages = array();
+        }
+
+        foreach (Package_Catalog::getCatalog() as $identifier => $package)
+        {
+            kohana::log('debug', $identifier .' => ' .$package['packageName'] .' version ' .$package['version']);
+        }
+
+        Package_Message::clear();
     }
 
     public function verify($identifier)
@@ -37,9 +55,7 @@ class PackageManager_Controller extends Bluebox_Controller
 
             $transaction->commit();
 
-            $name = Package_Catalog::getPackageDisplayName($identifier);
-
-            message::set('Verify of package ' .$name .' succeeded', 'success');
+            message::set('Verify operation completed', 'success');
         } 
         catch(Exception $e)
         {
@@ -59,9 +75,7 @@ class PackageManager_Controller extends Bluebox_Controller
 
             $transaction->commit();
 
-            $name = Package_Catalog::getPackageDisplayName($identifier);
-
-            message::set('Repair of package ' .$name .' succeeded', 'success');
+            message::set('Repair operation completed', 'success');
         }
         catch(Exception $e)
         {
@@ -81,9 +95,7 @@ class PackageManager_Controller extends Bluebox_Controller
 
             $transaction->commit();
 
-            $name = Package_Catalog::getPackageDisplayName($identifier);
-
-            message::set('Install of package ' .$name .' succeeded', 'success');
+            message::set('Install operation completed', 'success');
         }
         catch(Exception $e)
         {
@@ -103,9 +115,7 @@ class PackageManager_Controller extends Bluebox_Controller
 
             $transaction->commit();
 
-            $name = Package_Catalog::getPackageDisplayName($identifier);
-
-            message::set('Uninstall of package ' .$name .' succeeded', 'success');
+            message::set('Uninstall operation completed', 'success');
         }
         catch(Exception $e)
         {
@@ -115,8 +125,13 @@ class PackageManager_Controller extends Bluebox_Controller
         url::redirect(Router::$controller);
     }
 
-    public function migrate($identifier)
+    public function migrate($identifier = NULL)
     {
+        if (!empty($_POST['migrate'][$identifier]))
+        {
+            $identifier = $_POST['migrate'][$identifier];
+        }
+
         try
         {
             $transaction = Package_Transaction::beginTransaction();
@@ -125,9 +140,7 @@ class PackageManager_Controller extends Bluebox_Controller
 
             $transaction->commit();
 
-            $name = Package_Catalog::getPackageDisplayName($identifier);
-
-            message::set('Upgrade of package ' .$name .' succeeded', 'success');
+            message::set('Migrate operation completed', 'success');
         }
         catch(Exception $e)
         {
@@ -140,5 +153,10 @@ class PackageManager_Controller extends Bluebox_Controller
     public function repair_all()
     {
         $this->template->content = new View('generic/blank');
+    }
+
+    public function createRepo()
+    {
+        Package_Catalog_Remote::createRepo();
     }
 }
