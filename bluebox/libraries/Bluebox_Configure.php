@@ -117,7 +117,7 @@ abstract class Bluebox_Configure  extends Package_Configure
                     catch (Exception $e)
                     {
                         kohana::log('alert', 'Alerts during migration, this can USUALLY be ignored: ' .$e->getMessage());
-                        
+
                         foreach ($migration->getErrors() as $error)
                         {
                             if (strstr($error->getMessage(), 'Already at version'))
@@ -163,7 +163,7 @@ abstract class Bluebox_Configure  extends Package_Configure
                             $previousMigration = new Doctrine_Migration($package['directory'] .'/migrations/' .$className);
 
                             $modelVersion = $previousMigration->getLatestVersion();
-                        }                        
+                        }
 
                         kohana::log('debug', 'Determined that ' .$package['packageName'] .' version ' .$package['version'] .' works against ' .$className .' version ' .$modelVersion);
 
@@ -362,7 +362,7 @@ abstract class Bluebox_Configure  extends Package_Configure
     public function repair($identifier)
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
-        
+
         if (empty($package['models']))
         {
             return;
@@ -386,7 +386,7 @@ abstract class Bluebox_Configure  extends Package_Configure
                     kohana::log('debug', 'Setting ' .$className .' to version 0 and walking migrations forward to ensure table schema');
 
                     $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($className));
-                        
+
                     $migration->setCurrentVersion(0);
 
                     $migration->migrate();

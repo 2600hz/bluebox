@@ -1,58 +1,122 @@
 <?php
-class VoicemailManager
-{
-	public static function getCount($mailbox, $domain)
-	{
-		$eslManager = new EslManager();
 
-                $cmd = sprintf('vm_boxcount %s@%s|all', $mailbox, $domain);
-                Kohana::log('info','ESL: ' . $cmd);
+define('VM_BOXCOUNT_EXPECTED', 4);
+define('VM_BOXCOUNT_NEW', 0);
+define('VM_BOXCOUNT_SAVED', 1);
+define('VM_BOXCOUNT_NEW_URGENT', 2);
+define('VM_BOXCOUNT_SAVED_URGENT', 3);
 
-		$count = $eslManager->getResponse($eslManager->api($cmd));
-		$count = explode(':', $count);
+class VoicemailManager {
+  public static function getCount($mailbox, $domain) {
+    $eslManager = new EslManager();
 
-                if(sizeof($count) != 4)  {
-                    $count = array('new' => 'No Mailbox Defined!', 'saved' => '', 'new-urgent' => '', 'saved-urgent' => '');
-                } else {
-                    $count = array('new' => $count[0], 'saved' => $count[1], 'new-urgent' => $count[2], 'saved-urgent' => $count[3]);
-                }
+    $cmd = sprintf('vm_boxcount %s@%s|all', $mailbox, $domain);
 
-		return $count;
+    $call = $eslManager->api($cmd);
+    $resp = $eslManager->getResponse($call);
+    $fields = explode(':', $resp);
+
+    if ( count($fields) !== VM_BOXCOUNT_EXPECTED ) {
+      kohana::log('error', 'ESL: Cmd ' . $cmd . ' failed to execute in an expected way. Result: ' . $resp);
+      return NULL;
+    }
+
+    return array('new' => $fields[VM_BOXCOUNT_NEW]
+		 ,'saved' => $fields[VM_BOXCOUNT_SAVED]
+		 ,'new-urgent' => $fields[VM_BOXCOUNT_NEW_URGENT]
+		 ,'saved-urgent' => $fields[VM_BOXCOUNT_SAVED_URGENT]
+		 );
+  }
+
+  public static function updateVMTables($user, $domain) {
+    $eslManager = new EslManager();
+    $cmd = sprintf('vm_list %s@%s xml', $user, $domain);
+
+    $call = $eslManager->api($cmd);
+    $resp = $eslManager->getResponse($call);
+
+    kohana::log('debug', 'ESL: Cmd ' . $cmd . ' failed to execute in an expected way. Result: ' . $resp);
+
+    $xml = simplexml_load_string("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $resp);
+
+    $vm = new VoicemailMessage();
+
+    foreach ( $xml as $voicemail ) {
+      $v = (array) $voicemail;
+      $v['cid_name'] = $v['cid-name'];
+      $v['cid_number'] = $v['cid-number'];
+      $v['in_folder'] = $v['folder'];
+      $v['file_path'] = $v['path'];
+
+      $vm->fromArray($v);
+      $vm->replace();
+    }
+
+    $cmd = sprintf('vm_boxcount %s@%s|all', $user, $domain);
+
+    $call = $eslManager->api($cmd);
+    $resp = $eslManager->getResponse($call);
+    $fields = explode(':', $resp);
+
+    if ( count($fields) !== VM_BOXCOUNT_EXPECTED ) {
+      kohana::log('error', 'ESL: Cmd ' . $cmd . ' failed to execute in an expected way. Result: ' . $resp);
+      return;
+    }
+
+    $overview = new VoicemailOverview();
+    $overview->fromArray(array('new' => $fields[VM_BOXCOUNT_NEW]
+			       ,'saved' => $fields[VM_BOXCOUNT_SAVED]
+			       ,'new_urgent' => $fields[VM_BOXCOUNT_NEW_URGENT]
+			       ,'saved_urgent' => $fields[VM_BOXCOUNT_SAVED_URGENT]
+			       ,'username' => $user
+			       ,'domain' => $domain
+			       ));
+    $overview->replace();
+  }
+
+  public static function getList($user, $domain) {
+    //@TODO 10 second cache?
+
+    //@TODO Put this in a cron
+    self::updateVMTables($user, $domain);
+
+    $eslManager = new EslManager();
+    $cmd = sprintf('vm_list %s@%s xml', $user, $domain);
+
+    $call = $eslManager->api($cmd);
+    $resp = $eslManager->getResponse($call);
+
+    kohana::log('debug', 'ESL: Cmd ' . $cmd . ' failed to execute in an expected way. Result: ' . $resp);
+
+    $xml = simplexml_load_string("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $resp);
 	
-	}
-	
+    $voicemails = array();
 
-	public static function getList($user, $domain)
-	{
+    foreach ( $xml as $voicemail ) {
+      $voicemails[] = (array) $voicemail;
+    }
 
-		//@TODO 10 second cache?
-		$eslManager = new EslManager();
-		$cmd = sprintf('vm_list %s@%s xml', $user, $domain);
-                
-                Kohana::log('info','ESL: ' . $cmd);
-                
-                $xml = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $eslManager->getResponse($eslManager->api($cmd));
+    return $voicemails;
+  }
 
-		$idx = array('created_epoch', 'read_epoch', 'username', 'domain', 'path', 'uuid', 'cid-name', 'cid-number');
+  public static function getVoicemail($user, $domain, $uuid) {
+    $eslManager = new EslManager();
 
-		$xml = simplexml_load_string($xml);
+    $cmd = sprintf('vm_list %s@%s xml', $user, $domain);
+    $call = $eslManager->api($cmd);
+    $resp = $eslManager->getResponse($call);
 
-		$voicemails = array();
+    $xml = simplexml_load_string("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $resp);
 
-		foreach($xml as $voicemail)
-		{
-			$tmp = array();
+    foreach ( $xml as $voicemail ) {
+      if ( ! strcmp($voicemail->uuid, $uuid) ) {
+	return (array) $voicemail;
+      }
+    }
 
-			foreach($idx as $header)
-			{
-				$tmp[$header] = $voicemail->$header;
-			}
+    return array();
+  }
 
-			$voicemails[(string)$voicemail->uuid] = $tmp;
-		}
-		return $voicemails;
-	}
-	
 	public static function markRead()
 	{
 		//vm_read,<id>@<domain>[/profile] <read|unread> [<uuid>],vm_read,mod_voicemail
