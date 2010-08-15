@@ -54,5 +54,6 @@ echo form::open();
 <?php echo'<div>' .  form::submit('confirm', 'Blast') . '</div>';?>
 </fieldset>
 <?php echo form::close('');?>
+<a href="<?= url::site('voicemailviewer/index') ?>">Cancel</a>
 </div>
 

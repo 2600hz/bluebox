@@ -8,22 +8,20 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 
   public function index() {
     $user = users::$user;
-    /* setup account vars */
-    $user_id = $user->_data['user_id'];
-    $location_id = $user->_data['location_id'];
-    $account_id = $user->_data['account_id'];
-    $user_id = $user->_data['user_id'];
-
     $domain = 'voicemail_1';
 
-    $mailboxes = VoicemailManager::getMailboxes($account_id);
-
-    $vms = array();
-    $list = array();
+    $mailboxes = VoicemailManager::getMailboxes($user->_data['account_id']);
 
     // ghetto multibox support
-    foreach ( $mailboxes as $mailbox ) {
-      VoicemailManager::updateVMTables($mailbox, $domain);
+    try {
+      foreach ( $mailboxes as $mailbox ) {
+	// needs to be in a cron job
+	VoicemailManager::updateVMTables($mailbox['mailbox'], $domain);
+      }
+    } catch(Exception $e) {
+      $this->template->content = new View('voicemailviewer/unexpected');
+      $this->template->content->unexpected_msg = $e->getMessage();
+      return TRUE;
     }
 
     $this->template->content = new View('voicemailviewer/index');
@@ -84,15 +82,16 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
       Event::run('bluebox.deleteOnSubmit', $action);
 
       if ( ($action == self::SUBMIT_CONFIRM) ) {
-	if ( ($msg = Doctrine::getTable('VoicemailMessage')->findOneByUuid($uuid)) === NULL ) {
+	if ( ($msg = Doctrine::getTable('VoicemailMessage')->findOneByUuid($uuid, Doctrine::HYDRATE_ARRAY)) === NULL ) {
 	  messge::set('Unable to delete voicemail message.');
 	  $this->exitQtipAjaxForm();
 	  url::redirect(Router_Core::$controller);
 	} else {
-	  $domain = $msg->domain;
-	  $username = $msg->username;
-	  VoicemailManager::delete($username, $domain, $uuid);
-	  $msg->delete();
+	  VoicemailManager::delete($msg['username'], $msg['domain'], $uuid);
+	  Doctrine_Query::create()
+	    ->delete('VoicemailMessage')
+	    ->addWhere('uuid = ?', $msg['uuid'])
+	    ->execute();
 	}
 
 	$this->returnQtipAjaxForm(NULL);
@@ -113,7 +112,7 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 
     if ( ($msg = Doctrine::getTable('VoicemailMessage')->findOneByUuid($uuid, Doctrine::HYDRATE_ARRAY)) === NULL ) {
       messge::set('Unable to find voicemail message.');
-      url::redirect(url::site('voicemailviewer'));
+      return;
     }
 
     $file = $msg['file_path'];
@@ -134,7 +133,7 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 
     if ( ($msg = Doctrine::getTable('VoicemailMessage')->findOneByUuid($uuid, Doctrine::HYDRATE_ARRAY)) === NULL ) {
       messge::set('Unable to find voicemail message.');
-      url::redirect(url::site('voicemailviewer'));
+      return;
     }
 
     $file = $msg['file_path'];
@@ -151,34 +150,29 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
     die();
   }
 
-    /**
-     *
-     *  blast
-     * 	<user>@<domain> <sound_file> [<cid_num>] [<cid_name>]
-     *  voicemail_inject is used to add an arbitrary sound file to a users voicemail mailbox.
-     */
-    public function blast() {
-        $domain = VoicemailManager::getDomain();
+  /**
+   *
+   *  blast
+   * 	<user>@<domain> <sound_file> [<cid_num>] [<cid_name>]
+   *  voicemail_inject is used to add an arbitrary sound file to a users voicemail mailbox.
+   */
+  public function blast() {
+    $domain = VoicemailManager::getDomain();
 
+    $this->view->mailboxes = VoicemailManager::getAllMailboxes();
 
-        $this->view->mailboxes =VoicemailManager::getAllMailboxes();
-
-        if($this->input->post()) {
-            if($this->input->post('file_id') == 0) {
-                message::set('Select a file to to use in the voicemail message');
-            } else {
-                foreach($this->input->post('blast') as $mailbox) {
-
-                    echo VoicemailManager::blast($mailbox, $domain, Media::getFilePath($this->input->post('file_id')));
-                }
-            }
-        }
+    if ( $this->input->post() ) {
+      if($this->input->post('file_id') == 0) {
+	message::set('Select a file to to use in the voicemail message');
+      } else {
+	foreach($this->input->post('blast') as $mailbox) {
+	  echo VoicemailManager::blast($mailbox, $domain, Media::getFilePath($this->input->post('file_id')));
+	}
+      }
     }
+  }
 
-    public function service($key = NULL)
-    {
-        Kohana::log('info', 'Incoming email');
-
-    }
-
+  public function service($key = NULL) {
+    Kohana::log('info', 'Incoming email');
+  }
 }
