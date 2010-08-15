@@ -24,5 +24,4 @@
  *
  *
  */
-echo $details;
 ?>
