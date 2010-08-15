@@ -103,9 +103,11 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
     public function scan() {
-        // TODO: Make this run
+        // TODO: Make this run in the background
         
         MediaScanner::scan(Media::getAudioPath(), $this->knownTypes);
+        flush();exit();
+
     }
 
     public function details($mediaId) {
@@ -336,7 +338,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
     public function create() {
         if (isset($_POST['path']) and isset($_POST['newfolder'])) {
-            if ($this->createFolder(Media::getAudioPath() . $_POST['path'] . '/' . $_POST['newfolder'])) {
+            if ($this->createFolder(Media::getAudioPath() . $_POST['path'] . DIRECTORY_SEPARATOR . $_POST['newfolder'])) {
                 message::set('Folder created.');
 
                 url::redirect(Router_Core::$controller . '/index');
@@ -360,7 +362,16 @@ class GlobalMedia_Controller extends Bluebox_Controller
         return (is_dir($path) or filesystem::createDirectory($path));
     }
 
-    /*public function qtipAjaxReturn($data) {
-        javascript::codeBlock('$(\'.jqgrid_instance\').trigger("reloadGrid");');
+    /*public function buildDescriptionsFromFs()
+    {
+        $descriptions = MediaScanner::scanXml();
+        var_dump($descriptions);
+        $fp = fopen(MODPATH . '/mediamanager-1.0/audio_descriptions.ini', 'w');
+        foreach ($descriptions as $key => $value) {
+            fputs($fp, '"' . $key . '","' . $value . "\"\n");
+        }
+        fclose($fp);
+        exit();
     }*/
+
 }

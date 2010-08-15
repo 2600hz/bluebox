@@ -7,7 +7,7 @@
  *
  *
  * @author Darren Schreiber <d@d-man.org>
- * @license Closed/Copyright Darren Schreiber
+ * @license MPL
  */
 
 class MultiTenant extends Doctrine_Template {
