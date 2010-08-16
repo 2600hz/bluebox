@@ -102,6 +102,47 @@ class GlobalMedia_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
+    public function delete($mediafile_id) {
+      $base = strtolower($this->baseModel);
+      $this->createView();
+
+      $this->loadBaseModel($mediafile_id);
+
+      if ( $action = $this->submitted(array('submitString' => 'delete')) ) {
+	Event::run('bluebox.deleteOnSubmit', $action);
+
+	if ( ($action == self::SUBMIT_CONFIRM) ) {
+	  if ( ($mf = Doctrine::getTable('MediaFile')->findOneByMediafileId($mediafile_id, Doctrine::HYDRATE_ARRAY)) === NULL ) {
+	    messge::set('Unable to delete media file.');
+	    $this->exitQtipAjaxForm();
+	    url::redirect(Router_Core::$controller);
+	  } else {
+	    foreach ( $mf['registry']['rates'] as $rate ) {
+	      $f = Media::getAudioPath() . $mf['path'] . DIRECTORY_SEPARATOR . $rate . DIRECTORY_SEPARATOR;
+	      @unlink($f . basename($mf['file']));
+	    }
+
+	    Doctrine_Query::create()
+	      ->delete('MediaFile')
+	      ->where('mediafile_id = ?', $mf['mediafile_id'])
+	      ->execute();
+
+	    message::set('Removed ' . basename($mf['file']));
+
+	    $this->returnQtipAjaxForm(NULL);
+
+	    url::redirect(Router_Core::$controller);
+	  }
+	} else if ($action == self::SUBMIT_DENY) {
+	  $this->exitQtipAjaxForm();
+
+	  url::redirect(Router_Core::$controller);
+	}
+      }
+
+      $this->prepareDeleteView(NULL, $mediafile_id);
+    }
+
     public function scan() {
       // TODO: Make this run in the background
       MediaScanner::scan(Media::getAudioPath(), $this->knownTypes);
@@ -110,7 +151,6 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
     public function details($mediaId) {
         $this->view->mediaId = $mediaId;
-        
         $this->view->media = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
     }
 
@@ -289,10 +329,16 @@ class GlobalMedia_Controller extends Bluebox_Controller
             // That means if someone uploads the wrong audio file, it kinda messes things up big time.
             if (!in_array($audioFile->wave_framerate, (array)$mediaFile['registry']['rates'])) {
                 Kohana::log('debug', 'Updating ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
-                $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], array('rates' => $audioFile->wave_framerate));;
+                $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], array('rates' => array($audioFile->wave_framerate)));
+		$mediaFile['description'] = strlen($description) > 0 ? $description : $mediaFile['description'];
                 $mediaFile->save();
             } else {
+	      if ( strcmp($mediaFile['description'], $description) ) {
+		$mediaFile['description'] = $description;
+                $mediaFile->save();
+	      } else {
                 Kohana::log('debug', 'SKIPPED DB UPDATE - Nothing to update on ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
+	      }
             }
                 message::set('Successfully updated audio file in the system.');
 
@@ -308,9 +354,11 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
             // See if we know this filename, description & category from the XML info
             if (isset($descriptions[$shortname])) {
-                $mediaFile['description'] = $descriptions[$shortname];
-            } else {
-                $mediaFile['description'] = 'Unknown';
+	      $mediaFile['description'] = $descriptions[$shortname];
+            } else if ( strlen($description) > 0 ) {
+	      $mediaFile['description'] = $description;
+	    } else {
+	      $mediaFile['description'] = 'Unknown';
             }
 
             Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
@@ -318,7 +366,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
             $audioInfo = array( 'type' => $audioFile->wave_type,
                                 'compression' => $audioFile->wave_compression,
                                 'channels' => $audioFile->wave_channels,
-                                'rates' => $audioFile->wave_framerate,
+                                'rates' => array($audioFile->wave_framerate),
                                 'byterate' => $audioFile->wave_byterate,
                                 'bits' => $audioFile->wave_bits,
                                 'size' => $audioFile->wave_size,
@@ -335,19 +383,26 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
     public function create() {
-        if (isset($_POST['path']) and isset($_POST['newfolder'])) {
-            if ($this->createFolder(Media::getAudioPath() . $_POST['path'] . DIRECTORY_SEPARATOR . $_POST['newfolder'])) {
-                message::set('Folder created.');
+      $reqPath = '';
 
-                url::redirect(Router_Core::$controller . '/index');
-            } else {
-                message::set('The path ' . $_POST['path'] . ' does not exist and could not be created!');
-            }
-        }
+      if (isset($_POST['path']) and isset($_POST['newfolder'])) {
+	$reqPath = $_POST['path'];
+	$path = Media::getAudioPath() . $reqPath;
 
-        plugins::views($this);
+	kohana::log('debug', 'Creating ' . $path . DIRECTORY_SEPARATOR . $_POST['newfolder']);
+	if ($this->createFolder($path . DIRECTORY_SEPARATOR . $_POST['newfolder'])) {
+	  message::set('Folder created.');
 
-        $this->view->soundPath = Media::getAudioPath();
+	  url::redirect(Router_Core::$controller . '/index');
+	} else {
+	  message::set('The path ' . $_POST['path'] . ' does not exist or could not be created! Does your web user have write access?');
+	}
+      }
+
+      plugins::views($this);
+
+      $this->view->soundPath = Media::getAudioPath();
+      $this->view->reqPath = $reqPath;
     }
 
     /**
