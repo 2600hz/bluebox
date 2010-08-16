@@ -103,11 +103,9 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
     public function scan() {
-        // TODO: Make this run in the background
-        
-        MediaScanner::scan(Media::getAudioPath(), $this->knownTypes);
-        flush();exit();
-
+      // TODO: Make this run in the background
+      MediaScanner::scan(Media::getAudioPath(), $this->knownTypes);
+      $this->returnQtipAjaxForm(NULL);
     }
 
     public function details($mediaId) {
