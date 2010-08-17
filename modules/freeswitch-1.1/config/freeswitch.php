@@ -38,6 +38,7 @@ $config['default_packages'] = array(
     'externalxfer',
     //'sofia',
     'xmleditor',
+    'xmlcdr'
 );
 
 $config['ESLHost'] = '127.0.0.1';
