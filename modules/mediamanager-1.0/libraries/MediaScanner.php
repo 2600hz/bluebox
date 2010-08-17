@@ -1,5 +1,7 @@
 <?php
 
+require('getid3/getid3.php');
+
 class MediaScanner {
     public static function NormalizeFSNames($filename) {
         // NOTE: This is a FreeSWITCH-specific feature
@@ -32,6 +34,7 @@ class MediaScanner {
 
     public static function scan($soundPath, $fileTypes) {
       set_time_limit(0);
+
       // TODO: Make this a queued event to scan all files. Only possible once.
 
       /*
@@ -91,18 +94,7 @@ class MediaScanner {
 	  $registry = $knownFiles[$shortname]['registry'];
 
 	  if ( ! in_array($framerate, $registry['rates']) ) {
-	    $audioFile = new AudioFile();
-	    $audioFile->loadFile($filename);
-	    $audioInfo = array( 'type' => $audioFile->wave_type,
-				'compression' => $audioFile->wave_compression,
-				'channels' => $audioFile->wave_channels,
-				'rates' => array($audioFile->wave_framerate),
-				'byterate' => $audioFile->wave_byterate,
-				'bits' => $audioFile->wave_bits,
-				'size' => $audioFile->wave_size,
-				'length' => $audioFile->wave_length);
-
-	    $registry = array_merge($registry, $audioInfo);
+	    $registry = array_merge($registry, self::getAudioInfo($filename));
 
 	    Kohana::log('debug', 'Updating ' . $shortname . ' with sample rate ' . $framerate . '... ');
 
@@ -133,21 +125,9 @@ class MediaScanner {
 
 	  Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
 
-	  $audioFile = new AudioFile();
-	  $audioFile->loadFile($filename);
-	  $audioInfo = array( 'type' => $audioFile->wave_type,
-			      'compression' => $audioFile->wave_compression,
-			      'channels' => $audioFile->wave_channels,
-			      'rates' => array($audioFile->wave_framerate),
-			      'byterate' => $audioFile->wave_byterate,
-			      'bits' => $audioFile->wave_bits,
-			      'size' => $audioFile->wave_size,
-			      'length' => $audioFile->wave_length);
-
-	  $mediaFile['registry'] += $audioInfo;
+	  $mediaFile['registry'] += self::getAudioInfo($filename);
 
 	  $mediaFile->save();
-	  unset($audioFile);
 
 	  // Add to list of "known" files
 	  $knownFiles[$mediaFile['file']] = $mediaFile['mediafile_id'];
@@ -180,4 +160,45 @@ class MediaScanner {
 
         return $knownFiles;
     }*/
+
+    public static function getAudioInfo($filename) {
+      $id3 = new getID3();
+      $info = $id3->analyze($filename);
+
+      switch($info['audio']['dataformat']) {
+      case 'wav' :
+	return array('type' => $info['audio']['dataformat']
+		     ,'compression' => $info['audio']['compression_ratio']
+		     ,'channels' => $info['audio']['channels']
+		     ,'rates' => array($info['audio']['sample_rate'])
+		     ,'byterate' => $info['audio']['bitrate']
+		     ,'bits' => $info['audio']['bits_per_sample']
+		     ,'size' => $info['filesize']
+		     ,'length' => $info['playtime_seconds']
+		     );
+      case 'mp3' :
+	return array('type' => $info['audio']['dataformat']
+		     ,'compression' => $info['audio']['compression_ratio']
+		     ,'channels' => $info['audio']['channels']
+		     ,'rates' => array($info['audio']['sample_rate'])
+		     ,'byterate' => $info['audio']['bitrate']
+		     ,'bits' => NULL
+		     ,'size' => $info['filesize']
+		     ,'length' => $info['playtime_seconds']
+		     );
+      case 'ogg' :
+	return array('type' => $info['audio']['dataformat']
+		     ,'compression' => $info['audio']['compression_ratio']
+		     ,'channels' => $info['audio']['channels']
+		     ,'rates' => array($info['audio']['sample_rate'])
+		     ,'byterate' => $info['audio']['bitrate']
+		     ,'bits' => NULL
+		     ,'size' => $info['filesize']
+		     ,'length' => $info['playtime_seconds']
+		     );
+      default:
+	kohana::log('error', 'Unhandled media type(' . $info['audio']['dataformat'] . ') for file ' . $filename);
+	return array();
+      }
+    }
 }

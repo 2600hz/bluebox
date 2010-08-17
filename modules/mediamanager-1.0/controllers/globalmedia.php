@@ -291,95 +291,85 @@ class GlobalMedia_Controller extends Bluebox_Controller
         $this->view->soundPath = Media::getAudioPath();
     }
 
-    private function upload($tmpfile, $destfile, $basePath, $description = '', $replace = false)
-    {
-        $dir = dirname($destfile);
-        $shortname = str_replace($basePath, '', MediaScanner::NormalizeFSNames($destfile));
+    private function upload($tmpfile, $destfile, $basePath, $description = '', $replace = false) {
+      $dir = dirname($destfile);
+      $shortname = str_replace($basePath, '', MediaScanner::NormalizeFSNames($destfile));
 
-        /* can we write to the target folder? */
-        if (!filesystem::is_writable($dir)) {
-            message::set('The path ' . $dir . ' is not writable!');
-            return FALSE;
-        }
+      /* can we write to the target folder? */
+      if (!filesystem::is_writable($dir)) {
+	message::set('The path ' . $dir . ' is not writable!');
+	return FALSE;
+      }
 
-        $audioFile = new AudioFile();
-        $audioFile->loadFile($tmpfile);
+      $audioInfo = MediaScanner::getAudioInfo($tmpfile);
 
-        // Create folder where this file will go and move file there
-        $destfile = dirname($destfile) . '/' . $audioFile->wave_framerate . '/' . basename($destfile);
-        $this->createFolder(dirname($destfile));
+      // Create folder where this file will go and move file there
+      $destfile = dirname($destfile) . '/' . $audioInfo['byterate'] . '/' . basename($destfile);
+      $this->createFolder(dirname($destfile));
 
-        if (!is_writable(dirname($destfile)) or (file_exists($destfile) and !is_writable($destfile))) {
-            message::set(dirname($destfile) . ' is not writable');
-            return FALSE;
-        }
+      if (!is_writable(dirname($destfile)) or (file_exists($destfile) and !is_writable($destfile))) {
+	message::set(dirname($destfile) . ' is not writable');
+	return FALSE;
+      }
 
-        try {
-            move_uploaded_file($tmpfile, $destfile);
-        } catch (Exception $e) {
-            message::set('Unable to move uploaded file into ' . $destfile . '. ' . $e->getMessage());
-            return FALSE;
-        }
+      try {
+	move_uploaded_file($tmpfile, $destfile);
+      } catch (Exception $e) {
+	message::set('Unable to move uploaded file into ' . $destfile . '. ' . $e->getMessage());
+	return FALSE;
+      }
 
-        // See if this is in the DB
-        $mediaFile = Doctrine::getTable('MediaFile')->findOneByFile($shortname);
-        if ($mediaFile) {
-            // Note that this is a bit dangerous and could use improvement.
-            // We assume that all other properties in the file we just found match the file already uploaded.
-            // That means if someone uploads the wrong audio file, it kinda messes things up big time.
-            if (!in_array($audioFile->wave_framerate, (array)$mediaFile['registry']['rates'])) {
-                Kohana::log('debug', 'Updating ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
-                $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], array('rates' => array($audioFile->wave_framerate)));
-		$mediaFile['description'] = strlen($description) > 0 ? $description : $mediaFile['description'];
-                $mediaFile->save();
-            } else {
-	      if ( strcmp($mediaFile['description'], $description) ) {
-		$mediaFile['description'] = $description;
-                $mediaFile->save();
-	      } else {
-                Kohana::log('debug', 'SKIPPED DB UPDATE - Nothing to update on ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
-	      }
-            }
-                message::set('Successfully updated audio file in the system.');
+      // See if this is in the DB
+      $mediaFile = Doctrine::getTable('MediaFile')->findOneByFile($shortname);
+      if ($mediaFile) {
+	// Note that this is a bit dangerous and could use improvement.
+	// We assume that all other properties in the file we just found match the file already uploaded.
+	// That means if someone uploads the wrong audio file, it kinda messes things up big time.
+	if (!in_array($audioInfo['byterate'], (array)$mediaFile['registry']['rates'])) {
 
-                url::redirect(Router_Core::$controller . '/index');
-        } else {
-            // NEW FILE! Do lots of stuff
+	  Kohana::log('debug', 'Updating ' . $shortname . "...");
+	  $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], $audioInfo);
+	  $mediaFile['description'] = strlen($description) > 0 ? $description : $mediaFile['description'];
+	  $mediaFile->save();
+	} else {
+	  if ( strcmp($mediaFile['description'], $description) ) {
+	    $mediaFile['description'] = $description;
+	    $mediaFile->save();
+	  } else {
+	    Kohana::log('debug', 'SKIPPED DB UPDATE - Nothing to update on ' . $shortname . " with sample rate " . $audioInfo['byterate'] . "... ");
+	  }
+	}
+	message::set('Successfully updated audio file in the system.');
 
-            // Save info about file
-            $mediaFile = new MediaFile();
-            $mediaFile['file'] = $shortname;
-            $mediaFile['path'] = dirname($mediaFile['file']);   // We track the path separately to ease searching
-            $mediaFile['account_id'] = 1;
+	url::redirect(Router_Core::$controller . '/index');
+      } else {
+	// NEW FILE! Do lots of stuff
 
-            // See if we know this filename, description & category from the XML info
-            if (isset($descriptions[$shortname])) {
-	      $mediaFile['description'] = $descriptions[$shortname];
-            } else if ( strlen($description) > 0 ) {
-	      $mediaFile['description'] = $description;
-	    } else {
-	      $mediaFile['description'] = 'Unknown';
-            }
+	// Save info about file
+	$mediaFile = new MediaFile();
+	$mediaFile['file'] = $shortname;
+	$mediaFile['path'] = dirname($mediaFile['file']);   // We track the path separately to ease searching
+	$mediaFile['account_id'] = 1;
 
-            Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
+	// See if we know this filename, description & category from the XML info
+	if (isset($descriptions[$shortname])) {
+	  $mediaFile['description'] = $descriptions[$shortname];
+	} else if ( strlen($description) > 0 ) {
+	  $mediaFile['description'] = $description;
+	} else {
+	  $mediaFile['description'] = 'Unknown';
+	}
 
-            $audioInfo = array( 'type' => $audioFile->wave_type,
-                                'compression' => $audioFile->wave_compression,
-                                'channels' => $audioFile->wave_channels,
-                                'rates' => array($audioFile->wave_framerate),
-                                'byterate' => $audioFile->wave_byterate,
-                                'bits' => $audioFile->wave_bits,
-                                'size' => $audioFile->wave_size,
-                                'length' => $audioFile->wave_length);
+	Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
 
-            $mediaFile['registry'] += $audioInfo;
+	$mediaFile['registry'] += $audioInfo;
 
-            $mediaFile->save();
+	$mediaFile->save();
 
-            message::set('Successfully added audio file to the system.');
+	message::set('Successfully added audio file to the system.');
 
-            url::redirect(Router_Core::$controller . '/index');
-        }
+	url::redirect(Router_Core::$controller . '/index');
+      }
     }
 
     public function create() {
