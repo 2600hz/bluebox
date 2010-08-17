@@ -10,9 +10,9 @@
  *      require you to repair you module via the package manager.
  * ============================================================================
  */
-class Xmlcdr_1_1_1_Configure extends Bluebox_Configure
+class Xmlcdr_1_0_1_Configure extends Bluebox_Configure
 {
-    public static $version = '1.1.1';
+    public static $version = '1.0.1';
     public static $packageName = 'XML CDR';
     public static $author = 'Michael Phillips';
     public static $vendor = 'Michael Phillips';
@@ -23,7 +23,7 @@ class Xmlcdr_1_1_1_Configure extends Bluebox_Configure
     public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
         'core' => 0.1,
-        'freeswitch' => 1.1
+        'freeswitch' => '1.0.1'
     );
     public static $navLabel = 'CDR';
     public static $navBranch = '/System/';
