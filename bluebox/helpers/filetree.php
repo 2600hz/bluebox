@@ -117,14 +117,16 @@ class filetree {
         $dir_iterator = new RecursiveDirectoryIterator($directory);
         $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
 
-        foreach ($iterator as $name => $data) if (preg_match($excludeRegEx, $name) == 0) {
+        foreach ($iterator as $name => $data) {
+	  if (preg_match($excludeRegEx, $name) == 0) {
             $name = str_replace($basePath, '', $name);
-            if ($data->isDir()) {
-                $matches[$name] = $name;
+            if ( $data->isDir() && strcmp($name[strlen($name)-1], '.') ) {
+	      $matches[$name] = $name;
             } elseif (!$directoriesOnly) {
-                $matches[$name] = $name;
+	      $matches[$name] = $name;
             }
-        }
+	  }
+	}
 
         return $matches;
     }

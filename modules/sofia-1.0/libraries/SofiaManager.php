@@ -68,7 +68,6 @@ class SofiaManager
 
         if(!$sipRegCache)
         {
-            Kohana::log('info', 'Using cached registration');
 
             $eslManager = new EslManager();
             
@@ -78,10 +77,15 @@ class SofiaManager
 
             $xml = $eslManager->getResponse($result);
 
-            $xml = simplexml_load_string($xml);
+            $registrations = array();
 
-            $registrations = $xml->registrations->registration;
-            //var_dump((array)$registrations);
+            if($xml !== 'Command execution failed.') {
+                $xml = simplexml_load_string($xml);
+                Kohana::log('info', 'No XML returned');
+                $registrations = $xml->registrations->registration;
+
+            }    
+        //var_dump((array)$registrations);
 
             $result = array();
 
@@ -98,6 +102,7 @@ class SofiaManager
         } 
         else
         {
+            Kohana::log('info', 'Using cached registration');
             return $sipRegCache;
         }
     }
