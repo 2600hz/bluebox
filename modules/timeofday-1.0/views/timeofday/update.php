@@ -41,7 +41,7 @@
 
             <div style="display:inline; margin:0 10px;">
 
-                <?php echo form::label('timeofday[wen]', 'Wensday'); ?>
+                <?php echo form::label('timeofday[wen]', 'Wednesday'); ?>
 
                 <?php echo form::checkbox(array('name' => 'timeofday[wen]', 'class' => 'time_selector')); ?>
 
@@ -285,7 +285,7 @@
 
             text = text.replace(/1/, 'Tuesday');
 
-            text = text.replace(/2/, 'Wensday');
+            text = text.replace(/2/, 'Wednesday');
 
             text = text.replace(/3/, 'Thursday');
 

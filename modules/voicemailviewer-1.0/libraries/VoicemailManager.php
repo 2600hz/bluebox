@@ -35,9 +35,12 @@ class VoicemailManager {
     $call = $eslManager->api($cmd);
     $resp = $eslManager->getResponse($call);
 
-    kohana::log('debug', 'ESL: Cmd ' . $cmd . ' failed to execute in an expected way. Result: ' . $resp);
+    $xml = @simplexml_load_string("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $resp);
 
-    $xml = simplexml_load_string("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $resp);
+    if ( $xml === FALSE ) {
+      kohana::log('error', 'ESL: Cmd ' . $cmd . ' failed to execute in an expected way. Result: ' . $resp);
+      throw new Exception($resp);
+    }
 
     $vm = new VoicemailMessage();
 
@@ -60,7 +63,7 @@ class VoicemailManager {
 
     if ( count($fields) !== VM_BOXCOUNT_EXPECTED ) {
       kohana::log('error', 'ESL: Cmd ' . $cmd . ' failed to execute in an expected way. Result: ' . $resp);
-      return;
+      throw new Exception($resp);
     }
 
     $overview = new VoicemailOverview();
@@ -99,77 +102,54 @@ class VoicemailManager {
     return $voicemails;
   }
 
-  public static function getVoicemail($user, $domain, $uuid) {
-    $eslManager = new EslManager();
-
-    $cmd = sprintf('vm_list %s@%s xml', $user, $domain);
-    $call = $eslManager->api($cmd);
-    $resp = $eslManager->getResponse($call);
-
-    $xml = simplexml_load_string("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" . $resp);
-
-    foreach ( $xml as $voicemail ) {
-      if ( ! strcmp($voicemail->uuid, $uuid) ) {
-	return (array) $voicemail;
-      }
-    }
-
-    return array();
+  public static function markRead()
+  {
+    //vm_read,<id>@<domain>[/profile] <read|unread> [<uuid>],vm_read,mod_voicemail
+  }
+	
+  public static function markUnread()
+  {
+    //vm_read,<id>@<domain>[/profile] <read|unread> [<uuid>],vm_read,mod_voicemail
+  }
+	
+  public static function getMailboxes($account_id, $user_id = NULL) {
+    $q = Doctrine_Query::create()
+      ->select('v.mailbox')
+      ->from('Voicemail v')
+      ->where('v.account_id = ?');
+    return $q->execute($account_id, Doctrine::HYDRATE_ARRAY);
   }
 
-	public static function markRead()
-	{
-		//vm_read,<id>@<domain>[/profile] <read|unread> [<uuid>],vm_read,mod_voicemail
-	}
-	
-	public static function markUnread()
-	{
-		//vm_read,<id>@<domain>[/profile] <read|unread> [<uuid>],vm_read,mod_voicemail
-	}
-	
-	public static function getMailboxes($account_id, $user_id = NULL)
-	{
-		$tmp = array();
-		
-		$mailboxes = Doctrine::getTable('Voicemail')->findByAccountId($account_id);
-		foreach($mailboxes as $mailbox)
-		{
-			$tmp[$mailbox->mailbox] = $mailbox->mailbox;
-		}
-		return $tmp;
-	}
+  public static function getAllMailboxes() {
+    $q = Doctrine_Query::create()
+      ->select('v.mailbox')
+      ->from('Voicemail v');
+    $boxes = $q->execute(NULL, Doctrine::HYDRATE_ARRAY);
+    return array_map('vm_get_mailbox', $boxes);
+  }
 
-        public static function getAllMailboxes()
-        {
-            $mailboxes = Doctrine::getTable('Voicemail')->findAll();
-            $tmp = array();
-            foreach($mailboxes as $mailbox)
-               {
-                $tmp[$mailbox->mailbox] = $mailbox->mailbox;
-            }
-            return $tmp;
-        }
+  public static function getDomain($account_id = NULL) {
+    return 'voicemail_1';
+  }
 
-        public static function getDomain($account_id = NULL)
-        {
-            return 'voicemail_1';
-        }
+  public static function blast($mailbox, $domain, $file) {
+    //voicemail_inject,[group=]<box> <sound_file> [<cid_num>] [<cid_name>],voicemail_inject,mod_voicemail
 
-        public static function blast($mailbox, $domain, $file)
-        {
-            //voicemail_inject,[group=]<box> <sound_file> [<cid_num>] [<cid_name>],voicemail_inject,mod_voicemail
-                
-		$inject = sprintf('voicemail_inject %s@%s %s %s %s', $mailbox, $domain, $file, '4000', 'Voicemail');
-                
-		$eslManager = new EslManager();
-		$result = $eslManager->getResponse($eslManager->api($inject));
-                return $result;
-        }
+    $inject = sprintf('voicemail_inject %s@%s %s %s %s', $mailbox, $domain, $file, '4000', 'Voicemail');
 
-        public static function delete($user, $domain, $uuid)
-	{
-		//vm_delete,<id>@<domain>[/profile] [<uuid>],vm_delete,mod_voicemail
-		$eslManager = new EslManager();
-		$eslManager->getResponse($eslManager->api(sprintf('vm_delete %s@%s %s', $user, $domain, $uuid)));
-	}
+    $eslManager = new EslManager();
+    $result = $eslManager->getResponse($eslManager->api($inject));
+    return $result;
+  }
+
+  public static function delete($user, $domain, $uuid) {
+    //vm_delete,<id>@<domain>[/profile] [<uuid>],vm_delete,mod_voicemail
+    $eslManager = new EslManager();
+    $resp = $eslManager->getResponse($eslManager->api(sprintf('vm_delete %s@%s %s', $user, $domain, $uuid)));
+    kohana::log('debug', 'VM Delete returned ' . $resp);
+  }
+}
+
+function vm_get_mailbox($data) {
+  return $data['mailbox'];
 }
