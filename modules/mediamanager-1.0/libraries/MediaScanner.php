@@ -13,6 +13,11 @@ class MediaScanner {
     public static function filterKnownFiles($file) {
       $exists = FALSE;
 
+      if ( empty($file['registry']) || empty($file['registry']['rate']) ) {
+	$exists = file_exists($file['path']);
+	$file['registry']['rate'] = array();
+      }
+
       foreach ( $file['registry']['rates'] as $rate ) {
 	if ( ! $exists ) {
 	  $base = basename($file['path']);
@@ -176,6 +181,7 @@ class MediaScanner {
 		     ,'size' => $info['filesize']
 		     ,'length' => $info['playtime_seconds']
 		     );
+      case 'mp1' :
       case 'mp3' :
 	return array('type' => $info['audio']['dataformat']
 		     ,'compression' => $info['audio']['compression_ratio']

@@ -117,6 +117,11 @@ class GlobalMedia_Controller extends Bluebox_Controller
 	    $this->exitQtipAjaxForm();
 	    url::redirect(Router_Core::$controller);
 	  } else {
+	    if ( empty($mf['registy']) || empty($mf['registry']['rate']) ) {
+	      $mf['registry']['rate'] = array();
+	      @unlink($mf['file']);
+	    }
+
 	    foreach ( $mf['registry']['rates'] as $rate ) {
 	      $f = Media::getAudioPath() . $mf['path'] . DIRECTORY_SEPARATOR . $rate . DIRECTORY_SEPARATOR;
 	      @unlink($f . basename($mf['file']));
@@ -206,89 +211,89 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
 
-    public function download($mediaId, $sampleRate = NULL, $stream = FALSE)
-    {
-        $file = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
-        $fullPath = $this->locateFile($file, $sampleRate);
-        
-        $name = basename($file['file']);
-        if ($file['registry']['type'] == 'MPEG') {
-            $mime = 'audio/mpeg';
-        } else {
-            $mime = 'audio/x-wav';
-        }
-        header(sprintf('Content-type: %s', $mime));
-        if (!$stream) {
-            // Include filename and attachment disposition only if we don't want to stream
-            header(sprintf('Content-Disposition: attachment; filename="%s"', $name));
-        }
-        readfile($fullPath);
-        die();
+    public function download($mediaId, $sampleRate = NULL, $stream = FALSE) {
+      $file = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
+      $fullPath = $this->locateFile($file, $sampleRate);
+
+      $name = basename($file['file']);
+      if ( in_array($file['registry']['type'], array('MPEG', 'mp1', 'mp3')) ) {
+	$mime = 'audio/mpeg';
+      } else if ( ! strcmp($file['registry']['type'], 'ogg') ) {
+	$mime = 'audio/ogg';
+      } else {
+	$mime = 'audio/x-wav';
+      }
+
+      header(sprintf('Content-type: %s', $mime));
+      if (!$stream) {
+	// Include filename and attachment disposition only if we don't want to stream
+	header(sprintf('Content-Disposition: attachment; filename="%s"', $name));
+      }
+      readfile($fullPath);
+      die();
     }
 
-    public function add()
-    {
-        //javascript::add('ajaxupload');
-        
-        $this->view->title = 'Upload Media';
+    public function add() {
+      //javascript::add('ajaxupload');
 
-        $maxFilesize = ini_get('upload_max_filesize');
-        $maxPost = ini_get('post_max_size');
-        if ($maxFilesize <= $maxPost) {
-            $this->view->maxUpload =  __('Max file size that can uploaded is limited by upload_max_filesize to ') . $maxFilesize;
-        } else {
-            $this->view->maxUpload =  __('Max file size that can uploaded is limited by post_max_size to ') . $maxPost .'.  ';
-            $this->view->maxUpload .= __('If you attempt to upload something larger than this the page will simply reload.');
-        }
+      $this->view->title = 'Upload Media';
 
-        Kohana::log('debug', print_r($_POST, TRUE) . print_r($_FILES, TRUE));
-        
-        if (isset($_FILES['upload'])) {
-            switch ($_FILES['upload']['error']) {
-                case UPLOAD_ERR_INI_SIZE:
-                    message::set('The uploaded file exceeds the upload_max_filesize directive in php.ini');
-                    break;
+      $maxFilesize = ini_get('upload_max_filesize');
+      $maxPost = ini_get('post_max_size');
+      if ($maxFilesize <= $maxPost) {
+	$this->view->maxUpload =  __('Max file size that can uploaded is limited by upload_max_filesize to ') . $maxFilesize;
+      } else {
+	$this->view->maxUpload =  __('Max file size that can uploaded is limited by post_max_size to ') . $maxPost .'.  ';
+	$this->view->maxUpload .= __('If you attempt to upload something larger than this the page will simply reload.');
+      }
 
-                case UPLOAD_ERR_FORM_SIZE:
-                    message::set('The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form');
-                    break;
+      Kohana::log('debug', print_r($_POST, TRUE) . print_r($_FILES, TRUE));
 
-                case UPLOAD_ERR_PARTIAL:
-                    message::set('The uploaded file was only partially uploaded');
-                    break;
+      if (isset($_FILES['upload'])) {
+	switch ($_FILES['upload']['error']) {
+	case UPLOAD_ERR_INI_SIZE:
+	  message::set('The uploaded file exceeds the upload_max_filesize directive in php.ini');
+	  break;
 
-                case UPLOAD_ERR_NO_FILE:
-                    message::set('No file was uploaded');
-                    break;
+	case UPLOAD_ERR_FORM_SIZE:
+	  message::set('The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form');
+	  break;
 
-                case UPLOAD_ERR_NO_TMP_DIR:
-                    message::set('Missing a temporary folder');
-                    break;
+	case UPLOAD_ERR_PARTIAL:
+	  message::set('The uploaded file was only partially uploaded');
+	  break;
 
-                case UPLOAD_ERR_CANT_WRITE:
-                    message::set('Failed to write file to disk');
-                    break;
+	case UPLOAD_ERR_NO_FILE:
+	  message::set('No file was uploaded');
+	  break;
 
-                case UPLOAD_ERR_EXTENSION:
-                    message::set('File upload stopped by extension');
-                    break;
+	case UPLOAD_ERR_NO_TMP_DIR:
+	  message::set('Missing a temporary folder');
+	  break;
 
-              case UPLOAD_ERR_OK:
-                    $description = (isset($_POST['upload']['description']) ? $_POST['upload']['description'] : '');
-                    $uploadfile = Media::getAudioPath() . $_POST['upload']['path'] . '/' . basename($_FILES['upload']['name']);
-                  
-                    if ($this->upload($_FILES['upload']['tmp_name'], $uploadfile, Media::getAudioPath(), $description, TRUE)) {
-                        message::set('Uploaded file', 'success');
-                        
-                    }
-                    break;
+	case UPLOAD_ERR_CANT_WRITE:
+	  message::set('Failed to write file to disk');
+	  break;
 
-                default:
-                    message::set('Unknown error');
-            }
-        }
+	case UPLOAD_ERR_EXTENSION:
+	  message::set('File upload stopped by extension');
+	  break;
 
-        $this->view->soundPath = Media::getAudioPath();
+	case UPLOAD_ERR_OK:
+	  $description = (isset($_POST['upload']['description']) ? $_POST['upload']['description'] : '');
+	  $uploadfile = Media::getAudioPath() . $_POST['upload']['path'] . '/' . basename($_FILES['upload']['name']);
+
+	  if ($this->upload($_FILES['upload']['tmp_name'], $uploadfile, Media::getAudioPath(), $description, TRUE)) {
+	    message::set('Uploaded file', 'success');
+	  }
+	  break;
+
+	default:
+	  message::set('Unknown error');
+	}
+      }
+
+      $this->view->soundPath = Media::getAudioPath();
     }
 
     private function upload($tmpfile, $destfile, $basePath, $description = '', $replace = false) {
@@ -325,7 +330,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 	// Note that this is a bit dangerous and could use improvement.
 	// We assume that all other properties in the file we just found match the file already uploaded.
 	// That means if someone uploads the wrong audio file, it kinda messes things up big time.
-	if (!in_array($audioInfo['byterate'], (array)$mediaFile['registry']['rates'])) {
+	if (!in_array($audioInfo['byterate'], (array) $mediaFile['registry']['rates'])) {
 
 	  Kohana::log('debug', 'Updating ' . $shortname . "...");
 	  $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], $audioInfo);
