@@ -63,13 +63,16 @@
         <div class="field">
             <?php echo form::label('autoattendant[digit_timeout]', 'Inter-Digit Timeout:'); ?>
             <?php echo form::input('autoattendant[digit_timeout]'); ?>
-            <?php //javascript::codeBlock('$("#autoattendant_digit_timeout").spinner({max: 10, min: 1});'); ?>
         </div>
 
         <div class="field">
             <?php echo form::label('autoattendant[timeout]', 'No Entry Timeout:'); ?>
             <?php echo form::input('autoattendant[timeout]'); ?>
-            <?php //javascript::codeBlock('$("#autoattendant_timeout").spinner({max: 10, min: 1});'); ?>
+        </div>
+
+        <div class="field">
+            <?php echo form::label('autoattendant[registry][max-failures]', 'Max Retries:'); ?>
+            <?php echo form::input('autoattendant[registry][max-failures]', empty($autoattendant['registry']['max-failures']) ? 3 : $autoattendant['registry']['max-failures']); ?>
         </div>
 
     <?php echo form::close_section(); ?>

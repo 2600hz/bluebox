@@ -153,6 +153,9 @@ class numbermanager
             case 'TimeOfDay':
                 return html::anchor('timeofday/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_TimeOfDay_Route'));
 
+            case 'ExternalXfer':
+                return html::anchor('externalxfer/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_ExternalXfer_Route'));
+
             default:
                 if (isset($module['name']))
                 {

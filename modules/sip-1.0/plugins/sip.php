@@ -30,6 +30,37 @@ class Sip_Plugin extends Bluebox_Plugin
         $this->supportedTrunkTypes['sip'] = 'Sip Interface';
     }
 
+    public function viewSetup()
+    {
+        $this->subview = new View('sip/update');
+
+        $this->subview->tab = 'main';
+
+        $this->subview->section = 'general';
+
+        return TRUE;
+    }
+
+    public function updateTrunk()
+    {
+        if (!$this->viewSetup())
+        {
+            return FALSE;
+        }
+
+        if (!$this->loadViewData())
+        {
+            return FALSE;
+        }
+
+        $this->subview->trunk_options = TRUE;
+
+        if (!$this->addSubView())
+        {
+            return FALSE;
+        }
+    }
+
     public function validate()
     {
         $valid = TRUE;
@@ -43,7 +74,7 @@ class Sip_Plugin extends Bluebox_Plugin
         // The username can not be empty if it is submitted
         if ((isset($sip['username'])) AND (empty($sip['username'])))
         {
-            $validation->add_error('sip[username]', 'The sip username can not be blank');
+            $validation->add_error('sip[username]', 'The SIP username can not be blank');
 
             $valid = FALSE;
         }
@@ -51,7 +82,7 @@ class Sip_Plugin extends Bluebox_Plugin
         // The password can not be empty if it is submitted
         if ((isset($sip['password'])) AND (empty($sip['password'])))
         {
-            $validation->add_error('sip[password]', 'The sip password can not be blank');
+            $validation->add_error('sip[password]', 'The SIP password can not be blank');
 
             $valid = FALSE;
         }
@@ -78,7 +109,7 @@ class Sip_Plugin extends Bluebox_Plugin
 
             if ($device['plugins']['sip']['username'] == $sip['username'])
             {
-                $validation->add_error('sip[username]', 'The sip username already exists');
+                $validation->add_error('sip[username]', 'The SIP username already exists');
                 
                 $valid = FALSE;
             }

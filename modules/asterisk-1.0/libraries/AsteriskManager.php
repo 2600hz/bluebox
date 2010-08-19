@@ -1,19 +1,14 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
-/*
-*
-* Portions of this code are from the Asterisk PHP-AG API project. The license for that project supercedes this license for the files
-* contained within this module.
-*/
 /**
- * AsteriskManager.php - AsteriskManager class
+ * @package    Asterisk
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ * @created    Oct 5, 2009
+ */
+/**
  *
- * Manages Asterisk connectivity so that configurations can be read/updated/maintained via Asterisk drivers, real-time.
- *
- * Created on Oct 5, 2009
- *
- * @author Karl Anderson
- * @license LGPL
- * @package Asterisk_Driver
+ * Portions of this code are from the Asterisk PHP-AG API project. The license for that project supercedes this license for the files
+ * contained within this module.
  */
 class AsteriskManager
 {
@@ -24,28 +19,33 @@ class AsteriskManager
      * @access public
      */
     public $config;
+
     /**
      * Socket
      */
     public $socket = NULL;
+
     /**
      * Host we are connected to
      *
      * @var string
      */
     private $host;
+
     /**
      * Port on the host we are connected to
      *
      * @var integer
      */
     private $port;
+
     /**
      * Queued updates from the queuedConfigUpdate() methods
      *
      * @var array
      */
     private $queuedUpdates = array();
+
     /*
     * Error constants if things fail
     */
@@ -104,20 +104,29 @@ class AsteriskManager
     public function __construct($config = array())
     {
         // add defaults if config is not set
-        if (!isset($config['host'])) {
+        if (!isset($config['host']))
+        {
             $config['host'] = 'localhost';
         }
-        if (!isset($config['port'])) {
+
+        if (!isset($config['port']))
+        {
             $config['port'] = 5038;
         }
-        if (!isset($config['username'])) {
+
+        if (!isset($config['username']))
+        {
             $config['username'] = 'phpagi';
         }
-        if (!isset($config['password'])) {
+
+        if (!isset($config['password']))
+        {
             $config['password'] = 'phpagi';
         }
+        
         $this->config = $config;
     }
+    
     /**
      * Return a string of the current host we're connected to, or NULL if not connected
      *
@@ -140,18 +149,26 @@ class AsteriskManager
 
     public function setConfig($config)
     {
-        if (!isset($config['host'])) {
+        if (!isset($config['host']))
+        {
             $config['host'] = 'localhost';
         }
-        if (!isset($config['port'])) {
+
+        if (!isset($config['port']))
+        {
             $config['port'] = 5038;
         }
-        if (!isset($config['username'])) {
+
+        if (!isset($config['username']))
+        {
             $config['username'] = 'phpagi';
         }
-        if (!isset($config['password'])) {
+        
+        if (!isset($config['password']))
+        {
             $config['password'] = 'phpagi';
         }
+        
         $this->config = $config;
     }
 
@@ -173,18 +190,29 @@ class AsteriskManager
      */
     public function send($action, $parameters = array())
     {
-        if ($this->socket) {
+        if ($this->socket)
+        {
             $req = "Action: $action\r\n";
-            foreach($parameters as $var => $val) {
+
+            foreach($parameters as $var => $val)
+            {
                 $req.= "$var: $val\r\n";
             }
+
             $req.= "\r\n";
+
             fwrite($this->socket, $req);
-            Kohana::log('debug', print_r($req, TRUE));
+
+            //Kohana::log('debug', print_r($req, TRUE));
+
             $tmp = $this->waitResponse();
+
             //Kohana::log('debug', print_r($tmp, TRUE));
+
             return $tmp;
-        } else {
+        } 
+        else
+        {
             throw new AsteriskManager_Exception('Asterisk Manager socket is not active', self::ERROR_SOCKET_CLOSED);
         }
     }
@@ -201,51 +229,79 @@ class AsteriskManager
     public function waitResponse($allow_timeout = false)
     {
         $timeout = false;
-        do {
+
+        do
+        {
             $type = NULL;
+
             $parameters = array();
-            if (feof($this->socket)) return false;
+
+            if (feof($this->socket))
+            {
+                return false;
+            }
+
             $buffer = trim(fgets($this->socket, 4096));
-            while ($buffer != '') {
+
+            while ($buffer != '')
+            {
                 $a = strpos($buffer, ':');
-                if ($a) {
-                    if (!count($parameters)) // first line in a response?
+
+                if ($a) 
+                {
+                    // first line in a response?
+                    if (!count($parameters)) 
                     {
                         $type = strtolower(substr($buffer, 0, $a));
-                        if (substr($buffer, $a + 2) == 'Follows') {
+
+                        if (substr($buffer, $a + 2) == 'Follows')
+                        {
                             // A follows response means there is a miltiline field that follows.
                             $parameters['data'] = '';
+
                             $buff = fgets($this->socket, 4096);
-                            while (substr($buff, 0, 6) != '--END ') {
+
+                            while (substr($buff, 0, 6) != '--END ')
+                            {
                                 $parameters['data'].= $buff;
+
                                 $buff = fgets($this->socket, 4096);
                             }
                         }
                     }
+
                     // store parameter in $parameters
                     $parameters[substr($buffer, 0, $a) ] = substr($buffer, $a + 2);
                 }
+
                 $buffer = trim(fgets($this->socket, 4096));
             }
+
             // process response
-            switch ($type) {
-            case '': // timeout occured
-                $timeout = $allow_timeout;
-                break;
+            switch ($type) 
+            {
+                case '': // timeout occured
+                    $timeout = $allow_timeout;
 
-            case 'event':
-                //$this->process_event($parameters);
-                break;
+                    break;
 
-            case 'response':
-                break;
+                case 'event':
+                    //$this->process_event($parameters);
 
-            default:
-                $this->log('Unhandled response packet from Manager: ' . print_r($parameters, true));
-                break;
+                    break;
+
+                case 'response':
+                    break;
+
+                default:
+                    $this->log('Unhandled response packet from Manager: ' . print_r($parameters, true));
+
+                    break;
             }
         }
+
         while ($type != 'response' && !$timeout);
+
         return $parameters;
     }
 
@@ -260,47 +316,82 @@ class AsteriskManager
     public function connect($host = NULL, $username = NULL, $password = NULL, $events = 'on')
     {
         // use config if not specified
-        if (is_null($host)) $host = $this->config['host'];
-        if (is_null($username)) $username = $this->config['username'];
-        if (is_null($password)) $password = $this->config['password'];
+        if (is_null($host))
+        {
+            $host = $this->config['host'];
+        }
+
+        if (is_null($username))
+        {
+            $username = $this->config['username'];
+        }
+
+        if (is_null($password))
+        {
+            $password = $this->config['password'];
+        }
+        
         // get port from host if specified
-        if (strpos($host, ':') !== false) {
+        if (strpos($host, ':') !== false)
+        {
             $c = explode(':', $host);
+
             $this->host = $c[0];
+
             $this->port = $c[1];
-        } else {
+        } 
+        else
+        {
             $this->host = $host;
+
             $this->port = $this->config['port'];
         }
+
         // connect the socket
         $errno = $errstr = NULL;
+
         $this->socket = @fsockopen($this->host, $this->port, $errno, $errstr);
-        if (!$this->socket) {
+
+        if (!$this->socket)
+        {
             $this->log("Unable to connect to manager {$this->host}:{$this->port} ($errno): $errstr");
+
             return false;
         }
+
         // read the header
         $str = fgets($this->socket);
-        if ($str == false) {
+
+        if ($str == false)
+        {
             // a problem.
             $this->log("Asterisk Manager header not received.");
+
             return false;
-        } else {
-            // note: don't $this->log($str) until someone looks to see why it mangles the logging
-            
+        } 
+        else
+        {
+            // note: don't $this->log($str) until someone looks to see why it mangles the logging    
         }
+        
         // login
         $res = $this->send('login', array(
             'Username' => $username,
             'Secret' => $password,
             'Events' => $events
         ));
-        if ($res['Response'] != 'Success') {
+
+        if ($res['Response'] != 'Success')
+        {
             $this->log("Failed to login.");
+
             $this->disconnect();
+
             return false;
         }
+
         $this->log("Connected to {$this->host}:{$this->port}.");
+
         return true;
     }
 
@@ -329,13 +420,17 @@ class AsteriskManager
      */
     public function queueConfigUpdate($file, $action, $category, $variable = NULL, $value = NULL, $params = array())
     {
-        if (in_array($action, $this->allowedConfigActions)) {
+        if (in_array($action, $this->allowedConfigActions))
+        {
             //$id = str_pad(count($this->queuedUpdates), 6, '0', STR_PAD_LEFT);   // Get current command identifier
             $id = '000000';
+
             // Convert all the keys to lowercase to simplify the upcoming logic
-            if (is_array($params)) {
+            if (is_array($params))
+            {
                 $params = array_change_key_case($params);
             }
+
 //            // A list of updateconfig actions that should be preceded by a delete
 //            $predeleteActions = array(
 //                'insert',
@@ -352,6 +447,7 @@ class AsteriskManager
 //                ));
 //                $this->queueConfigUpdate($file, 'Delete', $category, $variable, $value, $params);
 //            }
+//
             // Set the required arguments
             $options = array(
                 'SrcFilename' => $file,
@@ -359,47 +455,68 @@ class AsteriskManager
                 'Action-' . $id => $action,
                 'Cat-' . $id => $category
             );
+            
             // Merge any arguments that require ids
-            if (!empty($variable)) {
+            if (!empty($variable))
+            {
                 $options['Var-' . $id] = $variable;
             }
-            if (!empty($value)) {
+
+            if (!empty($value))
+            {
                 $options['Value-' . $id] = $value;
             }
+
             // Merge any optional arguments that require ids
-            if (!empty($params['match'])) {
+            if (!empty($params['match']))
+            {
                 $options['Match-' . $id] = $params['match'];
             }
-            if (isset($params['line'])) {
+
+            if (isset($params['line']))
+            {
                 $options['Line-' . $id] = $params['line'];
             }
+
             // merge any remaing parameters that may have been provided
-            if (!empty($params) && is_array($params)) {
+            if (!empty($params) && is_array($params))
+            {
                 $options+= $params;
             }
-            if (isset($params['sendimmediate'])) {
+
+            if (isset($params['sendimmediate']))
+            {
                 $localParams = array(
                     'skippredelete',
                     'match',
                     'line',
                     'sendimmediate'
                 );
+
                 $options = array_diff_key($options, array_flip($localParams));
+
                 // Execute this update immediatey if it is marked as such
                 return $this->send('UpdateConfig', $options);
-            } else {
+            } 
+            else
+            {
                 $localParams = array(
                     'skippredelete',
                     'match',
                     'line',
                     'sendimmediate'
                 );
+
                 $options = array_diff_key($options, array_flip($localParams));
+
                 // Queue up for use later
                 $this->queuedUpdates[] = $options;
             }
+
             return TRUE;
-        } else {
+        } 
+        else
+        {
             throw new AsteriskManager_Exception('Unknown action specified to queueConfigUpdate (' . $action . ')', self::ERROR_INVALID_COMMAND);
         }
     }
@@ -421,6 +538,7 @@ class AsteriskManager
         $params+= array(
             'sendImmediate' => true
         );
+        
         $this->queueConfigUpdate($file, $action, $category, $variable, $value, $params);
     }
 
@@ -435,49 +553,79 @@ class AsteriskManager
      */
     public function commitConfigUpdates($reload = FALSE, $persistUpdates = FALSE, array $options = array())
     {
-        if (empty($this->queuedUpdates)) return TRUE;
+        if (empty($this->queuedUpdates))
+        {
+            return TRUE;
+        }
+
         $ignoreResponse = array();
-        foreach($this->queuedUpdates as $update) {
-            if (!isset($update['Reload']) and ($reload)) {
+
+        foreach($this->queuedUpdates as $update)
+        {
+            if (!isset($update['Reload']) and ($reload))
+            {
                 $update['Reload'] = $reload;
             }
-            if (isset($update['ignoreresponse'])) {
+
+            if (isset($update['ignoreresponse']))
+            {
                 $ignoreResponse = (array)$update['ignoreresponse'];
+
                 unset($update['ignoreresponse']);
             }
+
             $result = $this->send('UpdateConfig', $update);
-            if ($result['Response'] != 'Success' && !in_array($result['Message'], $ignoreResponse)) {
-                if (!$persistUpdates) {
+
+            if ($result['Response'] != 'Success' && !in_array($result['Message'], $ignoreResponse))
+            {
+                if (!$persistUpdates)
+                {
                     $this->queuedUpdates = array();
                 }
+
                 throw new AsteriskManager_Exception("Error during AMI transaction: " . $result['Message'], self::ERROR_INVALID_COMMAND);
             }
         }
-        if (!$persistUpdates) {
+
+        if (!$persistUpdates)
+        {
             $this->queuedUpdates = array();
         }
+
         return TRUE;
     }
 
     public function loadConfigContext($filename, $context)
     {
-        if (empty($filename) || empty($context)) {
+        if (empty($filename) || empty($context))
+        {
             return array();
-        } else {
+        } 
+        else
+        {
             $config = array(
                 'filename' => $filename,
                 'category' => $context
             );
         }
+
         $result = $this->send('GetConfig', $config);
-        if ($result['Response'] != 'Success') {
+
+        if ($result['Response'] != 'Success')
+        {
             return array();
         }
+
         $result = array_filter(array_flip($result) , array(
             $this,
             "filter_loadConfig"
         ));
-        if (!is_array($result)) $result = array();
+
+        if (!is_array($result))
+        {
+            $result = array();
+        }
+        
         return array_flip($result);
     }
 
@@ -494,12 +642,17 @@ class AsteriskManager
      */
     public function disconnect()
     {
-        if ($this->socket) {
+        if ($this->socket)
+        {
             $this->logoff();
+
             fclose($this->socket);
+
             $this->log("Disconnected from {$this->host}:{$this->port}.");
         }
+
         $this->host = NULL;
+        
         $this->port = NULL;
     }
 
@@ -534,12 +687,16 @@ class AsteriskManager
 
     private function filter_loadConfig($value)
     {
-        if (strstr($value, 'Category')) {
+        if (strstr($value, 'Category'))
+        {
             return FALSE;
         }
-        if (strstr($value, 'Response')) {
+
+        if (strstr($value, 'Response'))
+        {
             return FALSE;
         }
+        
         return TRUE;
     }
 }

@@ -27,7 +27,7 @@ class Bluebox_Tenant
 
         $location->account_id = $accountId;
 
-        $location->name = (isset($options['name']) ? $options['name'] : 'New Location');
+        $location->name = (isset($options['name']) ? $options['name'] : 'Main Location');
 
         $location->domain = $domain;
 
@@ -40,7 +40,7 @@ class Bluebox_Tenant
     {
         $user = new User();
 
-        $user->first_name = (isset($options['first']) ? $options['first'] : 'Admin');
+        $user->first_name = (isset($options['first']) ? $options['first'] : 'Account');
 
         $user->last_name = (isset($options['last']) ? $options['last'] : 'Admin');
 
@@ -52,7 +52,7 @@ class Bluebox_Tenant
         // Create a random password if none is given
         $user->password = (isset($options['password']) ? $options['password'] : substr(mdr(rand(1000000, 9999999)), 0, 5));
 
-        $user->user_type = (isset($options['user_type']) ? $options['user_type'] : User::TYPE_NORMAL_USER);
+        $user->user_type = (isset($options['user_type']) ? $options['user_type'] : User::TYPE_ACCOUNT_ADMIN);
 
         $user->location_id = $locationId;
 

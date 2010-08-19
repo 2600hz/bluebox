@@ -1,9 +1,39 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+$config['default_packages'] = array(
+    // Modules
+    'contextmanager',
+    'locationmanager',
+    'numbermanager',
+    'devicemanager',
+    'mediamanager',
+    'conference',
+    'autoattendant',
+    'ringgroup',
+    'voicemail',
+
+    // Plugins
+    'address',
+    'sip',
+
+
+
+
+
+
+    // Modules
+//    'trunkmanager',
+//    'timeofday',
+//    
+//    // Plugins
+//    'callerid',
+//    'simpleroute',
+//    'timezone',
+);
+
 /*
  * Asterisk engine configuration class
  */
-
 // Do we immediately commit changes to disk?
 $config['immediate'] = TRUE;
 

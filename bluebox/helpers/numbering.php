@@ -468,9 +468,9 @@ class numbering extends form
                 continue;
             }
 
-            $numbers = self::getNumbersByPool($pool);
+            $numbers = Doctrine::getTable('Number')->findByClassType($pool);
 
-            if (empty($numbers) AND $data['assigned'])
+            if ($numbers->count() == 0 AND $data['assigned'])
             {
                 continue;
             }
@@ -484,6 +484,8 @@ class numbering extends form
                 // if not then clean up the number pool name and use that
                 $classVars['description'] = str_replace('Number', '', $pool);
             }
+
+            $classVars['description'] = inflector::humanizeModelName($classVars['description']);
 
             if ($data['forDependent'])
             {
