@@ -38,6 +38,7 @@ $config['default_packages'] = array(
     'externalxfer',
     //'sofia',
     'xmleditor',
+    'xmlcdr'
 );
 
 $config['ESLHost'] = '127.0.0.1';
@@ -89,6 +90,11 @@ $config['filemap'][6] = array (
 $config['filemap'][7] = array (
     'filename' => $config['cfg_root'] .'/autoload_configs/acl.conf.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="acl.conf"]'
+);
+
+$config['filemap'][8] = array (
+    'filename' => $config['cfg_root'] .'/autoload_configs/xml_cdr.conf.xml',
+    'query' => '//document/section[@name="configuration"]/configuration[@name="xml_cdr.conf"][@description="XML CDR CURL logger"]'
 );
 
 // Base file - note that because the query string is //document, this section will contain
