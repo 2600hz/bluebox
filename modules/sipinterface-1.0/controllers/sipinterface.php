@@ -48,6 +48,7 @@ class SipInterface_Controller extends Bluebox_Controller
                 'key' => true
             )
         );
+        $grid->add('name', 'Interface Name');
         $grid->add('ip_address', 'IP Address', array(
                 'callback' => array($this, '_showIp')
             )
