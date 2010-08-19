@@ -75,7 +75,7 @@ class InterfaceManager_Configure extends Bluebox_Configure
 
                         $sipInterface['nat_type'] = 1;
 
-                        $sipInterface['Context'] = Doctrine::getTable('Context')->findOneByName('In-house Only');
+                        $sipInterface['Context'] = Doctrine::getTable('Context')->findOneByName('Publicly Accessible');
 
                         $sipInterface['nat_net_list_id'] = netlists::getSystemListId('nat.auto');
 
