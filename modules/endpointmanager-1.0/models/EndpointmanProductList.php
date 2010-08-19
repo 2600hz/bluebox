@@ -5,7 +5,7 @@ class EndpointmanProductList extends Bluebox_Record
     public function setTableDefinition()
     {
         $this->hasColumn('id', 'integer', 11, array('unsigned' => TRUE, 'notnull' => TRUE, 'primary' => TRUE,'autoincrement' => FALSE));
-        $this->hasColumn('brand', 'integer', 11, array('unsigned' => TRUE, 'notnull' => TRUE));
+        $this->hasColumn('brand_id', 'integer', 11, array('unsigned' => TRUE, 'notnull' => TRUE));
         $this->hasColumn('long_name', 'string', 255, array('notnull' => TRUE));
         $this->hasColumn('short_name', 'string', 255, array('notnull' => TRUE));
         $this->hasColumn('cfg_dir', 'string', 255, array('notnull' => TRUE));
@@ -19,8 +19,7 @@ class EndpointmanProductList extends Bluebox_Record
 
     public function setUp()
     {
-        $this->hasMany('EndpointmanCustomConfigs', array('local' => 'id', 'foreign' => 'product_id'));
-
-        $this->hasOne('EndpointmanBrandList', array('local' => 'brand', 'foreign' => 'id'));
+        $this->hasOne('EndpointmanBrandList', array('local' => 'brand_id', 'foreign' => 'id'));
+        $this->hasOne('EndpointmanProductList', array('local' => 'id', 'foreign' => 'product_id'));
     }
 }
