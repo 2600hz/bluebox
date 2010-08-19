@@ -42,10 +42,14 @@ class SofiaManager
 
             $device = explode('@', $registration['user']);
 
+            if (empty($device[0]) OR empty($device[1]))
+            {
+                continue;
+            }
+
             $deviceUser = $device[0];
 
             $deviceDomain = $device[1];
-
 
             if($deviceUser == $user && $deviceDomain == $domain)
             {
