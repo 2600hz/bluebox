@@ -34,11 +34,13 @@ class MediaFile extends Bluebox_Record
     }
     
     public static function getLength($ignore, $registry) {
-        $minutes = floor($registry['length'] % 3600 / 60);
-        $seconds = $registry['length'] % 60;
-        $miliseconds = (($registry['length']) - floor($registry['length'])) * 100;
+      if ( empty($registry) ) return 'Unknown';
 
-        return sprintf("%02d:%02d.%02d", $minutes, $seconds, $miliseconds);
+      $minutes = floor($registry['length'] % 3600 / 60);
+      $seconds = $registry['length'] % 60;
+      $miliseconds = (($registry['length']) - floor($registry['length'])) * 100;
+
+      return sprintf("%02d:%02d.%02d", $minutes, $seconds, $miliseconds);
     }
 
     public static function getSampleRate($ignore, $registry) {
