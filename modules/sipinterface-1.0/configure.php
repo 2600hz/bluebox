@@ -53,7 +53,7 @@ class InterfaceManager_Configure extends Bluebox_Configure
                     continue;
                 }
 
-                if (preg_match('/xinet[^0-9]*([^\s]+)/', $line, $matches))
+                if (preg_match('/inet[^0-9]*([^\s]+)/', $line, $matches))
                 {
                     if(!filter_var($matches[1], FILTER_VALIDATE_IP))
                     {
