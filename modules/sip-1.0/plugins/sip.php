@@ -58,16 +58,20 @@ class Sip_Plugin extends Bluebox_Plugin
 
         if ($base instanceof Device)
         {
-            // The username can not be empty if it is submitted
-            if ((isset($data['username'])) AND (empty($data['username'])))
-            {
-                $validator->add_error('sip[username]', 'The SIP username can not be blank');
-            }
+
 
             // The password can not be empty if it is submitted
-            if ((isset($data['password'])) AND (empty($data['password'])))
+            if (( ! isset($data['password'])) OR (empty($data['password'])))
             {
                 $validator->add_error('sip[password]', 'The SIP password can not be blank');
+            }
+
+            // The username can not be empty if it is submitted
+            if (( ! isset($data['username'])) OR (empty($data['username'])))
+            {
+                $validator->add_error('sip[username]', 'The SIP username can not be blank');
+                // if the username is blank stop now
+                return false;
             }
 
             // Get all devices
