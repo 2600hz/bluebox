@@ -55,6 +55,10 @@ class SipInterface_Controller extends Bluebox_Controller
         );
         $grid->add('port', 'Port');
         //$grid->add('Context/name', 'Default Context');
+        $grid->add('auth', 'Authentication', array(
+                'callback' => array($this, '_showAuth')
+            )
+        );
 
         // Add the actions to the grid
         $grid->addAction('sipinterface/edit', 'Edit', array(
@@ -100,6 +104,15 @@ class SipInterface_Controller extends Bluebox_Controller
             return 'Auto Detect';
         } else {
             return $ip;
+        }
+    }
+
+    public function _showAuth($auth)
+    {
+        if ($auth) {
+            return 'Required';
+        } else {
+            return 'None';
         }
     }
 
