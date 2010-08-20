@@ -94,7 +94,9 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if (!empty($metadata['models']))
         {
-            self::integrateNumberType($metadata['models'], $metadata['datastore_id']);
+            $models = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+
+            self::integrateNumberType($models, $metadata['datastore_id']);
         }
     }
 
@@ -111,7 +113,9 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if (!empty($metadata['models']))
         {
-            self::removeNumberType($metadata['models']);
+            $models = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+
+            self::removeNumberType($models);
         }
     }
 
