@@ -16,7 +16,7 @@ class Package_Exception extends Exception
         {
             Package_Message::set($message, 'error', $code);
         }
-
-        parent::__construct($message, $code);
+        
+        parent::__construct($message);
     }
 }
