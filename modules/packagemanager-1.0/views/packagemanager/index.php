@@ -30,7 +30,7 @@
     
     <div class="buttons form_bottom">
 
-        <?php //echo html::anchor('packagemanager/repair_all', __('Repair All'), array('class' => 'ajaxLink repair_all')); ?>
+        <?php echo html::anchor('packagemanager/repair_all', __('Repair All'), array('class' => 'repair_all')); ?>
 
         <span style="padding:5px">&nbsp;</span>
 
