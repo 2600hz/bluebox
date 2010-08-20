@@ -42,10 +42,14 @@ class SofiaManager
 
             $device = explode('@', $registration['user']);
 
+            if (empty($device[0]) OR empty($device[1]))
+            {
+                continue;
+            }
+
             $deviceUser = $device[0];
 
             $deviceDomain = $device[1];
-
 
             if($deviceUser == $user && $deviceDomain == $domain)
             {
@@ -81,11 +85,20 @@ class SofiaManager
 
             if($xml !== 'Command execution failed.') {
                 $xml = simplexml_load_string($xml);
-                Kohana::log('info', 'No XML returned');
-                $registrations = $xml->registrations->registration;
-
-            }    
-        //var_dump((array)$registrations);
+                
+                if ($xml AND $xml->registrations AND $xml->registrations->registration AND $xml->registrations->registration != '')
+                {
+                    $registrations = $xml->registrations->registration;
+                }
+                else
+                {
+                    Kohana::log('info', 'No XML returned');
+                }
+            }
+            else
+            {
+                Kohana::log('info', $cmd .': '. 'Command execution failed.');
+            }
 
             $result = array();
 

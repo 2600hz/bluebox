@@ -5,7 +5,7 @@
  * @license    Mozilla Public License (MPL)
  */
 abstract class Bluebox_Configure  extends Package_Configure
-{
+{   
     /**
      * Do the actual installation.
      *
@@ -38,8 +38,13 @@ abstract class Bluebox_Configure  extends Package_Configure
         // tables twice.
         $models = array();
 
-        if (!empty($package['models']))
+        if (!empty($package['directory']) AND is_dir($package['directory'] . '/models'))
         {
+            $package['models'] = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
+
+        if (!empty($package['models']))
+        {            
             foreach($package['models'] as $className)
             {
                 if ((get_parent_class($className) == 'Bluebox_Record') or (get_parent_class($className) == 'Doctrine_Record'))
@@ -75,6 +80,11 @@ abstract class Bluebox_Configure  extends Package_Configure
     public function migrate($identifier)
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
+
+        if (!empty($package['directory']) AND is_dir($package['directory'] . '/models'))
+        {
+            $package['models'] = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
 
         if (empty($package['models']))
         {
@@ -118,6 +128,9 @@ abstract class Bluebox_Configure  extends Package_Configure
                     {
                         kohana::log('alert', 'Alerts during migration, this can USUALLY be ignored: ' .$e->getMessage());
 
+                        // TODO: This isnt a great idea, but migrations are so noisy with needless failures... PITA
+                        $migration->setCurrentVersion($migration->getLatestVersion());
+
                         foreach ($migration->getErrors() as $error)
                         {
                             if (strstr($error->getMessage(), 'Already at version'))
@@ -134,6 +147,12 @@ abstract class Bluebox_Configure  extends Package_Configure
                             }
                         }
                     }
+                }
+                else
+                {
+                   $migration = new Bluebox_Migration(NULL, NULL, strtolower($className));
+
+                   $migration->setCurrentVersion(0);
                 }
             }
         }
@@ -183,6 +202,9 @@ abstract class Bluebox_Configure  extends Package_Configure
                     {
                         kohana::log('alert', 'Alerts during migration, this can USUALLY be ignored: ' .$e->getMessage());
 
+                        // TODO: This isnt a great idea, but migrations are so noisy with needless failures... PITA
+                        $migration->setCurrentVersion($migration->getLatestVersion());
+
                         foreach ($migration->getErrors() as $error)
                         {
                             if (strstr($error->getMessage(), 'Already at version'))
@@ -199,6 +221,12 @@ abstract class Bluebox_Configure  extends Package_Configure
                             }
                         }
                     }
+                }
+                else
+                {
+                   $migration = new Bluebox_Migration(NULL, NULL, strtolower($className));
+
+                   $migration->setCurrentVersion(0);
                 }
             }
         }
@@ -222,6 +250,11 @@ abstract class Bluebox_Configure  extends Package_Configure
 
         $tables = array();
 
+        if (!empty($package['directory']) AND is_dir($package['directory'] . '/models'))
+        {
+            $package['models'] = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
+        
         // Get the doctrine overlord
         try
         {
@@ -362,6 +395,11 @@ abstract class Bluebox_Configure  extends Package_Configure
     public function repair($identifier)
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
+
+        if (!empty($package['directory']) AND is_dir($package['directory'] . '/models'))
+        {
+            $package['models'] = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
 
         if (empty($package['models']))
         {
