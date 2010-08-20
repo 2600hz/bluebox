@@ -8,16 +8,19 @@ class Package_Catalog_Datastore extends Package_Catalog
 {
     public static function import(&$metadata)
     {
-        $possibleModels = glob($metadata['directory'] . '/models/*.php', GLOB_MARK);
+        $metadata['models'] = glob($metadata['directory'] . '/models/*.php', GLOB_MARK);
 
-        if (!empty($possibleModels))
-        {
-            $metadata['models'] = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
-        }
-        else
-        {
-            $metadata['models'] = array();
-        }
+//        $possibleModels = glob($metadata['directory'] . '/models/*.php', GLOB_MARK);
+//
+//        if (!empty($possibleModels))
+//        {
+//            $metadata['models'] = Doctrine::filterInvalidModels($metadata['directory'] . '/models');
+//            //$metadata['models'] = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+//        }
+//        else
+//        {
+//            $metadata['models'] = array();
+//        }
 
         try
         {
@@ -91,7 +94,9 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if (!empty($metadata['models']))
         {
-            self::integrateNumberType($metadata['models'], $metadata['datastore_id']);
+            $models = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+
+            self::integrateNumberType($models, $metadata['datastore_id']);
         }
     }
 
@@ -108,7 +113,9 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if (!empty($metadata['models']))
         {
-            self::removeNumberType($metadata['models']);
+            $models = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+
+            self::removeNumberType($models);
         }
     }
 
