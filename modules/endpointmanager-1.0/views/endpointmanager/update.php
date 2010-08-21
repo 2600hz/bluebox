@@ -8,16 +8,23 @@
 
     <?php echo form::open(); ?>
 
-    <?php echo form::open_section('My Module'); ?>
+    <?php echo form::open_section('Endpoint Device'); ?>
 
         <div class="field">
-            <?php echo form::label('mymodule[mydatafield1]', 'Field 1:'); ?>
-            <?php echo form::input('mymodule[mydatafield1]'); ?>
+            <?php echo form::label('endpointdevice[description]', 'Description:'); ?>
+            <?php echo form::input('endpointdevice[description]'); ?>
         </div>
 
         <div class="field">
-            <?php echo form::label('mymodule[mydatafield2]', 'Field 2:'); ?>
-            <?php echo form::input('mymodule[mydatafield2]'); ?>
+            <?php echo form::label('endpointdevice[mac]', 'MAC Address:'); ?>
+            <?php echo form::input('endpointdevice[mac]'); ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label('endpointmanager[endpoint_model_id]', 'Model:');
+            echo form::dropdown('endpointmanager[endpoint_model_id]', array('1' => '6755i'));
+        ?>
         </div>
 
     <?php echo form::close_section(); ?>
