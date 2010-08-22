@@ -98,8 +98,8 @@ class MediaScanner {
 	  $mediafile_id = $knownFiles[$shortname]['mediafile_id'];
 	  $registry = $knownFiles[$shortname]['registry'];
 
-	  if ( ! in_array($framerate, $registry['rates']) ) {
-	    $registry = array_merge($registry, self::getAudioInfo($filename));
+	  if ( ! in_array($framerate, (array)$registry['rates']) ) {
+	    $registry = array_merge((array)$registry, self::getAudioInfo($filename));
 
 	    Kohana::log('debug', 'Updating ' . $shortname . ' with sample rate ' . $framerate . '... ');
 
