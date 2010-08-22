@@ -61,7 +61,7 @@ class MediaScanner {
 					      );
       }
 
-      $knownFiles = array_filter($listedFiles, "self::filterKnownFiles");
+      $knownFiles = array_filter($listedFiles, "MediaScanner::filterKnownFiles");
 
       // TODO: Fix this. Download descriptions from the web?
       if (file_exists(MODPATH . 'mediamanager-1.0' . DIRECTORY_SEPARATOR . 'audio_descriptions.ini')) {
