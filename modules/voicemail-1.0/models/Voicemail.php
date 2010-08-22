@@ -28,7 +28,7 @@ class Voicemail extends Bluebox_Record
         // COLUMN DEFINITIONS
         $this->hasColumn('voicemail_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('name', 'string', 64, array('notnull' => true, 'notblank' => true));
-        $this->hasColumn('mailbox', 'string', 64, array('notnull' => true, 'unique' => true));
+        $this->hasColumn('mailbox', 'string', 64, array('notnull' => true));
         $this->hasColumn('password', 'string', 64, array('notnull' => true));
         $this->hasColumn('audio_format', 'string', 4, array('default' => 'wav'));
     }
