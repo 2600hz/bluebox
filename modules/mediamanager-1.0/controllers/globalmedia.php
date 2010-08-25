@@ -189,6 +189,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
     public function visualize($mediaId) {
         $media = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
         $file = $this->locateFile($media);
+
         if (!$file) {
             die();
         }
@@ -216,7 +217,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
       $fullPath = $this->locateFile($file, $sampleRate);
 
       $name = basename($file['file']);
-      if ( in_array($file['registry']['type'], array('MPEG', 'mp1', 'mp3')) ) {
+      if ( in_array($file['registry']['type'], array('MPEG', 'mp3')) ) {
 	$mime = 'audio/mpeg';
       } else if ( ! strcmp($file['registry']['type'], 'ogg') ) {
 	$mime = 'audio/ogg';
@@ -309,7 +310,12 @@ class GlobalMedia_Controller extends Bluebox_Controller
       $audioInfo = MediaScanner::getAudioInfo($tmpfile);
 
       // Create folder where this file will go and move file there
-      $destfile = dirname($destfile) . '/' . $audioInfo['byterate'] . '/' . basename($destfile);
+      if ( ! empty($audioInfo) ) {
+	$destfile = dirname($destfile) . '/' . $audioInfo['rates'][0] . '/' . basename($destfile);
+      } else {
+	$destfile = dirname($destfile) . '/' . basename($destfile);
+      }
+
       $this->createFolder(dirname($destfile));
 
       if (!is_writable(dirname($destfile)) or (file_exists($destfile) and !is_writable($destfile))) {
