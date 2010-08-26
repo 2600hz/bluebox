@@ -10,8 +10,8 @@ It was created by Jort Bloem
 class jsTree_Configure extends Bluebox_Configure
 {
     public static $version = 0.1;
-    public static $packageName = 'directory';
-    public static $displayName = 'Directory Listing';
+    public static $packageName = 'jstree';
+    public static $displayName = 'jsTree Library';
     public static $author = 'jsTree Community';
     public static $vendor = 'http://www.jstree.com/';
     public static $license = 'either the MIT License or the GNU General Public License (GPL) Version 2';
