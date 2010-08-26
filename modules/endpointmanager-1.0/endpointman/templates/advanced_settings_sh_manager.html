@@ -1,0 +1,56 @@
+<style type="text/css">
+<!--
+.brand {
+	border: thin dotted #000;
+}
+.product {
+	border: thin dotted #000;
+}
+.model {
+	border: thin dotted #000;
+}
+.button_Enable {
+	background-color: #3C0;
+}
+.button_Disable {
+	background-color: #F00;
+}
+-->
+</style>
+<?=_('Note: This will show or hide Brands/Products/Models on the Brand Configurations/Setup page ONLY!')?>
+<br />
+<br />
+{loop name="brand2_list"}
+<table width="100%" class="brand" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td colspan="2">{$value.name} (<?=_('Version')?> [{$value.cfg_ver}]) <form action='config.php{$web_vars}&display=epm_advanced&subpage=sh_manager' method='POST'><input type="hidden" name="brand" value="{$value.id}"><input type="submit" name="button_{if condition="$value.hidden == '1'"}show{else}hide{/if}" class="button_{if condition="$value.hidden == '1'"}show{else}hide{/if}" value="{if condition="$value.hidden == '1'"}<?=_('Show')?>{else}<?=_('Hide')?>{/if}"></form></td>
+  </tr>
+  <tr>
+    <td width="3%">&nbsp;</td>
+    <td width="97%">{loop name="value.products"}
+	<table width="100%" class="product" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td colspan="2">{$value.long_name} {if condition="$value.cfg_ver != ''"}(<?=_('Version')?> [{$value.cfg_ver}]){/if} <form action='config.php{$web_vars}&display=epm_advanced&subpage=sh_manager' method='POST'><input type="hidden" name="product" value="{$value.id}"><input type="submit" name="button_{if condition="$value.hidden == '1'"}show{else}hide{/if}" class="button_{if condition="$value.hidden == '1'"}show{else}hide{/if}" value="{if condition="$value.hidden == '1'"}<?=_('Show')?>{else}<?=_('Hide')?>{/if}"></form></td>
+      </tr>
+      <tr>
+        <td width="4%">&nbsp;</td>
+        <td width="96%">{loop name="value.models"}
+		<table width="100%" class="model" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td>{$value.model} <form action='config.php{$web_vars}&display=epm_advanced&subpage=sh_manager' method='POST'><input type="hidden" name="model" value="{$value.id}"><input type="submit" name="button_{if condition="$value.hidden == '1'"}show{else}hide{/if}" class="button_{if condition="$value.hidden == '1'"}Show{else}Hide{/if}" value="{if condition="$value.hidden == '1'"}<?=_('Show')?>{else}<?=_('Hide')?>{/if}"></form></td>
+          </tr>
+        </table>{/loop}</td>
+      </tr>
+    </table>{/loop}</td>
+  </tr>
+</table>
+<br />
+<br />
+{/loop}
+
+
+
+  
+
+
+  
