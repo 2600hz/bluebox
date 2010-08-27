@@ -9,7 +9,7 @@ It was created by Jort Bloem
 
 class jsTree_Configure extends Bluebox_Configure
 {
-    public static $version = 0.1;
+    public static $version = 1.0;
     public static $packageName = 'jstree';
     public static $displayName = 'jsTree Library';
     public static $author = 'jsTree Community';
