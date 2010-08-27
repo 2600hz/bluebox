@@ -23,11 +23,15 @@ class Directory_Controller extends Bluebox_Controller
 				$item['children']=array();
                     	}
                 	foreach ($extensions[substr($item['attr']['id'],5)] AS $ext) {
-				array_unshift($item['children'],array(
-					'data'=>$ext['name'],
-					'attr'=>array('id'=>'dev_'.$ext['device_id'],"rel"=>"extension")
-				));
-				$item["state"]="open";
+				if (array_key_exists('callerid',$ext['plugins']) &&
+					array_key_exists('internal_name',$ext['plugins']['callerid']) &&
+					array_key_exists('internal_number',$ext['plugins']['callerid'])) {
+					array_unshift($item['children'],array(
+						'data'=>$ext['plugins']['callerid']['internal_name']." (".$ext['plugins']['callerid']['internal_number'].")",
+						'attr'=>array('id'=>'dev_'.$ext['device_id'],"rel"=>"extension")
+					));
+					$item["state"]="open";
+				}
                 	}
             }
         }
