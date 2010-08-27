@@ -92,12 +92,17 @@ class Directory_Controller extends Bluebox_Controller
         }
 	return $extensions;
     }
-    public function index() { /* static page only - data comes in via json */ }
+    public function index() {
+	//Most of the data comes in via AJAX. Only thing we need is the URL:
+	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/jsonout';
+    }
     public function arrange()
     {
         javascript::add("jstree/_lib/jquery.cookie.js");
         javascript::add("jstree/_lib/jquery.hotkeys.js");
         javascript::add("jstree/jquery.jstree.js");
+	$this->view->serverurl=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/server';
+	$this->view->imagedir=Kohana::config('core.site_domain').'/modules/directory-1.0/assets/images/';
     }
     public function jsonout()
     {

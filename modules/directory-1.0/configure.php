@@ -10,7 +10,10 @@ class Directorygrouping_Configure extends Bluebox_Configure
     public static $summary = 'Shows a public-facing directory listing';
     public static $default = true;
     public static $type = Package_Manager::TYPE_MODULE;
-    public static $required = array( 'core' => 0.1, 'jstree' => 1.0, 'sofia'=> 1.0);
+    public static $required = array( 
+		'core' => 0.1, 
+		'jstree' => 1.0, 
+		'sofia'=> 1.0);
     public static $navBranch = '/Organization/';
     public static $navURL = '/directory';
     public static $navSubmenu = array (
