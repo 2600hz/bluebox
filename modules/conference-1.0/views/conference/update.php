@@ -50,7 +50,7 @@
         <div class="field">
         <?php
             echo form::label('conference[registry][energy-level]', 'Minimum Energy Level');
-            echo form::input('conference[registry][energy-level]', (isset($conference['registry']['energy_level'])) ? $conference['registry']['energy_level'] : '20');
+            echo form::input('conference[registry][energy-level]');
         ?>
         </div>
 

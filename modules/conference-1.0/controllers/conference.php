@@ -48,6 +48,14 @@ class Conference_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
+    protected function prepareUpdateView($baseModel = NULL)
+    {
+        parent::prepareUpdateView($baseModel);
+
+        $this->conference['registry'] += array('energy-level' => 20,
+                                   'comfort-noise' => true);
+    }
+
     public function _showRecord($registry)
     {
         return (empty($registry['record']) ?'No' : 'Yes');
