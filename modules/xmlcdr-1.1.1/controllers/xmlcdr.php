@@ -119,8 +119,8 @@ class Xmlcdr_Controller extends Bluebox_Controller {
                 'User Context' => 'user_context',
                 'Read Codec' => 'read_codec',
                 'Write Codec' => 'write_codec',
-                'Dailed Domain' => 'dialed_domain',
-                'Dailed User' => 'dialed_user'
+                'Dialed Domain' => 'dialed_domain',
+                'Dialed User' => 'dialed_user'
         );
 
         $details = '<h3>CDR</h3>';
