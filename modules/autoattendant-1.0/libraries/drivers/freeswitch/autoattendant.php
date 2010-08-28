@@ -51,9 +51,9 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver
             $xml->setAttributeValue('', 'digit-len', $autoattendant['extension_digits']);
         }
 
-        $xml->setAttributeValue('', 'timeout', $autoattendant['timeout']);
+        $xml->setAttributeValue('', 'timeout', $autoattendant['timeout'] * 1000);
 
-        $xml->setAttributeValue('', 'inter-digit-timeout', $autoattendant['digit_timeout']);
+        $xml->setAttributeValue('', 'inter-digit-timeout', $autoattendant['digit_timeout'] * 1000);
 
         if (!empty($autoattendant['registry']['max-failures']))
         {
