@@ -47,7 +47,7 @@ $config['ESLAuth'] = 'ClueCon';
 
 $config['cfg_root'] = '/usr/local/freeswitch/conf';
 
-$config['audio_root'] = '/usr/local/freeswitch/sounds';
+$config['audio_root'] = '/usr/local/freeswitch//sounds';
 
 $config['filemap'][0] = array (
     // Where do the files go for this feature? Note, if you end with a / and set the id key
