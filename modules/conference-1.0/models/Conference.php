@@ -21,9 +21,9 @@ class Conference extends Bluebox_Record
     );
 
     public static $default_profile = array(
-        'rate' => 8000,
+        'rate' => 32000,
         'interval' => 20,
-        'energy-level' => 250,
+        'energy-level' => 20,
         'sound-prefix' => '/usr/local/freeswitch/sounds/en/us/callie/',
         //'ack-sound' => 'beep.wav',
         //'nack-sound' => 'beeperr.wav',
