@@ -54,7 +54,6 @@ class SipInterface_Controller extends Bluebox_Controller
             )
         );
         $grid->add('port', 'Port');
-        //$grid->add('Context/name', 'Default Context');
         $grid->add('auth', 'Authentication', array(
                 'callback' => array($this, '_showAuth')
             )
