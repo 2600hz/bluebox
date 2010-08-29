@@ -8,21 +8,11 @@
 
 <?php if (empty($isConnected)): ?>
 == CONNECTION ==
-Failed to connect to ESL. Make sure FreeSWITCH is running...
+Failed to connect to FreeSWITCH's event socket subsystem. Make sure FreeSWITCH is running...
 Click an option below to test your connection again.
 <?php else: ?>
 == CONNECTION ==
 Connected to FreeSWITCH, please choose and option below..
-<?php endif; ?>
-
-<?php if (empty($isExtension)): ?>
-== ESL EXTENSION ==
-The FreeSWITCH PHP/ESL module is not installed (or not working). We will fail back to socket-based/native ESL support.
-This error is not critical, you can continue to use the ESL manager and choose to install the extension later.
-See http://wiki.freeswitch.org/wiki/Event_Socket_Library for more information.
-<?php else: ?>
-== ESL EXTENSION ==
-The FreeSWITCH PHP/ESL module is avaliable and loaded.
 <?php endif; ?>
 
 == HELP ==
