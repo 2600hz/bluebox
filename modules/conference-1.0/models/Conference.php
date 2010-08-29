@@ -24,7 +24,7 @@ class Conference extends Bluebox_Record
         'rate' => 32000,
         'interval' => 20,
         'energy-level' => 20,
-        'sound-prefix' => '/usr/local/freeswitch/sounds/en/us/callie/',
+        'sound-prefix' => '$${sounds_dir}',
         //'ack-sound' => 'beep.wav',
         //'nack-sound' => 'beeperr.wav',
         'caller-controls' => 'default',
