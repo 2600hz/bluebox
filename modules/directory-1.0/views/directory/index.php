@@ -10,7 +10,7 @@
                 xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
         }
         xmlhttp.onreadystatechange=update_notification;
-        xmlhttp.open("GET","/directory/jsonout?cascade=true&nocache="+(new Date).valueOf(),true);
+        xmlhttp.open("GET","<?php print $url; ?>?cascade=true&nocache="+(new Date).valueOf(),true);
         xmlhttp.send();
     }
 
