@@ -33,6 +33,8 @@ class Freeswitch_Plugin extends Bluebox_Plugin
 
         $audio_root = $this->session->get('installer.audio_root', FALSE);
 
+        $fsDefaultCfg = Kohana::config('freeswitch.cfg_root');
+
         if (!$cfg_root)
         {
             foreach (self::$scanDirs as $testDir)
@@ -49,7 +51,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
 
             if (empty($cfg_root))
             {
-                $cfg_root = $fsDefaulCfg;
+                $cfg_root = $fsDefaultCfg;
             }
         }
 
@@ -69,7 +71,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
 
             if (empty($audio_root))
             {
-                $audio_root = $fsDefaultAudioRoot;
+#                $audio_root = $fsDefaultAudioRoot;
             }
         }
 
@@ -90,8 +92,6 @@ class Freeswitch_Plugin extends Bluebox_Plugin
         $filemaps = Kohana::config('freeswitch.filemap');
 
         $oldXmlFiles = array();
-
-        $fsDefaultCfg = Kohana::config('freeswitch.cfg_root');
 
         foreach ($filemaps as $filemap)
         {
