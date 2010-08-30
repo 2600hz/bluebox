@@ -1,0 +1,334 @@
+# This file is part of FreePBX.
+#
+#    FreePBX is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    FreePBX is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with FreePBX.  If not, see <http://www.gnu.org/licenses/>.
+#
+# FreePBX language template for announcement
+# Copyright (C) 2008, 2009, 2010 Bandwith.com
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-02-27 17:34+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "My Devices List"
+msgstr ""
+
+msgid "Template Manager"
+msgstr ""
+
+msgid "Brand Configurations/Setup"
+msgstr ""
+
+msgid "Advanced Settings"
+msgstr ""
+
+msgid "IP address of phone server"
+msgstr ""
+
+msgid "Determine for me"
+msgstr ""
+
+msgid "Time Zone"
+msgstr ""
+
+msgid "Default Final Configuration Directory"
+msgstr ""
+
+msgid "Enable FreePBX ARI Module"
+msgstr ""
+
+msgid "Enable Debug Mode"
+msgstr ""
+
+msgid "Brand"
+msgstr ""
+
+msgid "Select Product"
+msgstr ""
+
+msgid "File Configuration Editor"
+msgstr ""
+
+msgid "Local File Configs"
+msgstr ""
+
+msgid "User File Configs"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "OUI Manager"
+msgstr ""
+
+msgid "Product Options/Configuration Editor"
+msgstr ""
+
+msgid "Show/Hide Brands/Models"
+msgstr ""
+
+msgid "Please wait for the progress bar to show below (this might take a minute or two)"
+msgstr ""
+
+msgid "Version"
+msgstr ""
+
+msgid "Use NMAP"
+msgstr ""
+
+msgid "Mac Address"
+msgstr ""
+
+msgid "Model of Phone"
+msgstr ""
+
+msgid "Extension Number"
+msgstr ""
+
+msgid "Template"
+msgstr ""
+
+msgid "Unmanaged Extensions"
+msgstr ""
+
+msgid "Current Managed Extensions"
+msgstr ""
+
+msgid "End Point Configuration Manager"
+msgstr ""
+
+msgid "You are currently editing"
+msgstr ""
+
+msgid "a custom config template for extension"
+msgstr ""
+
+msgid "the template named"
+msgstr ""
+
+msgid "Select Alternative File Configurations"
+msgstr ""
+
+msgid "You can also user certain variables in your configs"
+msgstr ""
+
+msgid "Server IP"
+msgstr ""
+
+msgid "Device's Mac Address"
+msgstr ""
+
+msgid "Device's Default Extension (Line 1 or Master)"
+msgstr ""
+
+msgid "Device's Description in FreePBX (Usually the Full Name)"
+msgstr ""
+
+msgid "for Model"
+msgstr ""
+
+msgid "Model"
+msgstr ""
+
+msgid "Add New Template"
+msgstr ""
+
+msgid "Template Name"
+msgstr ""
+
+msgid "Product Select"
+msgstr ""
+
+msgid "Model Classification"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+#new below
+
+msgid "Welcome to Endpoint Manager"
+msgstr ""
+
+msgid "You have no products (Modules) installed, click"
+msgstr
+
+msgid "here"
+msgstr ""
+
+msgid "to install some"
+msgstr ""
+
+msgid "Saved"
+msgstr ""
+
+msgid "Invalid MAC Address"
+msgstr ""
+
+msgid "One or more selected phones had the same extension as a phone already added, these devices were not added"
+msgstr ""
+
+msgid "Please select a Brand and/or Model"
+msgstr ""
+
+msgid "No Phones Selected"
+msgstr ""
+
+msgid "No Devices Found"
+msgstr ""
+
+msgid "Please select a product"
+msgstr ""
+
+msgid "Please select a template"
+msgstr ""
+
+msgid "No Brand Selected for Reboot"
+msgstr ""
+
+msgid "Unknown"
+msgstr ""
+
+msgid "You have disabled/removed all models that correspond to this brand. Please enable them in 'Brand Configurations/Setup' before trying to edit this phone"
+msgstr ""
+
+msgid "Go"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Reset"
+msgstr ""
+
+msgid "Add Selected Phones"
+msgstr ""
+
+msgid "Selected Phone(s) Options"
+msgstr ""
+
+msgid "Change Selected Phones to"
+msgstr ""
+
+msgid "Global Phone Options"
+msgstr ""
+
+msgid "Update Phones"
+msgstr ""
+
+msgid "Delete Selected Phones"
+msgstr ""
+
+msgid "Rebuild Configs for Selected Phones"
+msgstr ""
+
+msgid "Rebuild Configs for All Phones"
+msgstr ""
+
+msgid "Rebuild & Reboot"
+msgstr ""
+
+msgid "Reconfigure all"
+msgstr ""
+
+msgid "with"
+msgstr ""
+
+msgid "Deleted"
+msgstr ""
+
+msgid "Save Template"
+msgstr ""
+
+msgid "Check for Updates"
+msgstr ""
+
+msgid "Disable"
+msgstr ""
+
+msgid "Enable"
+msgstr ""
+
+msgid "Install"
+msgstr ""
+
+msgid "Uninstall"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Install Firmware"
+msgstr ""
+
+msgid "Remove Firmware"
+msgstr ""
+
+msgid "Update Firmware"
+msgstr ""
+
+msgid "Import/Export Devices My Devices List"
+msgstr ""
+
+msgid "Update Globals"
+msgstr ""
+
+msgid "like"
+msgstr ""
+
+msgid "Add Custom"
+msgstr ""
+
+msgid "Select"
+msgstr ""
+
+msgid "Save As"
+msgstr ""
+
+msgid "Export CSV file of devices"
+msgstr ""
+
+msgid "Export CSV"
+msgstr ""
+
+msgid "Import CSV file of devices"
+msgstr ""
+
+msgid "Note: CSV file should look like this"
+msgstr ""
+
+msgid "Extension"
+msgstr ""
+
+msgid "Extension can be blank"
+msgstr ""
+
+msgid "Show"
+msgstr ""
+
+msgid "Hide"
+msgstr ""

@@ -9,15 +9,19 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
         $xml->deleteChildren();
 
         $profile = arr::merge(Conference::$default_profile, $conference['profile']);
+        $registry = $conference['registry'];
 
         foreach ($profile as $parameter => $value)
         {
             $value = str_replace('/', '\/', $value);
             
+            if (isset($registry[$parameter])) {
+                $value = $registry[$parameter];
+            }
+
             $xml->update('/param[@name="' .$parameter .'"]{@value="' .$value .'"}');
         }
 
-        $registry = $conference['registry'];
         if( ! empty($registry['moh_type'])) {
             $value = str_replace('/', '\/', $registry['moh_type']);
             
@@ -37,6 +41,7 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
             
             $xml->update('/param[@name="pin"]{@value="' .$pin .'"}');
         }
+
     }
 
     public static function delete($conference)
