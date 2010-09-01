@@ -23,11 +23,15 @@ class Directory_Controller extends Bluebox_Controller
 				$item['children']=array();
                     	}
                 	foreach ($extensions[substr($item['attr']['id'],5)] AS $ext) {
-				array_unshift($item['children'],array(
-					'data'=>$ext['name'],
-					'attr'=>array('id'=>'dev_'.$ext['device_id'],"rel"=>"extension")
-				));
-				$item["state"]="open";
+				if (array_key_exists('callerid',$ext['plugins']) &&
+					array_key_exists('internal_name',$ext['plugins']['callerid']) &&
+					array_key_exists('internal_number',$ext['plugins']['callerid'])) {
+					array_unshift($item['children'],array(
+						'data'=>$ext['plugins']['callerid']['internal_name']." (".$ext['plugins']['callerid']['internal_number'].")",
+						'attr'=>array('id'=>'dev_'.$ext['device_id'],"rel"=>"extension")
+					));
+					$item["state"]="open";
+				}
                 	}
             }
         }
@@ -92,12 +96,21 @@ class Directory_Controller extends Bluebox_Controller
         }
 	return $extensions;
     }
-    public function index() { /* static page only - data comes in via json */ }
+    public function index() {
+	//Most of the data comes in via AJAX. Only thing we need is the URL:
+	// preg_replace replaces multiple slashes in a row with single slashes.
+	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/jsonout';
+	$this->view->url=preg_replace('/\/\/+/','/',$this->view->url);
+    }
     public function arrange()
     {
         javascript::add("jstree/_lib/jquery.cookie.js");
         javascript::add("jstree/_lib/jquery.hotkeys.js");
         javascript::add("jstree/jquery.jstree.js");
+	$this->view->serverurl=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/server';
+	$this->view->imagedir=Kohana::config('core.site_domain').'/modules/directory-1.0/assets/images/';
+	$this->view->serverurl=preg_replace('/\/\/+/','/',$this->view->serverurl);
+	$this->view->imagedir=preg_replace('/\/\/+/','/',$this->view->imagedir);
     }
     public function jsonout()
     {
@@ -140,19 +153,12 @@ class Directory_Controller extends Bluebox_Controller
         $stack=array(array());
 
         $tree=Doctrine::getTable('Grouping')->getTree()->fetchTree();
-	$channels=$this->getchannels('presence_id');
+	$channels=$this->_getchannels('presence_id');
 
 	// TODO: Make this module location aware. Until then, use the first location.
 	$location=Doctrine::getTable('Location')->findAll();
 	$location='@'.$location[0]['domain'];
-        $interfaces = SofiaManager::getSIPInterfaces();
-	$registered=array();
-
-        if ($interfaces) foreach($interfaces as $sipinterface_id => $interface) {
-		foreach (SofiaManager::getRegistrations($interface) AS $reg) {
-			$registered[$reg['user']]=1;
-		}
-        }
+	$registered=$this->_getregistrations('user');
 
         foreach ($tree AS $node) {
 		$stack[$node['level']]['value'][]=array('tag'=>'grouping','attributes'=>array('description'=>$node['name']));
@@ -197,7 +203,7 @@ class Directory_Controller extends Bluebox_Controller
     }
 	// This function gets an array of SimpleXMLElement objects - just (randomly) numerically indexed, or if
         // key is one of the fields, keyed by that field.
-    public function getchannels($key=NULL) {
+    public function _getchannels($key=NULL) {
 	$eslManager = new EslManager();
 	if(!$eslManager->isConnected()) {print "Not connected\n"; exit; }
 	$res=$eslManager->api("show","channels","as","xml");
@@ -208,24 +214,21 @@ class Directory_Controller extends Bluebox_Controller
 	$thistag="";
 	$result=array();
 	while ($xml->read()) {
-            switch ($xml->nodeType) {
-                case XMLReader::ELEMENT:
-			$thistag=$xml->name;
-			if ($thistag=='row') {
-				if ($channel) {
-					if (array_key_exists($key,$thisch)) {
-						$result[$thisch[$key]]=$thisch;
-					} else {
-						$result[]=$thisch;
-					}
+	    if ($xml->nodeType==XMLReader::ELEMENT) {
+		$thistag=$xml->name;
+		if ($thistag=='row') {
+			if ($channel) {
+				if (array_key_exists($key,$thisch)) {
+					$result[$thisch[$key]]=$thisch;
+				} else {
+					$result[]=$thisch;
 				}
-				$channel=true;
-				$thisch=array();
 			}
-                    	break;
-                case XMLReader::TEXT:
-                case XMLReader::CDATA:
-			$thisch[$thistag]=$xml->value;
+			$channel=true;
+			$thisch=array();
+		}
+	    } elseif ($xml->nodeType==XMLReader::TEXT) {
+		$thisch[$thistag]=$xml->value;
 	    }
 	}
 	if ($channel) {
@@ -237,11 +240,45 @@ class Directory_Controller extends Bluebox_Controller
 	}
 	return $result;
     }
-
-    public function test() {
-	print_r($this->getchannels('presence_id'));
-	exit;
+    public function _getregistrations($key=NULL) 
+    {
+	$esl=new EslManager();
+	$regs=array();
+	foreach (Doctrine::getTable('SipInterface')->findAll() AS $interface) {
+		$cmd="sofia xmlstatus profile sipinterface_".$interface->sipinterface_id." reg";
+		$res=$esl->api($cmd);
+		$res=$esl->getResponse($res);
+        	$xml=new XMLReader();
+		$xml->xml($res);
+		$data=NULL;
+		while ($xml->read()) {
+			if ($xml->nodeType==XMLReader::ELEMENT) {
+				$el=$xml->name;
+				if ($el=='registration') {
+					if (is_array($data)) {
+						if (array_key_exists($key,$data)) {
+							$regs[$data[$key]]=$data;
+						} else {
+							$regs[]=$data;
+						}
+					}
+					$data=array('sipinterface'=>'sipinterface_'.$interface->sipinterface_id);
+				}
+			} elseif ($xml->nodeType==XMLReader::TEXT) {
+				$data[$el]=$xml->value;
+			}
+		}
+		if (is_array($data)) {
+			if (array_key_exists($key,$data)) {
+				$regs[$data[$key]]=$data;
+			} else {
+				$regs[]=$data;
+			}
+		}
+	}
+	return $regs;
     }
+
     public function _remote_dir_fetch($url)
     {
         $tree=null;

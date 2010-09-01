@@ -14,7 +14,7 @@ $(function () {
                         "plugins" : [ "themes", "json_data", "ui", "crrm", "dnd", "types", "hotkeys", "contextmenu" ],
                         "json_data" : { 
                                 "ajax" : {
-                                        "url" : "/directory/server",
+                                        "url" : "<?php print $serverurl;?>",
                                         "data" : function (n) { 
                                                 return { 
                                                         "operation" : "get_children", 
@@ -31,7 +31,7 @@ $(function () {
                                         "extension" : {
                                                 "valid_children" : "none",
                                                 "icon" : {
-                                                        "image" : "/assets/js/jstree/_demo/file.png"
+                                                        "image" : "<?php print $imagedir; ?>/extension.png"
                                                 }
                                         },
                                         // The `folder` type
@@ -39,7 +39,7 @@ $(function () {
                                                 // can have files and other folders inside of it, but NOT `drive` nodes
                                                 "valid_children" : [ "default", "extension" ],
                                                 "icon" : {
-                                                        "image" : "/assets/js/jstree/_demo/folder.png"
+                                                        "image" : "<?php print $imagedir; ?>/grouping.png"
                                                 }
                                         }
                                 }
@@ -47,7 +47,7 @@ $(function () {
                 })
                 .bind("create.jstree", function (e, data) {
                         $.post(
-                                "/directory/server", 
+                                "<?php print $serverurl;?>", 
                                 { 
                                         "operation" : "create_node", 
                                         "id" : data.rslt.parent.attr("id"), 
@@ -70,7 +70,7 @@ $(function () {
                                 $.ajax({
                                         async : false,
                                         type: 'POST',
-                                        url: "/directory/server",
+                                        url: "<?php print $serverurl;?>",
                                         data : { 
                                                 "operation" : "remove_node", 
                                                 "id" : this.id
@@ -85,7 +85,7 @@ $(function () {
                 })
                 .bind("rename.jstree", function (e, data) {
                         $.post(
-                                "/directory/server", 
+                                "<?php print $serverurl;?>", 
                                 { 
                                         "operation" : "rename_node", 
                                         "id" : data.rslt.obj.attr("id"),
@@ -103,7 +103,7 @@ $(function () {
                                 $.ajax({
                                         async : false,
                                         type: 'POST',
-                                        url: "/directory/server",
+                                        url: "<?php print $serverurl;?>",
                                         data : { 
                                                 "operation" : "move_node", 
                                                 "id" : $(this).attr("id"), 
