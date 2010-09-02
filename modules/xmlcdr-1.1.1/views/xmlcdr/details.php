@@ -25,4 +25,9 @@
  *
  */
 echo $details;
+
+if (isset($views)) {
+    echo subview::renderAsSections($views);
+}
+
 ?>
