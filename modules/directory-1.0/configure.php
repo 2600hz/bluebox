@@ -36,7 +36,7 @@ class Directorygrouping_Configure extends Bluebox_Configure
         $branches->locked=true;
         $branches->save();
         $branches->getNode()->insertAsLastChildOf($root);
-
+/*	This is sample data. There is no known way to tell if a user wants to install sample data :(
         foreach (explode(" ","Albany Christchurch Ellerslie Remote") AS $name) {
                 $branch=new Grouping;
                 $branch->name=$name;
@@ -44,15 +44,11 @@ class Directorygrouping_Configure extends Bluebox_Configure
                 $branch->getNode()->insertAsLastChildOf($branches);
         }
 	// the last branch shows whatever is happening on remotebluebox
-	//$branch['plugins']=array('directory'=>array('remote'=>'http://remotebluebox/directory/xmlout'));
+	$branch['plugins']=array('directory'=>array('remote'=>'http://remotebluebox/directory/xmlout'));
 	$branch->save();
     }
+*/
 
-    //Add our devices to the database
-    public function repair() {
-        parent::repair();
-        Doctrine::createTablesFromArray(array('Grouping'));
     }
-
 }
 
