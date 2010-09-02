@@ -101,6 +101,34 @@ class Directory_Controller extends Bluebox_Controller
 	// preg_replace replaces multiple slashes in a row with single slashes.
 	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/jsonout';
 	$this->view->url=preg_replace('/\/\/+/','/',$this->view->url);
+	$this->view->lists=array();
+
+	$extxfers=Doctrine_Query::create()
+		->select("n.number,e.name,e.description")
+		->from("Number n,ExternalXfer e")
+		->where("n.class_type='ExternalXferNumber'")
+ 		->andWhere("n.foreign_id=e.external_xfer_id")
+		->orderBy("e.name,e.description")
+		->execute(array(),Doctrine::HYDRATE_SCALAR);
+	foreach ($extxfers AS $extxfer) {
+		$name=$extxfer['e_name'];
+		if ($extxfer['e_description']!='') {
+			$name.=" (".$extxfer['e_description'].")";
+		}
+		$this->view->lists['Speed Dials'][str_replace('\\',"",$extxfer['n_number'])]=$name;
+	}
+
+	$ringgroups=Doctrine_Query::create()
+		->select("n.number,r.name")
+		->from("Number n,RingGroup r")
+		->where("n.class_type='RingGroupNumber'")
+ 		->andWhere("n.foreign_id=r.ring_group_id")
+		->orderBy("r.name")
+		->execute(array(),Doctrine::HYDRATE_SCALAR);
+	foreach ($ringgroups AS $ringgroup) {
+		$name=$ringgroup['r_name'];
+		$this->view->lists['Ring Groups'][str_replace('\\',"",$ringgroup['n_number'])]=$name;
+	}
     }
     public function arrange()
     {

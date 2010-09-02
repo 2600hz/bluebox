@@ -57,12 +57,29 @@
 
                 
                 div.appendChild(newdiv);
-//                if (res[r].attributes.description=='Mark Grieve') {
-//                    alert(JSON.stringify(res[r]));
-//                }
-                //alert(JSON.stringify(res[r]));
             }
         }
     }
 
 </script>
+<?php 
+if (isset($lists)) { 
+	foreach ($lists AS $listname=>$listitems) {
+		echo "<hr><div><h1>$listname</h1><div class='grouping'>";
+		foreach ($listitems AS $number=>$name) { ?>
+			<div class="direntry">
+				<div class="dirname"><?php echo $name ?></div>
+				<div class="dirextension"><?php echo $number ?></div>
+			</div>
+
+<?php
+		}
+		echo "</div></div>";
+	}
+} ?>
+
+<?php 
+	if (isset($views)) {
+		echo subview::renderAsSections($views);
+	} 
+?>
