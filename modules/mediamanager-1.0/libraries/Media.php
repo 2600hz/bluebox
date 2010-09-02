@@ -44,6 +44,14 @@ class Media {
         }
     }
 
+    public static function getMediaFile($mediaId) {
+
+        $media = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
+        $filename = Media::getMediaFilename($media['file']);
+
+        return $filename;
+    }
+
     /**
      * Get the base audio path where all sound files are located, for this particular driver
      */
