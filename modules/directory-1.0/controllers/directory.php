@@ -449,14 +449,6 @@ class Directory_Controller extends Bluebox_Controller
 	return $conferences;
     }
 
-    public function test() 
-    {
-	$this->template->content="directory/index.php";
-	print "<pre>";
-	print_r($this->_get_conferences());
-	print "</pre>";
-    }
-
     public function _remote_dir_fetch($url)
     {
         $tree=null;
