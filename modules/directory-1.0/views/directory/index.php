@@ -1,6 +1,6 @@
 <div id="contents"> </div>
 <script type="text/javascript">
-    window.onload=function () {setInterval("request_update()",5000); request_update();}
+    window.onload=function () {setInterval("request_update()",<?php echo $updateinterval ?>); request_update();}
 
     function request_update() {
 	
@@ -66,9 +66,9 @@
 if (isset($lists)) { 
 	foreach ($lists AS $listname=>$listitems) {
 		echo "<hr><div><h1>$listname</h1><div class='grouping'>";
-		foreach ($listitems AS $number=>$name) { ?>
+		foreach ($listitems AS $number=>$data) { ?>
 			<div class="direntry">
-				<div class="dirname"><?php echo $name ?></div>
+				<div class="dirname"><?php echo $data['name'] ?></div>
 				<div class="dirextension"><?php echo $number ?></div>
 			</div>
 

@@ -102,6 +102,7 @@ class Directory_Controller extends Bluebox_Controller
 	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/jsonout';
 	$this->view->url=preg_replace('/\/\/+/','/',$this->view->url);
 	$this->view->lists=array();
+	$this->view->updateinterval=10000;
 
 	$extxfers=Doctrine_Query::create()
 		->select("n.number,e.name,e.description")
@@ -115,7 +116,7 @@ class Directory_Controller extends Bluebox_Controller
 		if ($extxfer['e_description']!='') {
 			$name.=" (".$extxfer['e_description'].")";
 		}
-		$this->view->lists['Speed Dials'][str_replace('\\',"",$extxfer['n_number'])]=$name;
+		$this->view->lists['Speed Dials'][str_replace('\\',"",$extxfer['n_number'])]=array("name"=>$name);
 	}
 
 	$ringgroups=Doctrine_Query::create()
@@ -127,7 +128,31 @@ class Directory_Controller extends Bluebox_Controller
 		->execute(array(),Doctrine::HYDRATE_SCALAR);
 	foreach ($ringgroups AS $ringgroup) {
 		$name=$ringgroup['r_name'];
-		$this->view->lists['Ring Groups'][str_replace('\\',"",$ringgroup['n_number'])]=$name;
+		$this->view->lists['Ring Groups'][str_replace('\\',"",$ringgroup['n_number'])]=array("name"=>$name);
+	}
+
+	$featurecodes=Doctrine_Query::create()
+		->select("n.number,r.name")
+		->from("Number n,FeatureCode r")
+		->where("n.class_type='FeatureCodeNumber'")
+ 		->andWhere("n.foreign_id=r.feature_code_id")
+		->orderBy("r.name")
+		->execute(array(),Doctrine::HYDRATE_SCALAR);
+	foreach ($featurecodes AS $featurecode) {
+		$name=$featurecode['r_name'];
+		$this->view->lists['Feature Codes'][str_replace('\\',"",$featurecode['n_number'])]=array("name"=>$name);
+	}
+
+	$conferences=Doctrine_Query::create()
+		->select("n.number,e.name")
+		->from("Number n,Conference e")
+		->where("n.class_type='ConferenceNumber'")
+ 		->andWhere("n.foreign_id=e.conference_id")
+		->orderBy("e.name")
+		->execute(array(),Doctrine::HYDRATE_SCALAR);
+	foreach ($conferences AS $conference) {
+		$name=$conference['e_name'];
+		$this->view->lists['<a href=directory/conferences>Conferences</a>'][str_replace('\\',"",$conference['n_number'])]=array("name"=>$name);
 	}
     }
     public function arrange()
@@ -149,6 +174,47 @@ class Directory_Controller extends Bluebox_Controller
  		header('Content-type: text/plain');
 	}
         print json_encode($listing);
+        exit;
+    }
+    public function conference_jsonout()
+    {
+	$listing=array(
+		"tag"=>"grouping",
+		"attributes"=>array("description"=>"Root"),
+		"value"=>array()
+	);
+	$conferences=$this->_get_conferences();
+	foreach ($conferences AS $conference) {
+		$cwork=array('tag'=>'grouping','attributes'=>array('description'=>$conference['bluebox']['e_name']),'value'=>array());
+		foreach ($conference['members'] AS $member) {
+			if (array_key_exists('clid',$member)) {
+				$name=$member['clid']['name'];
+				$number=$member['clid']['ext'];
+			} else {
+				$name=$member['caller_id_name'];
+				$number=$member['caller_id_number'];
+			}
+			if ($name!=$number) {
+				$name=$number." ".$name;
+			}
+			$number=sprintf("%02d:%02d:%02d",($member['join_time'] / 3600),($member['join_time']/60)%60,$member['join_time']%60);
+			if ($member['talking']=='true') {
+				$state='InUse';
+			} else {
+				$state="Idle";
+			}
+			$cwork["value"][]=array("tag"=>"extn","attributes"=>array("description"=>$name,"extension"=>$number,'state'=>$state));
+		}
+		$listing['value'][]=$cwork;
+	}
+	if (!array_key_exists('debug',$_REQUEST)) {
+ 		header('Content-type: text/json');
+	} else {
+ 		header('Content-type: text/plain');
+	}
+        print json_encode($listing)."\n";
+
+	//print '{"tag":"grouping","attributes":{"description":"Root"},"value":[{"tag":"grouping","attributes":{"description":"Christchurch"},"value":[{"tag":"extn","attributes":{"description":"The Polycom","extension":"1000","state":"Idle"}}]}]}';
         exit;
     }
     public function xmlout()
@@ -305,6 +371,90 @@ class Directory_Controller extends Bluebox_Controller
 		}
 	}
 	return $regs;
+    }
+
+    public function conferences() 
+    {
+	$this->template->content=new View("directory/index");
+	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/conference_jsonout';
+	$this->view->url=preg_replace('/\/\/+/','/',$this->view->url);
+	$this->view->updateinterval=1000;
+	$this->view->lists=array();
+    }
+
+    public function _get_conferences() {
+	$bbconf=array();
+	foreach (Doctrine_Query::create()
+		->select("n.number,e.name,e.conference_id")
+		->from("Number n,Conference e")
+		->where("n.class_type='ConferenceNumber'")
+ 		->andWhere("n.foreign_id=e.conference_id")
+		->orderBy("e.name")
+		->execute(array(),Doctrine::HYDRATE_SCALAR) AS $conference) {
+		$bbconf["conference_".$conference["e_conference_id"]]=$conference;
+	}
+	$clid=array();
+	foreach (Doctrine::getTable('Device')->findAll() AS $ext) {
+		if (array_key_exists('callerid',$ext['plugins']) &&
+			array_key_exists('internal_name',$ext['plugins']['callerid']) &&
+			array_key_exists('internal_number',$ext['plugins']['callerid'])) {
+			if (array_key_exists('sip',$ext['plugins']) && array_key_exists('username',$ext['plugins']['sip'])) {
+				$clid[$ext['plugins']['sip']['username']]=array(
+					'name'=>$ext['plugins']['callerid']['internal_name'],
+					'ext'=>$ext['plugins']['callerid']['internal_number']
+				);
+			}
+		}
+	}
+	$esl=new EslManager();
+	$res=$esl->api("conference xml_list");
+	$xml=new XMLReader();
+	$xml->xml($esl->getResponse($res));
+	$conferences=array();
+	$path=array();
+	while ($xml->read()) {
+		if ($xml->nodeType==XMLReader::ELEMENT) {
+			array_unshift($path,$xml->name);
+			if ($xml->name=='conference') {
+				$conferences[]=array();
+				end($conferences);
+				$conf=&$conferences[key($conferences)];
+				$current=&$conferences[key($conferences)];
+				$conf['members']=array();
+			} elseif ($xml->name=='member') {
+				$key=count($conf['members']);
+				$conf['members'][$key]=array();
+				$member=&$conf['members'][$key];
+				$current=&$conf['members'][$key];
+			}
+			if ($xml->hasAttributes) {
+                        	while($xml->moveToNextAttribute()) {
+	                            $current[$xml->name] = $xml->value;
+				    if (($xml->name=='name') && (array_key_exists($xml->value,$bbconf))) {
+					$current['bluebox']=$bbconf[$xml->value];
+				    }
+				}
+			}
+	
+			
+		} elseif ($xml->nodeType==XMLReader::END_ELEMENT) {
+			array_shift($path);
+                } elseif ($xml->nodeType==XMLReader::TEXT) {
+			$current[$path[0]]=$xml->value;
+			if (($path[0]=="caller_id_number") && array_key_exists($xml->value,$clid)) {
+				$current['clid']=$clid[$xml->value];
+			}
+		}
+	}
+	return $conferences;
+    }
+
+    public function test() 
+    {
+	$this->template->content="directory/index.php";
+	print "<pre>";
+	print_r($this->_get_conferences());
+	print "</pre>";
     }
 
     public function _remote_dir_fetch($url)
