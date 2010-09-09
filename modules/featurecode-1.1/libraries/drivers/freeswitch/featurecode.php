@@ -17,6 +17,8 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
 
         $destination = $number['Destination'];
         $registry = (array)$destination['registry'];
+
+        $vmdomain = 'voicemail_' .$destination['account_id'];
         
         switch ($registry['feature']) {
             case 'forward_on':
@@ -46,7 +48,7 @@ XML;
                 $xmlText = <<<XML
 <action application="answer"/>
 <action application="sleep" data="1000"/>
-<action application="voicemail" data="check default \${domain_name}"/>
+<action application="voicemail" data="check default $vmdomain"/>
 XML;
                 break;
 
@@ -57,7 +59,7 @@ XML;
                 $xmlText = <<<XML
 <action application="answer"/>
 <action application="sleep" data="1000"/>
-<action application="voicemail" data="check default \${domain_name} \${caller_id_number}"/>
+<action application="voicemail" data="check default $vmdomain \${caller_id_number}"/>
 XML;
                 break;
 
@@ -66,7 +68,7 @@ XML;
 <action application="answer"/>
 <action application="sleep" data="1000"/>
 <action application="set" data="voicemail_authorized=\${sip_authorized}"/>
-<action application="voicemail" data="check default \${domain_name} \${caller_id_number}"/>
+<action application="voicemail" data="check default $vmdomain \${caller_id_number}"/>
 XML;
                 break;
             
