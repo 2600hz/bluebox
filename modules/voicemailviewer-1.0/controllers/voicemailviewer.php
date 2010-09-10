@@ -166,7 +166,7 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 	message::set('Select a file to to use in the voicemail message');
       } else {
 	foreach($this->input->post('blast') as $mailbox) {
-	  echo VoicemailManager::blast($mailbox, $domain, Media::getFilePath($this->input->post('file_id')));
+	  echo VoicemailManager::blast($mailbox, $domain, Media::getMediaFile($this->input->post('file_id')));
 	}
       }
     }

@@ -119,9 +119,11 @@ class Xmlcdr_Controller extends Bluebox_Controller {
                 'User Context' => 'user_context',
                 'Read Codec' => 'read_codec',
                 'Write Codec' => 'write_codec',
-                'Dailed Domain' => 'dialed_domain',
-                'Dailed User' => 'dialed_user'
+                'Dialed Domain' => 'dialed_domain',
+                'Dialed User' => 'dialed_user'
         );
+
+        $this->xmlcdr = $xmlcdr;
 
         $details = '<h3>CDR</h3>';
         $details .= '<table>';
@@ -131,38 +133,13 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
         $details .= '</table>';
 
-        $details .= '<h3>Listen</h3>';
+        $this->view->details = $details;
 
-        if(file_exists($this->getFile($xmlcdr->uuid))) {
-            $details .= $this->playLink($xmlcdr->uuid);
-        } else {
-            $details .= 'No file found';
-        }
+        // Execute plugin hooks here, after we've loaded the core data sets
 
-        $this->template->content = new View('xmlcdr/details');
-        $this->template->content->details = $details;
-    }
-
-
-    public function playLink($uuid) {
-
-        return sprintf('<audio src="%s" controls="controls">No audio tag suport</audio>',  url::site('xmlcdr/listen/' . $uuid));
-
-    }
-
-    public function listen( $uuid) {
-        $this->auto_render = FALSE;
-
-        $file = $this->getFile($uuid);
-        if(!file_exists($file)) {
-            Kohana::log('error', 'Can\'t access file: '  . $file);
-            return;
-        }
-
-        header("Content-type: audio/wav");
-        header('Content-Length: '.filesize($file));
-        readfile($file);
-        die();
+        Event::run('bluebox.create_view', $this->view);
+ 
+        plugins::views($this);
     }
 
     public function service($key = NULL) {
@@ -179,17 +156,12 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
         }
     }
-    private function getBasePath() {
-        return '/usr/local/freeswitch/recordings/';
+
+    public function formatDate($date) {
+        $dt = new DateTime($date);
+        return $dt->format('m/d/Y h:i:s a');
     }
 
-    private function getRecordingExtension() {
-        return '.wav';
-    }
-
-    private function getFile($uuid) {
-        return $this->getBasePath() . $uuid . $this->getRecordingExtension();
-    }
 
     public function formatDuration ($sec, $padHours = false) {
 

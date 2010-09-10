@@ -115,11 +115,12 @@ class MediaScanner {
 	// Is an existing one?
 	if ( isset($knownFiles[$shortname]) ) {
 	  $mediafile_id = $knownFiles[$shortname]['mediafile_id'];
-	  $registry = $knownFiles[$shortname]['registry'];
+	  $registry = (array)$knownFiles[$shortname]['registry'];
 
 	  if ( ! in_array($framerate, (array)$registry['rates']) ) {
-	    $info = self::getAudioInfo($filename);
-	    $registry = array_merge((array)$registry, $info);
+	    //$info = self::getAudioInfo($filename);
+            $registry['rates'][] = $framerate;
+	    //$registry = arr::merge((array)$registry, $info);
 
 	    Doctrine_Query::create()
 	      ->update('MediaFile m')
@@ -127,7 +128,10 @@ class MediaScanner {
 	      ->where('m.mediafile_id = ?', $mediafile_id)
 	      ->execute();
 
-	    kohana::log('debug', 'Updating ' . $filename . ' with sample rate ' . $framerate . '... ');
+              kohana::log('debug', 'Updating ' . $filename . ' with sample rate ' . $framerate . '...');
+
+	    // Add to list of "known" files
+	    $knownFiles[$shortname]['registry'] = $registry;
 	  }
 	} else {
 	  kohana::log('debug', $filename . ' is a new file');
