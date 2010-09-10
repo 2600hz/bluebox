@@ -183,8 +183,11 @@ class GlobalMedia_Controller extends Bluebox_Controller
         $file = $this->locateFile($media);
 
         if (!$file) {
+	  kohana::log('debug', 'Failing to visualize ' . $mediaId);
             die();
         }
+
+	kohana::log('debug', 'Visualizing ' . $file);
 
         // Initialize audio analysis routine
         $audioFile = new AudioFile();
@@ -216,6 +219,8 @@ class GlobalMedia_Controller extends Bluebox_Controller
       } else {
 	$mime = 'audio/x-wav';
       }
+
+      kohana::log('debug', ($stream ? 'streaming' : 'downloading') . ' (' . $mime . ') ' . $name);
 
       header(sprintf('Content-type: %s', $mime));
       if (!$stream) {
