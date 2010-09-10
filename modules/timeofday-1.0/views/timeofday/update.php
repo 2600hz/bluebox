@@ -4,7 +4,7 @@
 
 </div>
 
-<div id="timeofday_update_form" class="update timeofday">
+<div id="timeofday_update_form" class="update timeofday" style="width: 100%; overflow-x: scroll;">
 
     <?php echo form::open(); ?>
 
