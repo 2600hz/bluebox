@@ -117,16 +117,12 @@ class GlobalMedia_Controller extends Bluebox_Controller
 	    $this->exitQtipAjaxForm();
 	    url::redirect(Router_Core::$controller);
 	  } else {
-	    if ( empty($mf['registy']) || empty($mf['registry']['rate']) ) {
-	      $mf['registry']['rate'] = array();
-	      @unlink($mf['file']);
-	    } else {
+	    kohana::log('debug', 'Found db entry to delete: ' . print_r($mf, TRUE));
 
-                foreach ( $mf['registry']['rates'] as $rate ) {
-                  $f = Media::getMediaFilename($mf['path'] . $mf['file'], $rate, TRUE);
-                  @unlink($f);
-                }
-            }
+	    while ( ($fullPath = $this->locateFile($mf)) !== FALSE ) {
+	      $result = @unlink($fullPath);
+	      kohana::log('debug', 'Deleting ' . $fullPath . ' with result ' . ($result ? 'TRUE' : 'FALSE') );
+	    }
 
 	    Doctrine_Query::create()
 	      ->delete('MediaFile')
