@@ -10,6 +10,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
         }
 
         $simpleroute = $base['plugins']['simpleroute'];
+        $sip = $base['plugins']['sip'];
 
         foreach ($simpleroute['patterns'] as $simple_route_id => $options)
         {
@@ -68,6 +69,16 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
                 $xml->update($caller_id .'/action[@application="set"][@data="effective_caller_id_name=${outbound_caller_id_name}"]');
 
                 $xml->update($caller_id .'/action[@application="set"][@data="effective_caller_id_number=${outbound_caller_id_number}"]');
+
+                // Put Caller ID into the right place
+                if (isset($sip['caller_id_field'])) {
+                    if (($sip['caller_id_field'] == 'rpid') or ($sip['caller_id_field'] == 'pid')) {
+                        $xml->update($caller_id . '/action[@application="export"][@bluebox="caller_id_field"]{@data="sip_cid_type=' . $sip['caller_id_field'] . '"}');
+                    } else {
+                        // Assume Caller ID is default or elsewhere
+                        $xml->deleteNode($caller_id . '/action[@application="export"][@bluebox="caller_id_field"]');
+                    }
+                }
 
                 $dummy = '/condition[@field="destination_number"][@expression="' . $pattern . '"][@bluebox="pattern_' .$simple_route_id .'_out"]';
 
