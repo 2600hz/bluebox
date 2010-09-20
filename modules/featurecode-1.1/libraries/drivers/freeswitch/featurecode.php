@@ -19,6 +19,7 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
         $registry = (array)$destination['registry'];
 
         $vmdomain = 'voicemail_' .$destination['account_id'];
+        $domain = 'location_' . $destination['location_id'];
         
         switch ($registry['feature']) {
             case 'forward_on':
@@ -75,14 +76,14 @@ XML;
             case 'park':
                 $xmlText = <<<XML
 <action application="set" data="fifo_music=\$\${hold_music}"/>
-<action application="fifo" data="\${destination_number}@\${domain_name} in"/>
+<action application="fifo" data="general@$domain in"/>
 XML;
                 break;
             
             case 'unpark':
                 $xmlText = <<<XML
 <action application="answer"/>
-<action application="fifo" data="\${destination_number}@\$\{domain_name} out nowait"/>
+<action application="fifo" data="general@$domain out nowait"/>
 XML;
                 break;
             
