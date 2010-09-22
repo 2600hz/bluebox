@@ -83,7 +83,7 @@ class Grouping extends Bluebox_Record
                 $new->name=$title; 
                 $new->save();
                 $new->getNode()->insertAsLastChildOf($this);
-                return array("status"=>1,"id"=>$new->grouping_id);
+                return array("status"=>1,"id"=>"node_".$new->grouping_id);
         }
         public function jsTree_get_children()
         {
