@@ -170,6 +170,8 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/settings/param[@name="nonce-ttl"]{@value="86400"}');
 
+        $xml->update('/settings/param[@name=rfc2833-pt]{@value="101"}');
+
         $xml->update('/settings/param[@name="manage-presence"]{@value="true"}');
 
         //$xml->update('/settings/param[@name="force-register-domain"]{@value="$${domain}"}');
