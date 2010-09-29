@@ -167,13 +167,11 @@ class AccountManager_Controller extends Bluebox_Controller
 
     protected function post_save(&$object)
     {
-        // Skip this stuff if just an edit.
-        if( ! $object->account_id) {
-            $object['Location'][0]['User'][0]['account_id'] = $object['account_id'];
 
-            $object['Location'][0]['User'][0]->save();
+        $object['Location'][0]['User'][0]['account_id'] = $object['account_id'];
 
-        }
+        $object['Location'][0]['User'][0]->save();
+
 
         Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
