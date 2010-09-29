@@ -92,7 +92,7 @@ XML;
         // Record any outbound calls, if the user is auth'd and the flag is set
         $xml = FreeSWITCH::createExtension('callrecord_outbound');
 
-        $filename = Kohana::config('freeswitch.audio_root') . '/recordings/${strftime(%Y-%m-%d-%H-%M-%S)}_${destination_number}_${caller_id_number}.wav';
+        $filename = Kohana::config('freeswitch.audio_root') . '/recordings/${uuid}.wav';
 
         // We'll always set the params for recorded calls, regardless of if they ever get used.
         $content = <<<XML
@@ -125,7 +125,7 @@ XML;
         // Is inbound call recording set? If so, record calls to this user
         if (!empty($callrecord['inbound']) and ($callrecord['inbound']))
         {
-            $filename = Kohana::config('freeswitch.audio_root') . '/recordings/${strftime(%Y-%m-%d-%H-%M-%S)}_${destination_number}_${caller_id_number}.wav';
+            $filename = Kohana::config('freeswitch.audio_root') . '/recordings/${uuid}.wav';
             $xml->update('/action[@application="record_session"][@bluebox="callrecord_action"][@data="' . str_replace('/', '\/', $filename) . '"]');
         }
         else
