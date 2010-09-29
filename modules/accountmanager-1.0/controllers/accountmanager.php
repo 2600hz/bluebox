@@ -115,57 +115,65 @@ class AccountManager_Controller extends Bluebox_Controller
 
     protected function save_prepare(&$object)
     {
+
         Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
         
         Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
-        // TODO: This should be done by the plugins but there is no way to ensure
-        // execution order and location must come first....
-        $location = $this->input->post('location', array());
+        // Skip this stuff if just an edit.
+        if( ! $object->account_id) {
 
-        $object['Location']->fromArray(array($location));
+            // TODO: This should be done by the plugins but there is no way to ensure
+            // execution order and location must come first....
+            $location = $this->input->post('location', array());
 
-        $user = $this->input->post('user', array());
+            $object['Location']->fromArray(array($location));
 
-        $object['Location'][0]['User']->fromArray(array($user));
+            $user = $this->input->post('user', array());
 
-        $object['Location'][0]['User'][0]['user_type'] = User::TYPE_ACCOUNT_ADMIN;
+            $object['Location'][0]['User']->fromArray(array($user));
 
-        // TODO: This could be done by the plugin but since the others are here
-        // we will put this here too...
-        $contexts = array();
+            $object['Location'][0]['User'][0]['user_type'] = User::TYPE_ACCOUNT_ADMIN;
 
-        if (!empty($_POST['context']['private']))
-        {
-            $contexts[] = array(
-                'name' => empty($_POST['context']['private_name']) ? 'In-house Only' : $_POST['context']['private_name'],
-                'locked' => FALSE
-            );
+            // TODO: This could be done by the plugin but since the others are here
+            // we will put this here too...
+            $contexts = array();
+
+            if (!empty($_POST['context']['private']))
+            {
+                $contexts[] = array(
+                    'name' => empty($_POST['context']['private_name']) ? 'In-house Only' : $_POST['context']['private_name'],
+                    'locked' => FALSE
+                );
+            }
+
+            if (!empty($_POST['context']['public']))
+            {
+                $contexts[] = array(
+                    'name' => empty($_POST['context']['public_name']) ? 'Publicly Accessible' : $_POST['context']['public_name'],
+                    'locked' => FALSE
+                );
+            }
+
+            if (!empty($contexts))
+            {
+                $object['Context']->fromArray($contexts);
+            }
         }
-
-        if (!empty($_POST['context']['public']))
-        {
-            $contexts[] = array(
-                'name' => empty($_POST['context']['public_name']) ? 'Publicly Accessible' : $_POST['context']['public_name'],
-                'locked' => FALSE
-            );
-        }
-
-        if (!empty($contexts))
-        {
-            $object['Context']->fromArray($contexts);
-        }
-        
         parent::save_prepare($object);
     }
 
     protected function post_save(&$object)
     {
-        $object['Location'][0]['User'][0]['account_id'] = $object['account_id'];
+        // Skip this stuff if just an edit.
+        if( ! $object->account_id) {
+            $object['Location'][0]['User'][0]['account_id'] = $object['account_id'];
 
-        $object['Location'][0]['User'][0]->save();
+            $object['Location'][0]['User'][0]->save();
+
+        }
 
         Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
