@@ -113,7 +113,11 @@ XML;
         
         $xml = Telephony::getDriver()->xml;
 
-        $callrecord = $number['Destination']['plugins']['callrecord'];
+        if (isset($number['Destination']['plugins']['callrecord']) {
+		$callrecord = $number['Destination']['plugins']['callrecord'];
+	} else {
+		return;
+	}
                 
         if (!$callrecord)
         {
