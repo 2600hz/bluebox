@@ -103,7 +103,7 @@ something else in front of it.
 
 
 	$cond='/condition[@field="${strftime_tz('.str_replace('/','\/',$timezone).' %u%H%M)}"]';
-        $xml->update($cond.'{@blueboxcomment="'.$comment.'"}{@expression="^['."$wday]$time".']"}');
+        $xml->update($cond.'{@blueboxcomment="'.$comment.'"}{@expression="^['."$wday]$time".'"}');
 
         if($action = fs::getTransferToNumber($destination['during_number_id']))
         {
