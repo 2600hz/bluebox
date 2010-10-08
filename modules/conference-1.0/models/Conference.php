@@ -42,7 +42,7 @@ class Conference extends Bluebox_Record
         'alone-sound' => 'conference/conf-alone.wav',
         //'perpetual-sound' => 'perpetual.wav',
         'moh-sound' => 'silence',
-        'enter-sound ' => 'tone_stream://%(200,0,500,600,700)',
+        'enter-sound' => 'tone_stream://%(200,0,500,600,700)',
         'exit-sound' => 'tone_stream://%(500,0,300,200,100,50,25)',
         'kicked-sound' => 'conference/conf-kicked.wav',
         'locked-sound' => 'conference/conf-locked.wav',
