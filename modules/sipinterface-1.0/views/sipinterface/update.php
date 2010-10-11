@@ -127,7 +127,12 @@
         <div class="field">
         <?php
             echo form::label('sipinterface[context_id]', 'Default Incoming Context:');
-            echo numbering::selectContext('sipinterface[context_id]', $sipinterface['context_id']);
+            echo numbering::selectContext(array(
+                    'name' => 'sipinterface[context_id]',
+                    'all' => TRUE
+                ),
+                $sipinterface['context_id']
+            );
         ?>
         </div>
 
