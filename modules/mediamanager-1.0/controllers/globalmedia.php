@@ -336,7 +336,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 	    Kohana::log('debug', 'SKIPPED DB UPDATE - Nothing to update on ' . $shortname . " with sample rate " . $audioInfo['byterate'] . "... ");
 	  }
 	}
-	message::set('Successfully updated audio file in the system.');
+	message::set('Successfully updated audio file in the system.', 'success');
 
 	url::redirect(Router_Core::$controller . '/index');
       } else {
@@ -363,7 +363,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
 	$mediaFile->save();
 
-	message::set('Successfully added audio file to the system.');
+	message::set('Successfully added audio file to the system.', 'success');
 
 	url::redirect(Router_Core::$controller . '/index');
       }
