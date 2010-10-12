@@ -20,9 +20,12 @@ class Number extends Bluebox_Record
     
     public static $errors = array(
         'number' => array (
-            'unique' => 'Number already exists',
+            'unique' => 'Number already exists in this location',
             'required' => 'Number is required',
             'default' => 'Number must be letters and numbers only'
+        ),
+        'location_id' => array (
+            'unique' => 'Number already exists in this location'
         )
     );
 
@@ -66,7 +69,7 @@ class Number extends Bluebox_Record
         $this->hasColumn('type', 'integer', 1, array('unsigned' => true, 'notnull' => true, 'default' => self::TYPE_INTERNAL));
         $this->hasColumn('dialplan', 'array', 10000, array('default' => array()));
 
-        $this->unique(array('number', 'account_id'));
+        $this->unique(array('number', 'location_id'));
     }
 
     /**
