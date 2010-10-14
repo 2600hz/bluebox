@@ -34,4 +34,12 @@ class Context extends Bluebox_Record
         $this->actAs('Timestampable');
         $this->actAs('MultiTenant');
     }
+
+    public function preDelete(Doctrine_Event $event)
+    {
+        if (count($this->getTable()->findAll()) <= 1)
+        {
+            throw new Exception('You can not delete the only context for this account!');
+        }
+    }
 }
