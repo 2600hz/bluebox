@@ -4,134 +4,8 @@
  * @author     K Anderson <bitbashing@gmail.com>
  * @license    Mozilla Public License (MPL)
  */
-abstract class Bluebox_Configure
-{
-    /**
-     * Version of this module. Use any php version string
-     * see http://php.net/manual/en/function.version-compare.php
-     * @var mixed
-     */
-    public static $version = 0.0;
-
-    /**
-     * The display name of this module
-     * @var string
-     */
-    public static $displayName = NULL;
-
-    /**
-     * The string to display as the name of the author(s)
-     * @var string
-     */
-    public static $author = 'Unspecified';
-
-    /**
-     * The string to display as the name organization
-     * @var string
-     */
-    public static $vendor = 'Unspecified';
-
-    /**
-     * The string to display as the type of license
-     * @var string
-     */
-    public static $license = 'MPL';
-
-    /**
-     * A breif description of the module, should to be under 150 charaters
-     * Used in module listings to brief the user to the purpose of the module
-     * @var string
-     */
-    public static $summary = 'This is a module for Bluebox.';
-
-    /**
-     * The full description of the module, used to provide users with more details
-     * @var string
-     */
-    public static $description = '';
-
-    /**
-     * The default enabled value, if true it will attempt to install by default
-     * @var bool
-     */
-    public static $default = FALSE;
-
-    /**
-     * If true this module can not be uninstalled
-     * @var bool
-     */
-    public static $denyRemoval = FALSE;
-
-    /**
-     * This is a list of catagories constants as defined in Core_PackageManager
-     * @var string
-     */
-    public static $type = Package_Manager::TYPE_DEFAULT;
-
-    /**
-     * This variable is useful for making sure the user has other modules installed that may be required
-     * @var array Key/value pair of modules and dependencies
-     */
-    public static $required = array();
-
-    /**
-     *
-     * @var string
-     */
-    public static $navBranch = '/';
-
-    /**
-     *
-     * @var string
-     */
-    public static $navURL = NULL;
-
-    /**
-     *
-     * @var string
-     */
-    public static $navLabel = NULL;
-
-    /**
-     *
-     * @var string
-     */
-    public static $navSummary = NULL;
-
-    /**
-     * This is an array optionally defining a submenu
-     * @var array
-     */
-    public static $navSubmenu = array();
-
-    /**
-     * The constuctor for this class ensures that the modules manditory defaults are fulfilled
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-
-    /*************************
-    * INSTALLATION ROUTINES *
-    *************************/
-    /**
-     * Do any pre-installation preparation.
-     *
-     * Things like making a temp directory or downloading stuff you might need.
-     * All modules have their preInstall() methods run first, before install() runs, so if you may need to setup
-     * something another module's install method depends on, do it here.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function preInstall()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-
+abstract class Bluebox_Configure  extends Package_Configure
+{   
     /**
      * Do the actual installation.
      *
@@ -162,60 +36,31 @@ abstract class Bluebox_Configure
         // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)
         // Note that we do this because Postgers & Doctrine don't like our polymorphic class extensions and try to create the same
         // tables twice.
-        $models = array();
-
         if (!empty($package['models']))
         {
-            foreach($package['models'] as $className)
+            $loadedModels = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
+
+        if (!empty($loadedModels))
+        {
+            $models = array();
+
+            foreach($loadedModels as $modelName)
             {
-                if ((get_parent_class($className) == 'Bluebox_Record') or (get_parent_class($className) == 'Doctrine_Record'))
+                if ((get_parent_class($modelName) == 'Bluebox_Record') or (get_parent_class($modelName) == 'Doctrine_Record'))
                 {
-                    $models[] = $className;
+                    $models[] = $modelName;
                 }
             }
+            
+            // If this package has any models of it's own (not extensions) then create the tables!
+            if (!empty($models))
+            {
+                kohana::log('debug', 'Adding table(s) ' .implode(', ', $models));
+
+                Doctrine::createTablesFromArray($models);
+            }
         }
-
-        // If this package has any models of it's own (not extensions) then create the tables!
-        if (!empty($models))
-        {
-            kohana::log('debug', 'Adding table(s) ' .implode(', ', $models));
-
-            Doctrine::createTablesFromArray($models);
-        }
-    }
-
-    /**
-     * Post-install routine for this module.
-     *
-     * Do any post-installation configuration that should happen after ALL modules have installed.
-     * This is the safest place to do things that may depend on other modules.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function postInstall()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
-
-    /**********************
-    * MIGRATION ROUTINES *
-    **********************/
-    /**
-     * Do any pre-migration preparation.
-     *
-     * Things like making a temp directory or downloading stuff you might need.
-     * All modules have their preMigrate() methods run first, before mirgrate() runs, so if you may need to setup
-     * something another module's install method depends on, do it here.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function preMigrate()
-    {
-        $this->noMethodMethod(__FUNCTION__);
     }
 
     /**
@@ -232,32 +77,159 @@ abstract class Bluebox_Configure
      *
      * @return array | NULL Array of failures, or NULL if everything is OK
      */
-    public function migrate()
+    public function migrate($identifier)
     {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-    /**
-     * Post-migration routine for this module.
-     *
-     * Do any post-migration configuration that should happen after ALL modules have migrated.
-     * This is the safest place to do things that may depend on other modules.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function postMigrate()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+        if (!empty($package['models']))
+        {
+            $loadedModels = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
 
-    /**********************
-    * UNINSTALL ROUTINES *
-    **********************/
-    public function preUninstall()
-    {
-        $this->noMethodMethod(__FUNCTION__);
+        if (empty($loadedModels))
+        {
+            return;
+        }
+
+        $installed = Package_Catalog::getInstalledPackage($package['packageName']);
+
+        if (Package_Dependency::compareVersion($package['version'], $installed['version']))
+        {
+            kohana::log('debug', 'Attempting to upgrade package ' .$installed['packageName'] .' version ' .$installed['version'] .' to ' .$package['version']);
+
+            foreach($loadedModels as $modelName)
+            {
+                if ((get_parent_class($modelName) != 'Bluebox_Record') AND (get_parent_class($modelName) != 'Doctrine_Record'))
+                {
+                    continue;
+                }
+
+                $migrationDirectory = $package['directory'] .'/migrations/' .$modelName;
+
+                kohana::log('debug', 'Looking for migrations in `' .$migrationDirectory .'`');
+
+                if (is_dir($migrationDirectory))
+                {
+                    try
+                    {
+                        $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($modelName));
+
+                        kohana::log('debug', 'Running migration on ' .$modelName .' from model version ' .$migration->getCurrentVersion() .' to ' .$migration->getLatestVersion());
+
+                        $migration->migrate();
+
+                        $msg = inflector::humanizeModelName($modelName);
+
+                        $msg .= ' database table upgraded to model version # ' .$migration->getCurrentVersion();
+
+                        Package_Message::set($msg, 'info', $identifier);
+                    }
+                    catch (Exception $e)
+                    {
+                        kohana::log('alert', 'Alerts during migration, this can USUALLY be ignored: ' .$e->getMessage());
+
+                        // TODO: This isnt a great idea, but migrations are so noisy with needless failures... PITA
+                        $migration->setCurrentVersion($migration->getLatestVersion());
+
+                        foreach ($migration->getErrors() as $error)
+                        {
+                            if (strstr($error->getMessage(), 'Already at version'))
+                            {
+                                $msg = inflector::humanizeModelName($modelName);
+
+                                $msg .= ' database table ' .inflector::lcfirst($error->getMessage());
+
+                                Package_Message::set($msg, 'info', $identifier);
+                            }
+                            else
+                            {
+                                Package_Message::set($error->getMessage(), 'alert', $identifier);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                   $migration = new Bluebox_Migration(NULL, NULL, strtolower($modelName));
+
+                   $migration->setCurrentVersion(0);
+                }
+            }
+        }
+        else
+        {
+            kohana::log('debug', 'Attempting to downgrade package ' .$installed['packageName'] .' version ' .$installed['version'] .' to ' .$package['version']);
+
+            foreach($loadedModels as $modelName)
+            {
+                if ((get_parent_class($modelName) != 'Bluebox_Record') AND (get_parent_class($modelName) != 'Doctrine_Record'))
+                {
+                    continue;
+                }
+
+                $migrationDirectory = $installed['directory'] .'/migrations/' .$modelName;
+
+                kohana::log('debug', 'Looking for migrations in `' .$migrationDirectory .'`');
+
+                if (is_dir($migrationDirectory))
+                {
+                    try
+                    {
+                        $modelVersion = 0;
+
+                        if (is_dir($package['directory'] .'/migrations/' .$modelName))
+                        {
+                            $previousMigration = new Doctrine_Migration($package['directory'] .'/migrations/' .$modelName);
+
+                            $modelVersion = $previousMigration->getLatestVersion();
+                        }
+
+                        kohana::log('debug', 'Determined that ' .$package['packageName'] .' version ' .$package['version'] .' works against ' .$modelName .' version ' .$modelVersion);
+
+                        $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($modelName));
+
+                        kohana::log('debug', 'Running migration on ' .$modelName .' from model version ' .$migration->getCurrentVersion() .' to ' .$modelVersion);
+
+                        $migration->migrate($modelVersion);
+
+                        $msg = inflector::humanizeModelName($modelName);
+
+                        $msg .= ' database table downgraded to model version # ' .$migration->getCurrentVersion();
+
+                        Package_Message::set($msg, 'info', $identifier);
+                    }
+                    catch (Exception $e)
+                    {
+                        kohana::log('alert', 'Alerts during migration, this can USUALLY be ignored: ' .$e->getMessage());
+
+                        // TODO: This isnt a great idea, but migrations are so noisy with needless failures... PITA
+                        $migration->setCurrentVersion($migration->getLatestVersion());
+
+                        foreach ($migration->getErrors() as $error)
+                        {
+                            if (strstr($error->getMessage(), 'Already at version'))
+                            {
+                                $msg = inflector::humanizeModelName($modelName);
+
+                                $msg .= ' database table ' .inflector::lcfirst($error->getMessage());
+
+                                Package_Message::set($msg, 'info', $identifier);
+                            }
+                            else
+                            {
+                                Package_Message::set($error->getMessage(), 'alert', $identifier);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                   $migration = new Bluebox_Migration(NULL, NULL, strtolower($modelName));
+
+                   $migration->setCurrentVersion(0);
+                }
+            }
+        }
     }
 
     /**
@@ -278,6 +250,16 @@ abstract class Bluebox_Configure
 
         $tables = array();
 
+        if (!empty($package['models']))
+        {
+            $loadedModels = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
+
+        if (empty($loadedModels))
+        {
+            return;
+        }        
+        
         // Get the doctrine overlord
         try
         {
@@ -292,20 +274,18 @@ abstract class Bluebox_Configure
 
         // For each of this modules models loop through all of their rows and delete them
         // This will ensure any relationships are broken safely, but is a brute force approach...
-        $models = $package['models'];
-
-        foreach($models as $model)
+        foreach($loadedModels as $modelName)
         {
             try
             {
-                $reflection = new ReflectionClass($model);
+                $reflection = new ReflectionClass($modelName);
 
                 if ($reflection->isSubclassOf('Doctrine_Template'))
                 {
                     throw new Exception('Model is a doctrine template');
                 }
 
-                $table = Doctrine::getTable($model);
+                $table = Doctrine::getTable($modelName);
 
                 $tableName = $table->getOption('tableName');
 
@@ -318,16 +298,16 @@ abstract class Bluebox_Configure
             }
             catch(Exception $e)
             {
-                Kohana::log('debug', 'Skipping uninstall on model ' . $model . ': ' .$e->getMessage());
+                Kohana::log('debug', 'Skipping uninstall on model ' . $modelName . ': ' .$e->getMessage());
 
                 continue;
             }
 
-            if (!in_array($declaringClass->name, $models))
+            if (!in_array($declaringClass->name, $loadedModels))
             {
-                Kohana::log('debug', 'Removing ' . $package['packageName'] . ' from table ' . $model);
+                Kohana::log('debug', 'Removing ' . $package['packageName'] . ' from table ' . $modelName);
 
-                $rows = Doctrine_Query::create()->from($model . ' t')->execute();
+                $rows = Doctrine_Query::create()->from($modelName . ' t')->execute();
 
                 foreach($rows as $row)
                 {
@@ -364,7 +344,7 @@ abstract class Bluebox_Configure
 
                 $relatedClass = $related->getOption('declaringClass');
 
-                if (empty($relatedClass) || in_array($relatedClass, $models))
+                if (empty($relatedClass) || in_array($relatedClass, $loadedModels))
                 {
                     $tables[] = $relatedTable;
                 }
@@ -415,57 +395,53 @@ abstract class Bluebox_Configure
         }
     }
 
-    public function postUninstall()
+    public function repair($identifier)
     {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+        $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-    /************************
-    * MAINTENANCE ROUTINES *
-    ************************/
-    /**
-     * Preform any possible automatic repairs
-     *
-     * By default this will update the package datastore, and numbertype tables.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function repair()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+        if (!empty($package['models']))
+        {
+            $loadedModels = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
 
-    /**
-     * Verify module is intact.
-     *
-     * Verify that this module has all it's parts and nothing looks out of whack.
-     * This gets called by install, upgrade, downgrade, repair and sanityCheck.
-     *
-     * You do not need to override this class if you are not adding additional functionality to it.
-     *
-     * @return array | NULL Array of failures, or NULL if everything is OK
-     */
-    public function verify()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+        if (empty($loadedModels))
+        {
+            return;
+        }
 
-    public function sanityCheck()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+        foreach($loadedModels as $modelName)
+        {
+            if ((get_parent_class($modelName) != 'Bluebox_Record') AND (get_parent_class($modelName) != 'Doctrine_Record'))
+            {
+                continue;
+            }
 
-    public function completedInstall()
-    {
-        $this->noMethodMethod(__FUNCTION__);
-    }
+            $migrationDirectory = $package['directory'] .'/migrations/' .$modelName;
 
-    private function noMethodMethod($method)
-    {
-        $class = str_replace('_Configure', '', get_class($this));
+            kohana::log('debug', 'Looking for migrations in `' .$migrationDirectory .'`');
 
-        Kohana::log('debug', "$class doesn't have a $method method");
+            if (is_dir($migrationDirectory))
+            {
+                try
+                {
+                    kohana::log('debug', 'Setting ' .$modelName .' to version 0 and walking migrations forward to ensure table schema');
+
+                    $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($modelName));
+
+                    $migration->setCurrentVersion(0);
+
+                    $migration->migrate();
+                }
+                catch(Exception $e)
+                {
+                    kohana::log('alert', 'Alerts during migration, this can USUALLY be ignored: ' .$e->getMessage());
+
+                    foreach ($migration->getErrors() as $error)
+                    {
+                        kohana::log('alert', $error->getMessage());
+                    }
+                }
+            }
+        }
     }
 }

@@ -45,7 +45,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
         stylesheet::add('php_file_tree.css');
 
         // Collect a list of paths in the system, to be displayed as a list
-        $this->view->filetree = filetree::php_file_tree(Media::getAudioPath(), "javascript:filterPath('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
+        $this->view->filetree = filetree::php_file_tree(Media::getMediaPath(), "javascript:filterPath('[link]');", FALSE, '/^8000$|^16000$|^32000$|^48000$/');
 
         // Build a grid with a hidden device_id, device_type, and add an option for the user to select the display columns
         $this->grid = jgrid::grid($this->baseModel, array(
@@ -102,51 +102,88 @@ class GlobalMedia_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
+    public function delete($mediafile_id) {
+      $base = strtolower($this->baseModel);
+      $this->createView();
+
+      $this->loadBaseModel($mediafile_id);
+
+      if ( $action = $this->submitted(array('submitString' => 'delete')) ) {
+	Event::run('bluebox.deleteOnSubmit', $action);
+
+	if ( ($action == self::SUBMIT_CONFIRM) ) {
+	  if ( ($mf = Doctrine::getTable('MediaFile')->findOneByMediafileId($mediafile_id, Doctrine::HYDRATE_ARRAY)) === NULL ) {
+	    messge::set('Unable to delete media file.');
+	    $this->exitQtipAjaxForm();
+	    url::redirect(Router_Core::$controller);
+	  } else {
+	    kohana::log('debug', 'Found db entry to delete: ' . print_r($mf, TRUE));
+
+	    while ( ($fullPath = $this->locateFile($mf)) !== FALSE ) {
+	      $result = @unlink($fullPath);
+	      kohana::log('debug', 'Deleting ' . $fullPath . ' with result ' . ($result ? 'TRUE' : 'FALSE') );
+	    }
+
+	    Doctrine_Query::create()
+	      ->delete('MediaFile')
+	      ->where('mediafile_id = ?', $mf['mediafile_id'])
+	      ->execute();
+
+	    message::set('Removed ' . basename($mf['file']));
+
+	    $this->returnQtipAjaxForm(NULL);
+
+	    url::redirect(Router_Core::$controller);
+	  }
+	} else if ($action == self::SUBMIT_DENY) {
+	  $this->exitQtipAjaxForm();
+
+	  url::redirect(Router_Core::$controller);
+	}
+      }
+
+      $this->prepareDeleteView(NULL, $mediafile_id);
+    }
+
     public function scan() {
-        // TODO: Make this run
-        
-        MediaScanner::scan(Media::getAudioPath(), $this->knownTypes);
+      // TODO: Make this run in the background
+      MediaScanner::scan(Media::getMediaPath(), $this->knownTypes);
+      $this->returnQtipAjaxForm(NULL);
     }
 
     public function details($mediaId) {
         $this->view->mediaId = $mediaId;
-        
         $this->view->media = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
     }
 
     private function locateFile($media, $sampleRate = NULL) {
-        $file = Media::getAudioPath() . $media['file'];
-
-        // See if the file exists. If not, try adding sample rates to the path
-        if (!file_exists($file)) {
-            $found = FALSE;
-            $file = Media::getAudioPath() . dirname($media['file']) . '/' . $sampleRate . '/' . basename($media['file']);
-
-            if (($sampleRate) and (file_exists($file))) {
-                $found = TRUE;
-            } else {
-                if (isset($media['registry']['rates'])) foreach ((array)$media['registry']['rates'] as $rate) {
-                    $file = Media::getAudioPath() . dirname($media['file']) . '/' . $rate . '/' . basename($media['file']);
-                    if (file_exists($file)) {
-                        $found = TRUE;
-                        continue;
-                    }
-                }
-            }
-
-            if (!$found)
-                return FALSE;
+        // Does base file or specific sampleRate file exist?
+        $file = Media::getMediaFilename($media['file'], $sampleRate, TRUE);
+        if (file_exists($file)) {
+            return $file;
         }
-        
-        return $file;
+
+        // If not, try all known sample rates
+        if (isset($media['registry']['rates'])) foreach ((array)$media['registry']['rates'] as $rate) {
+            $file = Media::getMediaFilename($media['file'], $rate, TRUE);
+            if (file_exists($file)) {
+                return $file;
+            }
+        }
+
+        return FALSE;
     }
 
     public function visualize($mediaId) {
         $media = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
         $file = $this->locateFile($media);
+
         if (!$file) {
+	  kohana::log('debug', 'Failing to visualize ' . $mediaId);
             die();
         }
+
+	kohana::log('debug', 'Visualizing ' . $file);
 
         // Initialize audio analysis routine
         $audioFile = new AudioFile();
@@ -166,188 +203,193 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
 
-    public function download($mediaId, $sampleRate = NULL, $stream = FALSE)
-    {
-        $file = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
-        $fullPath = $this->locateFile($file, $sampleRate);
-        
-        $name = basename($file['file']);
-        if ($file['registry']['type'] == 'MPEG') {
-            $mime = 'audio/mpeg';
-        } else {
-            $mime = 'audio/x-wav';
-        }
-        header(sprintf('Content-type: %s', $mime));
-        if (!$stream) {
-            // Include filename and attachment disposition only if we don't want to stream
-            header(sprintf('Content-Disposition: attachment; filename="%s"', $name));
-        }
-        readfile($fullPath);
-        die();
+    public function download($mediaId, $sampleRate = NULL, $stream = FALSE) {
+      $file = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
+      $fullPath = $this->locateFile($file, $sampleRate);
+
+      $name = basename($file['file']);
+      if ( in_array($file['registry']['type'], array('MPEG', 'mp3')) ) {
+	$mime = 'audio/mpeg';
+      } else if ( ! strcmp($file['registry']['type'], 'ogg') ) {
+	$mime = 'audio/ogg';
+      } else {
+	$mime = 'audio/x-wav';
+      }
+
+      kohana::log('debug', ($stream ? 'streaming' : 'downloading') . ' (' . $mime . ') ' . $name);
+
+      header(sprintf('Content-type: %s', $mime));
+      if (!$stream) {
+	// Include filename and attachment disposition only if we don't want to stream
+	header(sprintf('Content-Disposition: attachment; filename="%s"', $name));
+      }
+      readfile($fullPath);
+      die();
     }
 
-    public function add()
-    {
-        //javascript::add('ajaxupload');
-        
-        $this->view->title = 'Upload Media';
+    public function add() {
+      //javascript::add('ajaxupload');
 
-        $maxFilesize = ini_get('upload_max_filesize');
-        $maxPost = ini_get('post_max_size');
-        if ($maxFilesize <= $maxPost) {
-            $this->view->maxUpload =  __('Max file size that can uploaded is limited by upload_max_filesize to ') . $maxFilesize;
-        } else {
-            $this->view->maxUpload =  __('Max file size that can uploaded is limited by post_max_size to ') . $maxPost .'.  ';
-            $this->view->maxUpload .= __('If you attempt to upload something larger than this the page will simply reload.');
-        }
+      $this->view->title = 'Upload Media';
 
-        Kohana::log('debug', print_r($_POST, TRUE) . print_r($_FILES, TRUE));
-        
-        if (isset($_FILES['upload'])) {
-            switch ($_FILES['upload']['error']) {
-                case UPLOAD_ERR_INI_SIZE:
-                    message::set('The uploaded file exceeds the upload_max_filesize directive in php.ini');
-                    break;
+      $maxFilesize = ini_get('upload_max_filesize');
+      $maxPost = ini_get('post_max_size');
+      if ($maxFilesize <= $maxPost) {
+	$this->view->maxUpload =  __('Max file size that can uploaded is limited by upload_max_filesize to ') . $maxFilesize;
+      } else {
+	$this->view->maxUpload =  __('Max file size that can uploaded is limited by post_max_size to ') . $maxPost .'.  ';
+	$this->view->maxUpload .= __('If you attempt to upload something larger than this the page will simply reload.');
+      }
 
-                case UPLOAD_ERR_FORM_SIZE:
-                    message::set('The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form');
-                    break;
+      if (isset($_FILES['upload'])) {
+	switch ($_FILES['upload']['error']) {
+	case UPLOAD_ERR_INI_SIZE:
+	  message::set('The uploaded file exceeds the upload_max_filesize directive in php.ini');
+	  break;
 
-                case UPLOAD_ERR_PARTIAL:
-                    message::set('The uploaded file was only partially uploaded');
-                    break;
+	case UPLOAD_ERR_FORM_SIZE:
+	  message::set('The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form');
+	  break;
 
-                case UPLOAD_ERR_NO_FILE:
-                    message::set('No file was uploaded');
-                    break;
+	case UPLOAD_ERR_PARTIAL:
+	  message::set('The uploaded file was only partially uploaded');
+	  break;
 
-                case UPLOAD_ERR_NO_TMP_DIR:
-                    message::set('Missing a temporary folder');
-                    break;
+	case UPLOAD_ERR_NO_FILE:
+	  message::set('No file was uploaded');
+	  break;
 
-                case UPLOAD_ERR_CANT_WRITE:
-                    message::set('Failed to write file to disk');
-                    break;
+	case UPLOAD_ERR_NO_TMP_DIR:
+	  message::set('Missing a temporary folder');
+	  break;
 
-                case UPLOAD_ERR_EXTENSION:
-                    message::set('File upload stopped by extension');
-                    break;
+	case UPLOAD_ERR_CANT_WRITE:
+	  message::set('Failed to write file to disk');
+	  break;
 
-              case UPLOAD_ERR_OK:
-                    $description = (isset($_POST['upload']['description']) ? $_POST['upload']['description'] : '');
-                    $uploadfile = Media::getAudioPath() . $_POST['upload']['path'] . '/' . basename($_FILES['upload']['name']);
-                  
-                    if ($this->upload($_FILES['upload']['tmp_name'], $uploadfile, Media::getAudioPath(), $description, TRUE)) {
-                        message::set('Uploaded file', 'success');
-                        
-                    }
-                    break;
+	case UPLOAD_ERR_EXTENSION:
+	  message::set('File upload stopped by extension');
+	  break;
 
-                default:
-                    message::set('Unknown error');
-            }
-        }
+	case UPLOAD_ERR_OK:
+	  $description = (isset($_POST['upload']['description']) ? $_POST['upload']['description'] : '');
+	  $filename = $_POST['upload']['path'] . '/' . basename($_FILES['upload']['name']);
 
-        $this->view->soundPath = Media::getAudioPath();
+	  if ($this->upload($_FILES['upload']['tmp_name'], $filename, $description, TRUE)) {
+	    message::set('Uploaded file', 'success');
+	  }
+	  break;
+
+	default:
+	  message::set('Unknown error');
+	}
+      }
+
+      $this->view->soundPath = Media::getMediaPath();
     }
 
-    private function upload($tmpfile, $destfile, $basePath, $description = '', $replace = false)
-    {
+    private function upload($tmpfile, $shortname, $description = '', $replace = false) {
+        $audioInfo = MediaScanner::getAudioInfo($tmpfile);
+
+        $destfile = Media::getMediaFilename($shortname, $audioInfo['rates'][0], FALSE);  // Get whatever the proper name should be
         $dir = dirname($destfile);
-        $shortname = str_replace($basePath, '', MediaScanner::NormalizeFSNames($destfile));
 
-        /* can we write to the target folder? */
-        if (!filesystem::is_writable($dir)) {
-            message::set('The path ' . $dir . ' is not writable!');
-            return FALSE;
-        }
+      /* can we write to the target folder? */
+      if (!filesystem::is_writable($dir)) {
+	message::set('The path ' . $dir . ' is not writable!');
+	return FALSE;
+      }
 
-        $audioFile = new AudioFile();
-        $audioFile->loadFile($tmpfile);
+      $this->createFolder($dir);
 
-        // Create folder where this file will go and move file there
-        $destfile = dirname($destfile) . '/' . $audioFile->wave_framerate . '/' . basename($destfile);
-        $this->createFolder(dirname($destfile));
+      if (!is_writable(dirname($destfile)) or (file_exists($destfile) and !is_writable($destfile))) {
+	message::set(dirname($destfile) . ' is not writable');
+	return FALSE;
+      }
 
-        if (!is_writable(dirname($destfile)) or (file_exists($destfile) and !is_writable($destfile))) {
-            message::set(dirname($destfile) . ' is not writable');
-            return FALSE;
-        }
+      try {
+	move_uploaded_file($tmpfile, $destfile);
+      } catch (Exception $e) {
+	message::set('Unable to move uploaded file into ' . $destfile . '. ' . $e->getMessage());
+	return FALSE;
+      }
 
-        try {
-            move_uploaded_file($tmpfile, $destfile);
-        } catch (Exception $e) {
-            message::set('Unable to move uploaded file into ' . $destfile . '. ' . $e->getMessage());
-            return FALSE;
-        }
+      // See if this is in the DB
+      $mediaFile = Doctrine::getTable('MediaFile')->findOneByFile($shortname);
+      if ($mediaFile) {
+	// Note that this is a bit dangerous and could use improvement.
+	// We assume that all other properties in the file we just found match the file already uploaded.
+	// That means if someone uploads the wrong audio file, it kinda messes things up big time.
+	if (!in_array($audioInfo['byterate'], (array) $mediaFile['registry']['rates'])) {
 
-        // See if this is in the DB
-        $mediaFile = Doctrine::getTable('MediaFile')->findOneByFile($shortname);
-        if ($mediaFile) {
-            // Note that this is a bit dangerous and could use improvement.
-            // We assume that all other properties in the file we just found match the file already uploaded.
-            // That means if someone uploads the wrong audio file, it kinda messes things up big time.
-            if (!in_array($audioFile->wave_framerate, (array)$mediaFile['registry']['rates'])) {
-                Kohana::log('debug', 'Updating ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
-                $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], array('rates' => $audioFile->wave_framerate));;
-                $mediaFile->save();
-            } else {
-                Kohana::log('debug', 'SKIPPED DB UPDATE - Nothing to update on ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
-            }
-                message::set('Successfully updated audio file in the system.');
+	  Kohana::log('debug', 'Updating ' . $shortname . "...");
+          $registry = (array)$mediaFile['registry'];
+          $registry['rates'][] = $audioInfo['byterate'];
+	  $mediaFile['registry'] = $registry;
+	  $mediaFile['description'] = strlen($description) > 0 ? $description : $mediaFile['description'];
+	  $mediaFile->save();
+	} else {
+	  if ( strcmp($mediaFile['description'], $description) ) {
+	    $mediaFile['description'] = $description;
+	    $mediaFile->save();
+	  } else {
+	    Kohana::log('debug', 'SKIPPED DB UPDATE - Nothing to update on ' . $shortname . " with sample rate " . $audioInfo['byterate'] . "... ");
+	  }
+	}
+	message::set('Successfully updated audio file in the system.', 'success');
 
-                url::redirect(Router_Core::$controller . '/index');
-        } else {
-            // NEW FILE! Do lots of stuff
+	url::redirect(Router_Core::$controller . '/index');
+      } else {
+	// NEW FILE! Do lots of stuff
 
-            // Save info about file
-            $mediaFile = new MediaFile();
-            $mediaFile['file'] = $shortname;
-            $mediaFile['path'] = dirname($mediaFile['file']);   // We track the path separately to ease searching
-            $mediaFile['account_id'] = 1;
+	// Save info about file
+	$mediaFile = new MediaFile();
+	$mediaFile['file'] = $shortname;
+	$mediaFile['path'] = dirname($mediaFile['file']);   // We track the path separately to ease searching
+	$mediaFile['account_id'] = 1;
 
-            // See if we know this filename, description & category from the XML info
-            if (isset($descriptions[$shortname])) {
-                $mediaFile['description'] = $descriptions[$shortname];
-            } else {
-                $mediaFile['description'] = 'Unknown';
-            }
+	// See if we know this filename, description & category from the XML info
+	if (isset($descriptions[$shortname])) {
+	  $mediaFile['description'] = $descriptions[$shortname];
+	} else if ( strlen($description) > 0 ) {
+	  $mediaFile['description'] = $description;
+	} else {
+	  $mediaFile['description'] = 'Unknown';
+	}
 
-            Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
+	Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
 
-            $audioInfo = array( 'type' => $audioFile->wave_type,
-                                'compression' => $audioFile->wave_compression,
-                                'channels' => $audioFile->wave_channels,
-                                'rates' => $audioFile->wave_framerate,
-                                'byterate' => $audioFile->wave_byterate,
-                                'bits' => $audioFile->wave_bits,
-                                'size' => $audioFile->wave_size,
-                                'length' => $audioFile->wave_length);
+	$mediaFile['registry'] += $audioInfo;
 
-            $mediaFile['registry'] += $audioInfo;
+	$mediaFile->save();
 
-            $mediaFile->save();
+	message::set('Successfully added audio file to the system.', 'success');
 
-            message::set('Successfully added audio file to the system.');
-
-            url::redirect(Router_Core::$controller . '/index');
-        }
+	url::redirect(Router_Core::$controller . '/index');
+      }
     }
 
     public function create() {
-        if (isset($_POST['path']) and isset($_POST['newfolder'])) {
-            if ($this->createFolder(Media::getAudioPath() . $_POST['path'] . '/' . $_POST['newfolder'])) {
-                message::set('Folder created.');
+      $reqPath = '';
 
-                url::redirect(Router_Core::$controller . '/index');
-            } else {
-                message::set('The path ' . $_POST['path'] . ' does not exist and could not be created!');
-            }
-        }
+      if (isset($_POST['path']) and isset($_POST['newfolder'])) {
+	$reqPath = $_POST['path'];
+	$path = Media::getMediaPath() . $reqPath;
 
-        plugins::views($this);
+	kohana::log('debug', 'Creating ' . $path . DIRECTORY_SEPARATOR . $_POST['newfolder']);
+	if ($this->createFolder($path . DIRECTORY_SEPARATOR . $_POST['newfolder'])) {
+	  message::set('Folder created.');
 
-        $this->view->soundPath = Media::getAudioPath();
+	  url::redirect(Router_Core::$controller . '/index');
+	} else {
+	  message::set('The path ' . $_POST['path'] . ' does not exist or could not be created! Does your web user have write access?');
+	}
+      }
+
+      plugins::views($this);
+
+      $this->view->soundPath = Media::getMediaPath();
+      $this->view->reqPath = $reqPath;
     }
 
     /**
@@ -360,7 +402,16 @@ class GlobalMedia_Controller extends Bluebox_Controller
         return (is_dir($path) or filesystem::createDirectory($path));
     }
 
-    /*public function qtipAjaxReturn($data) {
-        javascript::codeBlock('$(\'.jqgrid_instance\').trigger("reloadGrid");');
+    /*public function buildDescriptionsFromFs()
+    {
+        $descriptions = MediaScanner::scanXml();
+        var_dump($descriptions);
+        $fp = fopen(MODPATH . '/mediamanager-1.0/audio_descriptions.ini', 'w');
+        foreach ($descriptions as $key => $value) {
+            fputs($fp, '"' . $key . '","' . $value . "\"\n");
+        }
+        fclose($fp);
+        exit();
     }*/
+
 }

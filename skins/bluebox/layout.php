@@ -167,10 +167,7 @@
             <!-- END OF CONTENT -->
 
             <div class="footer">
-
-                <script type="text/javascript" src="http://www.ohloh.net/p/484450/widgets/project_users_logo.js"></script>
                 <small><a href="http://www.2600hz.org">powered by blue.box</a></small>
-
             </div>
             <!-- END OF FOOTER -->
 

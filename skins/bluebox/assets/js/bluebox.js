@@ -121,8 +121,7 @@ $(document).ready(function () {
             } else if(request.status == 500) {
                 $.jGrowl('There was an error processing this request.', { theme: 'error', life: 5000 });
             } else if (request.status == 401) {
-                window.location = "http://192.168.1.119/index.php/user/index";
-                //$.jGrowl('Your session has timed out.', { theme: 'notice', life: 5000 });
+                $.jGrowl('Your session has timed out.', { theme: 'notice', life: 5000 });
             } else if(err == 'parsererror') {
                 $.jGrowl('The data recieved from the server was invalid.', { theme: 'error', life: 5000 });
             } else if(err == 'timeout') {
@@ -264,7 +263,7 @@ $(document).ready(function () {
                     }
                 },
                 show: {
-                    solo: true // And hide all other tooltips
+                    solo: false
                 },
                 style: {
                     width: 550,

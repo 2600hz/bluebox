@@ -223,7 +223,7 @@ class Provisioner_Controller extends Bluebox_Controller
             }
             // Attempt to save this provision, we need to do this even if the
             // driver errored out to repopulate the form and give any plugins a chance
-            if (empty($driverError) &&  $this->formSave($this->endpoint)) {
+            if (empty($driverError) && $this->formSave($this->endpoint)) {
                 url::redirect(Router_Core::$controller . '/edit/' . $this->endpoint->mac);
             }
             if (!empty($driverError)) message::set($driverError);

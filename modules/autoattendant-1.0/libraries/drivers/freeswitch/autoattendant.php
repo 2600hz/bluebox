@@ -19,9 +19,9 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver
         {
             case 'audio':
 
-                $xml->setAttributeValue('', 'greet-long', Media::getFilePath($autoattendant['registry']['mediafile_id']));
+                $xml->setAttributeValue('', 'greet-long', Media::getMediaFile($autoattendant['registry']['mediafile_id']));
 
-                $xml->setAttributeValue('', 'greet-short', Media::getFilePath($autoattendant['registry']['mediafile_id']));
+                $xml->setAttributeValue('', 'greet-short', Media::getMediaFile($autoattendant['registry']['mediafile_id']));
 
                 break;
 
@@ -37,9 +37,9 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver
 
                 $tts_string = 'say:' .preg_replace('/[^A-Za-z0-9.,!? ]/', '', $tts_string);
 
-                $xml->setAttributeValue('', 'tts-engine', 'cepstral');
+                $xml->setAttributeValue('', 'tts-engine', 'fliter');
 
-                $xml->setAttributeValue('', 'tts-voice', 'Allison-8kHz');
+                $xml->setAttributeValue('', 'tts-voice', 'slt');
 
                 $xml->setAttributeValue('', 'greet-long', $tts_string);
 
@@ -51,9 +51,9 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver
             $xml->setAttributeValue('', 'digit-len', $autoattendant['extension_digits']);
         }
 
-        $xml->setAttributeValue('', 'timeout', $autoattendant['timeout']);
+        $xml->setAttributeValue('', 'timeout', $autoattendant['timeout'] * 1000);
 
-        $xml->setAttributeValue('', 'inter-digit-timeout', $autoattendant['digit_timeout']);
+        $xml->setAttributeValue('', 'inter-digit-timeout', $autoattendant['digit_timeout'] * 1000);
 
         if (!empty($autoattendant['registry']['max-failures']))
         {

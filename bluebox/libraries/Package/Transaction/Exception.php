@@ -6,5 +6,17 @@
  */
 class Package_Transaction_Exception extends Package_Exception
 {
+    public function __construct($message = null, $code = 0, Exception $previous = null)
+    {
+        if ($code == 0)
+        {
+            Package_Operation_Message::set($message, 'error', 'transaction');
+        }
+        else
+        {
+            Package_Operation_Message::set($message, 'error', $code);
+        }
 
+        parent::__construct($message, $code);
+    }
 }

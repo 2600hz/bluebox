@@ -170,9 +170,42 @@ fUpdateBlueboxPerm() {
     chmod -R g+w upload/
 }
 
-fUpdateSwitchPerm() {
-    softswitch_guess="/tmp"
+fFixSoundsPerms() {
+    [ -d '/var/lib/asterisk/sounds/' ] && sounddir_guess="/var/lib/asterisk/sounds/"
 
+    [ -d '/usr/local/freeswitch/sounds/' ] && sounddir_guess="/usr/local/freeswitch/sounds"
+
+    [ -d '/opt/freeswitch/sounds/' ] && sounddir_guess="/opt/freeswitch/sounds"
+
+    echo
+    echo "SOUND FILE PRIVILEGES"
+    echo "---------------------------------------------------------"
+    echo "We need to verify the path to your sound files."
+    echo -n "Sound file dir [$sounddir_guess]? "
+
+    if [ ! -z $accept_all ]; then
+       sound_dir="$sounddir_guess"
+       echo
+    else
+        read ans
+
+        if [ -z $ans ]; then
+            sound_dir="$sounddir_guess"
+        else
+            sound_dir="$ans"
+        fi
+    fi
+
+    [ -z "$sound_dir" -o ! -d "$sound_dir" ] && return 0
+
+    echo "# chgrp -R $webuser $sound_dir/*"
+    chgrp -R $webuser $sound_dir/*
+
+    echo "# chmod -R g+w $sound_dir/*"
+    chmod -R g+w $sound_dir/*
+}
+
+fUpdateSwitchPerm() {
     [ -d '/usr/local/freeswitch/conf/' ] && softswitch_guess="/usr/local/freeswitch/conf"
 
     [ -d '/opt/freeswitch/conf/' ] && softswitch_guess="/opt/freeswitch/conf"
@@ -200,6 +233,8 @@ fUpdateSwitchPerm() {
             softswitch_dir="$ans"
         fi
     fi
+
+    [ -z "$softswitch_dir" -o ! -d "$softswitch_dir" ] && return 0
 
     echo "# chgrp -R $webuser $softswitch_dir/*"
     chgrp -R $webuser $softswitch_dir/*
@@ -234,6 +269,9 @@ while [ -n "$*" ]; do
         x--softswitch_dir=*)
             softswitch_dir=`echo "$1"|cut -d= -sf2`
             ;;
+        x--sound_dir=*)
+            sound_dir=`echo "$1"|cut -d= -sf2`
+            ;;
         x-y)
             accept_all=1
             ;;
@@ -254,6 +292,7 @@ fCheckSELinux
 fSetWebUser
 fUpdateBlueboxPerm
 fUpdateSwitchPerm
+fFixSoundsPerms
 
 [ -f '/etc/odbc.ini' ] && fUpdateOdbcPerm
 

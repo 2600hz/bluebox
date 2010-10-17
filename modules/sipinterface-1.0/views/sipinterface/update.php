@@ -86,6 +86,15 @@
         ?>
         </div>
 
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][compact_headers]',
+                                   'help' => 'Use SIP-compliant compact headers. Useful to fix broken UDP, where the packets are exceeding the size the router allows'
+                                   ), 'Use Compact Headers:');
+            echo form::checkbox('sipinterface[registry][compact_headers]');
+        ?>
+        </div>
+
     <?php echo form::close_section(); ?>
     
     <?php echo form::open_section('Network Lists'); ?>
@@ -113,12 +122,39 @@
 
     <?php echo form::close_section(); ?>
 
-    <?php echo form::open_section('Inbound Call Routing'); ?>
+    <?php echo form::open_section('Inbound Calls'); ?>
 
         <div class="field">
         <?php
             echo form::label('sipinterface[context_id]', 'Default Incoming Context:');
-            echo numbering::selectContext('sipinterface[context_id]', $sipinterface['context_id']);
+            echo numbering::selectContext(array(
+                    'name' => 'sipinterface[context_id]',
+                    'all' => TRUE
+                ),
+                $sipinterface['context_id']
+            );
+        ?>
+        </div>
+
+    <?php echo form::open_section('Default Behaviors for Connected Devices'); ?>
+
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][detect_nat_on_registration]',
+                                   'hint' => 'Detect SIP NAT IP & Port on Registration',
+                                   'help' => 'If this box is checked, FreeSWITCH will check, on registration, if the device is advertising an IP & Port that is different then where the packet is coming from. If so, it will guess as to whether or not the device is behind NAT and will attempt to use the detected IP & Port on future SIP messages instead of the IP & Port the device told us to communicate with. This can do more harm then good - use it wisely.'
+                                   ), 'Aggressive NAT Detection');
+            echo form::checkbox('sipinterface[registry][detect_nat_on_registration]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][force_rport]',
+                                   'hint' => 'Equivalent to forcing rport',
+                                   'help' => 'If this box is checked, FreeSWITCH will ignore the IP & Port that the SIP packet contained for where to send media to and will instead send media to the same IP & Port it has detected receiving media on from this device. This is equivalent to forcing the rport setting available on some devices. It will fix a lot of connection issues automatically and will cause FreeSWITCH to act closer to how Asterisk acts in regards to network traffic but can break advanced features in FreeSWITCH (like bypass media mode) - use this wisely.'
+                                   ), 'Use Network IP & Port for RTP');
+            echo form::checkbox('sipinterface[registry][force_rport]');
         ?>
         </div>
 

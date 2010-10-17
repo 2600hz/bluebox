@@ -47,6 +47,20 @@
         ?>
         </div>
 
+        <div class="field">
+        <?php
+            echo form::label('conference[registry][energy-level]', 'Minimum Energy Level');
+            echo form::input('conference[registry][energy-level]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label('conference[registry][comfort-noise]', 'Generate Comfort Noise?');
+            echo form::checkbox('conference[registry][comfort-noise]');
+        ?>
+        </div>
+
     <?php echo form::close_section(); ?>
 
     <?php if (FALSE): ?>

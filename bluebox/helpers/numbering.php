@@ -370,7 +370,7 @@ class numbering extends form
             $numbers = Doctrine_Query::create()
                 ->select('n.number_id, n.number, d.name')
                 ->from('Number n, n.' .$poolName .' d')
-                ->whereNotIn('n.foreign_id', array(0, 'NULL'))
+                ->where('(n.foreign_id <> ? AND n.foreign_id IS NOT NULL)', array(0))
                 ->andWhereIn('n.class_type', array($numberType['class']))
                 ->orderBy('number')
                 ->execute(array(), Doctrine::HYDRATE_SCALAR);
@@ -616,24 +616,39 @@ class numbering extends form
 
         // add in all the defaults if they are not provided
         $data += array(
-            'nullOption' => FALSE
+            'nullOption' => FALSE,
+            'all' => FALSE
         );
+        
+        if ( $data['all'] )
+        {
+            Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+        }
 
-        // TODO: optimize this query, use DQL?
-        $options = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
+        $options = Doctrine::getTable('Context')->findAll();
+
+        if ( $data['all'] )
+        {
+            Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);    
+        }
 
         if (!empty($data['nullOption']))
         {
-            $nullOption = array('context_id' => 0, 'name' => __($data['nullOption']));
-
-            array_unshift($options, $nullOption);
-
+            $contextOptions = array(0 => __($data['nullOption']));
+            
             unset($data['nullOption']);
         }
 
         foreach ($options as $option)
         {
-            $contextOptions[$option['context_id']] = $option['name'];
+            if ($data['all'])
+            {
+                $contextOptions[$option['Account']['name']][$option['context_id']] = $option['name'];
+            }
+            else
+            {
+                $contextOptions[$option['context_id']] = $option['name'];
+            }
         }
 
         return form::dropdown($data, $contextOptions, $selected);
@@ -767,7 +782,7 @@ class numbering extends form
         $numbers = Doctrine_Query::create()
             ->select('np.number_id, n.number')
             ->from('NumberPool np, np.Number n, np.NumberType nt')
-            ->where('(n.foreign_id = ? OR n.foreign_id IS NULL)', array(0))
+            ->where('(n.foreign_id <> ? AND n.foreign_id IS NOT NULL)', array(0))
             ->andwhereIn('n.class_type', $numberType)
             ->orderBy('number')
             ->execute(array(), Doctrine::HYDRATE_ARRAY);

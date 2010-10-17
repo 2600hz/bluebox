@@ -26,7 +26,9 @@ class Installer_Controller extends Bluebox_Controller
         // System Modules
         'accountmanager',
         'usermanager',
-        'rosetta'
+        'rosetta',
+        'errorreporter',
+        'dashboard'
     );
 
     /**
@@ -400,34 +402,42 @@ class Installer_Controller extends Bluebox_Controller
         // Get the current config files
         if ($files = Kohana::find_file('config', $config))
         {
-            $file = @file(end($files));
-        }
+            foreach ($files as $file)
+            {
+                if (strstr($file, SYSPATH))
+                {
+                    continue;
+                }
 
-        // Make sure we were sucessfull
-        if (empty($file))
+                $lines = @file($file);
+
+                // Compare what we where given to what is in the file and replace what differs
+                if (self::_replaceConfig($configMap, $lines))
+                {
+                    $lines = implode('', $lines);
+
+                    kohana::log('debug', 'writting bluebox config contents back to -> ' .$file);
+
+                    // If we got the file then we must have made changes, attempt to save it back
+                    // but if there is an error doing so have the user do it
+                    if (@file_put_contents($file, $lines) === FALSE)
+                    {
+                        $cache->set(time(), $lines, $config. '_file');
+
+                        message::set('Unable to write to ' .$config .'.php, please manualy replace it with ' .html::anchor('installer/viewCache?config_file=' . $config, 'this!', array(
+                            'target' => '_blank'
+                        )));
+
+                        return FALSE;
+                    }
+                }
+            }
+        }
+        else
         {
             message::set('Could not locate or read ' . $config . '.php!');
-            
+
             return FALSE;
-        }
-
-        // Compare what we where given to what is in the file and replace what differs
-        if (self::_replaceConfig($configMap, $file))
-        {
-            $file = implode('', $file);
-
-            // If we got the file then we must have made changes, attempt to save it back
-            // but if there is an error doing so have the user do it
-            if (@file_put_contents(end($files) , $file) === FALSE)
-            {
-                $cache->set(time() , $file, $config . '_file');
-
-                message::set('Unable to write to ' . $config . '.php, please manualy replace it with ' . html::anchor('installer/viewCache?config_file=' . $config, 'this!', array(
-                    'target' => '_blank'
-                )));
-
-                return FALSE;
-            }
         }
         
         return TRUE;

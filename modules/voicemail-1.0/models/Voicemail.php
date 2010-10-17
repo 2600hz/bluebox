@@ -28,7 +28,7 @@ class Voicemail extends Bluebox_Record
         // COLUMN DEFINITIONS
         $this->hasColumn('voicemail_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('name', 'string', 64, array('notnull' => true, 'notblank' => true));
-        $this->hasColumn('mailbox', 'string', 64, array('notnull' => true, 'unique' => true));
+        $this->hasColumn('mailbox', 'string', 64, array('notnull' => true));
         $this->hasColumn('password', 'string', 64, array('notnull' => true));
         $this->hasColumn('audio_format', 'string', 4, array('default' => 'wav'));
     }
@@ -42,5 +42,32 @@ class Voicemail extends Bluebox_Record
         $this->actAs('Polymorphic');
         $this->actAs('TelephonyEnabled');
         $this->actAs('MultiTenant');
+    }
+
+    public function preValidate(Doctrine_Event $event)
+    {
+        $record = &$event->getInvoker();
+
+        $errorStack = $this->getErrorStack();
+
+        $validator = Bluebox_Controller::$validation;
+
+        if (!empty($record['password']))
+        {
+            if (preg_match('/[^0-9]/', $record['password']))
+            {
+                $errorStack->add('password', 'onlydigits');
+            }
+        }
+
+        if (!empty($record['registry']['email_all_messages']))
+        {
+            if (!preg_match("/[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|edu|gov|mil|biz|info|mobi|name|aero|asia|jobs|museum)\b/i", $record['registry']['email_address']))
+            {
+                $validator->add_error('voicemail[registry][email_address]', 'This is not a valid email');
+
+                $errorStack->add('email_address', 'email');
+            }
+        }
     }
 }

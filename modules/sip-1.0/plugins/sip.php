@@ -30,17 +30,6 @@ class Sip_Plugin extends Bluebox_Plugin
         $this->supportedTrunkTypes['sip'] = 'Sip Interface';
     }
 
-    public function viewSetup()
-    {
-        $this->subview = new View('sip/update');
-
-        $this->subview->tab = 'main';
-
-        $this->subview->section = 'general';
-
-        return TRUE;
-    }
-
     public function updateTrunk()
     {
         if (!$this->viewSetup())
@@ -59,62 +48,57 @@ class Sip_Plugin extends Bluebox_Plugin
         {
             return FALSE;
         }
+
+        return TRUE;
     }
 
-    public function validate()
+    protected function validate($data, $validator)
     {
-        $valid = TRUE;
-        
         $base = $this->getBaseModelObject();
 
-        $validation = Bluebox_Controller::$validation;
-        
-        $sip = $this->input->post('sip', array());
-
-        // The username can not be empty if it is submitted
-        if ((isset($sip['username'])) AND (empty($sip['username'])))
+        if ($base instanceof Device)
         {
-            $validation->add_error('sip[username]', 'The SIP username can not be blank');
 
-            $valid = FALSE;
-        }
 
-        // The password can not be empty if it is submitted
-        if ((isset($sip['password'])) AND (empty($sip['password'])))
-        {
-            $validation->add_error('sip[password]', 'The SIP password can not be blank');
-
-            $valid = FALSE;
-        }
-
-        // Get all devices
-        $devices = Doctrine_Query::create()
-            ->select('d.plugins')
-            ->from('Device d')
-            ->execute(array(), Doctrine::HYDRATE_ARRAY);
-
-        // Check if this sip username is in use in the current account
-        // NOTE: This is nasty but a trade-off for far greater gains
-        foreach ($devices as $device)
-        {
-            if (empty($device['plugins']['sip']['username']))
+            // The password can not be empty if it is submitted
+            if (( ! isset($data['password'])) OR (empty($data['password'])))
             {
-                continue;
-            }
-            
-            if ((empty($base['device_id'])) or ($base['device_id'] == $device['device_id'])) 
-            {
-                continue;
+                $validator->add_error('sip[password]', 'The SIP password can not be blank');
             }
 
-            if ($device['plugins']['sip']['username'] == $sip['username'])
+            // The username can not be empty if it is submitted
+            if (( ! isset($data['username'])) OR (empty($data['username'])))
             {
-                $validation->add_error('sip[username]', 'The SIP username already exists');
-                
-                $valid = FALSE;
+                $validator->add_error('sip[username]', 'The SIP username can not be blank');
+                // if the username is blank stop now
+                return false;
+            }
+
+            // Get all devices
+            $devices = Doctrine_Query::create()
+                ->select('d.plugins')
+                ->from('Device d')
+                ->execute(array(), Doctrine::HYDRATE_ARRAY);
+
+            // Check if this sip username is in use in the current account
+            // NOTE: This is nasty but a trade-off for far greater gains
+            foreach ($devices as $device)
+            {
+                if (empty($device['plugins']['sip']['username']))
+                {
+                    continue;
+                }
+
+                if ($base['device_id'] == $device['device_id'])
+                {
+                    continue;
+                }
+
+                if ($device['plugins']['sip']['username'] == $data['username'])
+                {
+                    $validator->add_error('sip[username]', 'The SIP username already exists');
+                }
             }
         }
-
-        return $valid;
     }
 }

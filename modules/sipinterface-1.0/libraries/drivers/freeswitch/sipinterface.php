@@ -122,15 +122,30 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/settings/param[@name="auth-calls"]{@value="' . ($sipinterface['auth'] ? 'true' : 'false') .'"}');
 
-        // This may be overly optimistic but it should work in pretty much all cases
-        $xml->update('/settings/param[@name="aggressive-nat-detection"][@value="true"]');
+        // NAT detection settings for registrations
+        if (isset($sipinterface['registry']['detect_nat_on_registration']) and ($sipinterface['registry']['detect_nat_on_registration'])) {
+            $xml->update('/settings/param[@name="aggressive-nat-detection"]{@value="true"}');
+        } else {
+            $xml->deleteNode('/settings/param[@name="aggressive-nat-detection"]');
+        }
+
+        // NDLB / forced rport for crappy devices/setups
+        if (isset($sipinterface['registry']['force_rport']) and ($sipinterface['registry']['force_rport'])) {
+            $xml->update('/settings/param[@name="NDLB-force-rport"]{@value="true"}');
+        } else {
+            $xml->deleteNode('/settings/param[@name="NDLB-force-rport"]');
+        }
 
         // Turn off session timers, they are irritating and cause all sorts of issues
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
 
         // Enable compact headers by default. With all the Codecs FS now supports we see lots of
         // bad behavior re: UDP packets that are too large and get fragmented
-        $xml->update('/settings/param[@name="enable-compact-headers"]{@value="true"}');
+        if (isset($sipinterface['registry']['compact_headers']) and ($sipinterface['registry']['compact_headers'])) {
+            $xml->update('/settings/param[@name="enable-compact-headers"]{@value="true"}');
+        } else {
+            $xml->deleteNode('/settings/param[@name="enable-compact-headers"]');
+        }
 
         $xml->update('/settings/param[@name="user-agent-string"][@value="Configured by 2600hz"]');
 
@@ -154,6 +169,8 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         $xml->update('/settings/param[@name="inbound-reg-force-matching-username"]{@value="true"}');
 
         $xml->update('/settings/param[@name="nonce-ttl"]{@value="86400"}');
+
+        $xml->update('/settings/param[@name="rfc2833-pt"]{@value="101"}');
 
         $xml->update('/settings/param[@name="manage-presence"]{@value="true"}');
 

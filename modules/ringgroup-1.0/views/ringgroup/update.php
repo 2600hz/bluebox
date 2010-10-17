@@ -48,7 +48,6 @@
     <?php echo form::close_section(); ?>
 
     <?php echo form::open_section('Ring Group Member(s)'); ?>
-
         <div style="padding: 5px; overflow-y: auto; border: 1px solid #CCCCCC;">
 
             <ul id="ring_group_members" class="ring_group_members">
@@ -56,6 +55,7 @@
             </ul>
 
         </div>
+        (Drag devices up/down to re-order)
 
     <?php echo form::close_section(); ?>
 

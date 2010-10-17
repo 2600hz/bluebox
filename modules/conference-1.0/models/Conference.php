@@ -21,10 +21,10 @@ class Conference extends Bluebox_Record
     );
 
     public static $default_profile = array(
-        'rate' => 8000,
+        'rate' => 32000,
         'interval' => 20,
-        'energy-level' => 250,
-        'sound-prefix' => '/usr/local/freeswitch/sounds/en/us/callie/',
+        'energy-level' => 20,
+        'sound-prefix' => '$${sounds_dir}',
         //'ack-sound' => 'beep.wav',
         //'nack-sound' => 'beeperr.wav',
         'caller-controls' => 'default',
@@ -42,7 +42,7 @@ class Conference extends Bluebox_Record
         'alone-sound' => 'conference/conf-alone.wav',
         //'perpetual-sound' => 'perpetual.wav',
         'moh-sound' => 'silence',
-        'enter-sound ' => 'tone_stream://%(200,0,500,600,700)',
+        'enter-sound' => 'tone_stream://%(200,0,500,600,700)',
         'exit-sound' => 'tone_stream://%(500,0,300,200,100,50,25)',
         'kicked-sound' => 'conference/conf-kicked.wav',
         'locked-sound' => 'conference/conf-locked.wav',
@@ -81,5 +81,27 @@ class Conference extends Bluebox_Record
         $this->actAs('Timestampable');
         $this->actAs('TelephonyEnabled');
         $this->actAs('MultiTenant');
+    }
+
+    public function preValidate(Doctrine_Event $event)
+    {
+        $record = &$event->getInvoker();
+        
+        $errorStack = $this->getErrorStack();
+
+        $validator = Bluebox_Controller::$validation;
+
+        foreach ($record['pins'] as $key => $pin)
+        {
+            if (!empty($pin))
+            {
+                if (preg_match('/[^0-9]/', $pin))
+                {
+                    $validator->add_error('conference[pins][' .$key .']', 'Please provide only numbers');
+
+                    $errorStack->add('password', 'digitsonly');
+                }
+            }
+        }
     }
 }

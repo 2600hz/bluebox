@@ -42,10 +42,14 @@ class SofiaManager
 
             $device = explode('@', $registration['user']);
 
+            if (empty($device[0]) OR empty($device[1]))
+            {
+                continue;
+            }
+
             $deviceUser = $device[0];
 
             $deviceDomain = $device[1];
-
 
             if($deviceUser == $user && $deviceDomain == $domain)
             {
@@ -68,8 +72,6 @@ class SofiaManager
 
         if(!$sipRegCache)
         {
-            Kohana::log('info', 'Using cached registration');
-
             $eslManager = new EslManager();
             
             $cmd = 'sofia xmlstatus profile ' . $SIPInterface;
@@ -78,10 +80,25 @@ class SofiaManager
 
             $xml = $eslManager->getResponse($result);
 
-            $xml = simplexml_load_string($xml);
+            $registrations = array();
 
-            $registrations = $xml->registrations->registration;
-            //var_dump((array)$registrations);
+            if($xml !== 'Command execution failed.')
+            {
+                $xml = @simplexml_load_string($xml);
+
+                if ($xml AND $xml->registrations AND $xml->registrations->registration AND $xml->registrations->registration != '')
+                {
+                    $registrations = $xml->registrations->registration;
+                }
+                else
+                {
+                    Kohana::log('info', 'No XML returned');
+                }
+            }
+            else
+            {
+                Kohana::log('info', $cmd .': '. 'Command execution failed.');
+            }
 
             $result = array();
 
@@ -98,6 +115,7 @@ class SofiaManager
         } 
         else
         {
+            Kohana::log('info', 'Using cached registration');
             return $sipRegCache;
         }
     }

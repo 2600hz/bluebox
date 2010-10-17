@@ -10,7 +10,7 @@ class Package_Catalog_Remote
     {
         if (is_null($repos))
         {
-            $repos = kohana::config('core.repositories');
+            $repos = Kohana::config('core.repositories');
         }
 
         if (!is_array($repos))
@@ -36,16 +36,26 @@ class Package_Catalog_Remote
 
             foreach ($remoteCatalog as $package)
             {
+                Package_Catalog_Standardize::packageData($package, NULL);
+
+                Package_Catalog_Standardize::navigation($package);
+
                 if (empty($package['identifier']))
                 {
+                    Package_Message::log('alert', 'Remote repo ' .$repo .' provided an invalid package, ignoring!');
+
                     continue;
                 }
 
-                if (array_key_exists($package['identifier'], $remoteCatalog))
+                if (array_key_exists($package['identifier'], Package_Catalog::getCatalog()))
                 {
+                    Package_Message::log('debug', 'Remote repo ' .$repo .' provided existing package ' .$package['packageName'] .' version ' .$package['version'] .', ignoring');
+
                     continue;
                 }
 
+                Package_Message::log('debug', 'Remote repo ' .$repo .' provided new package ' .$package['packageName'] .' version ' .$package['version']);
+                
                 $package['status'] = Package_Manager::STATUS_UNINSTALLED;
 
                 $remoteCatalogs[$package['identifier']] = $package;
@@ -57,6 +67,8 @@ class Package_Catalog_Remote
 
     public function createRepo()
     {
+        Package_Catalog::disableRemote();
+
         $repoCatalog = Package_Catalog::getCatalog();
 
         foreach($repoCatalog as $key => &$package)
@@ -80,8 +92,16 @@ class Package_Catalog_Remote
     protected static function fetch($URL)
     {
         // needs caching...
+        if (!$repoXMLCatalog = @file_get_contents($URL))
+        {
+            Package_Message::log('alert', 'Unable to get catalog data from ' .$URL);
 
-        return @file_get_contents($URL);
+            return FALSE;
+        }
+
+        Package_Message::log('debug', 'Retrieved catalog data from ' .$URL);
+
+        return $repoXMLCatalog;
     }
 
     protected static function toXml($data, $rootNodeName = 'packages', $xml = null)

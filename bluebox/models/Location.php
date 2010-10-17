@@ -32,7 +32,7 @@ class Location extends Bluebox_Record
         // RELATIONSHIPS
         $this->hasOne('Account', array('local' => 'account_id', 'foreign' => 'account_id'));
         $this->hasMany('Number', array('local' => 'location_id', 'foreign' => 'location_id', 'cascade' => array('delete')));
-        $this->hasMany('User', array('local' => 'location_id', 'foreign' => 'location_id', 'cascade' => array('delete')));
+        $this->hasMany('User', array('local' => 'location_id', 'foreign' => 'location_id'));
 
         // BEHAVIORS
         $this->actAs('GenericStructure');
@@ -40,5 +40,12 @@ class Location extends Bluebox_Record
         $this->actAs('TelephonyEnabled');
         $this->actAs('MultiTenant');
     }
-}
 
+    public function preDelete(Doctrine_Event $event)
+    {
+        if (count($this->getTable()->findAll()) <= 1)
+	{
+	    throw new Exception ('You can not delete the only location for this account');
+	}
+    }
+}

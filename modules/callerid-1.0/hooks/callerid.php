@@ -4,6 +4,7 @@
 
     dialplan::register('CallerId', 'prenumber');
 
+
     plugins::register('devicemanager/create', 'view', array('CallerId_Plugin', 'update'));
 
     plugins::register('devicemanager/edit', 'view', array('CallerId_Plugin', 'update'));

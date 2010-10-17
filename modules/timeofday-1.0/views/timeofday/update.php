@@ -4,7 +4,7 @@
 
 </div>
 
-<div id="timeofday_update_form" class="update timeofday">
+<div id="timeofday_update_form" class="update timeofday" style="width: 100%; overflow-x: scroll;">
 
     <?php echo form::open(); ?>
 
@@ -41,7 +41,7 @@
 
             <div style="display:inline; margin:0 10px;">
 
-                <?php echo form::label('timeofday[wen]', 'Wensday'); ?>
+                <?php echo form::label('timeofday[wen]', 'Wednesday'); ?>
 
                 <?php echo form::checkbox(array('name' => 'timeofday[wen]', 'class' => 'time_selector')); ?>
 
@@ -200,7 +200,7 @@
 
     $("#timeofday_time").slider({
         from: 0,
-        to: 1430,
+        to: 1440,
         step: 15,
         dimension: '',
         scale: ['00:00', '1:00', '2:00', '3:00', '4:00', '5:00', '6:00', '7:00', '8:00',
@@ -285,7 +285,7 @@
 
             text = text.replace(/1/, 'Tuesday');
 
-            text = text.replace(/2/, 'Wensday');
+            text = text.replace(/2/, 'Wednesday');
 
             text = text.replace(/3/, 'Thursday');
 

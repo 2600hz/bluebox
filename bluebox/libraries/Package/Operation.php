@@ -38,7 +38,7 @@ class Package_Operation
                 break;            
 
             case Package_Manager::OPERATION_MIGRATE:
-                $agent = Package_Operation_Migrate;
+                $agent = new Package_Operation_Migrate;
 
                 break;
 
@@ -50,8 +50,10 @@ class Package_Operation
         {
             $name = Package_Catalog::getPackageName($identifier);
 
-            kohana::log('debug', 'Package management dispatching ' .$operation .' on ' .$identifier .'(' .$name .')');
+            Package_Message::log('debug', 'Package management dispatching ' .$operation .' on ' .$identifier .'(' .$name .')');
         }
+
+        $successfull = TRUE;
 
         foreach($steps as $step)
         {
@@ -59,7 +61,7 @@ class Package_Operation
             {
                 try
                 {
-                    kohana::log('debug', 'Package management executing ' .get_class($agent) .'->' .$step .'(' .$identifier .')');
+                    Package_Message::log('debug', 'Package management executing ' .get_class($agent) .'->' .$step .'(' .$identifier .')');
 
                     self::execStep($identifier, $step, $agent);
                 }
@@ -70,9 +72,20 @@ class Package_Operation
                     unset($identifiers[$pos]);
 
                     self::rollback($operation, $identifier, $step, $e);
+
+                    $successfull = FALSE;
                 }
             }
         }
+
+        foreach($identifiers as $identifier)
+        {
+            $package = Package_Catalog::getPackageByIdentifier($identifier);
+
+            Package_Operation_Message::set(ucfirst($operation) .' of package ' .$package['displayName'] .' version ' .$package['version'] .' completed', 'success', $identifier);
+        }
+
+        return $successfull;
     }
 
     protected static function execStep($identifier, $step, $agent)
@@ -105,7 +118,7 @@ class Package_Operation
                 break;
 
             default:
-                throw new Package_Operation_Exception('Unknown step ' .$step);
+                throw new Package_Operation_Exception('Unknown step ' .$step, $identifier);
         }
     }
 
@@ -117,7 +130,7 @@ class Package_Operation
         {
             if (empty($package['sourceURL']))
             {
-                throw new Package_Operation_Exception('Migrate could not find the source for the package');
+                throw new Package_Operation_Exception('Migrate could not find the source for the package', $identifier);
             }
 
             Package_Import::package($package['sourceURL']);
@@ -126,20 +139,73 @@ class Package_Operation
 
     protected static function rollback($operation, $identifier, $step, $error)
     {
-        kohana::log('error', 'Package operation ' .$operation .' failed during ' .$step .' on package ' .$identifier .': ' .$error->getMessage());
-        
-        try
+        Package_Message::log('error', 'Package operation ' .$operation .' failed during ' .$step .' on package ' .$identifier .': ' .$error->getMessage());
+
+        if ($step == 'validate')
         {
-            if ($operation != Package_Manager::OPERATION_UNINSTALL)
-            {
-                self::dispatch(Package_Manager::OPERATION_UNINSTALL, $identifier);
-            }
-        }
-        catch (Exception $e)
-        {
-            kohana::log('error', 'Error during rollback: ' .$e->getMessage());
+            Package_Message::log('debug', 'No rollback action for ' .$operation .' if we dont get past validate on package ' .$identifier);
+
+            Package_Operation_Message::set($error->getMessage(), 'error', $identifier);
+
+            return;
         }
 
-        throw $error;
+        Package_Operation_Message::set($error->getMessage(), 'error', $identifier);
+
+        switch ($operation)
+        {
+            case Package_Manager::OPERATION_INSTALL:
+                try
+                {
+                    Package_Message::log('debug', 'Trying to rollback install via uninstall on package ' .$identifier);
+
+                    Package_Operation_Message::ignoreLogLevels('success');
+
+                    self::dispatch(Package_Manager::OPERATION_UNINSTALL, $identifier);
+
+                    Package_Operation_Message::acceptAllLogLevels();
+                }
+                catch (Exception $e)
+                {
+                    Package_Operation_Message::set('Error during rollback: ' .$e->getMessage(), 'alert', $identifier);
+                }
+
+                break;
+
+            case Package_Manager::OPERATION_MIGRATE:
+                try
+                {
+                    if($package = Package_Catalog::getPackageByIdentifier($identifier))
+                    {
+                        if ($installed = Package_Catalog::getInstalledPackage($package['packageName']))
+                        {
+                            Package_Message::log('debug', 'Trying to rollback migrate via repair on package ' .$installed['identifier']);
+
+                            Package_Operation_Message::ignoreLogLevels('success');
+
+                            if(self::dispatch(Package_Manager::OPERATION_REPAIR, $installed['identifier']))
+                            {
+                                Package_Operation_Message::set('Rollback of package ' .$installed['displayName'] .' version ' .$installed['version'] .' completed', 'info', $identifier);
+                            }
+
+                            Package_Operation_Message::acceptAllLogLevels();
+                        }
+                    }
+                }
+                catch (Exception $e)
+                {
+                    Package_Operation_Message::set('Error during rollback: ' .$e->getMessage(), 'alert', $identifier);
+                }
+
+                break;
+
+            case Package_Manager::OPERATION_UNINSTALL:
+            case Package_Manager::OPERATION_REPAIR:
+            case Package_Manager::OPERATION_VERIFY:
+            default:
+                Package_Message::log('debug', 'No rollback action for ' .$operation .' on package ' .$identifier);
+
+                break;
+        }
     }
 }
