@@ -2,7 +2,7 @@
 
 class Directory_Controller extends Bluebox_Controller
 {
-    protected $authBypass = array('index','xmlout','jsonout','conference','conference_jsonout');
+    protected $authBypass = array('index','conferences','json_listing');
     public function __construct()
     {
         parent::__construct();
