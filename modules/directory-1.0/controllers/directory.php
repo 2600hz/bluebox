@@ -108,15 +108,18 @@ class Directory_Controller extends Bluebox_Controller
 	$devices=array();
 
 	foreach (Doctrine::getTable('Device')->findAll() AS $device) {
-		$new=array(
-			'id'=>$device['plugins']['sip']['username'],
-			'name'=>$device['plugins']['callerid']['internal_name'],
-			'ext'=>$device['plugins']['callerid']['internal_number'],
-		);
-		if (!array_key_exists($device['plugins']['directory']['group'],$devices)) {
-			$devices[$device['plugins']['directory']['group']]=array();
+		if (!array_key_exists('directory',$device['plugins'])) {
 		}
-		array_push($devices[$device['plugins']['directory']['group']],$new);
+			$new=array(
+				'id'=>$device['plugins']['sip']['username'],
+				'name'=>$device['plugins']['callerid']['internal_name'],
+				'ext'=>$device['plugins']['callerid']['internal_number'],
+			);
+			if (!array_key_exists($device['plugins']['directory']['group'],$devices))  {
+				$devices[$device['plugins']['directory']['group']]=array();
+			}
+			array_push($devices[$device['plugins']['directory']['group']],$new);
+		}
 	}
 	$level=0;
 	$branches='';
