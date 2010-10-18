@@ -37,7 +37,9 @@ class Context extends Bluebox_Record
 
     public function preDelete(Doctrine_Event $event)
     {
-        if (count($this->getTable()->findAll()) <= 1)
+        $unlimit = Session::instance()->get('bluebox.delete.unlimit', FALSE);
+
+        if (!$unlimit AND count($this->getTable()->findAll()) <= 1)
         {
             throw new Exception('You can not delete the only context for this account!');
         }

@@ -65,6 +65,7 @@ class User extends Bluebox_Record
         // RELATIONSHIPS
         $this->hasMany('Device', array('local' => 'user_id', 'foreign' => 'user_id'));
         $this->hasOne('Location', array('local' => 'location_id', 'foreign' => 'location_id', 'onDelete' => 'SET NULL'));
+        $this->hasOne('Account', array('local' => 'account_id', 'foreign' => 'account_id'));
 
         // BEHAVIORS
         $this->actAs('GenericStructure');
@@ -89,6 +90,13 @@ class User extends Bluebox_Record
 
     public function preDelete(Doctrine_Event $event)
     {
+        $unlimit = Session::instance()->get('bluebox.delete.unlimit', FALSE);
+
+        if ($unlimit)
+        {
+           return;
+        }
+
         $record = &$event->getInvoker();
 
         if ($record['user_type'] == User::TYPE_SYSTEM_ADMIN)
