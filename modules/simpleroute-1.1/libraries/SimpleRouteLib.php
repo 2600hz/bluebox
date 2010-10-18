@@ -9,15 +9,13 @@ class SimpleRouteLib
             return;
         }
 
-        Doctrine::getTable('Account')->bind(array('SimpleRoute', array('local' => 'account_id', 'foreign' => 'account_id')), Doctrine_Relation::MANY);
-
         Doctrine::getTable('SimpleRoute')->bind(array('Account', array('local' => 'account_id', 'foreign' => 'account_id')), Doctrine_Relation::ONE);
 
         Doctrine::getTable('SimpleRoute')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         Event::$data['SimpleRoute']->fromArray(self::importConfigRoutes());
     }
-    
+
     public static function importConfigRoutes()
     {
         $outboundPatterns = kohana::config('simpleroute.outbound_patterns');
