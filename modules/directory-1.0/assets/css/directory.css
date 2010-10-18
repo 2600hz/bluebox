@@ -6,13 +6,11 @@
 }
 
 .direntry {
-  /*background: red;*/
   margin-right: 7px;
   margin-left: 7px;
   font-size: +1em;
     
-    width: 170px;
-    /*border: 1px solid black;*/
+    width: 16em;
     overflow: auto;
     float: left;
     background-image: url("../images/dot.png");
