@@ -1,5 +1,6 @@
-<div id="contents"> </div>
+<?php print $branches; ?>
 <script type="text/javascript">
+    res=<?php echo $res?>;
     window.onload=function () {setInterval("request_update()",<?php echo $updateinterval ?>); request_update();}
 
     function request_update() {
@@ -10,55 +11,27 @@
                 xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
         }
         xmlhttp.onreadystatechange=update_notification;
-        xmlhttp.open("GET","<?php print $url; ?>?cascade=true&nocache="+(new Date).valueOf(),true);
+        xmlhttp.open("GET","<?php print $url; ?>",true);
         xmlhttp.send();
     }
 
     function update_notification() {
         if (xmlhttp.readyState==4 && xmlhttp.status==200) {
             res=JSON.parse(xmlhttp.responseText);
-            update_received();
+            update_received(res);
         }
     }
-
-    function update_received() {
-        recurse(res.value,1,document.getElementById("contents"));
-    }
-
-    function recurse(res,depth,div) {
-        var newdiv,newh;
-        div.innerHTML='';
-        for (var r=0; r<res.length; r++) {
-            if (res[r].tag=='grouping') {
-                newh=document.createElement('h'+depth.toString());
-                newh.innerHTML=res[r].attributes.description;
-                div.appendChild(newh);
-                newdiv=document.createElement('div');
-                newdiv.className="grouping";
-                div.appendChild(newdiv);
-                if (typeof(res[r].value)!='undefined') {
-                    recurse(res[r].value,depth+1,newdiv);
-                }
-            } else {
-                var newdiv2;
-                newdiv=document.createElement('div');
-                newdiv.className='direntry';
-
-                newdiv2=document.createElement('div');
-                newdiv2.className='dirname direntry'+res[r].attributes.state;
-                newdiv2.innerHTML=res[r].attributes.description;
-
-                newdiv.appendChild(newdiv2);
-                newdiv2=document.createElement('div');
-                newdiv2.className='dirextension';
-                newdiv2.innerHTML=res[r].attributes.extension;
-
-                newdiv.appendChild(newdiv2);
-
-                
-                div.appendChild(newdiv);
-            }
-        }
+    function update_received(res) {
+	divs=document.body.getElementsByTagName('div');
+	for (i=0; i<divs.length; i++) {
+		if (divs[i].className.indexOf('device_div')!=-1) {
+			state=res['ext'][divs[i].id.substr(7)];
+			if (state==null) {
+				state='Unavailable';
+			}
+			divs[i].getElementsByTagName('div')[0].className='dirname direntry'+state;
+		}
+	}
     }
 
 </script>

@@ -99,10 +99,42 @@ class Directory_Controller extends Bluebox_Controller
     public function index() {
 	//Most of the data comes in via AJAX. Only thing we need is the URL:
 	// preg_replace replaces multiple slashes in a row with single slashes.
-	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/jsonout';
+	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/json_listing';
 	$this->view->url=preg_replace('/\/\/+/','/',$this->view->url);
 	$this->view->lists=array();
-	$this->view->updateinterval=10000;
+	$this->view->updateinterval=5000;
+	$this->view->res=json_encode(Directory_Controller::_json_listing());
+
+	$devices=array();
+
+	foreach (Doctrine::getTable('Device')->findAll() AS $device) {
+		$new=array(
+			'id'=>$device['plugins']['sip']['username'],
+			'name'=>$device['plugins']['callerid']['internal_name'],
+			'ext'=>$device['plugins']['callerid']['internal_number'],
+		);
+		if (!array_key_exists($device['plugins']['directory']['group'],$devices)) {
+			$devices[$device['plugins']['directory']['group']]=array();
+		}
+		array_push($devices[$device['plugins']['directory']['group']],$new);
+	}
+	$level=0;
+	$branches='';
+	foreach (Doctrine_Query::create()->select("g.grouping_id,g.name,g.level")->from("Grouping g")->where("g.level>0")->orderBy("g.lft")->execute() AS $branch) {
+		if ($branch["level"]<$level) {
+			$branches.=str_repeat("</div>",$level-$branch["level"]);
+		}
+		$level=$branch["level"];
+		$branches.="<h$level>".$branch["name"]."</h$level><div class='grouping'>";
+		if (array_key_exists($branch['grouping_id'],$devices)) {
+			foreach ($devices[$branch['grouping_id']] AS $device) {
+				$branches.="<div class='direntry device_div' id='device_".$device['id']."'><div class='dirname'>".
+					$device['name']."</div><div class='dirextension'>".$device['ext']."</div></div>";
+			}
+		}
+	}
+	$branches.=str_repeat("</div>",$level);
+	$this->view->branches=$branches;
 
 	$extxfers=Doctrine_Query::create()
 		->select("n.number,e.name,e.description")
@@ -234,6 +266,74 @@ class Directory_Controller extends Bluebox_Controller
         $writer->endDocument();
         $writer->flush();
         exit;
+    }
+    public function _get_xml($esl,$command,$search) {
+	$result=array();
+	$current=array();
+
+	$res=$esl->api($command);
+	$xml=new XMLReader();
+	$xml->xml($esl->getResponse($res));
+
+	$path=array();
+        while($xml->read()) {
+            if ($xml->nodeType==XMLReader::ELEMENT) {
+		array_unshift($path,$xml->name);
+		if ($xml->name==$search) {
+			$current=array();
+		}
+	    } elseif ($xml->nodeType==XMLREader::TEXT) {
+		$current[$path[0]]=$xml->value;
+	    } elseif ($xml->nodeType==XMLReader::END_ELEMENT)  {
+		array_shift($path);
+		if ($xml->name==$search) {
+			array_push($result,$current);
+		}
+	    }
+	}
+	return $result;
+    }
+    public function _json_listing()
+    {
+	$status=array('ext'=>array(),'conf'=>array());
+	$conf=array();
+	$esl=new EslManager();
+
+	# foreach profile, foreach registered user on that profile, set the user to Idle:
+	foreach ( Directory_Controller::_get_xml($esl,"sofia xmlstatus","profile") AS $profile) {
+		foreach ( Directory_Controller::_get_xml($esl,"sofia xmlstatus profile ".$profile['name']." reg","registration") AS $reg) {
+			$status['ext'][$reg['sip-auth-user']]='Idle';
+		}
+	}
+
+	# foreach active channel
+	foreach ( Directory_Controller::_get_xml($esl,"show channels as xml","row") AS $row) {
+		# If the phone is ringing, and it's not allready busy:
+		if (($row['callstate']=='RINGING') && ((!array_key_exists($row['dest'],$status['ext'])) || ($status['ext'][$row['dest']]=='Idle'))) {
+			$status['ext'][$row['dest']]='Ringing';
+		# Else if they are on a conference:
+		} elseif (array_key_exists('application',$row) && ($row['application']=='conference')) {
+			$row['conference']=$row['application_data'];
+			$status['conf'][$row['dest']]=array();
+			$status['ext'][$row['cid_num']]='InUse';
+			$conf[$row['cid_num']]=$row['dest']; # Remember the conference they are in for later.
+		# Otherwise they are just busy.
+		} else {
+			$status['ext'][$row['cid_num']]='InUse';
+		}
+	}
+	# For each conference member:
+	foreach ( Directory_Controller::_get_xml($esl,"conference xml_list","member") AS $member) {
+		$status['conf'][$conf[$member['caller_id_number']]][$member['caller_id_number']]=array(
+			'last_talking'=>$member['last_talking'],
+			'join_time'=>$member['join_time']+0
+		);
+	}
+	return $status;
+    }
+    public function json_listing() {
+        print json_encode(Directory_Controller::_json_listing());
+	exit;
     }
     public function _build_listing()
     {
@@ -375,11 +475,32 @@ class Directory_Controller extends Bluebox_Controller
 
     public function conferences() 
     {
-	$this->template->content=new View("directory/index");
-	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/conference_jsonout';
+	$this->view->url=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/directory/json_listing';
 	$this->view->url=preg_replace('/\/\/+/','/',$this->view->url);
 	$this->view->updateinterval=1000;
-	$this->view->lists=array();
+
+	$clid=array();
+	foreach (Doctrine::getTable('Device')->findAll() AS $ext) {
+		if (array_key_exists('callerid',$ext['plugins']) &&
+			array_key_exists('internal_name',$ext['plugins']['callerid']) &&
+			array_key_exists('internal_number',$ext['plugins']['callerid'])) {
+			if (array_key_exists('sip',$ext['plugins']) && array_key_exists('username',$ext['plugins']['sip'])) {
+				$clid[$ext['plugins']['sip']['username']]=array(
+					'name'=>$ext['plugins']['callerid']['internal_name'],
+					'ext'=>$ext['plugins']['callerid']['internal_number']
+				);
+			}
+		}
+	}
+	$this->view->usercache=json_encode($clid);
+
+	$conf="";
+	foreach (Doctrine::getTable('ConferenceNumber')->findAll() AS $con) {
+		$conf.="<h1>".$con["Conference"]["name"]." (".$con['number'].")</h1><div class='conference_div' id=conf_".$con['number'].'></div>';
+	}
+
+	$this->view->conferences=$conf;
+	$this->view->res=json_encode(Directory_Controller::_json_listing());
     }
 
     public function _get_conferences() {
