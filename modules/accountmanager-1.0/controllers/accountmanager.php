@@ -110,7 +110,11 @@ class AccountManager_Controller extends Bluebox_Controller
             $this->session->set('multitenant_account_id', $id);
         }
 
+        Session::instance()->set('bluebox.delete.unlimit', TRUE);
+
         parent::delete($id);
+
+        Session::instance()->set('bluebox.delete.unlimit', FALSE);
     }
 
     protected function save_prepare(&$object)
