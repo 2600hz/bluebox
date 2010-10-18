@@ -108,8 +108,7 @@ class Directory_Controller extends Bluebox_Controller
 	$devices=array();
 
 	foreach (Doctrine::getTable('Device')->findAll() AS $device) {
-		if (!array_key_exists('directory',$device['plugins'])) {
-		}
+		if (array_key_exists('directory',$device['plugins'])) {
 			$new=array(
 				'id'=>$device['plugins']['sip']['username'],
 				'name'=>$device['plugins']['callerid']['internal_name'],
