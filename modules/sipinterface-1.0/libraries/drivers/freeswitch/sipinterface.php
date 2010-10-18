@@ -157,9 +157,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         {
             $xml->deleteNode('/settings/param[@name="apply-nat-acl"]');
         }
-        
-        $xml->update('/settings/param[@name="context"]{@value="context_' . $sipinterface['context_id'] . '"}');
-		
+
+        if (!empty($sipinterface['context_id']))
+        {
+            $xml->update('/settings/param[@name="context"]{@value="context_' . $sipinterface['context_id'] . '"}');
+        }
+        else
+        {
+            $xml->update('/settings/param[@name="context"]{@value=default_public"}');
+        }
+
         $xml->update('/settings/param[@name="rtp-timer-name"]{@value="soft"}');
 
         $xml->update('/settings/param[@name="codec-prefs"]{@value="$${global_codec_prefs}"}');

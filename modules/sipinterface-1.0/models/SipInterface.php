@@ -118,8 +118,7 @@ class SipInterface extends Bluebox_Record
 
         // Default routing context/context
         $this->hasColumn('context_id', 'integer', 11, array(
-                'unsigned' => true,
-                'notnull' => true
+                'unsigned' => true
             )
         );
         
@@ -137,11 +136,7 @@ class SipInterface extends Bluebox_Record
     public function setUp()
     {
         // RELATIONSHIPS
-        $this->hasOne('Context', array(
-                'local' => 'context_id',
-                'foreign' => 'context_id'
-            )
-        );
+        $this->hasOne('Context', array('local' => 'context_id', 'foreign' => 'context_id', 'onDelete' => 'SET NULL'));
 
         // BEHAVIORS
         $this->actAs('GenericStructure');
