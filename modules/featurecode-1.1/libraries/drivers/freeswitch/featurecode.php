@@ -12,14 +12,14 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
 
     }
 
-    public static function dialplan($number) {
+    public static function dialplan($number)
+    {
         $xml = Telephony::getDriver()->xml;
 
         $destination = $number['Destination'];
+
         $registry = (array)$destination['registry'];
 
-        $vmdomain = 'voicemail_' .$destination['account_id'];
-        
         switch ($registry['feature']) {
             case 'forward_on':
                 $xmlText = <<<XML
@@ -45,30 +45,56 @@ XML;
                 break;
             
             case 'voicemail':
+
+                $vmdomain = 'voicemail_' .$destination['account_id'];
+
                 $xmlText = <<<XML
-<action application="answer"/>
-<action application="sleep" data="1000"/>
-<action application="voicemail" data="check default $vmdomain"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="voicemail" data="check default $vmdomain"/>
+        <action application="hangup"/>
+
 XML;
                 break;
 
-            // TODO: This is ghetto - should be changed to use mwi-account variable and split it apart w/ regexs
-            // That would allow voicemail #s to not match Caller ID #s AND would work with shared mailboxes AND would provide
-            // an extra layer of security. FIX.
             case 'voicemail_quickauth':
+
+                $vmdomain = 'voicemail_' .$destination['account_id'];
+
+	 	$xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+
                 $xmlText = <<<XML
-<action application="answer"/>
-<action application="sleep" data="1000"/>
-<action application="voicemail" data="check default $vmdomain \${caller_id_number}"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="voicemail" data="check default \$2 \$1"/>
+        <action application="hangup"/>
+        <anti-action application="answer"/>
+        <anti-action application="sleep" data="1000"/>
+        <anti-action application="voicemail" data="check default $vmdomain"/>
+        <anti-action application="hangup"/>
+
 XML;
                 break;
 
             case 'voicemail_noauth':
+                $vmdomain = 'voicemail_' .$destination['account_id'];
+
+	 	$xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+
                 $xmlText = <<<XML
-<action application="answer"/>
-<action application="sleep" data="1000"/>
-<action application="set" data="voicemail_authorized=\${sip_authorized}"/>
-<action application="voicemail" data="check default $vmdomain \${caller_id_number}"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="set" data="voicemail_authorized=\${sip_authorized}"/>
+        <action application="voicemail" data="check default \$2 \$1"/>
+        <action application="hangup"/>
+        <anti-action application="answer"/>
+        <anti-action application="sleep" data="1000"/>
+        <anti-action application="voicemail" data="check default $vmdomain"/>
+        <anti-action application="hangup"/>
+
 XML;
                 break;
             
