@@ -167,6 +167,17 @@
         ?>
         </div>
 
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][force_register_domain]',
+                                   'hint' => 'Equivalent to forcing rport',
+                                   'help' => 'All inbound registrations will be considered for this domain, ignoring the domain provided by the registration request.  Setting this to none uses the domain specified in the registration.'
+                                   ), 'Force Registration Domain');
+            echo locations::dropdown(array('name' => 'sipinterface[registry][force_register_domain]',
+                                    'nullOption' => 'None'));
+        ?>
+        </div>
+
     <?php echo form::close_section(); ?>
 
     <?php if (isset($views)) echo subview::renderAsSections($views); ?>
