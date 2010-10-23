@@ -50,4 +50,44 @@ class Location extends Bluebox_Record
 	    throw new Exception ('You can not delete the only location for this account');
 	}
     }
+
+    public static function dictionary($multitenancy = TRUE)
+    {
+        $locations = array();
+
+        if (!$multitenancy)
+        {
+            Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+            $q = Doctrine_Query::create()
+                ->from('Location l, l.Account a')
+                ->select('l.location_id, l.name, a.name');
+
+            $results = $q->fetchArray();
+
+            Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+        }
+        else
+        {
+            $q = Doctrine_Query::create()
+                ->from('Location l')
+                ->select('l.location_id, l.name');
+
+            $results = $q->fetchArray();
+        }
+
+        foreach($results as $result)
+        {
+            if (!empty($result['Account']['name']))
+            {
+                $locations[$result['Account']['name']][$result['location_id']] = $result['name'];
+            }
+            else
+            {
+                $locations[$result['location_id']] = $result['name'];
+            }
+        }
+
+        return $locations;
+    }
 }
