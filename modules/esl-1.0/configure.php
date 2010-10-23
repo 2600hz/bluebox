@@ -7,7 +7,7 @@ class Esl_Configure extends Bluebox_Configure
     public static $author = '<ul><li>Michael Phillips</li><li>Karl Anderson</li></ul>';
     public static $vendor = 'Bluebox';
     public static $license = 'MPL';
-    public static $summary = 'FreeSWTICH Even Socket Layer Support';
+    public static $summary = 'FreeSWTICH Event Socket Layer Support';
     public static $description = 'FreeSWITCH ESL access. Provides real-time data to modules that interact directly with the switch, such as voicemail interactions';
     public static $default = TRUE;
     public static $type = Package_Manager::TYPE_MODULE;
