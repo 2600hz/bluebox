@@ -174,7 +174,8 @@
                                    'help' => 'All inbound registrations will be considered for this domain, ignoring the domain provided by the registration request.  Setting this to none uses the domain specified in the registration.'
                                    ), 'Force Registration Domain');
             echo locations::dropdown(array('name' => 'sipinterface[registry][force_register_domain]',
-                                    'nullOption' => 'None'));
+                                    'nullOption' => 'None',
+                                    'multitenancy' => FALSE));
         ?>
         </div>
 
