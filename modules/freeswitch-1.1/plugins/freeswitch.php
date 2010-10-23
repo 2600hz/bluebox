@@ -59,7 +59,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
         {
             foreach (self::$scanDirs as $testDir)
             {
-                $testPath = rtrim($testDir . '/') . '/sounds';
+                $testPath = rtrim($testDir) .'/sounds';
 
                 if (is_dir($testPath))
                 {
