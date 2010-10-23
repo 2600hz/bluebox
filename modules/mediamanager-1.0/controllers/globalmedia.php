@@ -1,5 +1,4 @@
-<?php
-defined('SYSPATH') or die('No direct access allowed.');
+<?php defined('SYSPATH') or die('No direct access allowed.');
 /*
 * Bluebox Modular Telephony Software Library / Application
 *
@@ -35,13 +34,16 @@ class GlobalMedia_Controller extends Bluebox_Controller
     public function __construct()
     {
         parent::__construct();
+
         $this->uploadPath = Kohana::config('upload.directory') . "/" . $this->session->get('user_id') . "/";
     }
 
     public function index()
     {
         $this->template->content = new View('globalmedia/index');
+
         javascript::add('php_file_tree_jquery.js');
+
         stylesheet::add('php_file_tree.css');
 
         // Collect a list of paths in the system, to be displayed as a list
@@ -289,7 +291,16 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
     private function upload($tmpfile, $shortname, $description = '', $replace = false) {
-        $audioInfo = MediaScanner::getAudioInfo($tmpfile);
+
+        try
+        {
+            $audioInfo = MediaScanner::getAudioInfo($tmpfile);
+        }
+        catch (Exception $e)
+        {
+            message::set('File error: ' .$e->getMessage());
+            return FALSE;
+        }
 
         $destfile = Media::getMediaFilename($shortname, $audioInfo['rates'][0], FALSE);  // Get whatever the proper name should be
         $dir = dirname($destfile);
