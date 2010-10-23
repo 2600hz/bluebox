@@ -101,21 +101,30 @@
 
         <div class="field">
         <?php
-            echo form::label('sipinterface[nat_net_list_id]', 'NAT List:');
+            echo form::label(array('for' => 'sipinterface[nat_net_list_id]',
+                                   'help' => 'When receiving a REGISTER or INVITE, enable NAT mode automatically if IP address in Contact header matches an entry defined in the access list. ACL is a misnomer in this case because access will not be denied if the user contact IP does not match.',
+                                   'hint' => 'Matches force NAT traversal mechanisms'
+                                    ), 'NAT List:');
             echo netlists::dropdown('sipinterface[nat_net_list_id]');
         ?>
         </div>
 
         <div class="field">
         <?php
-            echo form::label('sipinterface[inbound_net_list_id]', 'Inbound ACL:');
+            echo form::label(array('for' => 'sipinterface[inbound_net_list_id]',
+                                   'help' => 'A network list that defines who will be allowed to skip user authentication when making inbound calls to the server. Setting this to none will require all requests to pass authentication (username and password challenge) before being allowed to proceed.',
+                                   'hint' => 'Matches do not requre authentication'
+                                    ), 'Inbound ACL:');
             echo netlists::dropdown('sipinterface[inbound_net_list_id]');
         ?>
         </div>
 
         <div class="field">
         <?php
-            echo form::label('sipinterface[register_net_list_id]', 'Register ACL:');
+            echo form::label(array('for' => 'sipinterface[register_net_list_id]',
+                                   'help' => 'A network list of devices who will always be allowed to register to the server with any username / password combination.  Setting this to none will require all registration request to have a valid username and password.',
+                                   'hint' => 'Matches can register with no credentials'
+                                    ), 'Register ACL:');
             echo netlists::dropdown('sipinterface[register_net_list_id]');
         ?>
         </div>
