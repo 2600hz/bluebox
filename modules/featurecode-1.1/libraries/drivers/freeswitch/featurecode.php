@@ -100,15 +100,23 @@ XML;
             
             case 'park':
                 $xmlText = <<<XML
-<action application="set" data="fifo_music=\$\${hold_music}"/>
-<action application="fifo" data="\${destination_number}@\${domain_name} in"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="valet_park" data="account_${destination['account_id']} ask 1 10 10000 ivr/ivr-enter_ext_pound.wav"/>
+        <action application="hangup"/>
+
 XML;
                 break;
             
             case 'unpark':
                 $xmlText = <<<XML
-<action application="answer"/>
-<action application="fifo" data="\${destination_number}@\$\{domain_name} out nowait"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="valet_park" data="account_${destination['account_id']} ask 1 10 10000 ivr/ivr-enter_ext_pound.wav"/>
+        <action application="hangup"/>
+
 XML;
                 break;
             
