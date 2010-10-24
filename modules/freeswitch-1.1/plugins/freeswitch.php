@@ -219,7 +219,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
             {
                 message::set('Conflicting configuration files will be permanently erased if you continue!');
 
-                message::set('Click next again to proceed...', 'alert');
+                message::set('Click continue again to proceed...', 'alert');
 
                 // This session var lets the user continue the second time around (after the warning)
                 $this->session->set('installer.confirm_delete', true);
@@ -240,7 +240,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
             {
                 message::set('Conflicting configuration files will be permanently erased if you continue!');
 
-                message::set('Click next again to proceed...', 'alert');
+                message::set('Click continue again to proceed...', 'alert');
 
                 // This session var lets the user continue the second time around (after the warning)
                 $this->session->set('installer.confirm_delete', true);
