@@ -33,7 +33,7 @@ class XmlcdrManager
 		$cdr['billsec'] = (int)$xml_cdr->variables->billsec;
 		$cdr['hangup_cause'] = (string)$xml_cdr->variables->hangup_cause;
 		$cdr['uuid'] = (string)$xml_cdr->callflow[0]->caller_profile->uuid;
-		$cdr['bleg_uuid'] = (string)$xml_cdr->callflow[0]->caller_profile->bleg_uuid;
+		$cdr['bleg_uuid'] = (string)$xml_cdr->variables->bridge_uuid;
 		$cdr['accountcode'] = (string)$xml_cdr->variables->accountcode;
 		$cdr['domain_name'] = (string)$xml_cdr->variables->domain_name;
 		$cdr['user_context'] = (string)$xml_cdr->variables->user_context;
