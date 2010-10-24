@@ -34,7 +34,7 @@
 
         <span style="padding:5px">&nbsp;</span>
 
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Update'); ?>
+        <?php echo form::confirm_button('Update'); ?>
 
     </div>
 

@@ -44,14 +44,6 @@
 
     <?php echo form::close_section(); ?>
 
-    <div class="buttons form_bottom">
-
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Send'); ?>
-
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 
 </div>
