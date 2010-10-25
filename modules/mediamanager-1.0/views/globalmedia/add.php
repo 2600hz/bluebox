@@ -67,5 +67,5 @@
 
     <?php echo form::close_section(); ?>
 
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 </div>

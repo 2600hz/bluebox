@@ -157,9 +157,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         {
             $xml->deleteNode('/settings/param[@name="apply-nat-acl"]');
         }
-        
-        $xml->update('/settings/param[@name="context"]{@value="context_' . $sipinterface['context_id'] . '"}');
-		
+
+        if (!empty($sipinterface['context_id']))
+        {
+            $xml->update('/settings/param[@name="context"]{@value="context_' . $sipinterface['context_id'] . '"}');
+        }
+        else
+        {
+            $xml->update('/settings/param[@name="context"]{@value=default_public"}');
+        }
+
         $xml->update('/settings/param[@name="rtp-timer-name"]{@value="soft"}');
 
         $xml->update('/settings/param[@name="codec-prefs"]{@value="$${global_codec_prefs}"}');
@@ -174,9 +181,20 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/settings/param[@name="manage-presence"]{@value="true"}');
 
-        //$xml->update('/settings/param[@name="force-register-domain"]{@value="$${domain}"}');
+        if (!empty($sipinterface['registry']['force_register_domain']))
+        {
+            $forceLocation = '$${location_' .$sipinterface['registry']['force_register_domain'] .'}';
 
-        //$xml->update('/settings/param[@name="force-register-db-domain"]{@value="$${domain}"}');
+            $xml->update('/settings/param[@name="force-register-domain"]{@value="' .$forceLocation .'}"}');
+
+            $xml->update('/settings/param[@name="force-register-db-domain"]{@value="' .$forceLocation .'"}');
+        }
+        else
+        {
+            $xml->deleteNode('/settings/param[@name="force-register-domain"]');
+
+            $xml->deleteNode('/settings/param[@name="force-register-db-domain"]');
+        }
 
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
 

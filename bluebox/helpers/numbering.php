@@ -616,24 +616,39 @@ class numbering extends form
 
         // add in all the defaults if they are not provided
         $data += array(
-            'nullOption' => FALSE
+            'nullOption' => FALSE,
+            'all' => FALSE
         );
+        
+        if ( $data['all'] )
+        {
+            Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+        }
 
-        // TODO: optimize this query, use DQL?
-        $options = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
+        $options = Doctrine::getTable('Context')->findAll();
+
+        if ( $data['all'] )
+        {
+            Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);    
+        }
 
         if (!empty($data['nullOption']))
         {
-            $nullOption = array('context_id' => 0, 'name' => __($data['nullOption']));
-
-            array_unshift($options, $nullOption);
-
+            $contextOptions = array(0 => __($data['nullOption']));
+            
             unset($data['nullOption']);
         }
 
         foreach ($options as $option)
         {
-            $contextOptions[$option['context_id']] = $option['name'];
+            if ($data['all'])
+            {
+                $contextOptions[$option['Account']['name']][$option['context_id']] = $option['name'];
+            }
+            else
+            {
+                $contextOptions[$option['context_id']] = $option['name'];
+            }
         }
 
         return form::dropdown($data, $contextOptions, $selected);

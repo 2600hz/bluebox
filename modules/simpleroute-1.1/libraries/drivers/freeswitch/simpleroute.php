@@ -4,7 +4,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($base)
     {
-        if (empty($base['plugins']['simpleroute']))
+        if (empty($base['plugins']['simpleroute']['patterns']))
         {
             return;
         }

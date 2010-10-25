@@ -32,7 +32,7 @@ class Location extends Bluebox_Record
         // RELATIONSHIPS
         $this->hasOne('Account', array('local' => 'account_id', 'foreign' => 'account_id'));
         $this->hasMany('Number', array('local' => 'location_id', 'foreign' => 'location_id', 'cascade' => array('delete')));
-        $this->hasMany('User', array('local' => 'location_id', 'foreign' => 'location_id', 'cascade' => array('delete')));
+        $this->hasMany('User', array('local' => 'location_id', 'foreign' => 'location_id'));
 
         // BEHAVIORS
         $this->actAs('GenericStructure');
@@ -40,5 +40,54 @@ class Location extends Bluebox_Record
         $this->actAs('TelephonyEnabled');
         $this->actAs('MultiTenant');
     }
-}
 
+    public function preDelete(Doctrine_Event $event)
+    {
+        $unlimit = Session::instance()->get('bluebox.delete.unlimit', FALSE);
+
+        if (!$unlimit AND count($this->getTable()->findAll()) <= 1)
+	{
+	    throw new Exception ('You can not delete the only location for this account');
+	}
+    }
+
+    public static function dictionary($multitenancy = TRUE)
+    {
+        $locations = array();
+
+        if (!$multitenancy)
+        {
+            Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+            $q = Doctrine_Query::create()
+                ->from('Location l, l.Account a')
+                ->select('l.location_id, l.name, a.name');
+
+            $results = $q->fetchArray();
+
+            Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+        }
+        else
+        {
+            $q = Doctrine_Query::create()
+                ->from('Location l')
+                ->select('l.location_id, l.name');
+
+            $results = $q->fetchArray();
+        }
+
+        foreach($results as $result)
+        {
+            if (!empty($result['Account']['name']))
+            {
+                $locations[$result['Account']['name']][$result['location_id']] = $result['name'];
+            }
+            else
+            {
+                $locations[$result['location_id']] = $result['name'];
+            }
+        }
+
+        return $locations;
+    }
+}

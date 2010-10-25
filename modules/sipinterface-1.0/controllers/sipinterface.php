@@ -31,7 +31,21 @@
 class SipInterface_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'SipInterface';
-    
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        {
+            message::set('You are not authorized to manage sip interfaces!');
+
+            $this->returnQtipAjaxForm(NULL);
+
+            url::redirect('/');
+        }
+    }
+
     public function index()
     {
         $this->template->content = new View('generic/grid');

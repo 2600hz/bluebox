@@ -49,7 +49,9 @@ class EslManager
      */
     public function __destruct()
     {
-        return $this->esl->disconnect();
+        if ($this->isConnected()) {
+               return $this->esl->disconnect();
+       }
     }
 
     /**

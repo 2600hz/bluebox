@@ -1,5 +1,5 @@
 <div id="sipinterface_update_header" class="update sipinterface module_header">
-    <h2><?php echo __($title); ?></h2>
+    <h2><?php echo $title; ?></h2>
 </div>
 
 <div id="sipinterface_update_form" class="update sipinterface">
@@ -101,21 +101,30 @@
 
         <div class="field">
         <?php
-            echo form::label('sipinterface[nat_net_list_id]', 'NAT List:');
+            echo form::label(array('for' => 'sipinterface[nat_net_list_id]',
+                                   'help' => 'When receiving a REGISTER or INVITE, enable NAT mode automatically if IP address in Contact header matches an entry defined in the access list. ACL is a misnomer in this case because access will not be denied if the user contact IP does not match.',
+                                   'hint' => 'Matches force NAT traversal mechanisms'
+                                    ), 'NAT List:');
             echo netlists::dropdown('sipinterface[nat_net_list_id]');
         ?>
         </div>
 
         <div class="field">
         <?php
-            echo form::label('sipinterface[inbound_net_list_id]', 'Inbound ACL:');
+            echo form::label(array('for' => 'sipinterface[inbound_net_list_id]',
+                                   'help' => 'A network list that defines who will be allowed to skip user authentication when making inbound calls to the server. Setting this to none will require all requests to pass authentication (username and password challenge) before being allowed to proceed.',
+                                   'hint' => 'Matches do not requre authentication'
+                                    ), 'Inbound ACL:');
             echo netlists::dropdown('sipinterface[inbound_net_list_id]');
         ?>
         </div>
 
         <div class="field">
         <?php
-            echo form::label('sipinterface[register_net_list_id]', 'Register ACL:');
+            echo form::label(array('for' => 'sipinterface[register_net_list_id]',
+                                   'help' => 'A network list of devices who will always be allowed to register to the server with any username / password combination.  Setting this to none will require all registration request to have a valid username and password.',
+                                   'hint' => 'Matches can register with no credentials'
+                                    ), 'Register ACL:');
             echo netlists::dropdown('sipinterface[register_net_list_id]');
         ?>
         </div>
@@ -127,7 +136,12 @@
         <div class="field">
         <?php
             echo form::label('sipinterface[context_id]', 'Default Incoming Context:');
-            echo numbering::selectContext('sipinterface[context_id]', $sipinterface['context_id']);
+            echo numbering::selectContext(array(
+                    'name' => 'sipinterface[context_id]',
+                    'all' => TRUE
+                ),
+                $sipinterface['context_id']
+            );
         ?>
         </div>
 
@@ -153,14 +167,21 @@
         ?>
         </div>
 
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][force_register_domain]',
+                                   'hint' => 'Equivalent to forcing rport',
+                                   'help' => 'All inbound registrations will be considered for this domain, ignoring the domain provided by the registration request.  Setting this to none uses the domain specified in the registration.'
+                                   ), 'Force Registration Domain');
+            echo locations::dropdown(array('name' => 'sipinterface[registry][force_register_domain]',
+                                    'nullOption' => 'None',
+                                    'multitenancy' => FALSE));
+        ?>
+        </div>
+
     <?php echo form::close_section(); ?>
 
     <?php if (isset($views)) echo subview::renderAsSections($views); ?>
 
-    <div class="buttons form_bottom">
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 </div>
