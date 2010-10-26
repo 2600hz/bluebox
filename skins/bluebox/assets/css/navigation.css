@@ -66,6 +66,7 @@
     color:#666666;
     font-size:11px;
     line-height:1.6em;
+    visibility: hidden;
 }
 #navigation .navGroup .wrapper {
     height:87px;
