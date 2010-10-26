@@ -619,7 +619,14 @@ class numbering extends form
             'nullOption' => FALSE,
             'all' => FALSE
         );
-        
+
+        $contextOptions = array();
+
+        if (!empty($data['nullOption']))
+        {
+            $contextOptions = array(0 => __($data['nullOption']));
+        }
+
         if ( $data['all'] )
         {
             Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
@@ -632,24 +639,33 @@ class numbering extends form
             Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);    
         }
 
-        if (!empty($data['nullOption']))
-        {
-            $contextOptions = array(0 => __($data['nullOption']));
-            
-            unset($data['nullOption']);
-        }
+        $publicContexts = $otherContexts = array();
 
         foreach ($options as $option)
         {
-            if ($data['all'])
+            if (stristr($option['name'], 'public'))
             {
-                $contextOptions[$option['Account']['name']][$option['context_id']] = $option['name'];
+                $loadPt = &$publicContexts;
             }
             else
             {
-                $contextOptions[$option['context_id']] = $option['name'];
+                $loadPt = &$otherContexts;
+            }
+
+            if ($data['all'])
+            {
+
+                $loadPt[$option['Account']['name']][$option['context_id']] = $option['name'];
+            }
+            else
+            {
+                $loadPt[$option['context_id']] = $option['name'];
             }
         }
+
+        $contextOptions = arr::merge($contextOptions, $publicContexts, $otherContexts);
+
+        unset($data['nullOption'], $data['all']);
 
         return form::dropdown($data, $contextOptions, $selected);
     }
