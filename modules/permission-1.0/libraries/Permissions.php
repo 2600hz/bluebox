@@ -2,10 +2,9 @@
 class Permissions
 {
     public function allow($controller, $method, $options = array()) {
-        $userID = users::getCurrentUser();
 
-        if (!empty($userID->user_id)) {
-            $userID = $userID->user_id;
+        if (!empty(users::$user['user_id'])) {
+            $userID = users::$user['user_id'];
         } else {
             $userID = NULL;
         }
