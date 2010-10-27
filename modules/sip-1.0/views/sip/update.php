@@ -1,4 +1,4 @@
-<?php echo form::open_section('SIP Device Settings'); ?>
+<?php echo form::open_section('SIP Settings'); ?>
 
     <div class="field">
     <?php
