@@ -48,6 +48,8 @@ class TelephonyListener extends Doctrine_EventListener
 
     public function postTransactionCommit(Doctrine_Event $event)
     {
+	Event::run('telephony.postTransactionCommit', Bluebox_Record::getBaseTransactionObject());
+
         // A transaction just ended - we write out any configuration information set by the telephony driver now.
         // THIS IS WHERE WE UPDATE VIA THE SWITCH-SPECIFIC DRIVER!
         if (Kohana::config('telephony.driver') && Kohana::config('telephony.diskoutput'))
