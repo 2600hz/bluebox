@@ -122,8 +122,19 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/settings/param[@name="auth-calls"]{@value="' . ($sipinterface['auth'] ? 'true' : 'false') .'"}');
 
-        // This may be overly optimistic but it should work in pretty much all cases
-        $xml->update('/settings/param[@name="aggressive-nat-detection"][@value="true"]');
+        // NAT detection settings for registrations
+        if (isset($sipinterface['registry']['detect_nat_on_registration']) and ($sipinterface['registry']['detect_nat_on_registration'])) {
+            $xml->update('/settings/param[@name="aggressive-nat-detection"]{@value="true"}');
+        } else {
+            $xml->deleteNode('/settings/param[@name="aggressive-nat-detection"]');
+        }
+
+        // NDLB / forced rport for crappy devices/setups
+        if (isset($sipinterface['registry']['force_rport']) and ($sipinterface['registry']['force_rport'])) {
+            $xml->update('/settings/param[@name="NDLB-force-rport"]{@value="true"}');
+        } else {
+            $xml->deleteNode('/settings/param[@name="NDLB-force-rport"]');
+        }
 
         // Turn off session timers, they are irritating and cause all sorts of issues
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
@@ -146,9 +157,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         {
             $xml->deleteNode('/settings/param[@name="apply-nat-acl"]');
         }
-        
-        $xml->update('/settings/param[@name="context"]{@value="context_' . $sipinterface['context_id'] . '"}');
-		
+
+        if (!empty($sipinterface['context_id']))
+        {
+            $xml->update('/settings/param[@name="context"]{@value="context_' . $sipinterface['context_id'] . '"}');
+        }
+        else
+        {
+            $xml->update('/settings/param[@name="context"]{@value=default_public"}');
+        }
+
         $xml->update('/settings/param[@name="rtp-timer-name"]{@value="soft"}');
 
         $xml->update('/settings/param[@name="codec-prefs"]{@value="$${global_codec_prefs}"}');
@@ -159,11 +177,24 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/settings/param[@name="nonce-ttl"]{@value="86400"}');
 
+        $xml->update('/settings/param[@name="rfc2833-pt"]{@value="101"}');
+
         $xml->update('/settings/param[@name="manage-presence"]{@value="true"}');
 
-        //$xml->update('/settings/param[@name="force-register-domain"]{@value="$${domain}"}');
+        if (!empty($sipinterface['registry']['force_register_domain']))
+        {
+            $forceLocation = '$${location_' .$sipinterface['registry']['force_register_domain'] .'}';
 
-        //$xml->update('/settings/param[@name="force-register-db-domain"]{@value="$${domain}"}');
+            $xml->update('/settings/param[@name="force-register-domain"]{@value="' .$forceLocation .'}"}');
+
+            $xml->update('/settings/param[@name="force-register-db-domain"]{@value="' .$forceLocation .'"}');
+        }
+        else
+        {
+            $xml->deleteNode('/settings/param[@name="force-register-domain"]');
+
+            $xml->deleteNode('/settings/param[@name="force-register-db-domain"]');
+        }
 
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
 

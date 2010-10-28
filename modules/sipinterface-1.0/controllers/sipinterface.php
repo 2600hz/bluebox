@@ -31,7 +31,21 @@
 class SipInterface_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'SipInterface';
-    
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        {
+            message::set('You are not authorized to manage sip interfaces!');
+
+            $this->returnQtipAjaxForm(NULL);
+
+            url::redirect('/');
+        }
+    }
+
     public function index()
     {
         $this->template->content = new View('generic/grid');
@@ -48,12 +62,16 @@ class SipInterface_Controller extends Bluebox_Controller
                 'key' => true
             )
         );
+        $grid->add('name', 'Interface Name');
         $grid->add('ip_address', 'IP Address', array(
                 'callback' => array($this, '_showIp')
             )
         );
         $grid->add('port', 'Port');
-        //$grid->add('Context/name', 'Default Context');
+        $grid->add('auth', 'Authentication', array(
+                'callback' => array($this, '_showAuth')
+            )
+        );
 
         // Add the actions to the grid
         $grid->addAction('sipinterface/edit', 'Edit', array(
@@ -99,6 +117,15 @@ class SipInterface_Controller extends Bluebox_Controller
             return 'Auto Detect';
         } else {
             return $ip;
+        }
+    }
+
+    public function _showAuth($auth)
+    {
+        if ($auth) {
+            return 'Required';
+        } else {
+            return 'None';
         }
     }
 

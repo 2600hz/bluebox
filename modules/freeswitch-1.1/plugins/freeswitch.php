@@ -9,7 +9,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
 {
     // A list of possible directories that may have the freeswitch.xml
     // file (denoting the FS directory.
-    public static $scanForFS = array(
+    public static $scanDirs = array(
         '/usr/local/freeswitch',
         '/usr/local/freeswitch-trunk',
         '/opt/freeswitch',
@@ -31,19 +31,19 @@ class Freeswitch_Plugin extends Bluebox_Plugin
 
         $cfg_root = $this->session->get('installer.cfg_root', FALSE);
 
-        $fsDefaulCfg = Kohana::config('freeswitch.cfg_root');
+        $audio_root = $this->session->get('installer.audio_root', FALSE);
+
+        $fsDefaultCfg = Kohana::config('freeswitch.cfg_root');
 
         if (!$cfg_root)
         {
-            array_push(self::$scanForFS, $fsDefaulCfg);
-
-            foreach (self::$scanForFS as $testDir) 
+            foreach (self::$scanDirs as $testDir)
             {
-                $testPath = rtrim($testDir .'/') . '/conf/freeswitch.xml';
+                $testPath = rtrim($testDir) . '/conf/freeswitch.xml';
 
                 if (file_exists($testPath))
                 {
-                    $cfg_root = rtrim($testDir) .'/conf';
+                    $cfg_root = rtrim($testDir) . '/conf';
 
                     break;
                 }
@@ -51,19 +51,39 @@ class Freeswitch_Plugin extends Bluebox_Plugin
 
             if (empty($cfg_root))
             {
-                $cfg_root = $fsDefaulCfg;
+                $cfg_root = $fsDefaultCfg;
+            }
+        }
+
+        if (!$audio_root)
+        {
+            foreach (self::$scanDirs as $testDir)
+            {
+                $testPath = rtrim($testDir) .'/sounds';
+
+                if (is_dir($testPath))
+                {
+                    $audio_root = $testPath;
+
+                    break;
+                }
+            }
+
+            if (empty($audio_root))
+            {
+#                $audio_root = $fsDefaultAudioRoot;
             }
         }
 
         $subview->cfg_root = $cfg_root;
+
+        $subview->audio_root = $audio_root;
 
         $subview->esl_host = $this->session->get('installer.esl_host', Kohana::config('freeswitch.ESLHost'));
 
         $subview->esl_port = $this->session->get('installer.esl_port', Kohana::config('freeswitch.ESLPort'));
 
         $subview->esl_auth = $this->session->get('installer.esl_auth', Kohana::config('freeswitch.ESLAuth'));
-
-        $subview->audio_root = $this->session->get('installer.audio_root', Kohana::config('freeswitch.audio_root'));
 
         // Get a list of existing sip_profiles and warn the user that these will be deleted
         $sipProfiles = glob(rtrim($subview->cfg_root, '/') . '/sip_profiles/*.xml', GLOB_MARK);
@@ -75,9 +95,9 @@ class Freeswitch_Plugin extends Bluebox_Plugin
 
         foreach ($filemaps as $filemap)
         {
-            if ($fsDefaulCfg != $subview->cfg_root)
+            if ($fsDefaultCfg != $subview->cfg_root)
             {
-                $filemap['filename'] = str_replace($fsDefaulCfg, $subview->cfg_root, $filemap['filename']);
+                $filemap['filename'] = str_replace($fsDefaultCfg, $subview->cfg_root, $filemap['filename']);
             }
 
             if (file_exists($filemap['filename']))
@@ -199,7 +219,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
             {
                 message::set('Conflicting configuration files will be permanently erased if you continue!');
 
-                message::set('Click next again to proceed...', 'alert');
+                message::set('Click continue again to proceed...', 'alert');
 
                 // This session var lets the user continue the second time around (after the warning)
                 $this->session->set('installer.confirm_delete', true);
@@ -220,7 +240,7 @@ class Freeswitch_Plugin extends Bluebox_Plugin
             {
                 message::set('Conflicting configuration files will be permanently erased if you continue!');
 
-                message::set('Click next again to proceed...', 'alert');
+                message::set('Click continue again to proceed...', 'alert');
 
                 // This session var lets the user continue the second time around (after the warning)
                 $this->session->set('installer.confirm_delete', true);

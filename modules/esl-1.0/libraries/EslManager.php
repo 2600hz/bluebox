@@ -12,7 +12,9 @@ class EslManager
     private $esl = NULL;
 
     private $extension = FALSE;
-    
+
+    static private $instance;
+
     /**
      * Initialize the ESL connection.  This must be called first
      * @access public
@@ -42,14 +44,46 @@ class EslManager
         }
         return TRUE;
     }
-    
+
+    public static function getInstance()
+    {
+        if (!self::$instance)
+        {
+            return self::$instance = new EslManager();
+        }
+
+        return self::$instance;
+    }
+
+    public static function eventReloadXML()
+    {
+        self::getInstance()->reloadxml();
+    }
+
+    public static function eventReloadACL()
+    {
+        self::getInstance()->reloadacl();
+    }
+
+    public static function eventReloadXMLCDR()
+    {
+        self::getInstance()->sendRecv('api reload mod_xml_cdr');
+    }
+
+    public static function eventReloadSofia()
+    {
+        self::getInstance()->reload('mod_sofia');
+    }
+
     /*
      * Clean up connection when script is done executing.
      * If connected, try to disconnect.
      */
     public function __destruct()
     {
-        return $this->esl->disconnect();
+        if ($this->isConnected()) {
+               return $this->esl->disconnect();
+       }
     }
 
     /**

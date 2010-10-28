@@ -5,7 +5,7 @@
  * @license    Mozilla Public License (MPL)
  */
 abstract class Bluebox_Configure  extends Package_Configure
-{
+{   
     /**
      * Do the actual installation.
      *
@@ -36,25 +36,30 @@ abstract class Bluebox_Configure  extends Package_Configure
         // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)
         // Note that we do this because Postgers & Doctrine don't like our polymorphic class extensions and try to create the same
         // tables twice.
-        $models = array();
-
         if (!empty($package['models']))
         {
-            foreach($package['models'] as $className)
-            {
-                if ((get_parent_class($className) == 'Bluebox_Record') or (get_parent_class($className) == 'Doctrine_Record'))
-                {
-                    $models[] = $className;
-                }
-            }
+            $loadedModels = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
         }
 
-        // If this package has any models of it's own (not extensions) then create the tables!
-        if (!empty($models))
+        if (!empty($loadedModels))
         {
-            kohana::log('debug', 'Adding table(s) ' .implode(', ', $models));
+            $models = array();
 
-            Doctrine::createTablesFromArray($models);
+            foreach($loadedModels as $modelName)
+            {
+                if ((get_parent_class($modelName) == 'Bluebox_Record') or (get_parent_class($modelName) == 'Doctrine_Record'))
+                {
+                    $models[] = $modelName;
+                }
+            }
+            
+            // If this package has any models of it's own (not extensions) then create the tables!
+            if (!empty($models))
+            {
+                kohana::log('debug', 'Adding table(s) ' .implode(', ', $models));
+
+                Doctrine::createTablesFromArray($models);
+            }
         }
     }
 
@@ -76,7 +81,12 @@ abstract class Bluebox_Configure  extends Package_Configure
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-        if (empty($package['models']))
+        if (!empty($package['models']))
+        {
+            $loadedModels = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
+
+        if (empty($loadedModels))
         {
             return;
         }
@@ -87,14 +97,14 @@ abstract class Bluebox_Configure  extends Package_Configure
         {
             kohana::log('debug', 'Attempting to upgrade package ' .$installed['packageName'] .' version ' .$installed['version'] .' to ' .$package['version']);
 
-            foreach($package['models'] as $className)
+            foreach($loadedModels as $modelName)
             {
-                if ((get_parent_class($className) != 'Bluebox_Record') AND (get_parent_class($className) != 'Doctrine_Record'))
+                if ((get_parent_class($modelName) != 'Bluebox_Record') AND (get_parent_class($modelName) != 'Doctrine_Record'))
                 {
                     continue;
                 }
 
-                $migrationDirectory = $package['directory'] .'/migrations/' .$className;
+                $migrationDirectory = $package['directory'] .'/migrations/' .$modelName;
 
                 kohana::log('debug', 'Looking for migrations in `' .$migrationDirectory .'`');
 
@@ -102,13 +112,13 @@ abstract class Bluebox_Configure  extends Package_Configure
                 {
                     try
                     {
-                        $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($className));
+                        $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($modelName));
 
-                        kohana::log('debug', 'Running migration on ' .$className .' from model version ' .$migration->getCurrentVersion() .' to ' .$migration->getLatestVersion());
+                        kohana::log('debug', 'Running migration on ' .$modelName .' from model version ' .$migration->getCurrentVersion() .' to ' .$migration->getLatestVersion());
 
                         $migration->migrate();
 
-                        $msg = inflector::humanizeModelName($className);
+                        $msg = inflector::humanizeModelName($modelName);
 
                         $msg .= ' database table upgraded to model version # ' .$migration->getCurrentVersion();
 
@@ -118,11 +128,14 @@ abstract class Bluebox_Configure  extends Package_Configure
                     {
                         kohana::log('alert', 'Alerts during migration, this can USUALLY be ignored: ' .$e->getMessage());
 
+                        // TODO: This isnt a great idea, but migrations are so noisy with needless failures... PITA
+                        $migration->setCurrentVersion($migration->getLatestVersion());
+
                         foreach ($migration->getErrors() as $error)
                         {
                             if (strstr($error->getMessage(), 'Already at version'))
                             {
-                                $msg = inflector::humanizeModelName($className);
+                                $msg = inflector::humanizeModelName($modelName);
 
                                 $msg .= ' database table ' .inflector::lcfirst($error->getMessage());
 
@@ -135,20 +148,26 @@ abstract class Bluebox_Configure  extends Package_Configure
                         }
                     }
                 }
+                else
+                {
+                   $migration = new Bluebox_Migration(NULL, NULL, strtolower($modelName));
+
+                   $migration->setCurrentVersion(0);
+                }
             }
         }
         else
         {
             kohana::log('debug', 'Attempting to downgrade package ' .$installed['packageName'] .' version ' .$installed['version'] .' to ' .$package['version']);
 
-            foreach($package['models'] as $className)
+            foreach($loadedModels as $modelName)
             {
-                if ((get_parent_class($className) != 'Bluebox_Record') AND (get_parent_class($className) != 'Doctrine_Record'))
+                if ((get_parent_class($modelName) != 'Bluebox_Record') AND (get_parent_class($modelName) != 'Doctrine_Record'))
                 {
                     continue;
                 }
 
-                $migrationDirectory = $installed['directory'] .'/migrations/' .$className;
+                $migrationDirectory = $installed['directory'] .'/migrations/' .$modelName;
 
                 kohana::log('debug', 'Looking for migrations in `' .$migrationDirectory .'`');
 
@@ -158,22 +177,22 @@ abstract class Bluebox_Configure  extends Package_Configure
                     {
                         $modelVersion = 0;
 
-                        if (is_dir($package['directory'] .'/migrations/' .$className))
+                        if (is_dir($package['directory'] .'/migrations/' .$modelName))
                         {
-                            $previousMigration = new Doctrine_Migration($package['directory'] .'/migrations/' .$className);
+                            $previousMigration = new Doctrine_Migration($package['directory'] .'/migrations/' .$modelName);
 
                             $modelVersion = $previousMigration->getLatestVersion();
                         }
 
-                        kohana::log('debug', 'Determined that ' .$package['packageName'] .' version ' .$package['version'] .' works against ' .$className .' version ' .$modelVersion);
+                        kohana::log('debug', 'Determined that ' .$package['packageName'] .' version ' .$package['version'] .' works against ' .$modelName .' version ' .$modelVersion);
 
-                        $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($className));
+                        $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($modelName));
 
-                        kohana::log('debug', 'Running migration on ' .$className .' from model version ' .$migration->getCurrentVersion() .' to ' .$modelVersion);
+                        kohana::log('debug', 'Running migration on ' .$modelName .' from model version ' .$migration->getCurrentVersion() .' to ' .$modelVersion);
 
                         $migration->migrate($modelVersion);
 
-                        $msg = inflector::humanizeModelName($className);
+                        $msg = inflector::humanizeModelName($modelName);
 
                         $msg .= ' database table downgraded to model version # ' .$migration->getCurrentVersion();
 
@@ -183,11 +202,14 @@ abstract class Bluebox_Configure  extends Package_Configure
                     {
                         kohana::log('alert', 'Alerts during migration, this can USUALLY be ignored: ' .$e->getMessage());
 
+                        // TODO: This isnt a great idea, but migrations are so noisy with needless failures... PITA
+                        $migration->setCurrentVersion($migration->getLatestVersion());
+
                         foreach ($migration->getErrors() as $error)
                         {
                             if (strstr($error->getMessage(), 'Already at version'))
                             {
-                                $msg = inflector::humanizeModelName($className);
+                                $msg = inflector::humanizeModelName($modelName);
 
                                 $msg .= ' database table ' .inflector::lcfirst($error->getMessage());
 
@@ -199,6 +221,12 @@ abstract class Bluebox_Configure  extends Package_Configure
                             }
                         }
                     }
+                }
+                else
+                {
+                   $migration = new Bluebox_Migration(NULL, NULL, strtolower($modelName));
+
+                   $migration->setCurrentVersion(0);
                 }
             }
         }
@@ -222,6 +250,16 @@ abstract class Bluebox_Configure  extends Package_Configure
 
         $tables = array();
 
+        if (!empty($package['models']))
+        {
+            $loadedModels = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
+
+        if (empty($loadedModels))
+        {
+            return;
+        }        
+        
         // Get the doctrine overlord
         try
         {
@@ -236,20 +274,18 @@ abstract class Bluebox_Configure  extends Package_Configure
 
         // For each of this modules models loop through all of their rows and delete them
         // This will ensure any relationships are broken safely, but is a brute force approach...
-        $models = $package['models'];
-
-        foreach($models as $model)
+        foreach($loadedModels as $modelName)
         {
             try
             {
-                $reflection = new ReflectionClass($model);
+                $reflection = new ReflectionClass($modelName);
 
                 if ($reflection->isSubclassOf('Doctrine_Template'))
                 {
                     throw new Exception('Model is a doctrine template');
                 }
 
-                $table = Doctrine::getTable($model);
+                $table = Doctrine::getTable($modelName);
 
                 $tableName = $table->getOption('tableName');
 
@@ -262,16 +298,16 @@ abstract class Bluebox_Configure  extends Package_Configure
             }
             catch(Exception $e)
             {
-                Kohana::log('debug', 'Skipping uninstall on model ' . $model . ': ' .$e->getMessage());
+                Kohana::log('debug', 'Skipping uninstall on model ' . $modelName . ': ' .$e->getMessage());
 
                 continue;
             }
 
-            if (!in_array($declaringClass->name, $models))
+            if (!in_array($declaringClass->name, $loadedModels))
             {
-                Kohana::log('debug', 'Removing ' . $package['packageName'] . ' from table ' . $model);
+                Kohana::log('debug', 'Removing ' . $package['packageName'] . ' from table ' . $modelName);
 
-                $rows = Doctrine_Query::create()->from($model . ' t')->execute();
+                $rows = Doctrine_Query::create()->from($modelName . ' t')->execute();
 
                 foreach($rows as $row)
                 {
@@ -308,7 +344,7 @@ abstract class Bluebox_Configure  extends Package_Configure
 
                 $relatedClass = $related->getOption('declaringClass');
 
-                if (empty($relatedClass) || in_array($relatedClass, $models))
+                if (empty($relatedClass) || in_array($relatedClass, $loadedModels))
                 {
                     $tables[] = $relatedTable;
                 }
@@ -363,19 +399,24 @@ abstract class Bluebox_Configure  extends Package_Configure
     {
         $package = Package_Catalog::getPackageByIdentifier($identifier);
 
-        if (empty($package['models']))
+        if (!empty($package['models']))
+        {
+            $loadedModels = Doctrine::loadModels($package['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+        }
+
+        if (empty($loadedModels))
         {
             return;
         }
 
-        foreach($package['models'] as $className)
+        foreach($loadedModels as $modelName)
         {
-            if ((get_parent_class($className) != 'Bluebox_Record') AND (get_parent_class($className) != 'Doctrine_Record'))
+            if ((get_parent_class($modelName) != 'Bluebox_Record') AND (get_parent_class($modelName) != 'Doctrine_Record'))
             {
                 continue;
             }
 
-            $migrationDirectory = $package['directory'] .'/migrations/' .$className;
+            $migrationDirectory = $package['directory'] .'/migrations/' .$modelName;
 
             kohana::log('debug', 'Looking for migrations in `' .$migrationDirectory .'`');
 
@@ -383,9 +424,9 @@ abstract class Bluebox_Configure  extends Package_Configure
             {
                 try
                 {
-                    kohana::log('debug', 'Setting ' .$className .' to version 0 and walking migrations forward to ensure table schema');
+                    kohana::log('debug', 'Setting ' .$modelName .' to version 0 and walking migrations forward to ensure table schema');
 
-                    $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($className));
+                    $migration = new Bluebox_Migration($migrationDirectory, NULL, strtolower($modelName));
 
                     $migration->setCurrentVersion(0);
 

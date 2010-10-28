@@ -331,56 +331,24 @@ abstract class Bluebox_Controller extends Template_Controller
 
         // load the defaults into the options array
         $options += array (
-            'submitString' => 'save',
-            'cancelString' => 'cancel',
+            'confirmKey' => self::SUBMIT_CONFIRM,
+            'denyKey' => self::SUBMIT_DENY,
             'requestVar' => 'submit'
         );
 
-        //$options['cancelString'] = __($options['cancelString']);
-
-        $options['submitString'] = __($options['submitString']);
-
-        // if the requestVar is empty then we will only check for the
-        // existance of any post vars
-        if (!empty($options['requestVar']))
+        if (!empty($_REQUEST[$options['requestVar']][$options['denyKey']]))
         {
-            // if the requestVar is not in the post then this is not
-            // submitted
-            if (empty($_REQUEST[$options['requestVar']]))
-            {
-                return FALSE;
-            } 
-            else
-            {
-                $requestVar = $_REQUEST[$options['requestVar']];
-            }
-
-            // if the requestVar matches the cancel string then we where
-            // canceled
-            if (strcasecmp($requestVar, $options['cancelString']) == 0)
-            {
-                return self::SUBMIT_DENY;
-            }
-
-            // if the requestVar matches the cancel string then we where
-            // submitted
-            if (strcasecmp($requestVar, $options['submitString']) == 0)
-            {
-                return self::SUBMIT_CONFIRM;
-            }
-
-            // no match for the cancel or submit but the requestVar was
-            // present, leave it up to the controller
-            return FALSE;
+            return self::SUBMIT_DENY;
         }
-
-        // if we got here it is because we only want to know if there are any
-        // post vars at all
-        if (sizeof($this->input->post()) != 0)
+        else if (!empty($_REQUEST[$options['requestVar']][$options['confirmKey']]))
+        {
+            return self::SUBMIT_CONFIRM;
+        }
+        else if (sizeof($this->input->post()) != 0)
         {
             return TRUE;
         }
-        
+
         return FALSE;
     }
     

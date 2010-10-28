@@ -6,6 +6,12 @@
  */
 class form extends form_Core
 {
+    const BUTTONS_OKONLY = 'ok_only';
+    const BUTTONS_SAVE_CANCEL = 'save_cancel';
+    const BUTTONS_DELETE_CANCEL = 'delete_cancel';
+    const BUTTONS_OK_CANCEL = 'ok_cancel';
+    const BUTTONS_YES_NO = 'yes_no';
+
     /**
      * This var allows users to add classes to any or all form elements.  Array
      * keys can the name of a form method or the word 'all'.  The value can
@@ -360,18 +366,96 @@ class form extends form_Core
         return $result;
     }
 
+    public static function confirm_button($value = 'Save', $extra = '')
+    {
+        $data = array('name' => 'submit[' .Bluebox_Controller::SUBMIT_CONFIRM .']', 'class' => 'save small_green_button');
+
+        return self::button($data, $value, $extra);
+    }
+
+    public static function cancel_button($value = 'Cancel', $extra = '')
+    {
+        $data = array('name' => 'submit[' .Bluebox_Controller::SUBMIT_DENY .']', 'class' => 'cancel small_red_button');
+        
+        return self::button($data, $value, $extra);
+    }
+
     /**
      * Closes an open form tag.
      *
      * @param   string  string to be attached after the closing tag
      * @return  string
      */
-    public static function close($extra = '')
+    public static function close($buttons = NULL, $extra = '')
     {
+        $result = '';
+
+        if($buttons === TRUE)
+        {
+            $buttons = self::BUTTONS_SAVE_CANCEL;
+        }
+
+        switch ($buttons)
+        {
+            case self::BUTTONS_SAVE_CANCEL:
+                $result .= '<div class="buttons form_bottom">';
+
+                $result .= form::confirm_button();
+
+                $result .= form::cancel_button();
+
+                $result .= '</div>';
+
+                break;
+
+            case self::BUTTONS_DELETE_CANCEL:
+                $result .= '<div class="buttons form_bottom">';
+
+                $result .= form::confirm_button('Delete');
+
+                $result .= form::cancel_button();
+
+                $result .= '</div>';
+
+                break;
+
+            case self::BUTTONS_OKONLY:
+                $result .= '<div class="buttons form_bottom">';
+
+                $result .= form::confirm_button('Ok');
+
+                $result .= '</div>';
+
+                break;
+
+            case self::BUTTONS_OK_CANCEL:
+                $result .= '<div class="buttons form_bottom">';
+
+                $result .= form::confirm_button('Ok');
+
+                $result .= form::cancel_button();
+
+                $result .= '</div>';
+
+                break;
+
+            case self::BUTTONS_YES_NO:
+                $result .= '<div class="buttons form_bottom">';
+
+                $result .= form::confirm_button('Yes');
+
+                $result .= form::cancel_button('No');
+
+                $result .= '</div>';
+
+                break;
+        }
+
+
         list($extra) = self::_addDefaults(__FUNCTION__, $extra);
         
         // Call the parent
-        $result = parent::close($extra);
+        $result .= parent::close($extra);
 
         return $result;
     }

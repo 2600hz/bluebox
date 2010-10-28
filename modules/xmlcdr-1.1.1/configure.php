@@ -17,7 +17,7 @@ class Xmlcdr_1_1_1_Configure extends Bluebox_Configure
     public static $author = 'Michael Phillips';
     public static $vendor = 'Michael Phillips';
     public static $license = 'MPL';
-    public static $summary = 'Caller Detail Records via XMLCURL ';
+    public static $summary = 'Caller Detail Records via XML/CDR Records';
     public static $description = 'View caller records in a tablular format.';
     public static $default = FALSE;
     public static $type = Package_Manager::TYPE_MODULE;

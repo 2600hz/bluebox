@@ -34,7 +34,7 @@
 
 <?php echo form::close_section(); ?>
 
-<?php echo form::open_section('With Default Outbound Caller ID...'); ?>
+<?php echo form::open_section('Default Settings'); ?>
 
         <div class="field">
         <?php
@@ -54,6 +54,18 @@
         <?php
             echo form::label('simpleroute[area_code]', 'Local Area Code:');
             echo form::input('simpleroute[area_code]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'simpleroute[continue_on_fail]',
+                    'hint' => 'If this route fails progress to the next'
+                ),
+                'Continue on fail:'
+            );
+            echo form::checkbox('simpleroute[continue_on_fail]');
         ?>
         </div>
 

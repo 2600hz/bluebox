@@ -97,6 +97,11 @@ $config['filemap'][8] = array (
     'query' => '//document/section[@name="configuration"]/configuration[@name="xml_cdr.conf"][@description="XML CDR CURL logger"]'
 );
 
+$config['filemap'][9] = array (
+    'filename' => $config['cfg_root'] .'/jingle_profiles/bluebox_clients.xml',
+    'query' => '//document/section[@name="configuration"]/configuration[@name="dingaling.conf"]/profile'
+);
+
 // Base file - note that because the query string is //document, this section will contain
 // the remaining document and any includes for other filemap sections
 /*$config['filemap'][] = array (

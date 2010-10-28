@@ -63,7 +63,7 @@ function qtipAjaxForm(link) {
                 var options = {
                     complete: function (xhrObj, status) {
                         if(status == "error") {
-                            $.jGrowl('There was an error processing this request.', { theme: 'error', life: 5000 });
+                            $.jGrowl('There was an error processing this request.', {theme: 'error', life: 5000});
                             me.hide();
                         } else {
                             if (xhrObj.getResponseHeader("X-AjaxForm-Status") == "cancel") {
@@ -115,18 +115,17 @@ $(document).ready(function () {
             contentLoadedOnce = true;
 
             if(request.status == 0) {
-                $.jGrowl('Can not connect to server!\n Please Check Your Network.', { theme: 'error', life: 5000 });
+                $.jGrowl('Can not connect to server!\n Please Check Your Network.', {theme: 'error', life: 5000});
             } else if(request.status == 404) {
-                $.jGrowl('You are not authorized to access that function.', { theme: 'error', life: 5000 });
+                $.jGrowl('You are not authorized to access that function.', {theme: 'error', life: 5000});
             } else if(request.status == 500) {
-                $.jGrowl('There was an error processing this request.', { theme: 'error', life: 5000 });
+                $.jGrowl('There was an error processing this request.', {theme: 'error', life: 5000});
             } else if (request.status == 401) {
-                window.location = "http://192.168.1.119/index.php/user/index";
-                //$.jGrowl('Your session has timed out.', { theme: 'notice', life: 5000 });
+                $.jGrowl('Your session has timed out.', {theme: 'notice', life: 5000});
             } else if(err == 'parsererror') {
-                $.jGrowl('The data recieved from the server was invalid.', { theme: 'error', life: 5000 });
+                $.jGrowl('The data recieved from the server was invalid.', {theme: 'error', life: 5000});
             } else if(err == 'timeout') {
-                $.jGrowl('Request Time out.', { theme: 'error', life: 5000 });
+                $.jGrowl('Request Time out.', {theme: 'error', life: 5000});
             }
 
         }
@@ -140,10 +139,10 @@ $(document).ready(function () {
         toolTips();
         detrminant();
         additionalInfo();
-        $('.qtipAjaxForm').each(function () { qtipAjaxForm($(this)); });
-        $("a:contains('Delete')").each(function () { qtipAjaxForm($(this)); });
+        $('.qtipAjaxForm').each(function () {qtipAjaxForm($(this));});
+        $("a:contains('Delete')").each(function () {qtipAjaxForm($(this));});
     });
-
+    
     /**
      * NAVIGATION CAROUSEL
      ***************************************************************/
@@ -154,12 +153,18 @@ $(document).ready(function () {
     $('.navGroup ul').each(function () {
         // calculate the actual width of the ul elements
         totalWidth = 0;
-        $(this).find('li').each(function () {totalWidth += $(this).outerWidth();});
 
+        $(this).find('li').each(function () {totalWidth += $(this).outerWidth();});
+        
         $(this).parent().parent().addClass('infiniteCarousel');
+
         $(this).parent().parent().infiniteCarousel();
+
+        $(this).parents('.navGroup').hide();
     });
 
+    $('.navGroup').css("visibility", "visible");
+    
     /**
      * NAVIGATION PERSISTENT CATEGORIES
      ***************************************************************/
@@ -184,13 +189,17 @@ $(document).ready(function () {
 
         // hide the navigation items
         $('.navGroup').hide();
+        
         // show the navigation items that belong to this group
         $('#navGroup' + $(this).text()).show();
 
         // change the class to reflect the new category on the category bar
         categories.removeClass('current_category');
+        
         $(this).addClass('current_category');
     });
+
+    lastCategory = $('#navCategories li').first().attr('id');
 
     // on start up see if we can get the users last selected category
     persistent_category.get('lastCategory', function(ok, val) {
@@ -345,7 +354,7 @@ $(document).ready(function () {
     }
     numberDropdown();
 
-    $('.qtipAjaxForm').each(function () { qtipAjaxForm($(this)); });
+    $('.qtipAjaxForm').each(function () {qtipAjaxForm($(this));});
 
     // Create the modal backdrop on document load so all modal tooltips can use it
     $('<div id="qtipAjaxForm-reciever">')
@@ -353,7 +362,6 @@ $(document).ready(function () {
     .hide(); // Hide it initially
 
     /**
-<<<<<<< HEAD
      * DRIVES THE DESTINATION SELECTOR
      ***************************************************************/
     $('.destination_select').each(function() {
@@ -410,8 +418,6 @@ $(document).ready(function () {
     });
 
     /**
-=======
->>>>>>> origin/master
      * QTIP MODAL BACKDROP
      ***************************************************************/
     $('<div id="qtip-blanket">')
@@ -432,14 +438,14 @@ $(document).ready(function () {
      * LANGUAGE BAR
      ***************************************************************/
     $('#lang').change(function () {
-        $(this).fadeOut('fast', function () { $('#change_lang').fadeIn('fast'); });
-        $.post(document.location.href, { lang: $(this).val() }, function (data) {
+        $(this).fadeOut('fast', function () {$('#change_lang').fadeIn('fast');});
+        $.post(document.location.href, {lang: $(this).val()}, function (data) {
             $('#lang_bar').text('On the next page reload the language will be ' + data);
             $('#lang_bar').slideDown();
         });
     });
     $('#change_lang').click(function (e) {
         e.preventDefault();
-        $(this).fadeOut('fast', function () { $('#lang').fadeIn('fast'); });
+        $(this).fadeOut('fast', function () {$('#lang').fadeIn('fast');});
     });
 });

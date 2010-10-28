@@ -16,15 +16,46 @@ class Media {
         return $files;
     }
 
-    public static function getFilePath($mediafile_id) {
-        $file = Doctrine::getTable('MediaFile')->find($mediafile_id);
-        return self::getAudioPath() . $file['file'];
+    public static function getMediaFilename($filename, $sampleRate = NULL, $exists = FALSE) {
+        $filename = Media::getMediaPath() . $filename;
+
+        // If we're working with FreeSWITCH we need to tack on the samplerate to the folder name for accuracy if it's an 8/16/32/48k .WAV file
+        if (Kohana::config('telephony.driver') == 'FreeSwitch') {
+            $dirname = dirname($filename);
+            $basename = basename($filename);
+
+            // If there is a samplerate requested and it's a valid rate, try to use it
+            if ($sampleRate and in_array($sampleRate, array('8000', '16000', '32000', '48000'))) {
+                $newfile = $dirname . DIRECTORY_SEPARATOR . $sampleRate . DIRECTORY_SEPARATOR . $basename;
+                if ($exists and file_exists($newfile)) {
+                    return $newfile;
+                } elseif ($exists) {
+                    return $filename;
+                } else {
+                    return $filename;
+                }
+            } else {
+                return $filename;
+            }
+
+        } else {
+            // For Asterisk just return the file & dir as they were - no changes
+            return $filename;
+        }
+    }
+
+    public static function getMediaFile($mediaId) {
+
+        $media = Doctrine::getTable('MediaFile')->find($mediaId, Doctrine::HYDRATE_ARRAY);
+        $filename = Media::getMediaFilename($media['file']);
+
+        return $filename;
     }
 
     /**
      * Get the base audio path where all sound files are located, for this particular driver
      */
-    public static function getAudioPath() {
+    public static function getMediaPath() {
         $driver = strtolower(Kohana::config('telephony.driver'));
         return Kohana::config($driver . '.audio_root') . '/';
     }

@@ -216,12 +216,12 @@ class getid3_riff
 					$thisfile_riff_WAVE_bext_0['coding_history'] =         explode("\r\n", trim(substr($thisfile_riff_WAVE_bext_0['data'], 601)));
 
 					$thisfile_riff_WAVE_bext_0['origin_date_unix'] = gmmktime(
-																				substr($thisfile_riff_WAVE_bext_0['origin_time'], 0, 2),
-																				substr($thisfile_riff_WAVE_bext_0['origin_time'], 3, 2),
-																				substr($thisfile_riff_WAVE_bext_0['origin_time'], 6, 2),
-																				substr($thisfile_riff_WAVE_bext_0['origin_date'], 5, 2),
-																				substr($thisfile_riff_WAVE_bext_0['origin_date'], 8, 2),
-																				substr($thisfile_riff_WAVE_bext_0['origin_date'], 0, 4));
+																				(int)substr($thisfile_riff_WAVE_bext_0['origin_time'], 0, 2),
+																				(int)substr($thisfile_riff_WAVE_bext_0['origin_time'], 3, 2),
+																				(int)substr($thisfile_riff_WAVE_bext_0['origin_time'], 6, 2),
+																				(int)substr($thisfile_riff_WAVE_bext_0['origin_date'], 5, 2),
+																				(int)substr($thisfile_riff_WAVE_bext_0['origin_date'], 8, 2),
+																				(int)substr($thisfile_riff_WAVE_bext_0['origin_date'], 0, 4));
 
 					$thisfile_riff['comments']['author'][] = $thisfile_riff_WAVE_bext_0['author'];
 					$thisfile_riff['comments']['title'][]  = $thisfile_riff_WAVE_bext_0['title'];
@@ -1839,7 +1839,7 @@ class getid3_riff
 			IY41	Interlaced version of Y41P (www.leadtools.com)
 			IYU1	12 bit format used in mode 2 of the IEEE 1394 Digital Camera 1.04 spec    IEEE standard
 			IYU2	24 bit format used in mode 2 of the IEEE 1394 Digital Camera 1.04 spec    IEEE standard
-			IYUV	Planar YUV format (8-bpp Y plane, followed by 8-bpp 2×2 U and V planes)
+			IYUV	Planar YUV format (8-bpp Y plane, followed by 8-bpp 2ï¿½2 U and V planes)
 			i263	Intel ITU H.263 Videoconferencing (i263)
 			I420	Intel Indeo 4
 			IAN 	Intel Indeo 4 (RDX)

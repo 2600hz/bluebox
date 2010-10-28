@@ -1,4 +1,4 @@
-<?php echo form::open_section('SIP Device Settings'); ?>
+<?php echo form::open_section('SIP Settings'); ?>
 
     <div class="field">
     <?php
@@ -12,6 +12,23 @@
         echo form::input('sip[username]');
     ?>
     </div>
+
+    <?php if (isset($trunk_options)): ?>
+
+    <div class="field">
+    <?php
+        echo form::label(array(
+                'for' => 'sip[from_domain]',
+                'hint' => 'Force a domain name in From: field',
+                'help' => 'Sometimes providers require explicit domain names in the From: field for your calls to work (and bill) properly. This option, if set, will force a from domain on all your calls in the domain part of the SIP From: field'
+            ),
+            'SIP From Domain (optional):'
+        );
+        echo form::input('sip[from_domain]');
+    ?>
+    </div>
+
+    <?php endif; ?>
 
     <div class="field">
     <?php
@@ -42,6 +59,19 @@
         <div class="field">
         <?php
             echo form::label(array(
+                    'for' => 'sip[caller_id_field]',
+                    'hint' => 'Which header field to use',
+                    'help' => 'Different providers expect Caller ID info in different fields. This option lets you pick which field to put the Caller ID info into. If you are finding that Caller ID does not work on outbound calls, try changing this field until it does work. NOTE: If you change this to the From: field and you are using a provider who requires registration with a username and password, this option will likely break all outbound calls.'
+                ),
+                'Outbound Caller ID Field'
+            );
+            echo form::dropdown('sip[caller_id_field]', array('rpid' => 'Remote-Party-Id', 'pid' => 'P-Asserted-Identity', 'from' => 'From: Field'));
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
                     'for' => 'sip[sip_invite_format]',
                     'hint' => 'Invite format on calls to this device',
                     'help' => 'Some phones, switches and other devices will only accept SIP INVITE requests if they are in a specific format, such as E.164 (+1NPANXXXXXX, etc.) or 10-digit form. This selection decides how to preformat the INVITEs that go to this device.'
@@ -61,7 +91,7 @@
                     'hint' => 'Use custom to_user header for DID detection',
                     'help' => 'Some providers send calls to the username you registered as and provide the DID that is being called via an alternate header. If you find that calls from outside providers are not reaching your system with the correct phone number, try enabling this setting.'
                 ),
-                'Use SIP To-User'
+                'Inbound DID in To-User'
             );
             echo form::checkbox('sip[to_user]');
         ?>

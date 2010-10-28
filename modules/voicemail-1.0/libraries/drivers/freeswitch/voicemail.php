@@ -12,7 +12,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/params/param[@name="vm-password"]{@value="' . $base['password'] . '"}');
 
-            $xml->update('/params/param[@name="vm-message-ext "]{@value="' . $base['audio_format'] . '"}');
+            $xml->update('/params/param[@name="vm-message-ext"]{@value="' . $base['audio_format'] . '"}');
 
             $xml->setAttributeValue('', 'id', $base['mailbox']);
 

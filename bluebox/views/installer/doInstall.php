@@ -6,7 +6,7 @@
 
                 <div class="clickNext">
 
-                    <?php echo __('Click next to ' . strtolower($process) . '...'); ?>
+                    <?php echo __('Click continue to ' . strtolower($process) . '...'); ?>
                     
                 </div>
 
@@ -28,9 +28,9 @@
     if (class_exists('jquery') )
     {
         jquery::addQuery('#noJS')->hide();
-        jquery::addQuery('#next_Next')->click('function () {
-                $(\'#next_Next\').hide();
-                $(\'#prev_Prev\').hide();
+        jquery::addQuery('#next_Continue')->click('function () {
+                $(\'#next_Continue\').hide();
+                $(\'#prev_Back\').hide();
                 $(\'.clickNext\').hide();
                 $(\'.error\').hide();
                 $(\'.inProgress\').show();
