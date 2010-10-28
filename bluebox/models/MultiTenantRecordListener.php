@@ -17,6 +17,8 @@ class MultiTenantRecordListener extends Doctrine_Record_Listener
 
     public function getUserId()
     {
+        $prev_account_id = $this->account_id;
+
         if (empty($this->account_id))
         {
             // The user may change for example force_login
@@ -57,7 +59,10 @@ class MultiTenantRecordListener extends Doctrine_Record_Listener
                 throw new Exception('Unable to determine your authorization to manipulate this record');
             }
 
-            kohana::log('debug', 'MultiTenantRecordListener is using account id ' .$this->account_id);
+            if ($this->account_id != $prev_account_id)
+            {
+                kohana::log('debug', 'MultiTenantRecordListener is using account id ' .$this->account_id);
+            }
         }
 
         return $this->account_id;
