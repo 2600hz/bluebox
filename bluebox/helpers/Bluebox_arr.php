@@ -6,6 +6,372 @@
  */
 class arr extends arr_Core
 {
+    public static $append_string_separator = ' ';
+
+    /**
+     * Gets the value deep inside $array using $path to find it.
+     *
+     * @author Terrence Howard <chemisus@gmail.com>
+     * @param array $array
+     * @param string $path ...
+     * @return mixed
+     */
+    public static function get(&$array, $path)
+    {
+        $paths = func_get_args();
+
+        array_shift($paths);
+
+        return self::get_array($array, $paths);
+    }
+
+    /**
+     * Gets the value deep inside $array using $string to find it.
+     *
+     * @param array $array
+     * @param string $string
+     * @param bool $shift
+     * @return mixed
+     */
+    public static function get_string(&$array, $string, $shift = FALSE)
+    {
+        $paths = array();
+
+        parse_str($string, $paths);
+
+        $paths = self::recursive_keys($paths);
+
+        if ($shift)
+        {
+            array_shift($paths);
+        }
+
+        return self::get_array($array, $paths);
+    }
+
+    /**
+     * Gets the value deep inside $array using string values in $path to find it.
+     *
+     * @author Terrence Howard <chemisus@gmail.com>
+     * @param array $array
+     * @param array $paths
+     * @return mixed
+     */
+    public static function get_array(&$array, $paths)
+    {
+        if (!is_array($paths))
+        {
+            return NULL;
+        }
+
+        $array = &self::smart_cast($array);
+
+        while (count($paths))
+        {
+            $key = array_shift($paths);
+
+            if (!array_key_exists($key, (array)$array))
+            {
+                return NULL;
+            }
+
+            $array = &$array[$key];
+        }
+
+        return $array;
+    }
+
+    /**
+     * Sets the value deep inside $array using $path to find it.
+     *
+     * @author Terrence Howard <chemisus@gmail.com>
+     * @param array $array
+     * @param mixed $value
+     * @param string $path ...
+     * @return array
+     */
+    public static function set(&$array, $value, $path)
+    {
+        $paths = func_get_args();
+
+        array_shift($paths);
+
+        array_shift($paths);
+
+        return self::set_array($array, $value, $paths);
+    }
+
+    /**
+     * Sets the value deep inside $array using $string to find it.
+     *
+     * @param array $array
+     * @param mixed $value
+     * @param string $string
+     * @param bool $shift
+     * @return mixed
+     */
+    public static function set_string(&$array, $value, $string, $shift = FALSE)
+    {
+        $paths = array();
+
+        parse_str($string, $paths);
+
+        $paths = self::recursive_keys($paths);
+
+        if ($shift)
+        {
+            array_shift($paths);
+        }
+
+        return self::set_array($array, $value, $paths);
+    }
+
+    /**
+     * Sets the value deep inside $array using string values in $path to find it.
+     *
+     * @author Terrence Howard <chemisus@gmail.com>
+     * @param array $elem
+     * @param mixed $value
+     * @param array $paths
+     * @return array
+     */
+    public static function set_array(&$array, $value, $paths)
+    {
+        $array = &self::smart_cast($array);
+
+        $elem = &$array;
+
+        if (!is_array($paths))
+        {
+            return $array;
+        }
+
+        while (count($paths))
+        {
+            $key = array_shift($paths);
+
+            if (is_null($key))
+            {
+                $elem = &$elem[];
+            }
+            else
+            {
+                $elem = &$elem[$key];
+            }
+        }
+
+        if (is_array($elem) AND is_array($value))
+        {
+            $elem = arr::merge($elem, $value);
+        }
+        else
+        {
+            $elem = $value;
+        }
+
+        return $array;
+    }
+
+    public static function append(&$array, $value, $path)
+    {
+        $paths = func_get_args();
+
+        array_shift($paths);
+
+        array_shift($paths);
+
+        return self::append_array($array, $value, $paths);
+    }
+
+    public static function append_string(&$array, $value, $string, $shift = FALSE)
+    {
+        $paths = array();
+
+        parse_str($string, $paths);
+
+        $paths = self::recursive_keys($paths);
+
+        if ($shift)
+        {
+            array_shift($paths);
+        }
+
+        return self::append_array($array, $value, $paths);
+    }
+
+    public static function append_array(&$array, $value, $paths)
+    {
+        if (($existing = self::get_array($array, $paths)))
+        {
+            if (is_string($existing))
+            {
+                $value = $existing .self::$append_string_separator .$value;
+
+                $value = trim($value, self::$append_string_separator);
+            }
+            else if (is_array($existing))
+            {
+                $value = arr::merge($existing, (array)$value);
+            }
+            else
+            {
+                throw new Exception('Unable to append array values of type ' .gettype($value));
+            }
+        }
+
+        return self::set_array($array, $value, $paths);
+    }
+
+    public static function smart_cast(&$mixed)
+    {
+        if (is_array($mixed))
+        {
+            return $mixed;
+        }
+        else if (is_object($mixed) AND method_exists($mixed, 'toArray'))
+        {
+            return $mixed->toArray();
+        }
+        else
+        {
+            return (array)$mixed;
+        }
+    }
+
+    public static function recursive_keys($array, &$keys = array())
+    {
+        foreach ($array as $key => $value)
+        {
+            $keys[] = $key;
+
+            if (is_array($value))
+            {
+                self::recursive_keys($array[$key], $keys);
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * Will call $function on each object in $objects with $params as parameters.
+     *
+     * @author Terrence Howard <chemisus@gmail.com>
+     * @param array $objects
+     * @param string $function
+     * @param array $params
+     * @param string $implode
+     * @return array|string
+     */
+    public static function call($objects, $function, $params = NULL, $implode = FALSE)
+    {
+        $objects = (array)$objects;
+
+        $return = array();
+
+        foreach ($objects as $key => $object)
+        {
+            $return[$key] = call_user_func_array(array($object, $function), (array)$params);
+        }
+
+        if ($implode !== FALSE)
+        {
+            $return = implode($implode, $return);
+        }
+
+        return $return;
+    }
+
+    /**
+     * Checks if $subset's keys are a subset of $super's keys.
+     *
+     * @author Terrence Howard <chemisus@gmail.com>
+     * @param array $super
+     * @param array $subset
+     * @return boolean
+     */
+    public static function subset($super, $subset)
+    {
+        if (count($subset) > count($super))
+        {
+            return false;
+        }
+
+        $sub = array_intersect_key($subset, $super);
+
+        return count($sub) == count($subset) ? $sub : FALSE;
+    }
+
+    /**
+     * Merges two arrays recursivly, in a disctinct manor
+     *
+     * @param array Array 1
+     * @param array Array 2
+     * @return array
+     */
+    public static function merge_recursive_distinct (array &$array1, array &$array2)
+    {
+        $merged = $array1;
+
+        foreach ( $array2 as $key => &$value )
+        {
+            if ( is_array ( $value ) && isset ( $merged [$key] ) && is_array ( $merged [$key] ) )
+            {
+                $merged [$key] = self::merge_recursive_distinct ( $merged [$key], $value );
+            }
+            else
+            {
+                $merged [$key] = $value;
+            }
+        }
+
+        return $merged;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public static function find($array, $key, $value)
     {
         $filter = create_function('$array', "return ( \$array['$key'] == '$value');");
@@ -69,32 +435,6 @@ class arr extends arr_Core
         }
 
         return $result;
-    }
-
-    /**
-     * Merges two arrays recursivly, in a disctinct manor
-     *
-     * @param array Array 1
-     * @param array Array 2
-     * @return array
-     */
-    public static function merge_recursive_distinct ( array &$array1, array &$array2 )
-    {
-        $merged = $array1;
-
-        foreach ( $array2 as $key => &$value )
-        {
-            if ( is_array ( $value ) && isset ( $merged [$key] ) && is_array ( $merged [$key] ) )
-            {
-                $merged [$key] = self::merge_recursive_distinct ( $merged [$key], $value );
-            } 
-            else
-            {
-                $merged [$key] = $value;
-            }
-        }
-
-        return $merged;
     }
 
     /**
