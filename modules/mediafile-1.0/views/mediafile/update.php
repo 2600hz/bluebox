@@ -8,7 +8,7 @@
 
     <?php echo form::open_multipart(); ?>
 
-    <?php echo form::open_section('Media Information'); ?>
+    <?php echo form::open_section('Identification'); ?>
 
         <div class="field">
             <?php echo form::label('mediafile[name]', 'Name:'); ?>
@@ -22,83 +22,119 @@
 
     <?php echo form::close_section(); ?>
 
-    <?php echo form::open_section('File'); ?>
+    <?php if (!strcasecmp(Router::$method, 'create')): ?>
 
-        <?php if (!strcasecmp(Router::$method, 'create')): ?>
-
+        <?php echo form::open_section('File'); ?>
+    
             <div class="field">
                 <?php echo form::label('mediafile[upload]', 'Audio File (MP3 or WAV):'); ?>
                 <?php echo form::upload('mediafile[upload]'); ?>
             </div>
 
-        <?php else : ?>
+        <?php echo form::close_section(); ?>
+
+    <?php else : ?>
+
+        <?php echo form::open_section('Media Information'); ?>
 
             <div class="field">
-                <label class="label">Filepath: </label>
+                <label class="label">Path: </label>
                 <span><?php echo $mediafile->filepath(TRUE, FALSE); ?></span>
             </div>
 
-            <?php if (!kohana::config('mediafile.hide_rate_folders')) :?>
-
-                <div class="field">
-                    <label class="label">Filesize: </label>
-                    <span><?php echo number_format($mediafile['size'], 0); ?> bytes</span>
-                </div>
-
-                <div class="field">
-                    <label class="label">Type: </label>
-                    <span><?php echo $mediafile['type'] . ' (' .$mediafile['bits'] .' bit)'; ?></span>
-                </div>
-
-                <div class="field">
-                    <label class="label">Channels: </label>
-                    <span><?php echo $mediafile['channels']; ?></span>
-                </div>
-
-            <?php endif; ?>
-
             <div class="field">
-                <label class="label">Sample Rate: </label>
+                <?php echo form::label(array('for' => 'sample_rates', 'hint' => 'Click to Download'), 'Sample Rates:'); ?>
                 <span>
-                    <?php foreach ($sample_rates as $mediafile_id => $rate): ?>
-                        <?php echo html::anchor('mediafile/download/' .$mediafile_id, $rate . 'hz') . '&nbsp;&nbsp;';?>
+                    <?php foreach ($sample_rates as $file): ?>
+                        <?php echo html::anchor('mediafile/download/' .$file['mediafile_id'], $file['rates'] . 'hz') . '&nbsp;&nbsp;';?>
                     <?php endforeach; ?>
-                    (Click to Download)
                 </span>
             </div>
-    
-        <?php endif; ?>
-    
-    <?php echo form::close_section(); ?>
 
-    <?php if (strcasecmp(Router::$method, 'create')): ?>
+        <?php echo form::close_section(); ?>
 
         <?php if (kohana::config('mediafile.playback', TRUE)): ?>
 
-            <?php echo form::open_section('Playback'); ?>
+            <?php $file = end($sample_rates->toArray()); ?>
 
-                    <div class="field" style="text-align:center">
-                        <span>
-                            <audio src="<?php echo url_Core::file('mediafile/download/' .$mediafile_id. '/1', TRUE); ?>" controls="controls">Your browser does not support HTML5 audio.</audio>
-                        </span>
-                    </div>
+            <?php echo form::open_section('Playback'); ?>
+    
+                <div style="text-align: center;">
+                    <span>
+                        <audio src="<?php echo url_Core::file('mediafile/download/' .$file['mediafile_id'] .'/1', TRUE); ?>" controls="controls" preload="none">Your browser does not support HTML5 audio.</audio>
+                    </span>
+                </div>
 
             <?php echo form::close_section(); ?>
 
         <?php endif; ?>
 
-        <?php if (kohana::config('mediafile.visualization', FALSE)): ?>
+        <?php if (kohana::config('mediafile.file_details', TRUE)): ?>
 
-            <?php echo form::open_section('Visualization'); ?>
+            <?php echo form::open_section('File'); ?>
 
-                    <div class="field" style="text-align:center">
-                        <span>
-                            <?php echo html::image(array('src' => 'mediafile/visualize/' .$mediafile['mediafile_id'], 'width' => '400px', 'height' => '250px'), NULL, TRUE); ?>
-                        </span>
-                    </div>
+                <div id="sample_rate_tabs">
+
+                    <?php if (count($sample_rates) > 1): ?>
+
+                        <ul>
+                             <?php foreach ($sample_rates as $file): ?>
+
+                                 <li>
+                                     <a href="#sample_rate_<?php echo $file['rates']; ?>">
+                                         <span><?php echo $file['rates']; ?></span>
+                                     </a>
+                                 </li>
+
+                             <?php endforeach; ?>
+                        </ul>
+
+                    <?php endif; ?>
+
+                    <?php foreach ($sample_rates as $file): ?>
+
+                        <div id="sample_rate_<?php echo $file['rates']; ?>">
+
+                            <?php echo html::anchor('mediafile/delete/' .$file['mediafile_id'], 'Delete', array('style' => 'float:right;')); ?>
+
+                            <div class="field">
+                                <label class="label">Length: </label>
+                                <span><?php echo $file['length']; ?> sec</span>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Filesize: </label>
+                                <span><?php echo number_format($file['size'], 0); ?> bytes</span>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Type: </label>
+                                <span><?php echo $file['type'] . ' (' .$file['bits'] .' bit)'; ?></span>
+                            </div>
+
+                            <div class="field">
+                                <label class="label">Channels: </label>
+                                <span><?php echo $file['channels']; ?></span>
+                            </div>
+
+                            <?php if (kohana::config('mediafile.visualization', FALSE)): ?>
+
+                                <div class="field" style="text-align:center">
+                                    <span>
+                                        <?php echo html::image(array('src' => 'mediafile/visualize/' .$mediafile['mediafile_id'], 'width' => '400px', 'height' => '250px'), NULL, TRUE); ?>
+                                    </span>
+                                </div>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                    <?php endforeach; ?>
+
+                </div>
 
             <?php echo form::close_section(); ?>
-
+    
         <?php endif; ?>
 
     <?php endif; ?>
@@ -106,3 +142,11 @@
     <?php echo form::close(TRUE); ?>
     
 </div>
+
+<?php
+    if (count($sample_rates) > 1)
+    {
+        jquery::addPlugin('tabs');
+        javascript::codeBlock('$("#sample_rate_tabs").tabs();');
+    }
+?>

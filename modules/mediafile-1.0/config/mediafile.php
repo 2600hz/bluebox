@@ -11,3 +11,5 @@ $config['hide_rate_folders'] = TRUE;
 $config['upload_to_rate_folders'] = TRUE;
 
 $config['unknown_rate_folder'] = NULL;
+
+$config['file_details'] = FALSE;

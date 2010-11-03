@@ -67,7 +67,8 @@ class MediaFile extends Bluebox_Record
     {
         $resampled = Doctrine_Query::create()
              ->from('MediaFile')
-             ->where('file = ?', $this->get('file'));
+             ->where('file = ?', $this->get('file'))
+             ->orderBy('rates');
 
         if (is_null($this->get('mediacollection_id')))
         {
@@ -83,7 +84,7 @@ class MediaFile extends Bluebox_Record
             $resampled->andWhere('rates = ?', $rate);
         }
 
-        return $resampled;
+        return $resampled->execute();
     }
 
     public function prepare_upload($uploadvar = 'upload')

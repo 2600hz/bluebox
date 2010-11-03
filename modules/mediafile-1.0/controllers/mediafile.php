@@ -34,12 +34,11 @@ class MediaFile_Controller extends Bluebox_Controller
         // Add the actions to the grid
         $grid->addAction('mediafile/edit', 'Edit', array(
                 'arguments' => 'mediafile_id',
-                'width' => '120'
+                'attributes' => array('class' => 'qtipAjaxForm')
             )
         );
         $grid->addAction('mediafile/delete', 'Delete', array(
-                'arguments' => 'mediafile_id',
-                'width' => '20'
+                'arguments' => 'mediafile_id'
             )
         );
 
@@ -66,15 +65,12 @@ class MediaFile_Controller extends Bluebox_Controller
 
         if (kohana::config('mediafile.hide_rate_folders'))
         {
-            $sampleRates = $this->mediafile->get_resampled();
+            $this->view->sample_rates = $this->mediafile->get_resampled();
         }
-        else
+        else 
         {
-            $sampleRates[$this->mediafile['mediafile_id']] 
-                    = $this->mediafile['rates'];
+            $this->view->sample_rates = array($this->mediafile);
         }
-        
-        $this->view->sample_rates = $sampleRates;
 
         parent::prepareUpdateView($baseModel);
     }
