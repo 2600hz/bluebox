@@ -8,6 +8,11 @@ class arr extends arr_Core
 {
     public static $append_string_separator = ' ';
 
+    public static function is_iterable(&$thing)
+    {
+        return is_array( $thing ) OR ($thing instanceof Traversable);
+    }
+
     /**
      * Gets the value deep inside $array using $path to find it.
      *
