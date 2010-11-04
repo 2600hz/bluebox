@@ -8,9 +8,18 @@ class arr extends arr_Core
 {
     public static $append_string_separator = ' ';
 
-    public static function is_iterable(&$thing)
+    /**
+     * This function determines if a var is iterable.
+     * IE: safe for use in a foreach.
+     *
+     * Since this isnt specificly an array function it may be out of place
+     *
+     * @param mixed Var to test
+     * @return bool
+     */
+    public static function is_iterable(&$mixed)
     {
-        return is_array( $thing ) OR ($thing instanceof Traversable);
+        return isset($mixed) && (is_array($mixed) OR ($mixed instanceof Traversable));
     }
 
     /**
@@ -177,6 +186,15 @@ class arr extends arr_Core
         return $array;
     }
 
+    /**
+     * This function will append the value to an existing value in an array if
+     * one exists at the provided path, otherwise it is added as new.
+     *
+     * @param array $array
+     * @param mixed $value
+     * @param string $paths
+     * @return array
+     */
     public static function append(&$array, $value, $path)
     {
         $paths = func_get_args();
@@ -188,6 +206,18 @@ class arr extends arr_Core
         return self::append_array($array, $value, $paths);
     }
 
+    /**
+     * This function will append the value to an existing value in an array if
+     * one exists at the provided path, otherwise it is added as new.  If the
+     * optional parameter shift is true then the base name of the variable will
+     * be ignored.
+     *
+     * @param array $array
+     * @param mixed $value
+     * @param string $string
+     * @param bool $shift
+     * @return array
+     */
     public static function append_string(&$array, $value, $string, $shift = FALSE)
     {
         $paths = array();
@@ -204,6 +234,15 @@ class arr extends arr_Core
         return self::append_array($array, $value, $paths);
     }
 
+    /**
+     * This function will append the value to an existing value in an array if
+     * one exists at the provided path, otherwise it is added as new.
+     *
+     * @param array $array
+     * @param string $value
+     * @param array $paths
+     * @return array
+     */
     public static function append_array(&$array, $value, $paths)
     {
         if (($existing = self::get_array($array, $paths)))
@@ -227,6 +266,13 @@ class arr extends arr_Core
         return self::set_array($array, $value, $paths);
     }
 
+    /**
+     * This is a doctrine aware function that will accept a mixed var
+     * and attempt to return an array.
+     *
+     * @param mixed var to convert
+     * @return array
+     */
     public static function smart_cast(&$mixed)
     {
         if (is_array($mixed))
@@ -243,6 +289,14 @@ class arr extends arr_Core
         }
     }
 
+    /**
+     * This will create a recursive listing of all keys in a multidimensional
+     * array
+     *
+     * @param array
+     * @param array Used internally during recursion
+     * @return array
+     */
     public static function recursive_keys($array, &$keys = array())
     {
         foreach ($array as $key => $value)
@@ -350,7 +404,18 @@ class arr extends arr_Core
 
 
 
-
+  /**
+   *
+   *  NOTICE  NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+   *
+   *   The functions bellow this notice are depreciated and will be removed
+   *   in the following sprints.
+   *
+   *            !! DO NOT USE THE FUNCTIONS BELLOW THIS NOTICE !!
+   *
+   *  NOTICE  NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE NOTICE
+   *
+   */
 
 
 
