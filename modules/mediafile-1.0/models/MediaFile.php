@@ -11,7 +11,6 @@ class MediaFile extends Bluebox_Record
     {
         // COLUMN DEFINITIONS
         $this->hasColumn('mediafile_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
-        $this->hasColumn('mediacollection_id', 'integer', 11, array('unsigned' => true));
         $this->hasColumn('name', 'string', 255, array('notblank' => true));
         $this->hasColumn('description', 'string');
         $this->hasColumn('file', 'string', 255, array('notblank' => true));
@@ -29,9 +28,7 @@ class MediaFile extends Bluebox_Record
      * Sets up relationships, behaviors, etc.
      */
     public function setUp()
-    {
-        $this->hasOne('MediaCollection', array('local' => 'mediacollection_id', 'foreign' => 'mediacollection_id'));
-        
+    {     
         $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
     }
@@ -63,26 +60,19 @@ class MediaFile extends Bluebox_Record
         }
     }
 
-    public function get_resampled($rate = NULL)
+    public function get_resampled($rates = NULL)
     {
         $resampled = Doctrine_Query::create()
              ->from('MediaFile')
              ->where('file = ?', $this->get('file'))
              ->orderBy('rates');
 
-        if (is_null($this->get('mediacollection_id')))
-        {
-            $resampled->andWhere('mediacollection_id IS NULL');
-        }
-        else
-        {
-            $resampled->andWhere('mediacollection_id = ?', $this->get('mediacollection_id'));
-        }
-
         if (!empty($rate))
         {
-            $resampled->andWhere('rates = ?', $rate);
+            $resampled->andWhereIn('rates', (array)$rates);
         }
+
+        Event::run('mediafile.get_resampled', $resampled);
 
         return $resampled->execute();
     }
@@ -201,19 +191,7 @@ class MediaFile extends Bluebox_Record
     {
         $basepath = kohana::config('upload.directory');
 
-        if (class_exists('MediaCollection') AND $this->get('mediacollection_id'))
-        {
-            $mediacollection = Doctrine::getTable('MediaCollection')->find($this->get('mediacollection_id'));
-
-            if (!empty($mediacollection['path']))
-            {
-                $basepath = $mediacollection['path'];
-            }
-            else
-            {
-                throw new Exception ('Unable to locate media collection');
-            }
-        }
+        Event::run('mediafile.basepath', $basepath);
 
         $filepath = rtrim($basepath, DIRECTORY_SEPARATOR) .DIRECTORY_SEPARATOR;
 
@@ -279,7 +257,7 @@ class MediaFile extends Bluebox_Record
                 return 'audio/mpeg';
 
             default:
-                return 'audio/unknown';
+                return file::mime($this->filepath(TRUE));
         }
     }
 }
