@@ -13,7 +13,8 @@ class MediaFile_1_0_Configure extends Bluebox_Configure
     public static $default = true;
     public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
-        'core' => 0.1
+        'core' => 0.1,
+        'not' => array('mediamanager' => 0.1)
     );
     public static $navBranch = '/Media/';
     public static $navURL = '/mediafile/index';
