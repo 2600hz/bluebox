@@ -55,7 +55,7 @@
 
         <?php if (kohana::config('mediafile.playback', TRUE)): ?>
 
-            <?php $file = end($sample_rates->toArray()); ?>
+            <?php $file = end(arr::smart_cast($sample_rates)); ?>
 
             <?php echo form::open_section('Playback'); ?>
     
