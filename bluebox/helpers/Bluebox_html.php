@@ -32,7 +32,11 @@ class html extends html_Core
             
             if ( count($m) > 0 )
             {
-                $attributes['src'] = 'modules' .DIRECTORY_SEPARATOR .basename($m[0]) .DIRECTORY_SEPARATOR . ltrim($attributes['src'], DIRECTORY_SEPARATOR);
+                $attributes['src']  = 'modules' .DIRECTORY_SEPARATOR;
+                
+                $attributes['src'] .= basename($m[0]) .DIRECTORY_SEPARATOR;
+
+                $attributes['src'] .= ltrim($attributes['src'], DIRECTORY_SEPARATOR);
             }
         }
 
