@@ -259,11 +259,23 @@ class MediaFile extends Bluebox_Record
         }
     }
 
-    public static function catalog($display = '%2$s (%4$s)')
+    public static function catalog($display = NULL)
     {
         $catalog = array();
 
-        $records = Doctrine::getTable(__CLASS__)->findAll(Doctrine::HYDRATE_ARRAY);
+        $records = Doctrine::getTable(__CLASS__)->findAll();
+
+        $hide_rate = kohana::config('mediafile.hide_rate_folders');
+        
+        if (!$display)
+        {
+            $display = '%2$s (%4$s %9$shz)';
+            
+            if ($hide_rate)
+            {
+                $display = '%2$s (%4$s)';
+            }
+        }
 
         foreach ($records as $record)
         {
@@ -271,10 +283,10 @@ class MediaFile extends Bluebox_Record
 
             $param_arr = array_values($param_arr);
 
-            $catalog[$record['mediafile_id']] =
+            $catalog[$record->filepath(TRUE, !$hide_rate)] =
                 call_user_func_array('sprintf', $param_arr);
         }
-
+        
         return $catalog;
     }
 }

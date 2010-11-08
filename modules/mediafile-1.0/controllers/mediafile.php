@@ -207,7 +207,9 @@ class MediaFile_Controller extends Bluebox_Controller
     {
         if ($data instanceof MediaFile)
         {
-            $id = $data['mediafile_id'];
+            $hide_rate = kohana::config('mediafile.hide_rate_folders');
+
+            $id = $data->filepath(TRUE, !$hide_rate);
 
             $catalog = MediaFile::catalog();
 
