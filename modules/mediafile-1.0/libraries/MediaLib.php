@@ -4,15 +4,25 @@ require_once('getid3/getid3.php');
 
 class MediaLib
 {
-    public static function listMediaFiles()
+    public static function provideMediaWidget()
     {
-        $mediaFiles = Doctrine::getTable('MediaFile')->findAll();
-        
-        foreach ($mediaFiles as $mediaFile)
-        {
-            $name =  $mediaFile['name'] .' (' .$mediaFile['file'] .')';
+        $view = new View('mediafile/widget');
 
-            media::add('MediaFile', $mediaFile['mediafile_id'], $name);
+        media::addComponent('Media File', $view);
+    }
+
+    public static function maintance()
+    {
+        $records = Doctrine::getTable('MediaFile')->findAll();
+
+        foreach ($records as $record)
+        {
+            if (!is_file($record->filepath(TRUE)))
+            {
+                kohana::log('debug', 'The mediafile_id ' .$record['mediafile_id'] .' no longer exists...');
+
+                $record->delete();
+            }
         }
     }
     

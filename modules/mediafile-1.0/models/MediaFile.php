@@ -224,7 +224,7 @@ class MediaFile extends Bluebox_Record
 
     public function downloadName()
     {
-        $name  = $this->get('name');
+        $name = $this->get('name');
 
         $rate = (int)$this->get('rates');
 
@@ -233,13 +233,11 @@ class MediaFile extends Bluebox_Record
             $name .= '_' .$rate .'hz';
         }
 
-        $name  = trim(preg_replace('/[^a-zA-Z0-9_]+/imx', '_', $name), '_');
-
         $name .= '_' .time();
 
         $name .= '.' .pathinfo($this->get('file'), PATHINFO_EXTENSION);
 
-        return $name;
+        return html::token($name);
     }
 
     public function contentType()
@@ -259,5 +257,24 @@ class MediaFile extends Bluebox_Record
             default:
                 return file::mime($this->filepath(TRUE));
         }
+    }
+
+    public static function catalog($display = '%2$s (%4$s)')
+    {
+        $catalog = array();
+
+        $records = Doctrine::getTable(__CLASS__)->findAll(Doctrine::HYDRATE_ARRAY);
+
+        foreach ($records as $record)
+        {
+            $param_arr = arr::merge(array($display), $record);
+
+            $param_arr = array_values($param_arr);
+
+            $catalog[$record['mediafile_id']] =
+                call_user_func_array('sprintf', $param_arr);
+        }
+
+        return $catalog;
     }
 }

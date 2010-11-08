@@ -25,6 +25,7 @@ class MediaFile_Controller extends Bluebox_Controller
 
         if (!kohana::config('mediafile.hide_rate_folders'))
         {
+            $grid->add('rates', 'Rate');
             $grid->add('channels', 'Channels');
             $grid->add('length', 'Length');
         }
@@ -59,6 +60,72 @@ class MediaFile_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce(array('doctrine_query' => $q));
     }
 
+    /**
+     * This generic delete function will remove entries of $baseModel
+     */
+    public function delete($id = NULL)
+    {
+        $this->template->content = new View('mediafile/delete');
+
+        $this->view->title = 'Delete Media File';
+
+        $this->loadBaseModel($id);
+
+        if ($action = $this->submitted(array('submitString' => 'delete')))
+        {
+            Event::run('bluebox.deleteOnSubmit', $action);
+
+            if (($action == self::SUBMIT_CONFIRM))
+            {
+                $success = TRUE;
+
+                if(kohana::config('mediafile.hide_rate_folders', FALSE) AND !empty($_POST['delete_media_files']))
+                {
+                    foreach ($_POST['delete_media_files'] as $mediafile_id)
+                    {
+                        $mediafile = Doctrine::getTable('MediaFile')->find($mediafile_id);
+
+                        if (!$mediafile)
+                        {
+                            continue;
+                        }
+
+                        if (!$this->formDelete($mediafile))
+                        {
+                            $success = FALSE;
+                            
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    $success = $this->formDelete($this->mediafile);
+                }
+                
+                if ($success)
+                {
+                    $this->returnQtipAjaxForm(NULL);
+
+                    url::redirect(Router_Core::$controller);
+                }
+            }
+            else if ($action == self::SUBMIT_DENY)
+            {
+                $this->exitQtipAjaxForm();
+
+                url::redirect(Router_Core::$controller);
+            }
+        }
+
+        $this->view->set_global('mediafile', $this->mediafile);
+
+        Event::run('bluebox.prepare_delete_view', $this->view);
+
+        // Execute plugin hooks here, after we've loaded the core data sets
+        plugins::views($this);
+    }
+
     protected function prepareUpdateView($baseModel = NULL)
     {
         $sampleRates = array();
@@ -86,8 +153,22 @@ class MediaFile_Controller extends Bluebox_Controller
                 throw new Bluebox_Exception('Upload error ' .$error);
             }
         }
-        
+
         parent::save_prepare($object);
+    }
+
+    public function description($mediafile_id)
+    {
+        $mediafile = Doctrine::getTable('MediaFile')->find($mediafile_id);
+
+        if (isset($mediafile['description']))
+        {
+            echo $mediafile['description'];
+        }
+        
+        flush();
+
+        die();
     }
 
     public function download($mediafile_id, $stream = FALSE)
@@ -120,5 +201,32 @@ class MediaFile_Controller extends Bluebox_Controller
         flush();
         
         die();
+    }
+
+    public function qtipAjaxReturn($data)
+    {
+        if ($data instanceof MediaFile)
+        {
+            $id = $data['mediafile_id'];
+
+            $catalog = MediaFile::catalog();
+
+            $value = $catalog[$id];
+
+            jquery::addPlugin('growl');
+
+            Session::instance()->get_once('bluebox_message', array());
+
+            javascript::codeBlock('
+                $(\'#media_widget_file_list\')
+                    .prepend($("<option></option>")
+                    .attr("selected", "selected")
+                    .attr("value", "' .$id .'")
+                    .text("' .$value .'"))
+                    .trigger("change");
+            ');
+        }
+
+        parent::qtipAjaxReturn($data);
     }
 }

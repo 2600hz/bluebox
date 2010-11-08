@@ -2,8 +2,6 @@
 
 $config['playback'] = TRUE;
 
-$config['visualization'] = FALSE;
-
 $config['default_rates'] = array(8000, 16000, 32000, 48000);
 
 $config['hide_rate_folders'] = TRUE;
