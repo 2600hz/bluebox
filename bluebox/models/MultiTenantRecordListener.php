@@ -13,54 +13,38 @@
  */
 class MultiTenantRecordListener extends Doctrine_Record_Listener
 {
-    private $account_id = 0;
+    private static $account_id = 0;
 
     public function getUserId()
     {
-        if (empty($this->account_id))
-        {
-            // The user may change for example force_login
-            if (!empty(users::$user['account_id']))
-            {
-                $this->account_id = users::$user['account_id'];
-            }
+        $prev_account_id = self::$account_id;
 
-            $session = Session::instance();
+	// The user may change for example force_login
+	if (!empty(users::$user['account_id']))
+	{
+	    self::$account_id = users::$user['account_id'];
+	}
 
-            $account_id = $session->get('multitenant_account_id', FALSE);
+	$session = Session::instance();
 
-            if (!empty($account_id))
-            {
-                if (request::is_ajax())
-                {
-                    $controller = $session->get('ajax.base_controller', NULL);
-                }
-                else
-                {
-                    $controller = strtolower(Router::$controller);
-                }
+	if (($multitenant_account_id = $session->get('multitenant_account_id', FALSE)))
+	{
+	    self::$account_id = $multitenant_account_id;
+	}
 
-                if ($controller == 'accountmanager')
-                {
-                       $this->account_id = $account_id;
-                }
-                else
-                {
-                    $session->delete('multitenant_account_id');
-                }
-            }
+	if (!self::$account_id)
+	{
+	    Kohana::log('debug', 'Throwing exception due to empty user account_id');
 
-            if (empty($this->account_id))
-            {
-                Kohana::log('debug', 'Throwing exception due to empty user account_id');
+	    throw new Exception('Unable to determine your authorization to manipulate this record');
+	}
 
-                throw new Exception('Unable to determine your authorization to manipulate this record');
-            }
+	if (self::$account_id != $prev_account_id)
+	{
+	    kohana::log('debug', 'MultiTenantRecordListener is using account id ' .self::$account_id);
+	}
 
-            kohana::log('debug', 'MultiTenantRecordListener is using account id ' .$this->account_id);
-        }
-
-        return $this->account_id;
+        return self::$account_id;
     }
 
     public function preSave(Doctrine_Event $event)
