@@ -11,8 +11,10 @@ class MediaLib
         media::addComponent('Media File', $view);
     }
 
-    public static function maintance()
+    public static function maintenance()
     {
+        kohana::log('debug', 'Preforming maintenance on the media files');
+        
         $records = Doctrine::getTable('MediaFile')->findAll();
 
         foreach ($records as $record)

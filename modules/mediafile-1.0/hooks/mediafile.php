@@ -2,4 +2,4 @@
 
     Event::add('bluebox.media.widget', array('MediaLib', 'provideMediaWidget'));
 
-    Event::add('bluebox.maintance', array('MediaLib', 'maintance'));
+    Event::add('bluebox.maintenance', array('MediaLib', 'maintenance'));
