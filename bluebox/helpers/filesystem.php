@@ -192,14 +192,14 @@ class filesystem
 
             try
             {
-                if (!@unlink($dir.'/'.$obj))
+                if (!@unlink($dir .DIRECTORY_SEPARATOR .$obj))
                 {
-                    self::delete($dir.'/'.$obj, true);
+                    self::delete($dir .DIRECTORY_SEPARATOR .$obj, TRUE);
                 }
             } 
             catch (Exception $e)
             {
-                self::delete($dir.'/'.$obj, true);
+                self::delete($dir .DIRECTORY_SEPARATOR .$obj, TRUE);
             }
         }
 
@@ -223,11 +223,11 @@ class filesystem
     {
         if ($path{strlen($path) - 1} == DIRECTORY_SEPARATOR)
         {
-            return self::is_writable($path . uniqid(mt_rand()) . '.tmp');
+            return self::is_writable($path .uniqid(mt_rand()) .'.tmp');
         }
         else if (is_dir($path))
         {
-            return self::is_writable($path .DIRECTORY_SEPARATOR . uniqid(mt_rand()) . '.tmp');
+            return self::is_writable($path .DIRECTORY_SEPARATOR .uniqid(mt_rand()) .'.tmp');
         }
 
         // check tmp file for read/write capabilities
@@ -235,9 +235,9 @@ class filesystem
 
         $f = @fopen($path, 'c');
 
-        if ($f === false)
+        if ($f === FALSE)
         {
-            return false;
+            return FALSE;
         }
 
         fclose($f);
@@ -247,7 +247,7 @@ class filesystem
             unlink($path);
         }
         
-        return true;
+        return TRUE;
     }
 
     /**
