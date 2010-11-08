@@ -44,4 +44,15 @@ class html extends html_Core
 
         return parent::image($attributes, $alt, $index);
     }
+
+    public static function token($string)
+    {
+        $string = preg_replace('/[^a-zA-Z0-9-_:.]+/imx', '_', $string);
+
+        $string = trim($string, '_');
+
+        // TODO: ensure it starts with a letter!
+
+        return strtolower($string);
+    }
 }
