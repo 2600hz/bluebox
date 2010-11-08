@@ -245,9 +245,6 @@ abstract class Bluebox_Controller extends Template_Controller
         // Call the constructor's for all plugins registered
         plugins::construct();
 
-        // TODO: this needs to be outside of the requests, fired less frequently, and by a cron job..
-        Event::run('bluebox.maintance');
-
         // Setup anything related to authorizing the user
         Event::run('bluebox.ready', $this);
     }
