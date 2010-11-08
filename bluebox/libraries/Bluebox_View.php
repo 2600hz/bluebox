@@ -60,4 +60,67 @@ class View extends View_Core {
 
         }
     }
+
+    public function each(&$list, $varname = NULL, $renderer = FALSE)
+    {
+        if (empty($list))
+        {
+            return;
+        }
+
+        $iterate = $list;
+
+        if ($varname)
+        {
+            if (!isset($list[$varname]))
+            {
+                return;
+            }
+            
+            $iterate = $list[$varname];
+        }
+        
+        if (!arr::is_iterable($iterate))
+        {
+            return;
+        }
+
+        foreach ($iterate as $key => $value)
+        {
+            $view = clone $this;
+
+            $view->set('view_each_key', $key);
+
+            $view->set('view_each_value', (string)$value);
+
+            $view->set($key, $value);
+
+            if ($varname)
+            {
+                $view->set($varname, $value);
+            }
+
+            $view->render(TRUE, $renderer);
+
+            unset($view);
+        }
+    }
+
+    public function template($print = FALSE, $renderer = FALSE)
+    {
+        $output = (string)parent::render(FALSE, $renderer);
+
+        $output = json_encode($output);
+
+        $output = str_replace(array('\n', '  '), '', $output);
+
+        if ($print === TRUE)
+        {
+            echo $output;
+
+            return;
+        }
+
+        return $output;
+    }
 }

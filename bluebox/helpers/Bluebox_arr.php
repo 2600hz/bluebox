@@ -22,6 +22,16 @@ class arr extends arr_Core
         return isset($mixed) && (is_array($mixed) OR ($mixed instanceof Traversable));
     }
 
+    public static function max_key($array)
+    {
+        if (empty($array))
+        {
+            return 0;
+        }
+
+        return max(array_keys($array));
+    }
+
     /**
      * Gets the value deep inside $array using $path to find it.
      *
