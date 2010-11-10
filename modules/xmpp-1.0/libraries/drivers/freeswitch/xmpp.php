@@ -1,15 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * @author Jon Blanton <rjdev943@gmail.com>
- * @author Rockwood Cataldo <rjdev943@gmail.com>
+ * @author Jon Blanton <jon@2600hz.com>
+ * @author Rockwood Cataldo <rocco@2600hz.com>
  * @license MPL
  * @package Xmpp
  */
-class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver
-{
+class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
 
-    public static function set($xmppData)
-    {
+    public static function set($xmppData) {
         $xml = Telephony::getDriver()->xml;
 
         // Build the Dinagling profile...
@@ -32,7 +30,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver
         $xml->update('/param[@name="auto-reply"]{@value="' . $xmppData['registry']['autoreply'] . '"}');
         $xml->update('/param[@name="sasl"]{@value="' . $xmppData['registry']['sasl'] . '"}');
         $xml->update('/param[@name="tls"]{@value="' . ($xmppData['registry']['tls'] == 1 ? 'true' : 'false') . '"}');
-        $xml->update('/param[@name="use-rtp-timer"]{@value="' . $xmppData['registry']['usertptimer'] . '"}');
+        $xml->update('/param[@name="use-rtp-timer"]{@value="' . ($xmppData['registry']['usertptimer'] == 1 ? 'true' : 'false') . '"}');
         $xml->update('/param[@name="vad"]{@value="' . $xmppData['registry']['vad'] . '"}');
         $xml->update('/param[@name="candidate-acl"]{@value="' . $xmppData['registry']['candidateacl'] . '"}');
         $xml->update('/param[@name="local-network-acl"]{@value="' . $xmppData['registry']['localnetacl'] . '"}');
@@ -43,29 +41,25 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver
         $xml->update('/param[@name="exten"]{@value="' . $realExten['number'] . '"}');
 
 
-        // Build the dialplan from the ...l
-        foreach ($xmppData['registry']['patterns'] as $simple_route_id => $options)
-        {
-            foreach ($xmppData['registry']['contexts'] as $context_id => $enabled)
-            {//dingaling_1_pattern_1
+        // Build the dialplan from the ...
+        foreach ($xmppData['registry']['patterns'] as $simple_route_id => $options) {
+            foreach ($xmppData['registry']['contexts'] as $context_id => $enabled) {
+	    	//dingaling_1_pattern_1
                 $xml = FreeSwitch::createExtension($xmppData['xmpp_id'] .'_pattern_' .$simple_route_id, 'dingaling', 'context_' .$context_id);
 
-                if (empty($enabled))
-                {
+                if (empty($enabled)) {
                     $xml->deleteNode();
 
                     continue;
                 }
 
-                if (empty($options['enabled']))
-                {
+                if (empty($options['enabled'])) {
                     $xml->deleteNode();
 
                     continue;
                 }
 
-                if (!$pattern = simplerouter::getOutboundPattern($simple_route_id, 'freeswitch'))
-                {
+                if (!$pattern = simplerouter::getOutboundPattern($simple_route_id, 'freeswitch')) {
                     $xml->deleteNode();
 
                     continue;
@@ -75,12 +69,10 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver
 
                 $condition = '/condition[@field="destination_number"][@expression="' .$pattern . '"][@bluebox="pattern_' .$simple_route_id .'"]';
 
-                if (!empty($options['prepend']))
-                {
+                if (!empty($options['prepend'])) {
                     $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' .$options['prepend'] . '"}');
                 }
-                else
-                {
+                else {
                     $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend="}');
                 }
                 
@@ -90,13 +82,10 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver
         }
     }
 
-    public static function delete($xmppData)
-    {
+    public static function delete($xmppData) {
         //Delete dialplans
-        foreach ($xmppData['registry']['patterns'] as $simple_route_id => $options)
-        {
-            foreach ($xmppData['registry']['contexts'] as $context_id => $enabled)
-            {
+        foreach ($xmppData['registry']['patterns'] as $simple_route_id => $options) {
+            foreach ($xmppData['registry']['contexts'] as $context_id => $enabled) {
                 $xml = FreeSwitch::createExtension($xmppData['xmpp_id'] .'_pattern_' . $simple_route_id, 'dingaling', 'context_' .$context_id);
 
                 $xml->deleteNode();
@@ -112,5 +101,27 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver
         $xml->setXmlRoot($root);
 
         $xml->deleteNode();
+    }
+
+    public static function preAnswer() {
+	$xml = FreeSWITCH::createExtension('preanswer_gtalk');
+
+	$content = <<<XML
+
+	<condition field="source" expression="^mod_dingaling$">
+	        <action application="set" data="bypass_media=false"/>
+		<action application="info"/>
+	</condition>
+        <condition field="${gtalk_call}" expression="^true$"> <!-- Only do this if we haven't already handled this call -->
+            	<anti-action application="set" data="gtalk_call=true"/>
+		<anti-action application="answer"/>
+		<anti-action application="sleep" data="1000"/>
+		<anti-action application="start_dtmf"/>
+		<anti-action application="send_dtmf" data="1"/>
+        </condition>
+
+XML;
+
+	$xml->replaceWithXml($content);
     }
 }
