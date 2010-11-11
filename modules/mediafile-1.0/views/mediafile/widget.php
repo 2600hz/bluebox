@@ -1,7 +1,7 @@
 
     <div class="field">
-        <?php echo form::label($pluginvar .'[mediafile]', 'Media:'); ?>
-        <?php echo mediafiles::dropdown(array('name' => $pluginvar .'[mediafile]', 'id' => 'media_widget_file_list')); ?>
+        <?php echo form::label('media[mediafile]', 'Media:'); ?>
+        <?php echo mediafiles::dropdown(array('name' => 'media[mediafile]', 'id' => 'media_widget_file_list')); ?>
         &nbsp;&nbsp;<?php echo html::anchor('mediafile/create', 'Upload New Media', array('class' => 'qtipAjaxForm')); ?>
     </div>
 

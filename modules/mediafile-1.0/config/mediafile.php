@@ -4,7 +4,7 @@ $config['playback'] = TRUE;
 
 $config['default_rates'] = array(8000, 16000, 32000, 48000);
 
-$config['hide_rate_folders'] = TRUE;
+$config['hide_rate_folders'] = FALSE;
 
 $config['upload_to_rate_folders'] = TRUE;
 

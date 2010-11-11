@@ -8,7 +8,7 @@ class MediaLib
     {
         $view = new View('mediafile/widget');
 
-        media::addComponent('Media File', $view);
+        Media_Plugin::addComponent('Media File', $view);
     }
 
     public static function maintenance()
