@@ -21,7 +21,7 @@
         </div>
         <div class="field">
             <?php echo form::label('xmpp[registry][password]', 'Password:'); ?>
-            <?php echo form::input('xmpp[registry][password]'); ?>
+            <?php echo form::password('xmpp[registry][password]'); ?>
         </div>
         <div class="field">
             <?php echo form::label(array('for' => 'xmpp[registry][loginserver]',
@@ -46,20 +46,20 @@
         </div>
         <div class="field">
             <?php echo form::label(array('for' => 'xmpp[registry][autologin]',
-	    				 'help' => 'This option should be enabled in most cases.',
+	    				 'help' => 'This option should be enabled in most cases.'),
 				   'Auto-Login:'); ?>
             <?php echo form::checkbox('xmpp[registry][autologin]'); ?>
         </div>
         <div class="field">
             <?php echo form::label(array('for' => 'xmpp[registry][usertptimer]',
                                          'help' => 'If you are having issues with audio delay, you can try disabling this.' . 
-					 	   '<br>Otherwise this should be enabled.', 
+					 	   '<br>Otherwise this should be enabled.'), 
                                    'Use RTP Timer'); ?>
             <?php echo form::checkbox('xmpp[registry][usertptimer]'); ?>
         </div>
 	<div class="field">
 	    <?php echo form::label(array('for' => 'xmpp[registry][tls]',
-	    				 'help' => 'This option needs to be enabled for Google Voice.',
+	    				 'help' => 'This option needs to be enabled for Google Voice.'),
 				   'TLS:'); ?>
             <?php echo form::checkbox('xmpp[registry][tls]'); ?>
 	</div>

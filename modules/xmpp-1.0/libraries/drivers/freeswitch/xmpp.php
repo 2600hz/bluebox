@@ -103,7 +103,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
         $xml->deleteNode();
     }
 
-    public static function preAnswer() {
+    public static function preanswer() {
 	$xml = FreeSWITCH::createExtension('preanswer_gtalk');
 
 	$content = <<<XML
