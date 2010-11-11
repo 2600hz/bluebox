@@ -6,6 +6,6 @@ class TextToSpeech
     {
         $view = new View('tts/widget');
 
-        media::addComponent('Text to Speech', $view);
+        Media_Plugin::addComponent('Text to Speech', $view);
     }
 }
