@@ -71,7 +71,7 @@ abstract class Bluebox_Controller extends Template_Controller
 
             $this->session->set('ajax.base_method', strtolower(Router::$method));
         }
-
+        
         // Instantiate internationalization
         $this->i18n = i18n::instance();
 
@@ -158,7 +158,7 @@ abstract class Bluebox_Controller extends Template_Controller
                 break;
 
             default:
-                if (request::is_ajax())
+                if (request::is_ajax() OR !empty($_REQUEST['qtipAjaxForm']))
                 {
                     $this->viewParams['template'] = 'ajax';
                 } 
@@ -437,14 +437,14 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->template->content = new View('generic/blank');
 
             header("X-AjaxForm-Status: complete");
-            
+
             if(method_exists($this, 'qtipAjaxReturn'))
             {
                 $this->qtipAjaxReturn($object);
             }
 
             message::render(array(), array('growl' => TRUE, 'html' => FALSE));
-            
+
             $this->_render();
 
             flush();
@@ -730,7 +730,7 @@ abstract class Bluebox_Controller extends Template_Controller
 
         // Short hand for the baseModel
         $base = strtolower($baseModel);
-        
+
         if (is_null($id))
         {
             $this->$base = new $baseModel();
@@ -751,7 +751,7 @@ abstract class Bluebox_Controller extends Template_Controller
             }
         }
 
-        $this->view->base = $base;
+        $this->view->set_global('base', $base);
 
         Event::run('bluebox.load_base_model', $this->$base);
     }
@@ -766,7 +766,7 @@ abstract class Bluebox_Controller extends Template_Controller
         $base = strtolower($baseModel);
 
         // Allow our location object to be seen by the view
-        $this->view->$base = $this->$base;
+        $this->view->set_global($base, $this->$base);
 
         Event::run('bluebox.prepare_update_view', $this->view);
 
@@ -782,7 +782,9 @@ abstract class Bluebox_Controller extends Template_Controller
         }
 
         $base = strtolower($baseModel);
-        
+
+        $this->view->set_global($base, $this->$base);
+
         // Set the vars that the generic delete will be expecting
         $this->view->baseModel = strtolower($baseModel);
 
