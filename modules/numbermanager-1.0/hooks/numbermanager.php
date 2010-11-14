@@ -13,7 +13,9 @@
         Event::add('ajax.updateobject', array('Numbers', 'updateOnPageObjects'));
     }
 
-    
+    Event::add('bluebox.initialize.devicenumber', array('Numbers', 'initializeDeviceNumber'));
+
+
     plugins::register('numbermanager/create', 'view', array('NumberManager_Plugin', 'numberTargets'));
 
     plugins::register('numbermanager/edit', 'view', array('NumberManager_Plugin', 'numberTargets'));
