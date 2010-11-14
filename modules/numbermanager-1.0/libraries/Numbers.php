@@ -108,7 +108,7 @@ class Numbers
         }
     }
 
-    public static function associateNumbers($base = NULL)
+    public static function associateNumbers(&$base = NULL)
     {
         if (!$base)
         {
@@ -306,7 +306,11 @@ class Numbers
             }
 
             $number['dialplan'] = $dialplan;
-            
+
+            $number['class_type'] = 'DeviceNumber';
+
+            $number['foreign_id'] = $device['device_id'];
+
             $number['NumberContext']->fromArray(array(
                 0 => array('context_id' => $context_id)
             ));
@@ -325,12 +329,6 @@ class Numbers
             $number['account_id'] = $account_id;
 
             $number->save();
-
-            $_POST['numbers']['assigned'] = array(
-                $number['number_id'] => ''
-            );
-
-            self::associateNumbers($device);
         }
         catch (Exception $e)
         {
