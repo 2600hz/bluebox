@@ -88,7 +88,7 @@ class InterfaceManager_Configure extends Bluebox_Configure
         }
     }
 
-    private function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $context = 'Publicly Accessible') {
+    public static function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $context = 'Publicly Accessible') {
         Kohana::log('debug', 'Adding SIP interface for IP ' . $ip . ' on port ' . $port);
 
         $sipInterface = new SipInterface();
@@ -110,6 +110,13 @@ class InterfaceManager_Configure extends Bluebox_Configure
         $sipInterface['inbound_net_list_id'] = ($use_inbound_acl ? netlists::getSystemListId('trunks.auto') : 0);
 
         $sipInterface['register_net_list_id'] = 0;
+
+        $location = Doctrine::getTable('Location')->findOneByName('Main Location');
+
+        if (!empty($location['location_id']))
+        {
+            $sipInterface['registry'] = array('force_register_domain' => $location['location_id']);
+        }
 
         $sipInterface->save();
 
