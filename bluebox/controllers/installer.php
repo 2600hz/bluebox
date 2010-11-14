@@ -1364,6 +1364,56 @@ class Installer_Controller extends Bluebox_Controller
 
             $transaction->commit();
 
+            Bluebox_Tenant::generateDevice(Bluebox_Tenant::$created['accountId'], Bluebox_Tenant::$created['userId']);
+
+            if (Session::instance()->get('installer.samples', FALSE))
+            {
+                $sampleUsers = array(
+                    array(
+                        'first' => 'Peter',
+                        'last' => 'Gibbons',
+                        'username' => 'peter@initech.com',
+                        'password' => 'password1',
+                        'user_type' => User::TYPE_NORMAL_USER
+                    ),
+                    array(
+                        'first' => 'Michael',
+                        'last' => 'Bolton',
+                        'username' => 'michael@initech.com',
+                        'password' => 'password1',
+                        'user_type' => User::TYPE_NORMAL_USER
+                    ),
+                    array(
+                        'first' => 'Samir',
+                        'last' => 'Nagheenanajar',
+                        'username' => 'samir@initech.com',
+                        'password' => 'password1',
+                        'user_type' => User::TYPE_NORMAL_USER
+                    ),
+                    array(
+                        'first' => 'Bill',
+                        'last' => 'Lumbergh',
+                        'username' => 'bill@initech.com',
+                        'password' => 'password1',
+                        'user_type' => User::TYPE_NORMAL_USER
+                    ),
+                    array(
+                        'first' => 'Milton',
+                        'last' => 'Waddams',
+                        'username' => 'milton@initech.com',
+                        'password' => 'password1',
+                        'user_type' => User::TYPE_NORMAL_USER
+                    )
+                );
+
+                foreach ($sampleUsers as $sampleUser)
+                {
+                    $userId = Bluebox_Tenant::initializeUser(Bluebox_Tenant::$created['accountId'], Bluebox_Tenant::$created['locationId'], $sampleUser);
+
+                    Bluebox_Tenant::generateDevice(Bluebox_Tenant::$created['accountId'], $userId);
+                }
+            }
+            
             return TRUE;
         }
         catch(Exception $e)
