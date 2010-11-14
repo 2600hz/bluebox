@@ -150,7 +150,8 @@ class AccountManager_Controller extends Bluebox_Controller
                 {
                     $contexts[] = array(
                         'name' => empty($_POST['context']['private_name']) ? 'In-house Only' : $_POST['context']['private_name'],
-                        'locked' => FALSE
+                        'locked' => FALSE,
+                        'registry' => array('type' => 'private')
                     );
                 }
 
@@ -158,7 +159,8 @@ class AccountManager_Controller extends Bluebox_Controller
                 {
                     $contexts[] = array(
                         'name' => empty($_POST['context']['public_name']) ? 'Publicly Accessible' : $_POST['context']['public_name'],
-                        'locked' => FALSE
+                        'locked' => FALSE,
+                        'registry' => array('type' => 'public')
                     );
                 }
 
