@@ -12,6 +12,8 @@
 
     <?php foreach ($catalog as $section => $packages) : ?>
 
+        <?php if(sizeof($packages) == 0) continue; ?>
+
         <?php echo form::open_section($section); ?>
 
             <?php foreach ($packages as $packageName => $package) : ?>
