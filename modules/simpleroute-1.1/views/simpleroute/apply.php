@@ -26,7 +26,19 @@
 
         <?php echo form::label('simpleroute[contexts][' .$context['context_id'] .']', $context['name']); ?>
 
-        <?php echo form::checkbox('simpleroute[contexts][' .$context['context_id'] .']'); ?>
+        <?php
+            $default = NULL;
+            
+            if (!empty($context['registry']['type']) AND $context['registry']['type'] == 'private')
+            {
+                if (!isset($simpleroute['contexts'][$context['context_id']]))
+                {
+                    $default = TRUE;
+                }
+            }
+        ?>
+
+        <?php echo form::checkbox('simpleroute[contexts][' .$context['context_id'] .']', NULL, $default); ?>
 
         </div>
 

@@ -45,7 +45,18 @@ class SipInterface_Plugin extends Bluebox_Plugin
 
         foreach ($result as $row)
         {
-            $options[$row['sipinterface_id']] = $row['name'];
+            if (!$row['auth'])
+            {
+                $options[$row['sipinterface_id']] = $row['name'];
+            }
+        }
+
+        foreach ($result as $row)
+        {
+            if ($row['auth'])
+            {
+                $options[$row['sipinterface_id']] = $row['name'];
+            }
         }
 
         $this->subview->options = $options;

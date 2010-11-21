@@ -14,3 +14,5 @@
     plugins::register('devicemanager/edit', 'view', array('Sip_Plugin', 'update'));
 
     plugins::register('devicemanager', 'save', array('Sip_Plugin', 'save'));
+
+    Event::add('bluebox.initialize.device', array('SipLib', 'initializeDevice'));

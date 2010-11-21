@@ -161,6 +161,18 @@ fUpdateBlueboxPerm() {
     echo "# chmod -R g+w bluebox/config/"
     chmod -R g+w bluebox/config/
 
+    echo "# chgrp -R $webuser modules/freeswitch-*/config/freeswitch.php"
+    chgrp -R $webuser modules/freeswitch-*/config/freeswitch.php
+
+    echo "# chmod -R g+w modules/freeswitch-*/config/freeswitch.php"
+    chmod -R g+w modules/freeswitch-*/config/freeswitch.php
+
+    echo "# chgrp -R $webuser modules/asterisk-*/config/asterisk.php"
+    chgrp -R $webuser modules/asterisk-*/config/asterisk.php
+
+    echo "# chmod -R g+w modules/asterisk-*/config/asterisk.php"
+    chmod -R g+w modules/asterisk-*/config/asterisk.php
+
     [ ! -d upload/ ] && echo "# mkdir upload/" && mkdir -p upload/ 2>&1
 
     echo "# chgrp -R $webuser upload/"
