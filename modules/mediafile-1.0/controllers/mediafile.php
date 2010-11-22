@@ -157,15 +157,29 @@ class MediaFile_Controller extends Bluebox_Controller
         parent::save_prepare($object);
     }
 
-    public function description($mediafile_id)
+    public function description($filepath)
     {
-        $mediafile = Doctrine::getTable('MediaFile')->find($mediafile_id);
-
-        if (isset($mediafile['description']))
+        if (func_num_args() > 1)
         {
-            echo $mediafile['description'];
+            $filepath = '/' .implode('/', func_get_args());
         }
-        
+
+        $filename = pathinfo($filepath, PATHINFO_BASENAME);
+
+        $mediafiles = Doctrine::getTable('MediaFile')->findByFile($filename);
+
+        $hide_rate = kohana::config('mediafile.hide_rate_folders');
+
+        foreach ($mediafiles as $mediafile)
+        {
+            if ($mediafile->filepath(TRUE, !$hide_rate) == $filepath)
+            {
+                echo $mediafile['description'];
+
+                break;
+            }
+        }
+
         flush();
 
         die();

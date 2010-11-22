@@ -27,7 +27,21 @@ class MediaLib
             }
         }
     }
-    
+
+    public static function generateConfiguration()
+    {
+        list($media, $xml, $base) = Event::$data;
+
+        if (!empty($media['mediafile']))
+        {
+            kohana::log('debug', 'Configuring an auto-attendant to use: ' .$media['mediafile']);
+
+            $xml->setAttributeValue('', 'greet-long', $media['mediafile']);
+
+            $xml->setAttributeValue('', 'greet-short', $media['mediafile']);
+        }
+    }
+
     public static function getAudioInfo($path)
     {
         if (!is_file($path))
