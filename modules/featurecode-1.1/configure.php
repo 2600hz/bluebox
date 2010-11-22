@@ -23,9 +23,4 @@ class FeatureCode_1_1_0_Configure extends Bluebox_Configure
         'Search Feature Codes' => '/featurecode/index'
         ,'Add Feature Codes' => '/featurecode/create'
     );
-
-    public function migrate()
-    {
-        // TODO: Fix this so we migrate properly! Ask Karl
-    }
 }

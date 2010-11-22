@@ -20,7 +20,8 @@ $config['default_packages'] = array(
     'ringgroup',
     'timeofday',
     'voicemail',
-
+    'featurecode',
+    
     // Plugins
     'address',
     'callerid',

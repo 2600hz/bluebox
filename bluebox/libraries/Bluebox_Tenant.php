@@ -3,7 +3,9 @@
 class Bluebox_Tenant
 {
     public static $accountName = NULL;
-    
+
+    public static $created = array();
+
     public static function initializeAccount($options)
     {
         $account = new Account();
@@ -75,6 +77,8 @@ class Bluebox_Tenant
 
         $context->account_id = $accountId;
 
+        $context->registry = array('type' => 'private');
+
         $context->save();
 
         $context = new Context();
@@ -84,6 +88,8 @@ class Bluebox_Tenant
         $context->locked = FALSE;
 
         $context->account_id = $accountId;
+
+        $context->registry = array('type' => 'public');
 
         $context->save();
 
@@ -101,7 +107,7 @@ class Bluebox_Tenant
      *
      * TODO: Should we just pass in a list of options, and then pass it around accordingly?
      */
-    public static function initializeTenant($options)
+    public static function initializeTenant($options, $users = array())
     {
         // Add the core admin user to the system
         // TODO: Should check for errors here...
@@ -211,6 +217,8 @@ class Bluebox_Tenant
 
         self::$accountName = NULL;
 
+        self::$created = array ('userId' => $userId, 'locationId' => $locationId, 'accountId' => $accountId);
+
         // You can get everything you need from here
         return array ('userId' => $userId, 'locationId' => $locationId, 'accountId' => $accountId); 
     }
@@ -242,5 +250,82 @@ class Bluebox_Tenant
         $site->save();
 
         $site->free();
+    }
+
+    public static function generateDevice($accountId, $userId, $extension = NULL, $contextId = NULL)
+    {
+        Doctrine::getTable('Device')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+        if (!$contextId)
+        {
+            $contextId = Context::getContextByType('private', $accountId);
+        }
+
+        if (!$userId OR !$accountId OR !$contextId)
+        {
+            kohana::log('debug', 'Missing the necessary data to generate devices');
+
+            return;
+        }
+
+        $devices = Doctrine_Query::create()
+            ->from('Device')
+            ->where('account_id = ?', array($accountId))
+            ->execute();
+
+        $deviceNum = count($devices) + 1;
+
+        if (!$extension)
+        {
+            $baseExt = kohana::config('telephony.device_exten_start', 2000);
+
+            if (!$baseExt)
+            {
+                $baseExt = 2000;
+            }
+            
+            $extension = $baseExt + $deviceNum;
+        }
+
+        Kohana::log('debug', 'Generating a device for user ' .$userId .' in account ' .$accountId .' as extension ' .$extension .' in context ' .$contextId);
+
+        try
+        {
+            $device = new Device();
+
+            $device['account_id'] = $accountId;
+
+            $device['user_id'] = $userId;
+
+            $device['context_id'] = $contextId;
+
+            $device['name'] = 'Device ' .$deviceNum;
+
+            $device['type'] = 'SipDevice';
+
+            $data = array(
+                'device' => &$device,
+                'extension' => $extension,
+                'user_id' => $userId,
+                'context_id' => $contextId,
+                'account_id' => $accountId
+            );
+
+            Event::run('bluebox.initialize.device', $data);
+
+            $device->save();
+
+            Event::run('bluebox.initialize.devicenumber', $data);
+        }
+        catch(Exception $e)
+        {
+            kohana::log('error', 'Unable to generate device ' .$deviceNum . ' as ' .$extension .' because: ' .$e->getMessage());
+
+            return FALSE;
+        }
+
+        Doctrine::getTable('Device')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+        return TRUE;
     }
 }

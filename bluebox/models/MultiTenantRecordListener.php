@@ -36,7 +36,7 @@ class MultiTenantRecordListener extends Doctrine_Record_Listener
 	{
 	    Kohana::log('debug', 'Throwing exception due to empty user account_id');
 
-	    throw new Exception('Unable to determine your authorization to manipulate this record');
+	    //throw new Exception('Unable to determine your authorization to manipulate this record');
 	}
 
 	if (self::$account_id != $prev_account_id)

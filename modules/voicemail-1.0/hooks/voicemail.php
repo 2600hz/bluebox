@@ -15,3 +15,5 @@
     plugins::register('devicemanager/edit', 'view', array('Voicemail_Plugin', 'update'));
 
     plugins::register('devicemanager', 'save', array('Voicemail_Plugin', 'save'));
+
+    Event::add('bluebox.initialize.device', array('Voicemails', 'initializeDevice'));
