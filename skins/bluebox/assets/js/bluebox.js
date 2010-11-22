@@ -78,7 +78,7 @@ function qtipAjaxForm(link) {
                         }
                     },
                     beforeSubmit: function () {
-                        me.elements.content.html(me.options.content.text);
+                        //me.elements.content.html(me.options.content.text);
                     }
                 }
 
