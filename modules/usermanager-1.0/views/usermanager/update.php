@@ -82,7 +82,7 @@
         }
     ?>
 
-    <?php if (users::$user->user_type == User::TYPE_SYSTEM_ADMIN) : ?>
+    <?php if (users::getAttr('user_type') == User::TYPE_SYSTEM_ADMIN) : ?>
 
         <?php jquery::addPlugin('spinner'); ?>
     
