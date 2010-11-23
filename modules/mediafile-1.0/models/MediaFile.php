@@ -176,10 +176,10 @@ class MediaFile extends Bluebox_Record
                     $this->set('file', $uploadedFile['name']);
                 }
 
-                if (!$this->get('name'))
-                {
-                    $this->set('name', pathinfo($uploadedFile['name'], PATHINFO_FILENAME));
-                }
+//                if (!$this->get('name'))
+//                {
+//                    $this->set('name', pathinfo($uploadedFile['name'], PATHINFO_FILENAME));
+//                }
 
                 if ($this->get('path'))
                 {
@@ -226,6 +226,31 @@ class MediaFile extends Bluebox_Record
                 }
 
                 $directory = $this->filepath();
+
+                if (!$this->get('name') OR !$this->get('description'))
+                {
+                    $mediafiles = $this->get_resampled();
+
+                    if (!$this->get('name'))
+                    {
+                        if (isset($mediafiles[0]['name']))
+                        {
+                            $this->set('name', $mediafiles[0]['name']);
+                        }
+                        else
+                        {
+                            $this->set('name', pathinfo($uploadedFile['name'], PATHINFO_FILENAME));
+                        }
+                    }
+
+                    if (!$this->get('description'))
+                    {
+                        if (isset($mediafiles[0]['description']))
+                        {
+                            $this->set('description', $mediafiles[0]['description']);
+                        }
+                    }
+                }
 
                 if (!$directory OR (!filesystem::is_writable($directory) AND !filesystem::createDirectory($directory)))
                 {
