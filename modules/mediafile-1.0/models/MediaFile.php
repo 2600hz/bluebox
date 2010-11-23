@@ -3,7 +3,9 @@
 class MediaFile extends Bluebox_Record
 {
     private $uploaded_file = NULL;
-    
+  
+    public $skip_desc_propagate = FALSE;
+
     /**
      * Sets the table name, and defines the table columns.
      */
@@ -35,6 +37,50 @@ class MediaFile extends Bluebox_Record
 
     public function postSave()
     {
+        $modified = $this->getModified(FALSE, TRUE);
+        
+        if ((array_key_exists('description', $modified) OR array_key_exists('name', $modified)) AND !$this->skip_desc_propagate)
+        {
+            $resampled = $this->get_resampled();
+
+            foreach ($resampled as $key => $mediafile)
+            {
+                $differs = FALSE;
+                
+                if ($this->get('mediafile_id') == $mediafile['mediafile_id'])
+                {
+                    continue;
+                }
+
+                if ($this->get('description') != $mediafile['description'])
+                {
+                    $differs = TRUE;
+                    
+                    $resampled[$key]['description'] = $this->get('description');
+                }
+
+                if ($this->get('name') != $mediafile['name'])
+                {
+                    $differs = TRUE;
+
+                    $resampled[$key]['name'] = $this->get('name');
+                }
+
+                if (!$differs)
+                {
+                    continue;
+                }
+                
+                kohana::log('debug', 'Copy media file description or name from ' .$this->get('mediafile_id') .' to ' .$mediafile['mediafile_id']);
+                
+                $mediafile->skip_desc_propagate = TRUE;
+
+                $resampled[$key]->save();
+
+                $mediafile->skip_desc_propagate = FALSE;
+            }
+        }
+        
         if (!$this->uploaded_file)
         {
             return;
@@ -74,7 +120,19 @@ class MediaFile extends Bluebox_Record
 
         Event::run('mediafile.get_resampled', $resampled);
 
-        return $resampled->execute();
+        $result = array();
+
+        $mediafiles = $resampled->execute();
+        
+        foreach ($mediafiles as $key => $mediafile)
+        {
+            if ($this->filepath(TRUE, FALSE) == $mediafile->filepath(TRUE, FALSE))
+            {
+                $result[] = &$mediafiles[$key];
+            }
+        }
+
+        return $result;
     }
 
     public function prepare_upload($uploadvar = 'upload')
