@@ -22,8 +22,6 @@ class Input extends Input_Core
             $this->unfiltered_inputs[strtolower($input)] = $GLOBALS[$input];
         }
 
-        kohana::log('debug', print_r($this->unfiltered_inputs, TRUE));
-
         parent::__construct();
 
         // loop each of the request vars
