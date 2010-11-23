@@ -176,11 +176,6 @@ class MediaFile extends Bluebox_Record
                     $this->set('file', $uploadedFile['name']);
                 }
 
-//                if (!$this->get('name'))
-//                {
-//                    $this->set('name', pathinfo($uploadedFile['name'], PATHINFO_FILENAME));
-//                }
-
                 if ($this->get('path'))
                 {
                     $path = trim($this->get('path'), DIRECTORY_SEPARATOR) .DIRECTORY_SEPARATOR;
