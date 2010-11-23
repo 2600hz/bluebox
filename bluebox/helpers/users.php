@@ -83,7 +83,22 @@ class users
             }
         }
 
-        //self::changeDebugLevel(self::getAttr('debug_level'));
+        Event::run('bluebox.users.redirectInvalidUser');
+
+        $user_debug = self::getAttr('debug_level');
+
+        if ($user_debug > Kohana::config('core.log_threshold'))
+        {
+            self::changeDebugLevel($user_debug);
+        }
+
+        $log = sprintf('Effective user_id %s - account_id %s', self::getAttr('user_id'), self::getAttr('account_id'));
+
+        kohana::log('debug', $log);
+
+        $log = sprintf('Authentic user_id %s - account_id %s', self::getAuthenticAttr('user_id'), self::getAuthenticAttr('account_id'));
+
+        kohana::log('debug', $log);
 
         return TRUE;
     }
@@ -98,52 +113,29 @@ class users
 
                 if (self::getAttr('account_id') != $account_id)
                 {
-                    $masq_account = Doctrine::getTable('Account')->find(self::getAttr('account_id'), Doctrine::HYDRATE_ARRAY);
-
-                    $session = Session::instance();
-
-                    $masquerades = $session->get('bluebox.user.masquerades', array());
-
-                    $masquerades = arr::merge(array('Account' => $masq_account), $masquerades);
-
-                    $session->set('bluebox.user.masquerades', $masquerades);
+                    self::masqueradeAccount(self::getAttr('account_id'));
                 }
 
                 return TRUE;
             }
-
-            // We get here only if the current user is invalid - old cookie!
-            Auth::instance()->logout(TRUE);
         }
 
-        // Nobody logged in if we get here
+        Auth::instance()->logout(TRUE);
+
         self::$user = array();
-        
+       
+        self::restoreUser();
+ 
         return FALSE;
     }
 
-    public static function getAttr($paths)
+    public static function isAuthentic($paths)
     {
-        $user = self::getCurrentUser(TRUE);
-       
-        if ($paths == 'full_name')
-        {
-            return self::getAttr('first_name') .' ' .self::getAttr('last_name');
-        }
+        $attr = call_user_func_array(array('self', 'getAttr'), func_get_args());
 
-        return arr::get_array($user, func_get_args());
-    }
+        $authAttr = call_user_func_array(array('self', 'getAuthenticAttr'), func_get_args());
 
-    public static function getAuthenticAttr($paths)
-    {
-        $user = self::getCurrentUser(FALSE);
-
-        if ($paths == 'full_name')
-        {
-            return self::getAuthenticAttr('first_name') .' ' .self::getAuthenticAttr('last_name');
-        }
-
-        return arr::get_array($user, func_get_args());
+        return ($attr == $authAttr) ? TRUE : FALSE;
     }
 
     /**
@@ -168,6 +160,30 @@ class users
         }
         
         return arr::merge(self::$user, $masquerades);
+    }
+
+    public static function getAttr($paths)
+    {
+        $user = self::getCurrentUser(TRUE);
+       
+        if ($paths == 'full_name')
+        {
+            return self::getAttr('first_name') .' ' .self::getAttr('last_name');
+        }
+
+        return arr::get_array($user, func_get_args());
+    }
+
+    public static function getAuthenticAttr($paths)
+    {
+        $user = self::getCurrentUser(FALSE);
+
+        if ($paths == 'full_name')
+        {
+            return self::getAuthenticAttr('first_name') .' ' .self::getAuthenticAttr('last_name');
+        }
+
+        return arr::get_array($user, func_get_args());
     }
 
     public static function masqueradeAttr($value, $paths)
@@ -216,13 +232,6 @@ class users
         return TRUE;
     }
 
-    public static function restoreUser()
-    {
-        $session = Session::instance();
-        
-        $session->set('bluebox.user.masquerades', array());
-    }
-
     public static function masqueradeAccount($account_id)
     {
         $account = Doctrine::getTable('Account')->find($account_id, Doctrine::HYDRATE_ARRAY);
@@ -245,15 +254,24 @@ class users
         return TRUE;
     }
 
+    public static function restoreUser()
+    {
+        $session = Session::instance();
+        
+        $session->set('bluebox.user.masquerades', array());
+    }
+
     public static function restoreAccount()
     {
+        $session = Session::instance();
+        
         $masquerades = $session->get('bluebox.user.masquerades', array());
 
         unset($masquerades['Account'], $masquerades['account_id']);
         
         $session->set('bluebox.user.masquerades', $masquerades);
     }
-
+    
     public static function changeDebugLevel($new_level = NULL)
     {
         // If the users debug_level is valid then update our threshold and

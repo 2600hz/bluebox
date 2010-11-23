@@ -58,11 +58,24 @@
                                     ) , i18n::$langs, Session::instance()->get('lang', 'en'));
                                   ?>
 
-                                  <?php if (users::getAuthenticAttr('user_id') != users::getAttr('user_id')) : ?>
+                                  <?php if (!users::isAuthentic('user_id')) : ?>
                                 
                                         <div>
-                                            Masquerading as <?php echo users::getAttr('full_name') .' in ' .users::getAttr('Account', 'name'); ?>
-                                            <?php echo html::anchor('usermanager/restore', __('restore')); ?>
+                                            Masquerading user as <?php echo users::getAttr('full_name'); ?>
+                                            <?php 
+                                                if (class_exists('UserManager_Controller')) 
+                                                {
+                                                    echo html::anchor('usermanager/restore', __('restore'));
+                                                }
+                                            ?>
+                                        </div>
+
+                                  <?php endif; ?>
+
+                                  <?php if (!users::isAuthentic('account_id')) : ?>
+
+                                        <div>
+                                            Masquerading account as <?php echo users::getAttr('Account', 'name'); ?>
                                         </div>
 
                                   <?php endif; ?>
@@ -196,4 +209,8 @@
 <!-- Execution Time: {execution_time} -->
 <!-- Memory Usage: {memory_usage} -->
 <!-- Included Files: {included_files} -->
+<!-- User ID: <?php echo users::getAuthenticAttr('user_id'); ?> -->
+<!-- Account ID: <?php echo users::getAuthenticAttr('account_id'); ?> -->
+<!-- Masq User ID: <?php echo users::getAttr('user_id'); ?> -->
+<!-- Masq Accoutn ID: <?php echo users::getAttr('user_id'); ?> -->
 <?php } ?>
