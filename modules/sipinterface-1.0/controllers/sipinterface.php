@@ -36,7 +36,7 @@ class SipInterface_Controller extends Bluebox_Controller
     {
         parent::__construct();
 
-        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        if (users::getAttr('user_type') != User::TYPE_SYSTEM_ADMIN)
         {
             message::set('You are not authorized to manage sip interfaces!');
 

@@ -6,9 +6,7 @@
  */
 class users
 {
-    public static $user = array();
-
-    protected static $auth = NULL;
+    protected static $user = array();
 
     protected static $authBypass = array(
         'user' => array(
@@ -85,54 +83,37 @@ class users
             }
         }
 
-        // If the users debug_level is valid then update our threshold and
-        // re-init the kohana logger so it takes the new settings
-        if (!empty(users::$user['debug_level']) AND (users::$user['debug_level'] <= 4) AND (users::$user['debug_level'] >= 0))
-        {
-            Kohana::config_set('core.log_threshold', users::$user['debug_level']);
-
-            Kohana::log_directory(Kohana::config('core.log_directory'));
-
-            register_shutdown_function(array('Kohana', 'log_save'));
-        }
-
-        // If the session holds a override for user_type then update this users
-        // in-memory type
-        if ($user_type = $session->get('user.sysadmin.user_type', FALSE))
-        {
-            self::$user['user_type'] = $user_type;
-        }
+        //self::changeDebugLevel(self::getAttr('debug_level'));
 
         return TRUE;
     }
 
     public static function isUserAuthentic()
     {
-        // get a singleton of the auth module
-        if (is_null(self::$auth))
+        if(self::$user = User::getAuthenticUser())
         {
-            self::$auth = new Auth();
-        }
-
-        $authentic = self::$auth;
-
-        if ($authentic->logged_in())
-        {
-            $userEmail = $authentic->get_user();
-
-            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
-
-            self::$user = Doctrine::getTable('User')->findOneByEmailAddress($userEmail);
-
-            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
-
-            if (!empty(self::$user['account_id']))
+            if ($account_id = self::getAuthenticAttr('account_id'))
             {
+                self::$user['Account'] = Doctrine::getTable('Account')->find($account_id, Doctrine::HYDRATE_ARRAY);
+
+                if (self::getAttr('account_id') != $account_id)
+                {
+                    $masq_account = Doctrine::getTable('Account')->find(self::getAttr('account_id'), Doctrine::HYDRATE_ARRAY);
+
+                    $session = Session::instance();
+
+                    $masquerades = $session->get('bluebox.user.masquerades', array());
+
+                    $masquerades = arr::merge(array('Account' => $masq_account), $masquerades);
+
+                    $session->set('bluebox.user.masquerades', $masquerades);
+                }
+
                 return TRUE;
             }
 
             // We get here only if the current user is invalid - old cookie!
-            $authentic->logout(TRUE);
+            Auth::instance()->logout(TRUE);
         }
 
         // Nobody logged in if we get here
@@ -141,14 +122,158 @@ class users
         return FALSE;
     }
 
+    public static function getAttr($paths)
+    {
+        $user = self::getCurrentUser(TRUE);
+       
+        if ($paths == 'full_name')
+        {
+            return self::getAttr('first_name') .' ' .self::getAttr('last_name');
+        }
+
+        return arr::get_array($user, func_get_args());
+    }
+
+    public static function getAuthenticAttr($paths)
+    {
+        $user = self::getCurrentUser(FALSE);
+
+        if ($paths == 'full_name')
+        {
+            return self::getAuthenticAttr('first_name') .' ' .self::getAuthenticAttr('last_name');
+        }
+
+        return arr::get_array($user, func_get_args());
+    }
+
     /**
      * Returns the current user as an array
      *
      * @return array
      */
-    public static function getCurrentUser()
+    public static function getCurrentUser($masquerade = TRUE)
     {
-        return (array)self::$user;
+        if (!self::$user)
+        {
+            return array();
+        }
+
+        $masquerades = array();
+
+        if ($masquerade)
+        {
+            $session = Session::instance();
+
+            $masquerades = $session->get('bluebox.user.masquerades', array());
+        }
+        
+        return arr::merge(self::$user, $masquerades);
+    }
+
+    public static function masqueradeAttr($value, $paths)
+    {
+        $paths = func_get_args();
+
+        array_shift($paths);
+
+        $session = Session::instance();
+
+        $masquerades = $session->get('bluebox.user.masquerades', array());
+
+        arr::set_array($masquerades, $value, $paths);
+
+        $session->set('bluebox.user.masquerades', $masquerades);
+    }
+
+    public static function masqueradeUser($user_id, $retain_type = TRUE)
+    {
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+        $user = Doctrine::getTable('User')->find($user_id, Doctrine::HYDRATE_ARRAY);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+        if (!$user)
+        {
+            return FALSE;
+        }
+
+        if ($retain_type)
+        {
+            unset($user['user_type']);
+        }
+        
+        $session = Session::instance();
+
+        $masquerades = $session->get('bluebox.user.masquerades', array());
+
+        $masquerades = arr::merge($user, $masquerades);
+        
+        $session->set('bluebox.user.masquerades', $masquerades);
+
+        users::isUserAuthentic();
+        
+        return TRUE;
+    }
+
+    public static function restoreUser()
+    {
+        $session = Session::instance();
+        
+        $session->set('bluebox.user.masquerades', array());
+    }
+
+    public static function masqueradeAccount($account_id)
+    {
+        $account = Doctrine::getTable('Account')->find($account_id, Doctrine::HYDRATE_ARRAY);
+
+        if (!$account)
+        {
+            return FALSE;
+        }
+
+        $session = Session::instance();
+
+        $masquerades = $session->get('bluebox.user.masquerades', array());
+
+        $masquerades['Account'] = $account;
+
+        $masquerades['account_id'] = $account['account_id'];
+
+        $session->set('bluebox.user.masquerades', $masquerades);
+
+        return TRUE;
+    }
+
+    public static function restoreAccount()
+    {
+        $masquerades = $session->get('bluebox.user.masquerades', array());
+
+        unset($masquerades['Account'], $masquerades['account_id']);
+        
+        $session->set('bluebox.user.masquerades', $masquerades);
+    }
+
+    public static function changeDebugLevel($new_level = NULL)
+    {
+        // If the users debug_level is valid then update our threshold and
+        // re-init the kohana logger so it takes the new settings
+        if (($new_level <= 4) AND ($new_level >= 0))
+        {
+            $old_level = Kohana::config('core.log_threshold');
+
+            Kohana::config_set('core.log_threshold', $new_level);
+
+            Kohana::log_directory(Kohana::config('core.log_directory'));
+
+            register_shutdown_function(array('Kohana', 'log_save'));
+
+            Event::run('bluebox.change_debug_level', $new_level);
+
+            return TRUE;
+        }
+
+        return FALSE;
     }
 
     /**
