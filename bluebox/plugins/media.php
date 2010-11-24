@@ -23,6 +23,8 @@ class Media_Plugin extends Bluebox_Plugin
         if (self::$components)
         {
             $this->subview->set('components', self::$components);
+
+            return TRUE;
         }
 
         return FALSE;
