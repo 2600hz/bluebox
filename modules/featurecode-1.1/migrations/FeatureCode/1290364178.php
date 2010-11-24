@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class FeatureCode_1 extends Doctrine_Migration_Base
+class Migration_1290364178 extends Doctrine_Migration_Base
 {
     public function up()
     {

@@ -22,6 +22,7 @@ class Installer_Controller extends Bluebox_Controller
     public $minimumPackages = array(
         'core',
         'packagemanager',
+        'maintenance',
 
         // System Modules
         'accountmanager',

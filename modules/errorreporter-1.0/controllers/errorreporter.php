@@ -14,7 +14,7 @@ class ErrorReporter_Controller extends Bluebox_Controller
 
         $report['while'] = empty($_POST['report']['while']) ? '' : $_POST['report']['while'];
 
-        $report['contact'] = empty($_POST['report']['contact']) ? users::$user['email_address'] : $_POST['report']['contact'];
+        $report['contact'] = empty($_POST['report']['contact']) ? users::getAttr('email_address') : $_POST['report']['contact'];
 
         $report['error'] = empty($_POST['report']['error']) ? $error : $_POST['report']['error'];
 

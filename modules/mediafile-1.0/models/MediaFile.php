@@ -269,6 +269,8 @@ class MediaFile extends Bluebox_Record
     {
         $basepath = kohana::config('upload.directory');
 
+        $basepath = rtrim($basepath, DIRECTORY_SEPARATOR) .DIRECTORY_SEPARATOR .users::getAttr('account_id');
+
         Event::run('mediafile.basepath', $basepath);
 
         $filepath = rtrim($basepath, DIRECTORY_SEPARATOR) .DIRECTORY_SEPARATOR;

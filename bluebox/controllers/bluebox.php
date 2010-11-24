@@ -246,7 +246,8 @@ abstract class Bluebox_Controller extends Template_Controller
         plugins::construct();
 
         // Setup anything related to authorizing the user
-        Event::run('bluebox.ready', $this);
+     
+       Event::run('bluebox.ready', $this);
     }
 
     /**

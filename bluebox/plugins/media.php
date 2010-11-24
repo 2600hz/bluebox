@@ -20,9 +20,14 @@ class Media_Plugin extends Bluebox_Plugin
 
         Event::$data = $data;
 
-        $this->subview->set('components', self::$components);
+        if (self::$components)
+        {
+            $this->subview->set('components', self::$components);
 
-        return TRUE;
+            return TRUE;
+        }
+
+        return FALSE;
     }
 
     public static function addComponent($name, $view)

@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class AutoAttendant_1_0_Configure extends Bluebox_Configure
+class AutoAttendant_1_0_1_Configure extends Bluebox_Configure
 {
-    public static $version = 1.0;
+    public static $version = '1.0.1';
     public static $packageName = 'autoattendant';
     public static $displayName = 'Auto Attendant';
     public static $author = 'Karl Anderson';
@@ -12,8 +12,7 @@ class AutoAttendant_1_0_Configure extends Bluebox_Configure
     public static $default = true;
     public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
-        'core' => 0.1,
-        'mediamanager' => 0.1
+        'core' => 0.1
     );
     public static $navLabel = 'Auto Attendants';
     public static $navBranch = '/Applications/';
