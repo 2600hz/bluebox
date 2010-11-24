@@ -11,7 +11,6 @@ $config['default_packages'] = array(
     // Modules
     'contextmanager',
     'locationmanager',
-    'mediamanager',
     'numbermanager',
     'trunkmanager',
     'autoattendant',
@@ -31,7 +30,8 @@ $config['default_packages'] = array(
     
     // Freeswitch
     'esl',
-    'mediaoption',
+    'mediafile',
+    'tts',
     'multitenant',
     'netlistmanager',
     'odbc',
