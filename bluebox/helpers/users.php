@@ -105,9 +105,11 @@ class users
 
     public static function isUserAuthentic()
     {
-        if(self::$user = User::getAuthenticUser())
+        $authentic = Auth::instance();
+        
+        if($authentic->logged_in())
         {
-            if ($account_id = self::getAuthenticAttr('account_id'))
+            if ((self::$user = User::getAuthenticUser()) && ($account_id = self::getAuthenticAttr('account_id')))
             {
                 self::$user['Account'] = Doctrine::getTable('Account')->find($account_id, Doctrine::HYDRATE_ARRAY);
 
@@ -118,10 +120,10 @@ class users
 
                 return TRUE;
             }
+
+            $authentic->logout(TRUE);
         }
-
-        Auth::instance()->logout(TRUE);
-
+        
         self::$user = array();
        
         self::restoreUser();
