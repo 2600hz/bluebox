@@ -218,6 +218,11 @@ class Package_Dependency
 
         foreach ($catalog as $id => $package)
         {
+            if ($package['status'] == Package_Manager::STATUS_UNINSTALLED)
+            {
+                continue;
+            }
+
             $dependent = $package['packageName'];
             
             foreach($package['required'] as $requirement => $conditions)
