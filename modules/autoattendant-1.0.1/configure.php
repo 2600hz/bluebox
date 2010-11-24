@@ -12,8 +12,7 @@ class AutoAttendant_1_0_1_Configure extends Bluebox_Configure
     public static $default = true;
     public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
-        'core' => 0.1,
-        //'mediamanager' => 0.1
+        'core' => 0.1
     );
     public static $navLabel = 'Auto Attendants';
     public static $navBranch = '/Applications/';
