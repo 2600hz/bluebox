@@ -13,38 +13,9 @@
  */
 class MultiTenantRecordListener extends Doctrine_Record_Listener
 {
-    private static $account_id = 0;
-
     public function getUserId()
     {
-        $prev_account_id = self::$account_id;
-
-	// The user may change for example force_login
-	if (!empty(users::$user['account_id']))
-	{
-	    self::$account_id = users::$user['account_id'];
-	}
-
-	$session = Session::instance();
-
-	if (($multitenant_account_id = $session->get('multitenant_account_id', FALSE)))
-	{
-	    self::$account_id = $multitenant_account_id;
-	}
-
-	if (!self::$account_id)
-	{
-	    Kohana::log('debug', 'Throwing exception due to empty user account_id');
-
-	    throw new Exception('Unable to determine your authorization to manipulate this record');
-	}
-
-	if (self::$account_id != $prev_account_id)
-	{
-	    kohana::log('debug', 'MultiTenantRecordListener is using account id ' .self::$account_id);
-	}
-
-        return self::$account_id;
+        return users::getAttr('Account', 'account_id');
     }
 
     public function preSave(Doctrine_Event $event)
@@ -116,15 +87,13 @@ class MultiTenantRecordListener extends Doctrine_Record_Listener
 
     public function preDqlUpdate($event)
     {   
-        $q = $event->getQuery();
+        $q = &$event->getQuery();
 
         $q->andWhere('account_id = ' .$this->getUserId());
     }
 
     public function preDqlSelect($event)
     {
-        $query = $event->getQuery();
-
         $q = &$event->getQuery();
 
         $q->andWhere('account_id = ' .$this->getUserId());

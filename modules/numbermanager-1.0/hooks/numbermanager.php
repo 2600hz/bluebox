@@ -8,12 +8,16 @@
 
     Event::add('bluebox.prepare_update_view', array('Numbers', 'dynamicNumberPlugin'));
 
+
     if (Session::instance()->get('ajax.base_controller') == 'numbermanager')
     {
         Event::add('ajax.updateobject', array('Numbers', 'updateOnPageObjects'));
     }
 
-    
+
+    Event::add('bluebox.create.extensionnumber', array('Numbers', 'createExtensionNumber'));
+
+
     plugins::register('numbermanager/create', 'view', array('NumberManager_Plugin', 'numberTargets'));
 
     plugins::register('numbermanager/edit', 'view', array('NumberManager_Plugin', 'numberTargets'));

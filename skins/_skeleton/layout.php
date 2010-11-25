@@ -33,11 +33,13 @@
 
             <div class="topbar">
 
-                <?php if (isset(users::$user->first_name)) : ?>
-                    <?php echo __('Welcome') .' ' .users::$user->first_name . ' ' . users::$user->last_name .'!'; ?>
-                    <?php echo html::anchor('user/logout', __('Logout'));?>
-                <?php endif; ?>
+                <?php if (users::getAttr('user_id')): ?>
 
+                    <?php echo __('Welcome') . ' ' .users::getAttr('full_name'); ?>
+                    <?php echo html::anchor('user/logout', __('Logout')); ?>
+
+                <?php endif; ?>
+                
             </div>
 
 

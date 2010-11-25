@@ -21,7 +21,7 @@
         </div>
         <div class="field">
             <?php echo form::label('xmpp[registry][password]', 'Password:'); ?>
-            <?php echo form::input('xmpp[registry][password]'); ?>
+            <?php echo form::password('xmpp[registry][password]'); ?>
         </div>
         <div class="field">
             <?php echo form::label(array('for' => 'xmpp[registry][loginserver]',
@@ -45,19 +45,29 @@
             <?php echo form::input('xmpp[registry][autoreply]'); ?>
         </div>
         <div class="field">
-            <?php echo form::label('xmpp[registry][autologin]', 'Auto-Login:'); ?>
+            <?php echo form::label(array('for' => 'xmpp[registry][autologin]',
+	    				 'help' => 'This option should be enabled in most cases.'),
+				   'Auto-Login:'); ?>
             <?php echo form::checkbox('xmpp[registry][autologin]'); ?>
         </div>
         <div class="field">
-            <?php echo form::label('xmpp[registry][tls]', 'TLS:'); ?>
-            <?php echo form::checkbox('xmpp[registry][tls]'); ?>
+            <?php echo form::label(array('for' => 'xmpp[registry][usertptimer]',
+                                         'help' => 'If you are having issues with audio delay, you can try disabling this.' . 
+					 	   '<br>Otherwise this should be enabled.'), 
+                                   'Use RTP Timer'); ?>
+            <?php echo form::checkbox('xmpp[registry][usertptimer]'); ?>
         </div>
+	<div class="field">
+	    <?php echo form::label(array('for' => 'xmpp[registry][tls]',
+	    				 'help' => 'This option needs to be enabled for Google Voice.'),
+				   'TLS:'); ?>
+            <?php echo form::checkbox('xmpp[registry][tls]'); ?>
+	</div>
 
         <!-- HIDDEN FIELDS FOR NON-USER-CONFIGURABLE SETTINGS (well for now) -->
         <?php echo form::hidden('xmpp[registry][dialplan]', 'XML'); ?>
         <?php echo form::hidden('xmpp[registry][rtpip]', '$${bind_server_ip}'); ?>
         <?php echo form::hidden('xmpp[registry][sasl]', 'plain'); ?>
-        <?php echo form::hidden('xmpp[registry][usertptimer]', 'true'); ?>
         <?php echo form::hidden('xmpp[registry][vad]', 'both'); ?>
         <?php echo form::hidden('xmpp[registry][candidateacl]', 'wan.auto'); ?>
         <?php echo form::hidden('xmpp[registry][localnetacl]', 'localnet.auto'); ?>
@@ -69,12 +79,10 @@
         <div class="field">
             <?php echo form::label('xmpp[registry][exten]', 'Route incoming calls to:'); ?>
             <?php
-                if (isset($xmpp['registry']['exten']))
-                {
+                if (isset($xmpp['registry']['exten'])) {
                     $selectedClass = numbering::getAssignedPoolByNumber($xmpp['registry']['exten']);
                 }
-                else
-                {
+                else {
                     $selectedClass = NULL;
                 }
 
@@ -166,3 +174,4 @@
     <?php jquery::addPlugin(array('dependent')); ?>
 
 </div>
+

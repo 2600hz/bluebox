@@ -1,13 +1,9 @@
 <?php
 class Permissions
 {
-    public function allow($controller, $method, $options = array()) {
-
-        if (!empty(users::$user['user_id'])) {
-            $userID = users::$user['user_id'];
-        } else {
-            $userID = NULL;
-        }
+    public function allow($controller, $method, $options = array())
+    {
+        $userID = users::getAttr('user_id');
 
         $permission = Doctrine_Query::create()
             ->select('p.permission')
