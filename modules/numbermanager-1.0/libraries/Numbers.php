@@ -253,7 +253,7 @@ class Numbers
        }
     }
 
-    public static function initializeDeviceNumber()
+    public static function createExtensionNumber()
     {
         extract(Event::$data);
 
@@ -261,19 +261,22 @@ class Numbers
 
         try
         {
-            $locations = Doctrine_Query::create()
-                ->from('Location')
-                ->where('account_id = ?', array($account_id))
-                ->execute();
-
-            if (empty($locations[0]['location_id']))
+            if (empty($location_id))
             {
-                kohana::log('error', 'Unable to initialize device number: could not determine location_id');
-                
-                return;
-            }
+                $locations = Doctrine_Query::create()
+                    ->from('Location')
+                    ->where('account_id = ?', array($account_id))
+                    ->execute();
 
-            $location_id = $locations[0]['location_id'];
+                if (empty($locations[0]['location_id']))
+                {
+                    kohana::log('error', 'Unable to initialize device number: could not determine location_id');
+
+                    return;
+                }
+
+                $location_id = $locations[0]['location_id'];
+            }
 
             $number = new Number();
 
@@ -286,7 +289,7 @@ class Numbers
             $number['registry'] = array(
                 'ignoreFWD' => '0',
                 'ringtype' => 'ringing',
-                'timeout' => 30
+                'timeout' => 20
             );
 
             $dialplan = array(
@@ -333,6 +336,8 @@ class Numbers
         catch (Exception $e)
         {
             kohana::log('error', 'Unable to initialize device number: ' .$e->getMessage());
+
+            throw $e;
         }
 
         Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);

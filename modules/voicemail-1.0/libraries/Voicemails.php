@@ -2,37 +2,50 @@
 
 class Voicemails
 {
-    public static function initializeDevice()
+    public static function createExtension()
     {
+        Event::$data += array(
+            'voicemail_password' => self::generatePin(),
+            'voicemail_timezone' => kohana::config('locale.timezone'),
+            'voicemail_email_all_messages' => empty(Event::$data['user']['email_address']) ? 0 : 1,
+            'voicemail_delete_file' => 0,
+            'voicemail_attach_audio_file' => 1,
+            'voicemail_email_address' => empty(Event::$data['user']['email_address']) ? '' : Event::$data['user']['email_address']
+        );
+
         extract(Event::$data);
 
         Doctrine::getTable('Voicemail')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+        $name_append = '';
+
+        if (!empty($owner_name))
+        {
+            $name_append = ' for ' .$owner_name;
+        }
 
         try
         {
             $voicemail = new Voicemail();
 
-            $voicemail['name'] = 'Voicemail for ' .$device['name'];
+            $voicemail['name'] = 'VM ' .$extension .$name_append;
 
             $voicemail['mailbox'] = $extension;
 
-            $voicemail['password'] = self::generatePin();
+            $voicemail['password'] = $voicemail_password;
 
             $voicemail['account_id'] = $account_id;
 
             $voicemail['plugins'] = array('timezone' => array(
-                'timezone' => kohana::config('locale.timezone')
+                'timezone' => $voicemail_timezone
             ));
 
-            if (($user = Doctrine::getTable('User')->find($user_id)) AND !empty($user['email_address']))
-            {
-                $voicemail['registry'] = array(
-                    'email_all_messages' => 1,
-                    'delete_file' => 0,
-                    'attach_audio_file' => 1,
-                    'email_address' => $user['email_address']
-                );
-            }
+            $voicemail['registry'] = array(
+                'email_all_messages' => $voicemail_email_all_messages,
+                'delete_file' => $voicemail_delete_file,
+                'attach_audio_file' => $voicemail_attach_audio_file,
+                'email_address' => $voicemail_email_address
+            );
 
             $voicemail->save();
 
@@ -44,9 +57,13 @@ class Voicemails
         }
         catch (Exception $e)
         {
+            Doctrine::getTable('Voicemail')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+            
             kohana::log('error', 'Unable to generate voicemail for device: ' .$e->getMessage());
+
+            throw $e;
         }
-        
+
         Doctrine::getTable('Voicemail')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
     }
 

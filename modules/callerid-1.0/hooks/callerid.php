@@ -19,4 +19,4 @@
     plugins::register('externalxfer', 'save', array('CallerId_Plugin', 'save'));
 
     
-    Event::add('bluebox.initialize.device', array('CidLib', 'initializeDevice'));
+    Event::add('bluebox.create.extension', array('CidLib', 'createExtension'));

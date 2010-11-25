@@ -2,15 +2,21 @@
 
 class CidLib
 {
-    public static function initializeDevice()
+    public static function createExtension()
     {
-        extract(Event::$data);
+        Event::$data += array(
+            'callerid_internal_name' => Event::$data['owner_name'],
+            'callerid_external_name' => Event::$data['owner_name'],
+            'callerid_external_number' => str_pad(Event::$data['extension'], 10, "5", STR_PAD_LEFT)
+        );
 
+        extract(Event::$data);
+        
         $plugin = array('callerid' => array(
-            'internal_name' => $device['name'],
+            'internal_name' => $callerid_internal_name,
             'internal_number' => $extension,
-            'external_name' => '2600hz blue.box',
-            'external_number' => str_pad($extension, 10, "5", STR_PAD_LEFT)
+            'external_name' => $callerid_external_name,
+            'external_number' => $callerid_external_number
         ));
 
         $device['plugins'] = arr::merge($device['plugins'], $plugin);

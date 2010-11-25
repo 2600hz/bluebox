@@ -16,17 +16,8 @@ class QuickAdd_1_0_Configure extends Bluebox_Configure
         'core' => 0.1
     );
     public static $navBranch = '/Organization/';
-    public static $navURL = '/quickadd/index';
+    public static $navURL = '/quickadd/create';
     public static $navSubmenu = array(
-        'List' => '/quickadd/index',
-        'Add' => '/quickadd/create',
-        'Edit' => array(
-            'url' => '/quickadd/edit',
-            'disabled' => TRUE
-        ) ,
-        'Delete' => array(
-            'url' => '/quickadd/delete',
-            'disabled' => TRUE
-        )
+        'Create' => '/quickadd/create'
     );
 }

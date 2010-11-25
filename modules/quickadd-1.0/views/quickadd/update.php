@@ -1,6 +1,6 @@
 <div id="quickadd_update_header" class="update quickadd module_header">
 
-    <h2><?php echo $title; ?></h2>
+    <h2><?php echo _('Quick Add Extension'); ?></h2>
 
 </div>
 
@@ -50,7 +50,37 @@
         </div>
 
     <?php echo form::close_section(); ?>
-    
+
+    <?php echo form::open_section('Number'); ?>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'number[number]',
+                    'hint' => 'Used for on-network calls',
+                    'help' => 'Number other phones within this same PBX/switch network dial to reach this user'
+                ),
+                'Internal Extension Number:'
+            );
+            echo form::input('number[number]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'callerid[external_number]',
+                    'hint' => 'Used for outside calls',
+                    'help' => 'Caller ID information used when calling phones outside this network.'
+                ),
+                'External CID Number:'
+            );
+            echo form::input('callerid[external_number]');
+        ?>
+        </div>
+
+    <?php echo form::close_section(); ?>
+
     <?php echo form::open_section('Call Routing'); ?>
 
         <div class="field">
@@ -70,41 +100,10 @@
                     'Default Context:'
                 );
             ?>
-            <?php echo numbering::selectContext('device[context_id]'); ?>
+            <?php echo numbering::selectContext('number[context_id]'); ?>
         </div>
 
     <?php echo form::close_section(); ?>
-
-    <?php echo form::open_section('Number'); ?>
-
-        <div class="field">
-        <?php
-            echo form::label(array(
-                    'for' => 'callerid[internal_number]',
-                    'hint' => 'Used for on-network calls',
-                    'help' => 'Caller ID information used when calling other phones within this same PBX/switch network.'
-                ),
-                'Internal Extension Number:'
-            );
-            echo form::input('callerid[internal_number]');
-        ?>
-        </div>
-
-        <div class="field">
-        <?php
-            echo form::label(array(
-                    'for' => 'callerid[external_number]',
-                    'hint' => 'Used for outside calls',
-                    'help' => 'Caller ID information used when calling phones outside this network.'
-                ),
-                'External CID Number:'
-            );
-            echo form::input('callerid[external_number]');
-        ?>
-        </div>
-    
-    <?php echo form::close_section(); ?>
-
 
     <?php echo form::close(TRUE); ?>
 
