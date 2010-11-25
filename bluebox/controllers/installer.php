@@ -1103,7 +1103,7 @@ class Installer_Controller extends Bluebox_Controller
 
         $created = $this->session->get('Bluebox_installer.created');
 
-        Bluebox_Tenant::generateDevice($created['accountId'], $created['userId']);
+        Bluebox_Tenant::createUserExtension($created['userId']);
 
         if (Session::instance()->get('installer.samples', FALSE))
         {
@@ -1149,7 +1149,7 @@ class Installer_Controller extends Bluebox_Controller
             {
                 $userId = Bluebox_Tenant::initializeUser($created['accountId'], $created['locationId'], $sampleUser);
 
-                Bluebox_Tenant::generateDevice($created['accountId'], $userId);
+                Bluebox_Tenant::createUserExtension($userId);
             }
         }
 

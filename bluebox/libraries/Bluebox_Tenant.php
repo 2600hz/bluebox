@@ -252,28 +252,55 @@ class Bluebox_Tenant
         $site->free();
     }
 
-    public static function generateDevice($accountId, $userId, $extension = NULL, $contextId = NULL)
+    public static function createUserExtension($user_id, $extension = NULL, $context_id = NULL, $location_id = NULL, $options = array())
     {
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+        
+        $user = Doctrine::getTable('User')->find($user_id);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+        if (!$user)
+        {
+            kohana::log('debug', 'Could not locate user_id ' .$user_id);
+
+            return FALSE;
+        }
+
+        $account_id = $user['account_id'];
+
+        if (!$context_id)
+        {
+            $context_id = Context::getContextByType('private', $account_id);
+        }
+
+        if (!$location_id)
+        {
+            Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+            $locations = Doctrine_Query::create()
+                ->from('Location')
+                ->where('account_id = ?', array($account_id))
+                ->execute();
+            
+            Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+            if (empty($locations[0]['location_id']))
+            {
+                kohana::log('error', 'Unable to initialize device number: could not determine location_id');
+
+                return FALSE;
+            }
+
+            $location_id = $locations[0]['location_id'];
+        }
+
         Doctrine::getTable('Device')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
-        if (!$contextId)
-        {
-            $contextId = Context::getContextByType('private', $accountId);
-        }
-
-        if (!$userId OR !$accountId OR !$contextId)
-        {
-            kohana::log('debug', 'Missing the necessary data to generate devices');
-
-            return;
-        }
-
-        $devices = Doctrine_Query::create()
-            ->from('Device')
-            ->where('account_id = ?', array($accountId))
-            ->execute();
-
-        $deviceNum = count($devices) + 1;
+        $deviceNum = Doctrine_Query::create()
+                        ->from('Device')
+                        ->where('account_id = ?', array($account_id))
+                        ->count() + 1;
 
         if (!$extension)
         {
@@ -287,38 +314,53 @@ class Bluebox_Tenant
             $extension = $baseExt + $deviceNum;
         }
 
-        Kohana::log('debug', 'Generating a device for user ' .$userId .' in account ' .$accountId .' as extension ' .$extension .' in context ' .$contextId);
+        Kohana::log('debug', 'Generating a device for user ' .$user_id .' in account ' .$account_id .' as extension ' .$extension .' in context ' .$context_id);
 
         try
         {
+            $conn = Doctrine_Manager::connection();
+
+            $conn->beginTransaction();
+
             $device = new Device();
 
-            $device['account_id'] = $accountId;
+            $device['account_id'] = $account_id;
 
-            $device['user_id'] = $userId;
+            $device['user_id'] = $user_id;
 
-            $device['context_id'] = $contextId;
+            $device['context_id'] = $context_id;
 
-            $device['name'] = 'Device ' .$deviceNum;
+            $device['name'] = 'Exten ' .$extension .' for ' .$user['first_name'] .' ' .$user['last_name'];
 
             $device['type'] = 'SipDevice';
 
             $data = array(
                 'device' => &$device,
+                'user' => &$user,
                 'extension' => $extension,
-                'user_id' => $userId,
-                'context_id' => $contextId,
-                'account_id' => $accountId
+                'user_id' => $user_id,
+                'context_id' => $context_id,
+                'account_id' => $account_id,
+                'location_id' => $location_id ,
+                'owner_name' => $user['first_name'] .' ' .$user['last_name']
             );
 
-            Event::run('bluebox.initialize.device', $data);
+            $data += $options;
+
+            Event::run('bluebox.create.extension', $data);
 
             $device->save();
 
-            Event::run('bluebox.initialize.devicenumber', $data);
+            Event::run('bluebox.create.extensionnumber', $data);
+
+            $conn->commit();
         }
         catch(Exception $e)
         {
+            $conn->rollback();
+
+            Doctrine::getTable('Device')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+            
             kohana::log('error', 'Unable to generate device ' .$deviceNum . ' as ' .$extension .' because: ' .$e->getMessage());
 
             return FALSE;
