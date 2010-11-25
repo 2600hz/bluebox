@@ -21,8 +21,13 @@ class Xmpp_1_0_Configure extends Bluebox_Configure
         'core' => 0.1,
         'simpleroute' => 0.1
     );
+<<<<<<< Updated upstream
     public static $navLabel = 'XMPP / GTalk';
+    public static $navBranch = '/Applications/';
+=======
+    public static $navLabel = 'XMPP';
     public static $navBranch = '/Connectivity/';
+>>>>>>> Stashed changes
     public static $navURL = 'xmpp/index';
     public static $navSubmenu = array(
         'List' => 'xmpp/index',
