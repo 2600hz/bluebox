@@ -185,7 +185,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         {
             $forceLocation = '$${location_' .$sipinterface['registry']['force_register_domain'] .'}';
 
-            $xml->update('/settings/param[@name="force-register-domain"]{@value="' .$forceLocation .'}"}');
+            $xml->update('/settings/param[@name="force-register-domain"]{@value="' .$forceLocation .'"}');
 
             $xml->update('/settings/param[@name="force-register-db-domain"]{@value="' .$forceLocation .'"}');
         }

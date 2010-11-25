@@ -1,6 +1,7 @@
 /**
  * FORMS TO AJAX REQUESTS
  ***************************************************************/
+
 function qtipAjaxForm(link) {
     try {
         link.qtip('api');
@@ -77,7 +78,7 @@ function qtipAjaxForm(link) {
                         }
                     },
                     beforeSubmit: function () {
-                        me.elements.content.html(me.options.content.text);
+                        //me.elements.content.html(me.options.content.text);
                     }
                 }
 
@@ -107,7 +108,7 @@ $(document).ready(function () {
 
     /**
      * ATTEMPT TO HANDLE AJAX ERRORS
-     ***************************************************************/
+     **************************************************************/
     $.ajaxSetup({
         error:function(request, err) {
 
@@ -140,7 +141,7 @@ $(document).ready(function () {
         detrminant();
         additionalInfo();
         $('.qtipAjaxForm').each(function () {qtipAjaxForm($(this));});
-        $("a:contains('Delete')").each(function () {qtipAjaxForm($(this));});
+        $(".jqgrid_instance a:contains('Delete')").each(function () {qtipAjaxForm($(this));});
     });
     
     /**

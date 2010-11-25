@@ -150,6 +150,7 @@ class form extends form_Core
             (
                 'type'  => 'hidden',
                 'name'  => $name,
+                'id'    => html::token($name),
                 'value' => $value,
                 'class' => $classes
             );

@@ -52,7 +52,7 @@
 
     <?php echo form::close_section(); ?>
 
-    <?php echo form::open_section('Outbound Call Routing'); ?>
+    <?php echo form::open_section('Call Routing'); ?>
 
         <div class="field">
             <?php

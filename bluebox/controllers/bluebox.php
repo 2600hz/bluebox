@@ -245,11 +245,8 @@ abstract class Bluebox_Controller extends Template_Controller
         // Call the constructor's for all plugins registered
         plugins::construct();
 
-        // TODO: this needs to be outside of the requests, fired less frequently, and by a cron job..
-        Event::run('bluebox.maintance');
-
         // Setup anything related to authorizing the user
-        Event::run('bluebox.ready', $this);
+       Event::run('bluebox.ready', $this);
     }
 
     /**
@@ -859,6 +856,8 @@ abstract class Bluebox_Controller extends Template_Controller
 
     protected function save_prepare(&$object)
     {
+        Doctrine_Manager::connection()->beginTransaction();
+        
         // Let things know we are about to save
         Event::run('bluebox.save_prepare', $object);
     }
@@ -877,12 +876,16 @@ abstract class Bluebox_Controller extends Template_Controller
 
     protected function save_succeeded(&$object)
     {
+        Doctrine_Manager::connection()->commit();
+
         // Let things respond to a failed save
         Event::run('bluebox.save_succeeded', $object);
     }
 
     protected function save_failed(&$object)
     {
+        Doctrine_Manager::connection()->rollback();
+
         // Let things respond to a failed save
         Event::run('bluebox.save_failed', $object);
     }
