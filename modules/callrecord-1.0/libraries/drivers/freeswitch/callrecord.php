@@ -130,7 +130,13 @@ XML;
         if (!empty($callrecord['inbound']) and ($callrecord['inbound']))
         {
             $filename = Kohana::config('freeswitch.audio_root') . '/../recordings/${uuid}.wav';
-            $xml->update('/action[@application="record_session"][@bluebox="callrecord_action"][@data="' . str_replace('/', '\/', $filename) . '"]');
+            $cr_cmd = str_replace('/', '\/', $filename);
+
+            //Not the prettiest fix, but it works
+            $condlog = '${cond(${callrecord_outbound} == 1 ? Already recording - Skipping inbound recording : Currently not recording, starting to record}';
+            $cond = '${cond(${callrecord_outbound} == 1 ?  : ' . $cr_cmd . '}';
+            $xml->update('/action[@application="log"][@bluebox="callrecord_action"][@data="INFO ' . $condlog . '"]');
+            $xml->update('/action[@application="record_session"][@bluebox="callrecord_action"][@data="' . $cond . '"]');
         }
         else
         {
