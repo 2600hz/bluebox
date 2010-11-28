@@ -88,21 +88,21 @@ class arr extends arr_Core
             return NULL;
         }
 
-        $array = &self::smart_cast($array);
+        $tmpArray = self::smart_cast($array);
 
         while (count($paths))
         {
             $key = array_shift($paths);
 
-            if (!array_key_exists($key, (array)$array))
+            if (!array_key_exists($key, (array)$tmpArray))
             {
                 return NULL;
             }
 
-            $array = &$array[$key];
+            $tmpArray = &$tmpArray[$key];
         }
 
-        return $array;
+        return $tmpArray;
     }
 
     /**
