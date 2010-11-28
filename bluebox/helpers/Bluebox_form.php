@@ -1114,7 +1114,14 @@ class form extends form_Core
 
         if (is_object(View::$instance) AND View::$instance->is_set($varname))
         {
-            $viewVar = arr::smart_cast(View::$instance->$varname);
+            $viewVar = View::$instance->$varname;
+            
+            if (is_string($viewVar))
+            {
+                return $viewVar;
+            }
+
+            $viewVar = arr::smart_cast($viewVar);
 
             if (($viewValue = arr::get_string($viewVar, $name, TRUE)))
             {
