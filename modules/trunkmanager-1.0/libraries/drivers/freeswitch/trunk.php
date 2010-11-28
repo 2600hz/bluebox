@@ -45,6 +45,24 @@ class FreeSwitch_Trunk_Driver extends FreeSwitch_Base_Driver
             $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$interface, 'trunk_' . $trunk['trunk_id']);
 
             $xml->update('/param[@name="realm"]{@value="' . $trunk['server'] . '"}');
+
+            if ($registerProxy = arr::get($trunk, 'registry', 'registerProxy'))
+            {
+                $xml->update('/param[@name="register-proxy"]{@value="' .$registerProxy . '"}');
+            }
+            else
+            {
+                $xml->deleteNode('/param[@name="register-proxy"]');
+            }
+
+            if ($outboundProxy = arr::get($trunk, 'registry', 'outboundProxy'))
+            {
+                $xml->update('/param[@name="outbound-proxy"]{@value="' .$outboundProxy . '"}');
+            }
+            else
+            {
+                $xml->deleteNode('/param[@name="outbound-proxy"]');
+            }
         }
 
         $modified = $trunk->getModified(TRUE, TRUE);
