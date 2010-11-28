@@ -20,7 +20,7 @@
         <div class="field">
         <?php
             echo form::label('trunk[type]', 'Trunk Type:');
-            echo form::dropdown('trunk[type]', empty($supportedTrunkTypes) ? array() : $supportedTrunkTypes);
+            echo form::dropdown('trunk[type]', $supportedTrunkTypes);
         ?>
         </div>
 
