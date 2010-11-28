@@ -61,20 +61,22 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
                     {
                         $xml->update('/param[@name="password"]{@value="' .$plugins['sip']['password'] .'"}');
                     }
-
-                    // Assume we want to register if user/pass is specified
-                    // TODO: Make this a checkbox?
-                    $xml->update('/param[@name="register"]{@value="true"}');
                 } 
                 else
                 {
-                    // Assume we don't want to register if no user/pass is specified
-                    $xml->update('/param[@name="register"]{@value="false"}');
-
                     // Have to put something, so we'll just make it generic
                     $xml->update('/param[@name="username"]{@value="TCAPI_User"}');
                     
                     $xml->update('/param[@name="password"]{@value="TCAPI_User"}');
+                }
+
+                if (empty($plugins['sip']['registry']['register']))
+                {
+                    $xml->update('/param[@name="register"]{@value="false"}');
+                }
+                else
+                {
+                    $xml->update('/param[@name="register"]{@value="true"}');
                 }
 
                 // Add custom from domain, if set
