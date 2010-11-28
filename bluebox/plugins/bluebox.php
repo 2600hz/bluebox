@@ -282,6 +282,8 @@ abstract class Bluebox_Plugin
     {
         $this->base = $this->getBaseModelObject();
 
+        $this->subview->set_global($this->name, array());
+
         if (!isset($this->base['plugins']))
         {
             return FALSE;
