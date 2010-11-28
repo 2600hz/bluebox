@@ -44,13 +44,13 @@
         <div class="field">
         <?php
             echo form::label(array(
-                    'for' => 'sip[registry][register]',
+                    'for' => 'sip[register]',
                     'hint' => 'Attempt to register to trunk provider',
                     'help' => 'By registering, the softswitch informs the other UA of its whereabouts. This is generally used when the softswitch wants the other UA to send the softswitch calls, and the other UA expects this sort of registration. If the softswitch uses the other UA only as a gateway (e.g., to the PSTN), then registration is not generally required. '
                 ),
                 'Register'
             );
-            echo form::checkbox('sip[registry][register]');
+            echo form::checkbox('sip[register]');
         ?>
         </div>
 
@@ -124,11 +124,11 @@
         $('#sip_username').change(function(e) {
             if ($(this).val() != '')
             {
-                $('#sip_registry_register').attr('checked', 'checked');
+                $('#sip_register').attr('checked', 'checked');
 
-                $.scrollTo($('#sip_registry_register'));
+                $.scrollTo($('#sip_register'));
 
-                $('#sip_registry_register').siblings('.label').animate({backgroundColor: '#FCFF9F'}, 250).animate({backgroundColor: 'white'}, 1000);
+                $('#sip_register').siblings('.label').animate({backgroundColor: '#FCFF9F'}, 250).animate({backgroundColor: 'white'}, 1000);
 
                 $(this).unbind(e);
             }

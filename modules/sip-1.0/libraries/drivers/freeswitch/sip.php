@@ -70,7 +70,7 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
                     $xml->update('/param[@name="password"]{@value="TCAPI_User"}');
                 }
 
-                if (empty($plugins['sip']['registry']['register']))
+                if (empty($plugins['sip']['register']))
                 {
                     $xml->update('/param[@name="register"]{@value="false"}');
                 }
