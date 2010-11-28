@@ -283,7 +283,7 @@ class arr extends arr_Core
      * @param mixed var to convert
      * @return array
      */
-    public static function smart_cast(&$mixed)
+    public static function smart_cast($mixed)
     {
         if (is_array($mixed))
         {
