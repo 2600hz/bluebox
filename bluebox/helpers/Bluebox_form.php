@@ -1115,8 +1115,8 @@ class form extends form_Core
         if (is_object(View::$instance) AND View::$instance->is_set($varname))
         {
             $viewVar = View::$instance->$varname;
-            
-            if (is_string($viewVar))
+
+            if (is_string($viewVar) OR is_bool($viewVar))
             {
                 return $viewVar;
             }
