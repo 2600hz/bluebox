@@ -2,7 +2,7 @@
 /**
  * Allow the installer to be run.  This should be set to false after installation
  */
-$config['installer_enabled'] = FALSE;
+$config['installer_enabled'] = TRUE;
 
 /**
  * Base path of the web site. If this includes a domain, eg: localhost/kohana/
@@ -51,7 +51,7 @@ $config['output_compression'] = FALSE;
  * Enable or disable global XSS filtering of GET, POST, and SERVER data. This
  * option also accepts a string to specify a specific XSS filtering tool.
  */
-$config['global_xss_filtering'] = FALSE;
+$config['global_xss_filtering'] = TRUE;
 
 /**
  * Enable or disable hooks.
@@ -66,7 +66,7 @@ $config['enable_hooks'] = TRUE;     // Bluebox will fail miserably if you turn t
  *  3 - Notices
  *  4 - Debugging
  */
-$config['log_threshold'] = 4;
+$config['log_threshold'] = 0;
 
 /**
  * Message logging directory.
@@ -101,7 +101,7 @@ $config['extension_prefix'] = 'Bluebox_';
 $config['modules'] = array
 (
 	MODPATH.'auth-1.0',      // Authentication
-        MODPATH.'packagemanager-1.0'
+    MODPATH.'packagemanager-1.0'
 	// MODPATH.'forge',     // Form generation
 	// MODPATH.'kodoc',     // Self-generating documentation
 	// MODPATH.'media',     // Media caching and compression
@@ -119,13 +119,13 @@ $config['require_login'] = TRUE;
 /**
  * If this is true the user has allowed us to collect anonymous statistics about what modules they use
  */
-$config['anonymous_statistics'] = FALSE;
+$config['anonymous_statistics'] = TRUE;
 
 /**
  * Is this an oxymoron? Well we need to be able to group
  * multiple responses, it is not used for any other reason. Promise :)
  */
-$config['anonymous_id'] = '4AAC2428C730C14766CA3C25198E4FEF';
+$config['anonymous_id'] = '';
 
 /**
  * If true then a minimum password complexity is enforced
