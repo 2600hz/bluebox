@@ -6,18 +6,17 @@ class Conference extends Bluebox_Record
     const TYPE_MODERATOR = 1;
 
     public static $default_keymap = array(
-      'vol talk dn' => '1',
-      'vol talk zero' => '2',
-      'vol talk up' => '3',
-      'vol listen dn' => '4',
-      'vol listen zero' => '5',
-      'vol listen up' => '6',
-      'energy dn' => '7',
-      'energy equ' => '8',
-      'energy up' => '9',
-      'deaf mute' => '*',
-      'mute' => '0',
-      'hangup' => '#'
+        'vol talk dn' => '1',
+        'vol talk zero' => '2',
+        'vol talk up' => '3',
+        'vol listen dn' => '4',
+        'vol listen zero' => '5',
+        'vol listen up' => '6',
+        'energy dn' => '7',
+        'energy equ' => '8',
+        'energy up' => '9',
+        'deaf mute' => '*',
+        'mute' => '0'
     );
 
     public static $default_profile = array(
@@ -27,7 +26,7 @@ class Conference extends Bluebox_Record
         'sound-prefix' => '$${sounds_dir}',
         //'ack-sound' => 'beep.wav',
         //'nack-sound' => 'beeperr.wav',
-        'caller-controls' => 'default',
+        'caller-controls' => 'default-keymap',
         'tts-engine' => 'flite',
         'tts-voice' => 'kal',
         'muted-sound' => 'conference/conf-muted.wav',
