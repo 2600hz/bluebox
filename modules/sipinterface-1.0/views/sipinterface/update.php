@@ -35,9 +35,19 @@
         <?php
             echo form::label(array('for' => 'sipinterface[ext_ip_address]',
                                    'hint' => 'Leave blank to auto-detect',
-                                   'help' => 'The external IP address is used in SIP and SDP headers to specify where packets should be routed to/from when talking with external/remote servers. This is very important - incorrectly setting this is very often the cause of one-way audio, since SIP packets will sometimes successfully make it back and forth but the SDP header will have an invalid address for audio.'),
-                             'External IP Address:');
+                                   'help' => 'The external IP address is used in SIP headers to specify where packets should be routed to/from when talking with external/remote servers. This is very important - incorrectly setting this is very often the cause of one-way audio, since SIP packets will sometimes successfully make it back and forth but the SDP will have an invalid address for audio.'),
+                             'External SIP IP Address:');
             echo form::input('sipinterface[ext_ip_address]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][media_ip_address]',
+                                   'hint' => 'Leave blank to auto-detect',
+                                   'help' => 'The external IP address is used in SDP headers to specify where media should be routed to/from when talking with external/remote servers. This is very important - incorrectly setting this is will cause issues with audio, since the SDP header will have an invalid address for the media streams.'),
+                             'External Media IP Address:');
+            echo form::input('sipinterface[registry][media_ip_address]');
         ?>
         </div>
 
@@ -146,6 +156,16 @@
         </div>
 
     <?php echo form::open_section('Default Behaviors for Connected Devices'); ?>
+
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][all_reg_options_ping]',
+                                   'hint' => 'Detect SIP NAT IP & Port on Registration',
+                                   'help' => 'With this option set the softswitch will periodically send an OPTIONS packet to all registered endpoints to keep the connectoin alive.'
+                                   ), 'SIP Ping Registered Devices');
+            echo form::checkbox('sipinterface[registry][all_reg_options_ping]');
+        ?>
+        </div>
 
         <div class="field">
         <?php
