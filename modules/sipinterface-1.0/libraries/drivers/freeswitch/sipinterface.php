@@ -133,21 +133,21 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             if ($sipinterface['nat_type'])
             {
                 // Force external IP w/ auto-nat
-                $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $sip_ip_address. '"}');
+                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="autonat:' . $sip_ip_address. '"}');
 
                 if (!empty($media_ip_address))
                 {
-                    $xml->update('/settings/param[@name="ext-sip-ip"]{@value="autonat:' . $media_ip_address . '"}');
+                    $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $media_ip_address . '"}');
                 }
             } 
             else
             {
                 // Force static external IP
-                $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $sip_ip_address .'"}');
+                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="' . $sip_ip_address .'"}');
 
                 if (!empty($media_ip_address))
                 {
-                    $xml->update('/settings/param[@name="ext-sip-ip"]{@value="' . $media_ip_address . '"}');
+                    $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $media_ip_address . '"}');
                 }
             }
         } 
