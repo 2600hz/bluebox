@@ -159,11 +159,11 @@
 
         <div class="field">
         <?php
-            echo form::label(array('for' => 'sipinterface[registry][all_reg_options_ping]',
-                                   'hint' => 'Detect SIP NAT IP & Port on Registration',
+            echo form::label(array('for' => 'sipinterface[registry][options_ping]',
+                                   'hint' => 'Send registered devices SIP option pings',
                                    'help' => 'With this option set the softswitch will periodically send an OPTIONS packet to all registered endpoints to keep the connectoin alive.'
                                    ), 'SIP Ping Registered Devices');
-            echo form::checkbox('sipinterface[registry][all_reg_options_ping]');
+            echo form::checkbox('sipinterface[registry][options_ping]');
         ?>
         </div>
 
