@@ -118,12 +118,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // should we ping registered devices?
-        if(arr::get($sipinterface, 'registry', 'all_reg_options_ping'))
+        if(arr::get($sipinterface, 'registry', 'options_ping'))
         {
+            $xml->update('/settings/param[@name="nat-options-ping"]{@value="true"}');
+
             $xml->update('/settings/param[@name="all-reg-options-ping"]{@value="true"}');
         }
         else
         {
+            $xml->deleteNode('/settings/param[@name="nat-options-ping"]');
+
             $xml->deleteNode('/settings/param[@name="all-reg-options-ping"]');
         }
 
