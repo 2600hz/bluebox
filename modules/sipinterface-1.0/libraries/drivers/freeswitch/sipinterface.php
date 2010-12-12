@@ -52,8 +52,15 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         // Turn off session timers, they are irritating and cause all sorts of issues
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
 
-        $xml->update('/settings/param[@name="user-agent-string"][@value="Configured by 2600hz"]');
-
+        if ($user_agent = kohana::config('sipinterface.user_agent'))
+        {
+            $xml->update('/settings/param[@name="user-agent-string"]{@value="' .kohana::config('sipinterface.user_agent') .'"}');
+        }
+        else
+        {
+            $xml->deleteNode('/settings/paramp[@name="user-agent-string"]');
+        }
+        
         $xml->update('/settings/param[@name="rtp-timer-name"]{@value="soft"}');
 
         $xml->update('/settings/param[@name="codec-prefs"]{@value="$${global_codec_prefs}"}');
@@ -84,7 +91,6 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             $xml->update('/settings/param[@name="sip-ip"]{@value="$${local_ip_v4}"}');
         }
 
-
         if (($ip_address = arr::get($sipinterface, 'registry', 'media_ip_address')) OR ($ip_address = arr::get($sipinterface, 'ip_address')))
         {
             $media_ip_address = $ip_address;
@@ -95,7 +101,6 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         {
             $xml->update('/settings/param[@name="rtp-ip"]{@value="$${local_ip_v4}"}');
         }
-
 
         // If the user has a port defined then use it otherwise use 5060
         if ($port = arr::get($sipinterface, 'port'))
@@ -132,26 +137,34 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // Set our external IPs for SIP & RTP
-        if (!empty($sip_ip_address))
+        if ($ext_ip_address = arr::get($sipinterface, 'ext_ip_address'))
         {
             if ($sipinterface['nat_type'])
             {
                 // Force external IP w/ auto-nat
-                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="autonat:' . $sip_ip_address. '"}');
+                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="autonat:' . $ext_ip_address. '"}');
 
                 if (!empty($media_ip_address))
                 {
                     $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $media_ip_address . '"}');
                 }
+                else
+                {
+                    $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $ext_ip_address . '"}');
+                }
             } 
             else
             {
                 // Force static external IP
-                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="' . $sip_ip_address .'"}');
+                $xml->update('/settings/param[@name="ext-sip-ip"]{@value="' . $ext_ip_address .'"}');
 
                 if (!empty($media_ip_address))
                 {
                     $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $media_ip_address . '"}');
+                }
+                else
+                {
+                    $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $ext_ip_address . '"}');
                 }
             }
         } 
