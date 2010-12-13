@@ -70,43 +70,43 @@ $config['filemap'][2] = array (
 );
 
 $config['filemap'][3] = array (
-    'filename' => $config['cfg_root'] .'/dialplan/bluebox_routes.xml',
-    'query' => '//document/section[@name="routes"]/context[@name="multitenant_routing_context"]'
-);
-
-$config['filemap'][4] = array (
     'filename' => $config['cfg_root'] .'/dialplan/bluebox_dialplan.xml',
     'query' => '//document/section[@name="dialplan"]/context'
 );
 
-$config['filemap'][5] = array (
+$config['filemap'][4] = array (
     'filename' => $config['cfg_root'] .'/autoload_configs/conference.conf.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="conference.conf"]'
 );
 
-$config['filemap'][6] = array (
+$config['filemap'][5] = array (
     'filename' => $config['cfg_root'] .'/autoload_configs/ivr.conf.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="ivr.conf"][@description="IVR menus"]'
 );
 
-$config['filemap'][7] = array (
+$config['filemap'][6] = array (
     'filename' => $config['cfg_root'] .'/autoload_configs/bluebox_odbc.conf.xml',
     'query' => '//document/section[@name="odbc"]'
 );
 
-$config['filemap'][8] = array (
+$config['filemap'][7] = array (
     'filename' => $config['cfg_root'] .'/autoload_configs/acl.conf.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="acl.conf"]'
 );
 
-$config['filemap'][9] = array (
+$config['filemap'][8] = array (
     'filename' => $config['cfg_root'] .'/autoload_configs/xml_cdr.conf.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="xml_cdr.conf"][@description="XML CDR CURL logger"]'
 );
 
-$config['filemap'][10] = array (
+$config['filemap'][9] = array (
     'filename' => $config['cfg_root'] .'/jingle_profiles/bluebox_clients.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="dingaling.conf"]/profile'
+);
+
+$config['filemap'][10] = array (
+    'filename' => $config['cfg_root'] .'/dialplan/bluebox_routes.xml',
+    'query' => '//document/section[@name="routes"]/context[@name="multitenant_routing_context"]'
 );
 
 // Base file - note that because the query string is //document, this section will contain
