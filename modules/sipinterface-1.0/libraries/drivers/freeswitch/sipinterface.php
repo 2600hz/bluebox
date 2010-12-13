@@ -41,6 +41,8 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             return TRUE;
         }
 
+        $allow_seperate_media_ip = kohana::config('sipinterface.allow_seperate_media_ip');
+
         // Reference to our XML document
         $xml = Telephony::getDriver()->xml;
 
@@ -58,7 +60,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
         else
         {
-            $xml->deleteNode('/settings/paramp[@name="user-agent-string"]');
+            $xml->deleteNode('/settings/param[@name="user-agent-string"]');
         }
         
         $xml->update('/settings/param[@name="rtp-timer-name"]{@value="soft"}');
@@ -79,11 +81,9 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/settings/param[@name="auth-calls"]{@value="' . ($sipinterface['auth'] ? 'true' : 'false') .'"}');
 
-        // Set our internal IPs for SIP & RTP. This also defines what interface we bind to.
+        // Set our internal IPs for SIP. This also defines what interface we bind to.
         if ($ip_address = arr::get($sipinterface, 'ip_address'))
         {
-            $sip_ip_address = $ip_address;
-
             $xml->update('/settings/param[@name="sip-ip"]{@value="' .$ip_address .'"}');
         }
         else
@@ -91,10 +91,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             $xml->update('/settings/param[@name="sip-ip"]{@value="$${local_ip_v4}"}');
         }
 
-        if (($ip_address = arr::get($sipinterface, 'registry', 'media_ip_address')) OR ($ip_address = arr::get($sipinterface, 'ip_address')))
+        // If we are seperating the media and sip IPs then get the current
+        // media internal IP otherwise use the same as SIP
+        if ($allow_seperate_media_ip)
         {
-            $media_ip_address = $ip_address;
+            $ip_address = arr::get($sipinterface, 'registry', 'media_ip_address');
+        }
 
+        // Set our internal IPs for RTP. This also defines what interface we bind to.
+        if ($ip_address)
+        {
             $xml->update('/settings/param[@name="rtp-ip"]{@value="' .$ip_address .'"}');
         }
         else
@@ -143,50 +149,60 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             {
                 // Force external IP w/ auto-nat
                 $xml->update('/settings/param[@name="ext-sip-ip"]{@value="autonat:' . $ext_ip_address. '"}');
-
-                if (!empty($media_ip_address))
-                {
-                    $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $media_ip_address . '"}');
-                }
-                else
-                {
-                    $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $ext_ip_address . '"}');
-                }
             } 
             else
             {
                 // Force static external IP
                 $xml->update('/settings/param[@name="ext-sip-ip"]{@value="' . $ext_ip_address .'"}');
-
-                if (!empty($media_ip_address))
-                {
-                    $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $media_ip_address . '"}');
-                }
-                else
-                {
-                    $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $ext_ip_address . '"}');
-                }
             }
         } 
         elseif ($sipinterface['nat_type'] == 1)
         {
             // Automatically detect NAT and external IP using various strategies built into FS
-            $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="auto-nat"}');
-
             $xml->update('/settings/param[@name="ext-sip-ip"]{@value="auto-nat"}');
         } 
         elseif($sipinterface['nat_type'] == 2)
         {
             // No IP defined and no auto-nat set... Just try to use stun to auto-detect
-            $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="stun:stun.freeswitch.org"}');
-            
             $xml->update('/settings/param[@name="ext-sip-ip"]{@value="stun:stun.freeswitch.org"}');
         } 
         else
         {
-            $xml->deleteNode('/settings/param[@name="ext-rtp-ip"]');
-            
             $xml->deleteNode('/settings/param[@name="ext-sip-ip"]');
+        }
+
+        // if we are allowing sip and rtp to be on different IPs then get the
+        // external address of the media, otherwise use the same as SIP
+        if ($allow_seperate_media_ip)
+        {
+            $ext_ip_address = arr::get($sipinterface, 'registry', 'media_ext_ip_address');
+        }
+
+        // Set our external IPs for RTP
+        if ($ext_ip_address)
+        {
+            if ($sipinterface['nat_type'])
+            {
+                $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $ext_ip_address . '"}');
+            }
+            else
+            {
+                $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $ext_ip_address . '"}');
+            }
+        }
+        elseif ($sipinterface['nat_type'] == 1)
+        {
+            // Automatically detect NAT and external IP using various strategies built into FS
+            $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="auto-nat"}');
+        }
+        elseif($sipinterface['nat_type'] == 2)
+        {
+            // No IP defined and no auto-nat set... Just try to use stun to auto-detect
+            $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="stun:stun.freeswitch.org"}');
+        }
+        else
+        {
+            $xml->deleteNode('/settings/param[@name="ext-rtp-ip"]');
         }
 
         // NAT detection settings for registrations

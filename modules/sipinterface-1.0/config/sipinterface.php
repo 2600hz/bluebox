@@ -2,4 +2,4 @@
 
 $config['user_agent'] = 'Configured by 2600hz!';
 
-$config['allow_seperate_media_ip'] = TRUE;
+$config['allow_seperate_media_ip'] = FALSE;
