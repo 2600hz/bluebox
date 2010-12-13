@@ -8,6 +8,27 @@ class arr extends arr_Core
 {
     public static $append_string_separator = ' ';
 
+    public static function filter_collection($arrays, $paths, $value = NULL)
+    {
+        $paths = func_get_args();
+
+        array_shift($paths);
+
+        $value = array_pop($paths);
+
+        $result = array();
+
+        foreach ($arrays as $pos => $array)
+        {
+            if (self::get_array($array, $paths) == $value)
+            {
+                $result[$pos] = $array;
+            }
+        }
+
+        return empty($result) ? FALSE : $result;
+    }
+
     /**
      * This function determines if a var is iterable.
      * IE: safe for use in a foreach.
