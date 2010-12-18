@@ -34,9 +34,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
     /**
      * Indicate we support FreeSWITCH
      */
-    public static function set($sipinterface)
+    public static function set($base)
     {
-        if (!($sipinterface instanceof SipInterface))
+        if ($base instanceof Location)
+        {
+            $alias_sipinterface_id = arr::get($base, 'plugins', 'sipinterface', 'sipinterface_id');
+
+            self::update_aliases($base['location_id'], $alias_sipinterface_id);
+        }
+
+        if (!($base instanceof SipInterface))
         {
             return TRUE;
         }
@@ -47,9 +54,9 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         $xml = Telephony::getDriver()->xml;
 
         // The section we are working with is <document><section name="configuration"><configuration name="conference.conf">
-        FreeSwitch::setSection('sofia', 'sipinterface_' . $sipinterface['sipinterface_id']);
+        FreeSwitch::setSection('sofia', 'sipinterface_' . $base['sipinterface_id']);
 
-        $xml->update('/domains/domain[@name="all"][@alias="true"][@parse="false"]');
+        $xml->deleteNode('/domains');
 
         // Turn off session timers, they are irritating and cause all sorts of issues
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
@@ -79,10 +86,10 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/settings/param[@name="enable-timer"]{@value="false"}');
 
-        $xml->update('/settings/param[@name="auth-calls"]{@value="' . ($sipinterface['auth'] ? 'true' : 'false') .'"}');
+        $xml->update('/settings/param[@name="auth-calls"]{@value="' . ($base['auth'] ? 'true' : 'false') .'"}');
 
         // Set our internal IPs for SIP. This also defines what interface we bind to.
-        if ($ip_address = arr::get($sipinterface, 'ip_address'))
+        if ($ip_address = arr::get($base, 'ip_address'))
         {
             $xml->update('/settings/param[@name="sip-ip"]{@value="' .$ip_address .'"}');
         }
@@ -95,7 +102,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         // media internal IP otherwise use the same as SIP
         if ($allow_seperate_media_ip)
         {
-            $ip_address = arr::get($sipinterface, 'registry', 'media_ip_address');
+            $ip_address = arr::get($base, 'registry', 'media_ip_address');
         }
 
         // Set our internal IPs for RTP. This also defines what interface we bind to.
@@ -109,7 +116,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // If the user has a port defined then use it otherwise use 5060
-        if ($port = arr::get($sipinterface, 'port'))
+        if ($port = arr::get($base, 'port'))
         {
             $xml->update('/settings/param[@name="sip-port"]{@value="' .$port . '"}');
         } 
@@ -119,7 +126,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // check if multiple-registrations per credintial should be enabled
-        if(arr::get($sipinterface, 'multiple'))
+        if(arr::get($base, 'multiple'))
         {
             $xml->update('/settings/param[@name="multiple-registrations"]{@value="true"}');
         }
@@ -129,7 +136,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // should we ping registered devices?
-        if(arr::get($sipinterface, 'registry', 'options_ping'))
+        if(arr::get($base, 'registry', 'options_ping'))
         {
             $xml->update('/settings/param[@name="nat-options-ping"]{@value="true"}');
 
@@ -143,9 +150,9 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // Set our external IPs for SIP & RTP
-        if ($ext_ip_address = arr::get($sipinterface, 'ext_ip_address'))
+        if ($ext_ip_address = arr::get($base, 'ext_ip_address'))
         {
-            if ($sipinterface['nat_type'])
+            if ($base['nat_type'])
             {
                 // Force external IP w/ auto-nat
                 $xml->update('/settings/param[@name="ext-sip-ip"]{@value="autonat:' . $ext_ip_address. '"}');
@@ -156,12 +163,12 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
                 $xml->update('/settings/param[@name="ext-sip-ip"]{@value="' . $ext_ip_address .'"}');
             }
         } 
-        elseif ($sipinterface['nat_type'] == 1)
+        elseif ($base['nat_type'] == 1)
         {
             // Automatically detect NAT and external IP using various strategies built into FS
             $xml->update('/settings/param[@name="ext-sip-ip"]{@value="auto-nat"}');
         } 
-        elseif($sipinterface['nat_type'] == 2)
+        elseif($base['nat_type'] == 2)
         {
             // No IP defined and no auto-nat set... Just try to use stun to auto-detect
             $xml->update('/settings/param[@name="ext-sip-ip"]{@value="stun:stun.freeswitch.org"}');
@@ -175,13 +182,13 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         // external address of the media, otherwise use the same as SIP
         if ($allow_seperate_media_ip)
         {
-            $ext_ip_address = arr::get($sipinterface, 'registry', 'media_ext_ip_address');
+            $ext_ip_address = arr::get($base, 'registry', 'media_ext_ip_address');
         }
 
         // Set our external IPs for RTP
         if ($ext_ip_address)
         {
-            if ($sipinterface['nat_type'])
+            if ($base['nat_type'])
             {
                 $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="autonat:' . $ext_ip_address . '"}');
             }
@@ -190,12 +197,12 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
                 $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="' . $ext_ip_address . '"}');
             }
         }
-        elseif ($sipinterface['nat_type'] == 1)
+        elseif ($base['nat_type'] == 1)
         {
             // Automatically detect NAT and external IP using various strategies built into FS
             $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="auto-nat"}');
         }
-        elseif($sipinterface['nat_type'] == 2)
+        elseif($base['nat_type'] == 2)
         {
             // No IP defined and no auto-nat set... Just try to use stun to auto-detect
             $xml->update('/settings/param[@name="ext-rtp-ip"]{@value="stun:stun.freeswitch.org"}');
@@ -206,7 +213,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // NAT detection settings for registrations
-        if (arr::get($sipinterface, 'registry', 'detect_nat_on_registration'))
+        if (arr::get($base, 'registry', 'detect_nat_on_registration'))
         {
             $xml->update('/settings/param[@name="aggressive-nat-detection"]{@value="true"}');
         } 
@@ -216,7 +223,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // NDLB / forced rport for crappy devices/setups
-        if (arr::get($sipinterface, 'registry', 'force_rport'))
+        if (arr::get($base, 'registry', 'force_rport'))
         {
             $xml->update('/settings/param[@name="NDLB-force-rport"]{@value="true"}');
         }
@@ -227,7 +234,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         // Enable compact headers by default. With all the Codecs FS now supports we see lots of
         // bad behavior re: UDP packets that are too large and get fragmented
-        if (arr::get($sipinterface, 'registry', 'compact_headers'))
+        if (arr::get($base, 'registry', 'compact_headers'))
         {
             $xml->update('/settings/param[@name="enable-compact-headers"]{@value="true"}');
         }
@@ -237,7 +244,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // Find the context id that we should direct unauthed calls to
-        if ($context_id = arr::get($sipinterface, 'context_id'))
+        if ($context_id = arr::get($base, 'context_id'))
         {
             $xml->update('/settings/param[@name="context"]{@value="context_' .$context_id . '"}');
         }
@@ -247,7 +254,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // If there is a forced domain set it up now
-        if ($force_domain = arr::get($sipinterface, 'registry', 'force_register_domain'))
+        if ($force_domain = arr::get($base, 'registry', 'force_register_domain'))
         {
             $force_location = '$${location_' .$force_domain .'}';
 
@@ -263,7 +270,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
 
         // Set relevant ACLs
-        if ($aclList = netlists::getListName($sipinterface['nat_net_list_id']))
+        if ($aclList = netlists::getListName($base['nat_net_list_id']))
         {
             $xml->update('/settings/param[@name="apply-nat-acl"]{@value="' .$aclList .'"}');
         }
@@ -272,7 +279,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             $xml->deleteNode('/settings/param[@name="apply-nat-acl"]');
         }
         
-        if ($aclList = netlists::getListName($sipinterface['inbound_net_list_id']))
+        if ($aclList = netlists::getListName($base['inbound_net_list_id']))
         {
             $xml->update('/settings/param[@name="apply-inbound-acl"]{@value="' .$aclList .'"}');
         } 
@@ -281,7 +288,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             $xml->deleteNode('/settings/param[@name="apply-inbound-acl"]');
         }
 
-        if ($aclList = netlists::getListName($sipinterface['register_net_list_id']))
+        if ($aclList = netlists::getListName($base['register_net_list_id']))
         {
             $xml->update('/settings/param[@name="apply-register-acl"]{@value="' .$aclList .'"}');
         } 
@@ -289,10 +296,46 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         {
             $xml->deleteNode('/settings/param[@name="apply-register-acl"]');
         }
+
+        $locations = Doctrine::getTable('Location')->findAll();
+
+        foreach ($locations as $location)
+        {
+            $alias_sipinterface_id = arr::get($location, 'plugins', 'sipinterface', 'sipinterface_id');
+
+            self::update_aliases($location['location_id'], $alias_sipinterface_id);
+        }
+        
+        if ($default_sipinterface_id = SipInterface::get_default('sipinterface_id'))
+        {
+            $xml = FreeSwitch::setSection('sofia', 'sipinterface_' .$default_sipinterface_id);
+
+            $xp = new DOMXPath($xml);
+
+            $elements = $xp->query($xml->preUpdate(''));
+
+            if (count($elements) == 1)
+            {
+                $node = $elements->item(0);
+
+                $parentNode = $node->parentNode;
+
+                $parentNode->removeChild($node);
+
+                $parentNode->appendChild($node);
+
+                $xml->update('/domains/domain[@name="all"][@alias="true"][@parse="false"]');
+            }
+        }
     }
 
     public static function delete($sipinterface)
     {
+        if ($base instanceof Location)
+        {
+            self::update_aliases($base['location_id']);
+        }
+
         if (!($sipinterface instanceof SipInterface))
         {
             return TRUE;
@@ -306,4 +349,28 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
         $xml->deleteNode();
     }
+
+    public static function update_aliases($location_id, $alias_sipinterface_id = NULL)
+    {
+        $location_name = '$${location_' .$location_id .'}';
+
+        $sipinterfaces = Doctrine::getTable('SipInterface')->findAll();
+
+        foreach($sipinterfaces as $sipinterface)
+        {
+            $sipinterface_id = $sipinterface['sipinterface_id'];
+
+            $xml = FreeSwitch::setSection('sofia_aliases', 'sipinterface_' .$sipinterface_id);
+
+            if ($sipinterface_id == $alias_sipinterface_id)
+            {
+                $xml->update('/alias[@name="' .$location_name .'"]');
+            }
+            else
+            {
+                $xml->deleteNode('/alias[@name="' .$location_name .'"]');
+            }
+        }
+    }
+
 }

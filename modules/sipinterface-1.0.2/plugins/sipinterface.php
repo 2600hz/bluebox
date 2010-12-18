@@ -37,30 +37,6 @@ class SipInterface_Plugin extends Bluebox_Plugin
 
         $this->subview->section = 'general';
 
-        $subview->options = array();
-
-        $result = Doctrine::getTable('SipInterface')->findAll(Doctrine::HYDRATE_ARRAY);
-
-        $options = array();
-
-        foreach ($result as $row)
-        {
-            if (!$row['auth'])
-            {
-                $options[$row['sipinterface_id']] = $row['name'];
-            }
-        }
-
-        foreach ($result as $row)
-        {
-            if ($row['auth'])
-            {
-                $options[$row['sipinterface_id']] = $row['name'];
-            }
-        }
-
-        $this->subview->options = $options;
-
         return TRUE;
     }
 }

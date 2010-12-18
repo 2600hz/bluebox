@@ -49,7 +49,12 @@ class SipInterface extends Bluebox_Record
             'default' => 'Invalid selection.'
         )
     );
-    
+
+    private static $nested = FALSE;
+
+    // This is only used during transactions were there are not interfaces already (IE: install)
+    private static $default_id = NULL;
+
     /**
      * Sets the table name, and defines the table columns.
      */
@@ -142,5 +147,82 @@ class SipInterface extends Bluebox_Record
         $this->actAs('GenericStructure');
         $this->actAs('Timestampable');
         $this->actAs('TelephonyEnabled');
+    }
+
+    /**
+     * TODO: So I need the default_sipinterface_id to be a 'global' setting across all interfaces
+     * and since we have nowhere to save that I am going to cheat and put it on all interfaces.
+     * this will keep them in sync but a better solution needs to be found...
+     */
+    public function postSave()
+    {
+        if (self::$nested)
+        {
+            return;
+        }
+
+        self::$nested = TRUE;
+
+        $sipinterfaces = Doctrine::getTable('SipInterface')->findAll();
+
+        if(!$default_sipinterface_id = arr::get($this->get('registry'), 'default_sipinterface_id'))
+        {
+            if (!self::$default_id)
+            {
+                if (!$default_sipinterface_id = self::get_default('sipinterface_id'))
+                {
+                    self::$default_id = $this->get('sipinterface_id');
+                }
+            }
+
+            $default_sipinterface_id = self::$default_id;
+        }
+        
+        foreach($sipinterfaces as $sipinterface)
+        {
+            $registry = $sipinterface['registry'];
+
+            $registry['default_sipinterface_id'] = $default_sipinterface_id;
+
+            $sipinterface['registry'] = $registry;
+
+            $sipinterface->save();
+        }
+
+        self::$nested = FALSE;
+    }
+
+    public static function get_default($paths = NULL)
+    {
+        $sipinterfaces = Doctrine::getTable('SipInterface')->findAll();
+
+        if ($sipinterfaces->count())
+        {
+            $default_sipinterface = array();
+
+            foreach ($sipinterfaces as $sipinterface)
+            {
+                if($default_sipinterface_id = arr::get($sipinterface, 'registry', 'default_sipinterface_id'))
+                {
+                    $default_sipinterface = Doctrine::getTable('SipInterface')->find($default_sipinterface_id);
+
+                    if ($default_sipinterface)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (!$paths)
+            {
+                return empty($default_sipinterface) ? FALSE : $default_sipinterface;
+            }
+
+            $paths = func_get_args();
+
+            return arr::get_array($default_sipinterface, $paths);
+        }
+
+        return FALSE;
     }
 }

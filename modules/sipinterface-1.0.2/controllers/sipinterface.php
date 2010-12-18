@@ -108,6 +108,29 @@ class SipInterface_Controller extends Bluebox_Controller
                     = netlists::getSystemListId('nat.auto');
         }
 
+        $result = Doctrine::getTable('SipInterface')->findAll(Doctrine::HYDRATE_ARRAY);
+
+        $options = array();
+
+        foreach ($result as $row)
+        {
+            if (!$row['auth'])
+            {
+                $options[$row['sipinterface_id']] = $row['name'];
+            }
+        }
+
+        foreach ($result as $row)
+        {
+            if ($row['auth'])
+            {
+                $options[$row['sipinterface_id']] = $row['name'];
+            }
+        }
+
+        $this->view->options = $options;
+
+
         parent::prepareUpdateView();
     }
 

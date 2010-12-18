@@ -50,6 +50,13 @@
         ?>
         </div>
 
+        <div class="field">
+        <?php
+            echo form::label('Default Interface:');
+            echo sipinterfaces::dropdown('sipinterface[registry][default_sipinterface_id]');
+        ?>
+        </div>
+
     <?php echo form::close_section(); ?>
 
     <?php if (kohana::config('sipinterface.allow_seperate_media_ip')): ?>
