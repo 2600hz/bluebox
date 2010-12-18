@@ -51,7 +51,7 @@ class sipinterfaces
 
         if ($data['null_option'])
         {
-            array_unshift($options, $data['null_option']);
+            arr::unshift_assoc($options, 0, $data['null_option']);
         }
 
         $data = array_diff($data, $defaults);
