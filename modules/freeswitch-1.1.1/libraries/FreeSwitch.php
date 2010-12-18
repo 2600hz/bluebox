@@ -79,6 +79,7 @@ class FreeSwitch extends Telephony_Driver
         'conferences' => '//document/section[@name="configuration"]/configuration[@name="conference.conf"]',
         'conference_profile' => '//document/section[@name="configuration"]/configuration[@name="conference.conf"]/profiles/profile[@name="conference_%s"]',
         'sofia' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]',
+        'sofia_aliases' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]/aliases',
         'gateway' => '//document/section[@name="configuration"]/configuration[@name="sofia.conf"]/profiles/profile[@name="%s"]/gateways/gateway[@name="%s"]',
         'voicemail' => '//document/section[@name="configuration"]/configuration[@name="voicemail.conf"]/profiles/profile[@name="%s"]',
         'xmlcdr' => '//document/section[@name="configuration"]/configuration[@name="xml_cdr.conf"][@description="XML CDR CURL logger"]',
@@ -501,7 +502,7 @@ class FreeSwitch extends Telephony_Driver
             self::$aclDirty = TRUE;
         }
 
-        if (($sectionName == 'sofia') or ($sectionName == 'gateway'))
+        if (($sectionName == 'sofia') or ($sectionName == 'sofia_aliases') or ($sectionName == 'gateway'))
         {
             self::$sofiaDirty = TRUE;
         }
