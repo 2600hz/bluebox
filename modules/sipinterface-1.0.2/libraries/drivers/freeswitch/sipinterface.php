@@ -329,14 +329,14 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         }
     }
 
-    public static function delete($sipinterface)
+    public static function delete($base)
     {
         if ($base instanceof Location)
         {
             self::update_aliases($base['location_id']);
         }
 
-        if (!($sipinterface instanceof SipInterface))
+        if (!($base instanceof SipInterface))
         {
             return TRUE;
         }
@@ -345,7 +345,7 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
         $xml = Telephony::getDriver()->xml;
         
         // The section we are working with is <document><section name="configuration"><configuration name="conference.conf">
-        FreeSwitch::setSection('sofia', 'sipinterface_' . $sipinterface['sipinterface_id']);
+        FreeSwitch::setSection('sofia', 'sipinterface_' . $base['sipinterface_id']);
 
         $xml->deleteNode();
     }
