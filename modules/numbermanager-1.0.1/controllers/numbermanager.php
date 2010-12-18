@@ -57,6 +57,17 @@ class NumberManager_Controller extends Bluebox_Controller
                 )
             )
         );
+        $grid->add('type', 'Type', array(
+                'width' => '70',
+                'align' => 'center',
+                'search' => false,
+                'sortable' => false,
+                'callback' => array(
+                    'arguments' => 'type',
+                    'function' => array($this, '_showType')
+                )
+            )
+        );
         $grid->add('Location/name', 'Location', array(
                 'width' => '150',
                 'search' => false,
@@ -184,6 +195,21 @@ class NumberManager_Controller extends Bluebox_Controller
     public function _showPools($NULL, $number_id)
     {
         return numbermanager::showPools($number_id);
+    }
+
+    public function _showType($NULL, $type)
+    {
+        switch ($type)
+        {
+            case Number::TYPE_INTERNAL:
+                return 'Internal';
+
+            case Number::TYPE_EXTERNAL:
+                return 'External';
+
+            default:
+                return 'Unknown';
+        }
     }
 
     protected function save_prepare(&$object)
