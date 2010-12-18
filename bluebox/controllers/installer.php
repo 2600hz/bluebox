@@ -718,7 +718,8 @@ class Installer_Controller extends Bluebox_Controller
         if (stristr($databaseOptions['type'], 'sqlite'))
         {
             $databaseOptions['host'] = $this->session->get('installer.dbPathName');
-
+var_dump($databaseOptions['host']);
+var_dump(file_exists($databaseOptions['host']));
             if (!file_exists($databaseOptions['host']))
             {
                 message::set('SQLite path does not exist or can not be read!');
@@ -1179,6 +1180,10 @@ class Installer_Controller extends Bluebox_Controller
     *************************************************************************/
     private function _loadAllModules()
     {
+        $driver = Kohana::config('telephony.driver');
+
+        Kohana::config_set('telephony.driver', NULL);
+
         $loadList = glob(MODPATH .'*', GLOB_MARK);
 
         foreach($loadList as $key => $module)
@@ -1214,6 +1219,8 @@ class Installer_Controller extends Bluebox_Controller
                 }
             }
         }
+
+        Kohana::config_set('telephony.driver', $driver);
     }
 
     /**
@@ -1351,6 +1358,10 @@ class Installer_Controller extends Bluebox_Controller
     
     private function _freshInstall()
     {
+        $defaultModules = Kohana::config('config.modules');
+
+        Kohana::config_set('core.modules', $defaultModules);
+
         // Get the doctrine overlord
         $manager = Doctrine_Manager::getInstance();
 
