@@ -23,7 +23,7 @@ class Conference extends Bluebox_Record
         'rate' => 32000,
         'interval' => 20,
         'energy-level' => 20,
-        'sound-prefix' => '$${sounds_dir}',
+        'sound-prefix' => '$${sounds_dir}/en/us/callie',
         //'ack-sound' => 'beep.wav',
         //'nack-sound' => 'beeperr.wav',
         'caller-controls' => 'default-keymap',
