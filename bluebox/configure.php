@@ -5,7 +5,7 @@
  */
 class Core_Configure extends Bluebox_Configure
 {
-    public static $version = '1.0.3';
+    public static $version = '1.0.4-dev';
     public static $packageName = 'core';
     public static $displayName = 'Bluebox Core';
     public static $author = '2600hz Team';

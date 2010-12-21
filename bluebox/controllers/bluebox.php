@@ -14,7 +14,7 @@ abstract class Bluebox_Controller extends Template_Controller
     /**
      * @var float The bluebox core version
      */
-    public static $version = '1.0.3';
+    public static $version = '1.0.4-dev';
 
     protected $authBypass = array();
 
