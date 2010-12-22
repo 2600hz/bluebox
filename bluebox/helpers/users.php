@@ -133,9 +133,11 @@ class users
 
     public static function isAuthentic($paths)
     {
-        $attr = call_user_func_array(array('self', 'getAttr'), func_get_args());
+        $paths = func_get_args();
 
-        $authAttr = call_user_func_array(array('self', 'getAuthenticAttr'), func_get_args());
+        $attr = call_user_func_array(array('self', 'getAttr'), $paths);
+
+        $authAttr = call_user_func_array(array('self', 'getAuthenticAttr'), $paths);
 
         return ($attr == $authAttr) ? TRUE : FALSE;
     }
@@ -173,7 +175,9 @@ class users
             return self::getAttr('first_name') .' ' .self::getAttr('last_name');
         }
 
-        return arr::get_array($user, func_get_args());
+        $paths = func_get_args();
+
+        return arr::get_array($user, $paths);
     }
 
     public static function getAuthenticAttr($paths)
@@ -185,7 +189,9 @@ class users
             return self::getAuthenticAttr('first_name') .' ' .self::getAuthenticAttr('last_name');
         }
 
-        return arr::get_array($user, func_get_args());
+        $paths = func_get_args();
+
+        return arr::get_array($user, $paths);
     }
 
     public static function masqueradeAttr($value, $paths)

@@ -38,7 +38,7 @@ class TTS_1_0_Configure extends Bluebox_Configure
 
         $tts_engine['description'] = 'Flite (festival-lite) is an opensource test to speech engine developed at CMU';
 
-        $tts_engine['speakers'] = array('kal');
+        $tts_engine['speakers'] = array('kal', 'slt', 'rms', 'awb');
 
         $tts_engine->save();
     }

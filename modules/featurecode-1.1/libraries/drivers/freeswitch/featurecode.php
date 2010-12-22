@@ -62,7 +62,7 @@ XML;
 
                 $vmdomain = 'voicemail_' .$destination['account_id'];
 
-	 	$xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
 
                 $xmlText = <<<XML
 
@@ -81,10 +81,12 @@ XML;
             case 'voicemail_noauth':
                 $vmdomain = 'voicemail_' .$destination['account_id'];
 
-	 	$xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+                $xml->setXmlRoot($xml->getExtensionRoot());
+
+                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
 
                 $xmlText = <<<XML
-
+                
         <action application="answer"/>
         <action application="sleep" data="1000"/>
         <action application="set" data="voicemail_authorized=\${sip_authorized}"/>
@@ -130,14 +132,14 @@ XML;
             case 'delay_echo':
                 $xmlText = <<<XML
 <action application="answer"/>
-<action application="delay_echo" data="5000"/>
+<action application="delay_echo" data="1000"/>
 XML;
                 break;
             
             case 'tone_test':
                 $xmlText = <<<XML
 <action application="answer"/>
-<action application="playback" data="tone_stream://%(251,0,1004);loops=-1"/>
+<action application="playback" data="tone_stream://%(1000,0,2600);loops=-1"/>
 XML;
                 break;
             

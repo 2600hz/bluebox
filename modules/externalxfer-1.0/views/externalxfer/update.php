@@ -66,6 +66,15 @@
     </div>
 
     <?php echo form::close_section(); ?>
+
+    <?php echo form::open_section('Options'); ?>
+
+        <div class="field">
+            <?php echo form::label('externalxfer[registry][ignore_early_media]', 'Ignore Early Media:'); ?>
+            <?php echo form::checkbox('externalxfer[registry][ignore_early_media]'); ?>
+        </div>
+
+    <?php echo form::close_section(); ?>
     
     <?php
         if (isset($views))

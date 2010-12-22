@@ -99,7 +99,16 @@ class FreeSwitch_ExternalXfer_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/action[@application="export"][@bluebox="sipCalleeIdNumber"]{@data="sip_callee_id_number=' .$number['number'] .'"}');
 
-            $xml->update('/action[@application="bridge"]{@data="' .$dialstring .'"}');
+
+            $options = '';
+
+            if (arr::get($destination, 'registry', 'ignore_early_media'))
+            {
+                $options = '{ignore_early_media=true}';
+
+            }
+
+            $xml->update('/action[@application="bridge"]{@data="' .$options.$dialstring .'"}');
         }
     }
 }
