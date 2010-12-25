@@ -74,6 +74,11 @@
             <?php echo form::checkbox('externalxfer[registry][ignore_early_media]'); ?>
         </div>
 
+        <div class="field">
+            <?php echo form::label('externalxfer[registry][require_confirmation]', 'Confirm on Answer:'); ?>
+            <?php echo form::checkbox('externalxfer[registry][require_confirmation]'); ?>
+        </div>
+
     <?php echo form::close_section(); ?>
     
     <?php

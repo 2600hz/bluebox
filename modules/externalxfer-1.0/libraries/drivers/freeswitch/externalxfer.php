@@ -100,12 +100,24 @@ class FreeSwitch_ExternalXfer_Driver extends FreeSwitch_Base_Driver
             $xml->update('/action[@application="export"][@bluebox="sipCalleeIdNumber"]{@data="sip_callee_id_number=' .$number['number'] .'"}');
 
 
-            $options = '';
+            $options = array();
 
             if (arr::get($destination, 'registry', 'ignore_early_media'))
             {
-                $options = '{ignore_early_media=true}';
+                $options[] = 'ignore_early_media=true';
 
+            }
+
+            if (arr::get($destination, 'registry', 'require_confirmation'))
+            {
+                $options[] = 'group_confirm_file=ivr\/accept_reject_voicemail.wav,group_confirm_key=1,call_timeout=60';
+
+            }
+
+            if (count($options) > 0) {
+                $options = '{' . implode(',', $options) . '}';
+            } else {
+                $options = '';
             }
 
             $xml->update('/action[@application="bridge"]{@data="' .$options.$dialstring .'"}');
