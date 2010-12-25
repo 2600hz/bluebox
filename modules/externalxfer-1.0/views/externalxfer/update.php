@@ -79,6 +79,11 @@
             <?php echo form::checkbox('externalxfer[registry][require_confirmation]'); ?>
         </div>
 
+        <div class="field">
+            <?php echo form::label('externalxfer[registry][require_confirmation_timeout]', 'Wait for Confirmation:'); ?>
+            <?php echo form::input('externalxfer[registry][require_confirmation_timeout]'); ?> seconds
+        </div>
+
     <?php echo form::close_section(); ?>
     
     <?php

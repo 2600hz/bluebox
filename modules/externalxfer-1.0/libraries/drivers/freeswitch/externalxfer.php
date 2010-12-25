@@ -110,12 +110,12 @@ class FreeSwitch_ExternalXfer_Driver extends FreeSwitch_Base_Driver
 
             if (arr::get($destination, 'registry', 'require_confirmation'))
             {
-                $options[] = 'group_confirm_file=ivr\/accept_reject_voicemail.wav,group_confirm_key=1,call_timeout=60';
+                $options[] = 'group_confirm_file=ivr\/ivr-accept_reject_voicemail.wav,group_confirm_key=1,leg_timeout=' . arr::get($destination, 'registry', 'require_confirmation_timeout');
 
             }
 
             if (count($options) > 0) {
-                $options = '{' . implode(',', $options) . '}';
+                $options = '[' . implode(',', $options) . ']';
             } else {
                 $options = '';
             }
