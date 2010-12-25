@@ -115,7 +115,7 @@ class FreeSwitch_ExternalXfer_Driver extends FreeSwitch_Base_Driver
             }
 
             if (count($options) > 0) {
-                $options = '[' . implode(',', $options) . ']';
+                $options = '{' . implode(',', $options) . '}';
             } else {
                 $options = '';
             }
