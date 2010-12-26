@@ -659,9 +659,11 @@ class FreeSwitch extends Telephony_Driver
         // otherwise we are wasting cycles and string comparisons
         $paths = (array)$path;
 
+        $freeswitch_filemap = kohana::config('freeswitch.filemap');
+
         foreach ($paths as $path)
         {
-            foreach (Kohana::config('freeswitch.filemap') as $key => $options) 
+            foreach ($freeswitch_filemap as $key => $options) 
             {
                 if (isset($options['filename']))
                 {
@@ -677,10 +679,14 @@ class FreeSwitch extends Telephony_Driver
                             Kohana::log('debug', 'FreeSWITCH -> For query ' . $path . ' we\'re loading ' . $options['filename']);
 
                             Telephony::load($options);
+
+                            $freeswitch_filemap[$key] = $options;
                         }
                     }
                 }
             }
         }
+
+        kohana::config_set('freeswitch.filemap', $freeswitch_filemap);
     }
 }
