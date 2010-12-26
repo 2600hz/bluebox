@@ -670,9 +670,9 @@ class FreeSwitch extends Telephony_Driver
                         // See if this is already in memory
                         if (!isset($this->sectionsUsed[$key]))
                         {
-                            $this->sectionsUsed[$key] = TRUE;
-
                             Event::run('freeswitch.autoloadxml', $options);
+
+                            $this->sectionsUsed[$key] = TRUE;
 
                             Kohana::log('debug', 'FreeSWITCH -> For query ' . $path . ' we\'re loading ' . $options['filename']);
 
