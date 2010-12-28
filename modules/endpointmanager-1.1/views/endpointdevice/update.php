@@ -17,6 +17,7 @@
         $list = $endpoint->get_devices_list();
 
         echo form::dropdown('endpointdevice[brand]', $list);
+
     ?>
     </div>
 

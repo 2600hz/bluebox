@@ -79,26 +79,23 @@ class endpointman {
         $provisioner_lib->model = $model['name'];
 
         //Timezone
-        $provisioner_lib->timezone = 'GMT-11:00';
+        $provisioner_lib->timezone = date_offset_get(new DateTime);
 
         //Server IP
-        $provisioner_lib->server[1]['ip'] = "10.10.10.10";
+        $provisioner_lib->server[1]['ip'] = $_SERVER["SERVER_ADDR"];
         $provisioner_lib->server[1]['port'] = 5060;
-
-        $provisioner_lib->server[2]['ip'] = "20.20.20.20";
-        $provisioner_lib->server[2]['port'] = 7000;
 
         //Provide alternate Configuration file instead of the one from the hard drive
         //$endpoint->config_files_override['$mac.cfg'] = "{\$srvip}\n{\$admin_pass|0}\n{\$test.line.1}";
 
         //Pretend we have three lines, we could just have one line or 20...whatever the phone supports
-        $provisioner_lib->lines[1] = array('ext' => '103', 'secret' => 'blah', 'displayname' => 'Joe Blow', 'vmail' => 'whee');
-        //$endpoint->lines[2] = array('ext' => '104', 'secret' => 'blah4', 'displayname' => 'Display Name');
-        //$endpoint->lines[3] = array('ext' => '105', 'secret' => 'blah5', 'displayname' => 'Other Account');
+        foreach($phone_info['line'] as $line) {
+            $provisioner_lib->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description']);
+        }
 
         $provisioner_lib->root_dir = MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR;
 
-        $provisioner_lib->processor_info = 'blue.box and Andrew Nagy, who\'s an INI file ninja';
+        $provisioner_lib->processor_info = 'Endpoint Manager 1.1 for Blue.Box';
 
         //Set Variables according to the template_data files included. We can include different template.xml files within family_data.xml also one can create
         //template_data_custom.xml which will get included or template_data_<model_name>_custom.xml which will also get included
