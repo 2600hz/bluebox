@@ -150,7 +150,7 @@ class form extends form_Core
             (
                 'type'  => 'hidden',
                 'name'  => $name,
-                'id'    => html::token($name),
+                'id'    => html::token($name .' hidden'),
                 'value' => $value,
                 'class' => $classes
             );
@@ -1072,14 +1072,9 @@ class form extends form_Core
      * @param string $value The current elements value, this is set if it is currently empty
      * @return void
      */
-    protected function _attemptRePopulate($name, $value, $returnValue = NULL)
+    protected function _attemptRepopulate($name, $value, $returnValue = NULL)
     {
         if (!is_null($value))
-        {
-            return $value;
-        }
-
-        if (empty($name) || !is_string($name))
         {
             return $value;
         }
@@ -1089,100 +1084,54 @@ class form extends form_Core
             return $value;
         }
 
-        if ((!is_null($returnValue)) AND ($pos = strpos($name, '[]')))
-        {
-            $parentArray = substr($name, 0, $pos);
-
-            $subArray = substr($name, $pos + 2);
-
-            foreach (self::$repopulateValues as $key => $repopulateValue)
-            {
-                if (!strstr($key, $parentArray))
-                {
-                    continue;
-                }
-
-                if (!strstr($key, $subArray))
-                {
-                    continue;
-                }
-
-                if ($returnValue == $repopulateValue)
-                {
-                    return TRUE;
-                }
-            }
-        }
-
-        // see if we have a repopulate value in our cache for this name
-        if (array_key_exists($name, self::$repopulateValues))
-        {
-            return self::$repopulateValues[$name];
-        }
-
-        if (!is_object (View::$instance))
-        {
-            return $value;
-        }
+//        if ((!is_null($returnValue)) AND ($pos = strpos($name, '[]')))
+//        {
+//            $parentArray = substr($name, 0, $pos);
+//
+//            $subArray = substr($name, $pos + 2);
+//
+//            foreach (self::$repopulateValues as $key => $repopulateValue)
+//            {
+//                if (!strstr($key, $parentArray))
+//                {
+//                    continue;
+//                }
+//
+//                if (!strstr($key, $subArray))
+//                {
+//                    continue;
+//                }
+//
+//                if ($returnValue == $repopulateValue)
+//                {
+//                    return TRUE;
+//                }
+//            }
+//        }
 
         // get the first part of the name (up to the first [)
-        list($baseName) = explode('[', $name);
+        list($varname) = explode('[', $name);
 
-        if (!isset(View::$instance->$baseName))
+        if (is_object(View::$instance) AND View::$instance->is_set($varname))
         {
-            return $value;
-        }
+            $viewVar = View::$instance->$varname;
 
-        // setup a pointer to the views variable (ie View::$instanace->Devices)
-        $document = &View::$instance->$baseName;
-
-        if ($document instanceof Bluebox_Record)
-        {
-            $document = $document->toArray();
-        }
-
-        if (!is_array($document))
-        {
-            return $document;
-        }
-
-        // merge the values we just found into our cache (after
-        // flattening the array)
-        $repopulateValues = array($baseName => $document);
-        
-        self::$repopulateValues = arr::merge_recursive_distinct(
-            self::$repopulateValues,
-            arr::flatten($repopulateValues)
-        );
-
-        if ((!is_null($returnValue)) AND ($pos = strpos($name, '[]')))
-        {
-            $parentArray = substr($name, 0, $pos);
-
-            $subArray = substr($name, $pos + 2);
-
-            foreach (self::$repopulateValues as $key => $repopulateValue)
+            if (is_string($viewVar) OR is_bool($viewVar))
             {
-                if (!strstr($key, $parentArray))
-                {
-                    continue;
-                }
+                return $viewVar;
+            }
 
-                if (!strstr($key, $subArray))
-                {
-                    continue;
-                }
+            $viewVar = arr::smart_cast($viewVar);
 
-                if ($returnValue == $repopulateValue)
-                {
-                    return TRUE;
-                }
+            if (($viewValue = arr::get_string($viewVar, $name, TRUE)))
+            {
+                return $viewValue;
             }
         }
 
-        if (array_key_exists($name, self::$repopulateValues))
+        if (($postValue = arr::get_string($_POST, $name)))
         {
-            return self::$repopulateValues[$name];
+            return $postValue;
         }
 
         return $value;
@@ -1201,9 +1150,9 @@ class form extends form_Core
         {
             return FALSE;
         }
-        
+
         $errors = Bluebox_Controller::$validation->errors();
-        
+
         if (array_key_exists($field, $errors))
         {
             return $errors[$field];
@@ -1211,6 +1160,7 @@ class form extends form_Core
 
         return FALSE;
     }
+
 
     /**
      * This function will guess the i18n keys that are most likely or convert an i18n

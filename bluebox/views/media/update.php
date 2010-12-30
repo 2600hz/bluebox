@@ -42,7 +42,7 @@
 
 <?php javascript::codeBlock(); ?>
 
-    var selected_type = $('#media_type').val();
+    var selected_type = $('#media_type_hidden').val();
 
     var selected_tab = $('a[href="#' + selected_type + '"]').parent();
 
@@ -56,18 +56,18 @@
     $('#media_tabs').tabs({
         select: function(event, ui) {
             var selection = ui.tab.hash;
-            $('#media_type').val(selection.substr(1));
+            $('#media_type_hidden').val(selection.substr(1));
         },
         selected: selected
     });
 
-    if (!$('#media_type').val())
+    if (!$('#media_type_hidden').val())
     {
         var tab_pos = $('#media_tabs').tabs('option', 'selected');
 
         var init_value = $($('#media_tabs > ul li')[tab_pos]).find('a').attr('href').substr(1);
 
-        $('#media_type').val(init_value);
+        $('#media_type_hidden').val(init_value);
     }
     
 <?php javascript::blockEnd(); ?>

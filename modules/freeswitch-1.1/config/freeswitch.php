@@ -20,6 +20,7 @@ $config['default_packages'] = array(
     'timeofday',
     'voicemail',
     'featurecode',
+    'quickadd',
     
     // Plugins
     'address',

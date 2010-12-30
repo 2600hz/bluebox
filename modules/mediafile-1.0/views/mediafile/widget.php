@@ -15,7 +15,7 @@
         $('#media_widget_file_list').change(function () {
             $('#mediafile_description')
                 .text('Please Wait . . .')
-                .load('/mediafile/description/' + $(this).val());
+                .load( '<?php echo url::base(TRUE); ?>/mediafile/description/' + $(this).val());
         }).trigger('change');
 
     <?php javascript::blockEnd(); ?>

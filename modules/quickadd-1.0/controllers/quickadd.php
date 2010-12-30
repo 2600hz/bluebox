@@ -17,6 +17,8 @@ class QuickAdd_Controller extends Bluebox_Controller
 
         $object['location_id'] = $_POST['number']['location_id'];
 
+        Doctrine_Manager::connection()->beginTransaction();
+
         parent::save_prepare($object);
     }
 
@@ -32,15 +34,21 @@ class QuickAdd_Controller extends Bluebox_Controller
 
         $success = Bluebox_Tenant::createUserExtension($object['user_id'], $extension, $context_id, $location_id, array(
                 'callerid_external_number' => $extension,
-                'callerid_external_number' => $external_cid
+                'callerid_external_number' => $external_cid,
+                'sip_password' => $_POST['user']['create_password']
             )
         );
 
         if (!$success)
         {
+           Doctrine_Manager::connection()->rollback();           
+
            throw new Bluebox_Validation_Exception('Could not quick create!');
         }
-
+        else
+        {
+            Doctrine_Manager::connection()->commit();
+        }
 
         parent::post_save($object);
     }

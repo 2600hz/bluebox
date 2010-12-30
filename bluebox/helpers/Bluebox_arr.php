@@ -9,6 +9,35 @@ class arr extends arr_Core
     public static $append_string_separator = ' ';
 
     /**
+     * Finds all sub arrays in $arrays with $paths whose value is equal to $value
+     * 
+     * @param array $arrays [expected to be multidimensional]
+     * @param list $paths
+     * @param mixed $value
+     * @return mixed array|FALSE
+     */
+    public static function filter_collection($arrays, $paths, $value = NULL)
+    {
+        $paths = func_get_args();
+
+        array_shift($paths);
+
+        $value = array_pop($paths);
+
+        $result = array();
+
+        foreach ($arrays as $pos => $array)
+        {
+            if (self::get_array($array, $paths) == $value)
+            {
+                $result[$pos] = $array;
+            }
+        }
+
+        return empty($result) ? FALSE : $result;
+    }
+
+    /**
      * This function determines if a var is iterable.
      * IE: safe for use in a foreach.
      *
@@ -22,6 +51,12 @@ class arr extends arr_Core
         return isset($mixed) && (is_array($mixed) OR ($mixed instanceof Traversable));
     }
 
+    /**
+     * Finds the max value of the array keys
+     *
+     * @param array $array
+     * @return int
+     */
     public static function max_key($array)
     {
         if (empty($array))
@@ -88,21 +123,21 @@ class arr extends arr_Core
             return NULL;
         }
 
-        $array = &self::smart_cast($array);
+        $tmpArray = self::smart_cast($array);
 
         while (count($paths))
         {
             $key = array_shift($paths);
 
-            if (!array_key_exists($key, (array)$array))
+            if (!array_key_exists($key, (array)$tmpArray))
             {
                 return NULL;
             }
 
-            $array = &$array[$key];
+            $tmpArray = &$tmpArray[$key];
         }
 
-        return $array;
+        return $tmpArray;
     }
 
     /**
@@ -283,7 +318,7 @@ class arr extends arr_Core
      * @param mixed var to convert
      * @return array
      */
-    public static function smart_cast(&$mixed)
+    public static function smart_cast($mixed)
     {
         if (is_array($mixed))
         {
@@ -372,7 +407,7 @@ class arr extends arr_Core
     }
 
     /**
-     * Merges two arrays recursivly, in a disctinct manor
+     * Merges two arrays recursivly, in a distinct manor
      *
      * @param array Array 1
      * @param array Array 2
