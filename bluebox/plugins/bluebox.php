@@ -282,6 +282,8 @@ abstract class Bluebox_Plugin
     {
         $this->base = $this->getBaseModelObject();
 
+        $this->subview->set_global($this->name, array());
+
         if (!isset($this->base['plugins']))
         {
             return FALSE;
@@ -289,7 +291,7 @@ abstract class Bluebox_Plugin
 
         if (isset($this->base['plugins'][$this->name]))
         {
-            $this->subview->{$this->name} = $this->base['plugins'][$this->name];
+            $this->subview->set_global($this->name, $this->base['plugins'][$this->name]);
         }
 
         return TRUE;

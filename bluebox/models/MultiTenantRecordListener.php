@@ -13,54 +13,9 @@
  */
 class MultiTenantRecordListener extends Doctrine_Record_Listener
 {
-    private $account_id = 0;
-
     public function getUserId()
     {
-        if (empty($this->account_id))
-        {
-            // The user may change for example force_login
-            if (!empty(users::$user['account_id']))
-            {
-                $this->account_id = users::$user['account_id'];
-            }
-
-            $session = Session::instance();
-
-            $account_id = $session->get('multitenant_account_id', FALSE);
-
-            if (!empty($account_id))
-            {
-                if (request::is_ajax())
-                {
-                    $controller = $session->get('ajax.base_controller', NULL);
-                }
-                else
-                {
-                    $controller = strtolower(Router::$controller);
-                }
-
-                if ($controller == 'accountmanager')
-                {
-                       $this->account_id = $account_id;
-                }
-                else
-                {
-                    $session->delete('multitenant_account_id');
-                }
-            }
-
-            if (empty($this->account_id))
-            {
-                Kohana::log('debug', 'Throwing exception due to empty user account_id');
-
-                throw new Exception('Unable to determine your authorization to manipulate this record');
-            }
-
-            kohana::log('debug', 'MultiTenantRecordListener is using account id ' .$this->account_id);
-        }
-
-        return $this->account_id;
+        return users::getAttr('Account', 'account_id');
     }
 
     public function preSave(Doctrine_Event $event)
@@ -132,15 +87,13 @@ class MultiTenantRecordListener extends Doctrine_Record_Listener
 
     public function preDqlUpdate($event)
     {   
-        $q = $event->getQuery();
+        $q = &$event->getQuery();
 
         $q->andWhere('account_id = ' .$this->getUserId());
     }
 
     public function preDqlSelect($event)
     {
-        $query = $event->getQuery();
-
         $q = &$event->getQuery();
 
         $q->andWhere('account_id = ' .$this->getUserId());

@@ -64,7 +64,8 @@ class User extends Bluebox_Record
     {
         // RELATIONSHIPS
         $this->hasMany('Device', array('local' => 'user_id', 'foreign' => 'user_id'));
-        $this->hasOne('Location', array('local' => 'location_id', 'foreign' => 'location_id'));
+        $this->hasOne('Location', array('local' => 'location_id', 'foreign' => 'location_id', 'onDelete' => 'SET NULL'));
+        $this->hasOne('Account', array('local' => 'account_id', 'foreign' => 'account_id'));
 
         // BEHAVIORS
         $this->actAs('GenericStructure');
@@ -84,6 +85,41 @@ class User extends Bluebox_Record
             $this->unHashedPassword = $password;
             
             return $this->_set('password', Auth::instance()->hash_password($password));
+        }
+    }
+
+    public function preDelete(Doctrine_Event $event)
+    {
+        $unlimit = Session::instance()->get('bluebox.delete.unlimit', FALSE);
+
+        if ($unlimit)
+        {
+           return;
+        }
+
+        $record = &$event->getInvoker();
+
+        if ($record['user_type'] == User::TYPE_SYSTEM_ADMIN)
+        {
+            if ($this->countUserType(User::TYPE_SYSTEM_ADMIN) <= 1)
+            {
+                throw new Exception('You can not delete the only system admin!');
+            }
+        }
+    }
+
+    public function preUpdate(Doctrine_Event $event)
+    {
+        $record = &$event->getInvoker();
+
+        $modified = $this->getModified(TRUE);
+
+        if (array_key_exists('user_type', $modified) AND $modified['user_type'] == User::TYPE_SYSTEM_ADMIN)
+        {
+            if ($this->countUserType(User::TYPE_SYSTEM_ADMIN) <= 1)
+            {
+                throw new Exception('You can not deallocate the only system admin!');
+            }
         }
     }
 
@@ -170,5 +206,32 @@ class User extends Bluebox_Record
 
             $errorStack->add('password', 'nocomplexity');
         }
+    }
+
+    public function countUserType($user_type)
+    {
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+        $users = $this->getTable()->findByUserType(User::TYPE_SYSTEM_ADMIN);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+        return count($users);
+    }
+
+    public static function getAuthenticUser()
+    {
+        if (!($emailAddress = Auth::instance()->get_user()))
+        {
+            return FALSE;
+        }
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+        $user = Doctrine::getTable('User')->findOneByEmailAddress($emailAddress, Doctrine::HYDRATE_ARRAY);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+        return $user;
     }
 }

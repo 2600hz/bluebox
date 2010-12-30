@@ -6,10 +6,10 @@
  */
 class Bluebox_Core
 {
-    public static function bootstrapPackages()
+    public static function bootstrapPackages($ignoreInstaller = FALSE)
     {
 
-        if (Bluebox_Installer::is_installing())
+        if (Bluebox_Installer::is_installing() AND $ignoreInstaller !== TRUE)
         {
             return TRUE;
         }

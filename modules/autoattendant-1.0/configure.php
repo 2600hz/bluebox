@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class AutoAttendant_Configure extends Bluebox_Configure
+class AutoAttendant_1_0_Configure extends Bluebox_Configure
 {
     public static $version = 1.0;
     public static $packageName = 'autoattendant';

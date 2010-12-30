@@ -141,8 +141,6 @@ abstract class Bluebox_Record extends Doctrine_Record
 
             self::setBaseSaveObject(NULL);
 
-            message::set($e->getMessage());
-
             throw new Exception($e->getMessage());
             
             return FALSE;

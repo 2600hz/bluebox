@@ -30,8 +30,8 @@
                           'redial' => 'Redial',
                           'call_return' => 'Call Return',
                           'voicemail' => 'Check Voicemail',
-                          'voicemail_quickauth' => 'Check Voicemail (Mailbox = Internal Caller ID)',
-                          'voicemail_noauth' => 'Check Voicemail (No Authorization, Mailbox = Internal Caller ID)',
+                          'voicemail_quickauth' => 'Check Voicemail (Mailbox = Device MWI)',
+                          'voicemail_noauth' => 'Check Voicemail (No Authorization, Mailbox = Device MWI)',
                           'park' => 'Park',
                           'unpark' => 'Unpark / Pickup',
                           'echo' => 'Echo Test',
@@ -50,14 +50,6 @@
         }
     ?>
 
-    <div class="buttons form_bottom">
-
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 
 </div>

@@ -13,3 +13,5 @@
 
     plugins::register('devicemanager', 'save', array('CallRecord_Plugin', 'save'));
 
+    plugins::register('xmlcdr/details', 'view', array('CallRecord_Plugin', 'recordings'));
+

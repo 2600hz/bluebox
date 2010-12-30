@@ -33,45 +33,11 @@ class SimpleRoute_1_1_Configure extends Bluebox_Configure
     
     public function postInstall()
     {
-        $outboundPatterns = kohana::config('simpleroute.outbound_patterns');
-
-        if (!is_array($outboundPatterns))
+        foreach (SimpleRouteLib::importConfigRoutes() as $route)
         {
-            return;
-        }
-
-        // This is the second work arround for the double loading issue... hmmm
-        $createdPatterns = array();
-        
-        foreach ($outboundPatterns as $outboundPattern)
-        {
-            if (empty($outboundPattern['name']))
-            {
-                continue;
-            }
-
-            if (in_array($outboundPattern['name'], $createdPatterns))
-            {
-                continue;
-            }
-
-            $createdPatterns[] = $outboundPattern['name'];
-
-            if (empty($outboundPattern['patterns']))
-            {
-                continue;
-            }
-
-            if (!is_array($outboundPattern['patterns']))
-            {
-                $outboundPattern['patterns'] = array($outboundPattern['patterns']);
-            }
-
             $simpleRoute = new SimpleRoute;
 
-            $simpleRoute['name'] = $outboundPattern['name'];
-
-            $simpleRoute['patterns'] = $outboundPattern['patterns'];
+            $simpleRoute->fromArray($route);
 
             $simpleRoute->save();
         }

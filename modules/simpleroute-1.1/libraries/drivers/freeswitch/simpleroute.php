@@ -4,7 +4,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($base)
     {
-        if (empty($base['plugins']['simpleroute']))
+        if (empty($base['plugins']['simpleroute']['patterns']))
         {
             return;
         }
@@ -81,6 +81,15 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
                 }
 
                 $dummy = '/condition[@field="destination_number"][@expression="' . $pattern . '"][@bluebox="pattern_' .$simple_route_id .'_out"]';
+
+                if (!empty($simpleroute['continue_on_fail']))
+                {
+                    $xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="failure_causes=NORMAL_CLEARING,ORIGINATOR_CANCEL,CRASH"}');
+                }
+                else
+                {
+                    $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
+                }
 
                 $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
             }
