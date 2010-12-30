@@ -31,6 +31,19 @@ abstract class Bluebox_Configure  extends Package_Configure
             $modules = array_unique(array_merge($loadedModules, array($package['directory'])));
 
             Kohana::config_set('core.modules', $modules);
+
+            if (is_dir($package['directory'] .'/hooks'))
+            {
+                // Since we're running late, we need to go grab
+                // the hook files again (sad but true)
+                $hooks = Kohana::list_files('hooks', TRUE, $package['directory'] .'/hooks');
+
+                foreach($hooks as $file)
+                {
+                    // Load the hook
+                    include_once $file;
+                }
+            }
         }
 
         // If this package has any models, load them and determine which ones are BASE models (i.e. not extensions of other models)

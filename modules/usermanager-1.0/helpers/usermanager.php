@@ -47,7 +47,7 @@ class usermanager {
 
         foreach($userTypes as $userType => $displayName)
         {
-            if ($userType <= users::$user['user_type'])
+            if ($userType <= users::getAttr('user_type'))
             {
                 $options[$userType] = $displayName;
             }

@@ -90,7 +90,6 @@ class Auth_Doctrine_Driver extends Auth_Driver
             // Complete the login
             $_SESSION['user_id'] = $user['user_id'];
 
-
             return $this->complete_login($username);
         }
 

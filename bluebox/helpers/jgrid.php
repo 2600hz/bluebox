@@ -816,6 +816,11 @@ class jgrid
         // This is an easy way to re-index the array (otherwise the grid create JS will be incorrect)
         $this->jquery['colModel'] = array_values($this->jquery['colModel']);
     }
+    public function getQuery()
+    {
+        return $this->_autoQuery();
+    }
+
     /**
      * This function will build a doctrine query object from the supplied columns
      *

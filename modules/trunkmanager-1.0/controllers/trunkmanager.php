@@ -76,9 +76,11 @@ class TrunkManager_Controller extends Bluebox_Controller
 
     public function prepareUpdateView()
     {
+        // NOTE: This runs first because the plugins hook into this event and
+        //    populate the supportedTrunkTypes
         parent::prepareUpdateView();
 
-        $this->view->supportedTrunkTypes = $this->supportedTrunkTypes;
+        $this->view->supportedTrunkTypes = empty($this->supportedTrunkTypes) ? array() : $this->supportedTrunkTypes;
     }
 
     protected function save_succeeded(&$object)

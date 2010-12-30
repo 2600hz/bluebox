@@ -26,7 +26,19 @@
 
         <?php echo form::label('simpleroute[contexts][' .$context['context_id'] .']', $context['name']); ?>
 
-        <?php echo form::checkbox('simpleroute[contexts][' .$context['context_id'] .']'); ?>
+        <?php
+            $default = NULL;
+            
+            if (!empty($context['registry']['type']) AND $context['registry']['type'] == 'private')
+            {
+                if (!isset($simpleroute['contexts'][$context['context_id']]))
+                {
+                    $default = TRUE;
+                }
+            }
+        ?>
+
+        <?php echo form::checkbox('simpleroute[contexts][' .$context['context_id'] .']', NULL, $default); ?>
 
         </div>
 
@@ -34,7 +46,7 @@
 
 <?php echo form::close_section(); ?>
 
-<?php echo form::open_section('With Default Outbound Caller ID...'); ?>
+<?php echo form::open_section('Default Settings'); ?>
 
         <div class="field">
         <?php
@@ -54,6 +66,18 @@
         <?php
             echo form::label('simpleroute[area_code]', 'Local Area Code:');
             echo form::input('simpleroute[area_code]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'simpleroute[continue_on_fail]',
+                    'hint' => 'If this route fails progress to the next'
+                ),
+                'Continue on fail:'
+            );
+            echo form::checkbox('simpleroute[continue_on_fail]');
         ?>
         </div>
 

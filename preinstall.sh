@@ -161,6 +161,18 @@ fUpdateBlueboxPerm() {
     echo "# chmod -R g+w bluebox/config/"
     chmod -R g+w bluebox/config/
 
+    echo "# chgrp -R $webuser modules/freeswitch-*/config/freeswitch.php"
+    chgrp -R $webuser modules/freeswitch-*/config/freeswitch.php
+
+    echo "# chmod -R g+w modules/freeswitch-*/config/freeswitch.php"
+    chmod -R g+w modules/freeswitch-*/config/freeswitch.php
+
+    echo "# chgrp -R $webuser modules/asterisk-*/config/asterisk.php"
+    chgrp -R $webuser modules/asterisk-*/config/asterisk.php
+
+    echo "# chmod -R g+w modules/asterisk-*/config/asterisk.php"
+    chmod -R g+w modules/asterisk-*/config/asterisk.php
+
     [ ! -d upload/ ] && echo "# mkdir upload/" && mkdir -p upload/ 2>&1
 
     echo "# chgrp -R $webuser upload/"
@@ -243,23 +255,6 @@ fUpdateSwitchPerm() {
     chmod -R g+w $softswitch_dir/*
 }
 
-fUpdateOdbcPerm() {
-    echo
-    echo "ODBC PRIVILEGES"
-    echo "---------------------------------------------------------"
-    echo "Updating the permissions so Blue.box can write to "
-    echo "odbc.ini files."
-
-    if fConfirmYes "Would you like to update odbc.ini permissions (Y/n)"; then
-
-        echo "# chgrp $webuser /etc/odbc.ini"
-        chgrp $webuser /etc/odbc.ini
-
-        echo "# chmod a+w /etc/odbc.ini"
-        chmod a+w /etc/odbc.ini
-    fi
-}
-
 cd `dirname $0`
 while [ -n "$*" ]; do
     case "x$1" in   
@@ -293,8 +288,6 @@ fSetWebUser
 fUpdateBlueboxPerm
 fUpdateSwitchPerm
 fFixSoundsPerms
-
-[ -f '/etc/odbc.ini' ] && fUpdateOdbcPerm
 
 echo
 echo "PLEASE SET UP YOUR DB"

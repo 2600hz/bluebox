@@ -1,7 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * @author Jon Blanton <rjdev943@gmail.com>
- * @author Rockwood Cataldo <rjdev943@gmail.com>
+ * @author Jon Blanton <jon@2600hz.com>
+ * @author Rockwood Cataldo <rocco@2600hz.com>
  * @license MPL
  * @package Xmpp
  */

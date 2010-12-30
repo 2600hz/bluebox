@@ -14,9 +14,9 @@ class AccountManager_Controller extends Bluebox_Controller
             )
         );
 
-        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        if (users::getAttr('user_type') != User::TYPE_SYSTEM_ADMIN)
         {
-            $grid->where('account_id = ', users::$user['account_id']);
+            $grid->where('account_id = ', users::getAttr('account_id'));
         }
 
         // Add the base model columns to the grid
@@ -54,7 +54,7 @@ class AccountManager_Controller extends Bluebox_Controller
 
     public function create()
     {
-        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        if (users::getAttr('user_type') != User::TYPE_SYSTEM_ADMIN)
         {
             message::set('You are not authorized to add an account!');
 
@@ -64,18 +64,17 @@ class AccountManager_Controller extends Bluebox_Controller
         }
         else
         {
-            $this->session->delete('multitenant_account_id');
+            users::restoreAccount();
         }
         
         parent::create();
     }
 
-
     public function edit($id = NULL)
     {
-        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        if (users::getAttr('user_type') != User::TYPE_SYSTEM_ADMIN)
         {
-            if (users::$user['account_id'] != $id)
+            if (users::getAttr('account_id') != $id)
             {
                 message::set('You are not authorized to manage that account!');
 
@@ -86,7 +85,7 @@ class AccountManager_Controller extends Bluebox_Controller
         }
         else
         {
-            $this->session->set('multitenant_account_id', $id);
+            users::masqueradeAccount($id);
         }
         
         parent::edit($id);
@@ -94,9 +93,9 @@ class AccountManager_Controller extends Bluebox_Controller
 
     public function delete($id = NULL)
     {
-        if (users::$user['user_type'] != User::TYPE_SYSTEM_ADMIN)
+        if (users::getAttr('user_type') != User::TYPE_SYSTEM_ADMIN)
         {
-            if (users::$user['account_id'] != $id)
+            if (users::getAttr('account_id') != $id)
             {
                 message::set('You are not authorized to delete that account!');
 
@@ -107,7 +106,7 @@ class AccountManager_Controller extends Bluebox_Controller
         }
         else
         {
-            $this->session->set('multitenant_account_id', $id);
+            users::masqueradeAccount($id);
         }
 
         Session::instance()->set('bluebox.delete.unlimit', TRUE);
@@ -150,7 +149,8 @@ class AccountManager_Controller extends Bluebox_Controller
                 {
                     $contexts[] = array(
                         'name' => empty($_POST['context']['private_name']) ? 'In-house Only' : $_POST['context']['private_name'],
-                        'locked' => FALSE
+                        'locked' => FALSE,
+                        'registry' => array('type' => 'private')
                     );
                 }
 
@@ -158,7 +158,8 @@ class AccountManager_Controller extends Bluebox_Controller
                 {
                     $contexts[] = array(
                         'name' => empty($_POST['context']['public_name']) ? 'Publicly Accessible' : $_POST['context']['public_name'],
-                        'locked' => FALSE
+                        'locked' => FALSE,
+                        'registry' => array('type' => 'public')
                     );
                 }
 

@@ -218,4 +218,20 @@ class User extends Bluebox_Record
 
         return count($users);
     }
+
+    public static function getAuthenticUser()
+    {
+        if (!($emailAddress = Auth::instance()->get_user()))
+        {
+            return FALSE;
+        }
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+        $user = Doctrine::getTable('User')->findOneByEmailAddress($emailAddress, Doctrine::HYDRATE_ARRAY);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+        return $user;
+    }
 }

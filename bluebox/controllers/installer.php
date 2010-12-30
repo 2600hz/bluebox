@@ -22,6 +22,7 @@ class Installer_Controller extends Bluebox_Controller
     public $minimumPackages = array(
         'core',
         'packagemanager',
+        'maintenance',
 
         // System Modules
         'accountmanager',
@@ -95,7 +96,14 @@ class Installer_Controller extends Bluebox_Controller
             'coreAction' => Router::$controller . '.' . $this->currentStep
         );
 
-        $this->_loadAllModules();
+        if ($this->currentStep != 'finalize')
+        {
+            $this->_loadAllModules();
+        }
+        else
+        {
+            Bluebox_Core::bootstrapPackages(TRUE);
+        }
     }
 
     /**
@@ -710,7 +718,8 @@ class Installer_Controller extends Bluebox_Controller
         if (stristr($databaseOptions['type'], 'sqlite'))
         {
             $databaseOptions['host'] = $this->session->get('installer.dbPathName');
-
+var_dump($databaseOptions['host']);
+var_dump(file_exists($databaseOptions['host']));
             if (!file_exists($databaseOptions['host']))
             {
                 message::set('SQLite path does not exist or can not be read!');
@@ -1085,7 +1094,75 @@ class Installer_Controller extends Bluebox_Controller
         $this->template->allowPrev = FALSE;
 
         $this->template->allowNext = FALSE;
+ 
+        // Force a login of the master/admin user for the remainder of the install
+        Auth::instance()->force_login($this->session->get('installer.adminEmailAddress'));
 
+        users::isUserAuthentic();
+
+        users::getCurrentUser();
+
+        $created = $this->session->get('Bluebox_installer.created');
+
+        Bluebox_Tenant::createUserExtension($created['userId']);
+
+        if (Session::instance()->get('installer.samples', FALSE))
+        {
+            $sampleUsers = array(
+                array(
+                    'first' => 'Peter',
+                    'last' => 'Gibbons',
+                    'username' => 'peter@initech.com',
+                    'password' => inflector::generatePassword(),
+                    'user_type' => User::TYPE_NORMAL_USER
+                ),
+                array(
+                    'first' => 'Michael',
+                    'last' => 'Bolton',
+                    'username' => 'michael@initech.com',
+                    'password' => inflector::generatePassword(),
+                    'user_type' => User::TYPE_NORMAL_USER
+                ),
+                array(
+                    'first' => 'Samir',
+                    'last' => 'Nagheenanajar',
+                    'username' => 'samir@initech.com',
+                    'password' => inflector::generatePassword(),
+                    'user_type' => User::TYPE_NORMAL_USER
+                ),
+                array(
+                    'first' => 'Bill',
+                    'last' => 'Lumbergh',
+                    'username' => 'bill@initech.com',
+                    'password' => inflector::generatePassword(),
+                    'user_type' => User::TYPE_NORMAL_USER
+                ),
+                array(
+                    'first' => 'Milton',
+                    'last' => 'Waddams',
+                    'username' => 'milton@initech.com',
+                    'password' => inflector::generatePassword(),
+                    'user_type' => User::TYPE_NORMAL_USER
+                )
+            );
+
+            foreach ($sampleUsers as $sampleUser)
+            {
+                $userId = Bluebox_Tenant::initializeUser($created['accountId'], $created['locationId'], $sampleUser);
+
+                Bluebox_Tenant::createUserExtension($userId);
+            }
+        }
+
+        if ($this->session->get('installer.tel_driver') == 'freeswitch')
+        {
+            Event::run('freeswitch.reload.xml');
+
+            Event::run('freeswitch.reload.acl');
+
+            Event::run('freeswitch.reload.sofia');
+        }
+        
         self::_resetWizard();
 
         $this->session->delete('Bluebox_message');
@@ -1103,6 +1180,10 @@ class Installer_Controller extends Bluebox_Controller
     *************************************************************************/
     private function _loadAllModules()
     {
+        $driver = Kohana::config('telephony.driver');
+
+        Kohana::config_set('telephony.driver', NULL);
+
         $loadList = glob(MODPATH .'*', GLOB_MARK);
 
         foreach($loadList as $key => $module)
@@ -1138,6 +1219,8 @@ class Installer_Controller extends Bluebox_Controller
                 }
             }
         }
+
+        Kohana::config_set('telephony.driver', $driver);
     }
 
     /**
@@ -1170,6 +1253,11 @@ class Installer_Controller extends Bluebox_Controller
             {
                 // Add an event for this telephony driver exclusively
                 $this->pluginEvents['driver'] = Router::$controller . '.' . $this->currentStep . '.' . $driver;
+            }
+
+            if ($this->currentStep == 'finalize')
+            {
+                url::redirect('/installer');
             }
         }
     }
@@ -1270,6 +1358,10 @@ class Installer_Controller extends Bluebox_Controller
     
     private function _freshInstall()
     {
+        $defaultModules = Kohana::config('config.modules');
+
+        Kohana::config_set('core.modules', $defaultModules);
+
         // Get the doctrine overlord
         $manager = Doctrine_Manager::getInstance();
 
@@ -1364,6 +1456,8 @@ class Installer_Controller extends Bluebox_Controller
 
             $transaction->commit();
 
+            Session::instance()->set('Bluebox_installer.created', Bluebox_Tenant::$created);
+            
             return TRUE;
         }
         catch(Exception $e)
