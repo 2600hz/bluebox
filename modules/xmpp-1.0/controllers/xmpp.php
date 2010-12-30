@@ -1,11 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * This commenting section needs to written eventually.
- */
-
-/**
- * @author Jon Blanton <rjdev943@gmail.com>
- * @author Rockwood Cataldo <rjdev943@gmail.com>
+ * @author Jon Blanton <jon@2600hz.com>
+ * @author Rockwood Cataldo <rocco@2600hz.com>
  * @license MPL
  * @package Xmpp
  */
@@ -14,14 +10,12 @@ class Xmpp_Controller extends Bluebox_Controller
     protected $baseModel = 'Xmpp';
 
     // Need to load the dependClass.js
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         javascript::add(array('jquery.dependClass.js'), 50);
     }
 
-    public function index()
-    {
+    public function index() {
         $this->template->content = new View('generic/grid');
 
         // Setup the base grid object
@@ -58,18 +52,10 @@ class Xmpp_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
-    public function prepareUpdateView()
-    {
+    public function prepareUpdateView() {
         parent::prepareUpdateView();
 
         $this->view->outboundPatterns = Doctrine::getTable('SimpleRoute')->findAll(Doctrine::HYDRATE_ARRAY);
         $this->view->contexts = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
     }
-    /**
-     * Create, edit, and delete is all handled for you.  You can; however, involve
-     * your contoller in the process where you need to deviate from the standard behaviour
-     * or override it entirely.  You can accomplish this by either creating the
-     * appropriate methods or hooking into the events.  Our you can do your own
-     * thing with completely different method names, its up to you !
-     */
 }

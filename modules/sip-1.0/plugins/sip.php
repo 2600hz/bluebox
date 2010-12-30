@@ -58,8 +58,6 @@ class Sip_Plugin extends Bluebox_Plugin
 
         if ($base instanceof Device)
         {
-
-
             // The password can not be empty if it is submitted
             if (( ! isset($data['password'])) OR (empty($data['password'])))
             {

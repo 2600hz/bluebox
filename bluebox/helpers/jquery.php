@@ -224,6 +224,9 @@ class jquery
         ),
         'uiCSS' => array(
             'css' => 'ui.all.css'
+        ),
+        'colorEffects' => array (
+            'js' => 'jquery.color.js'
         )
     );
     /**

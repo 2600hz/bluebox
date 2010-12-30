@@ -32,9 +32,9 @@
 
             <div class="topbar">
 
-                <?php if (isset(users::$user)) : ?>
+                <?php if (users::getAttr('user_id')) : ?>
                     <div>
-                        Welcome <?php echo users::$user->first_name . ' ' . users::$user->last_name; ?>!
+                        Welcome <?php echo users::getAttr('full_name'); ?>!
                     </div>
                                         <div class="quiet"><?php echo html::anchor('user/logout', 'logout');?></div>
                 <?php endif; ?>
