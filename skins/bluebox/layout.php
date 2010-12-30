@@ -44,30 +44,52 @@
 
                         <!-- Login manager -->
                         <div class="loginManager">
-                        <?php if (!empty(users::$user)): ?>
-                                <?php  echo __('Welcome') . ' ' . users::$user->first_name . ' ' . users::$user->last_name; ?>
-                            |
-                            <?php echo html::anchor('user/logout', __('Logout')); ?>
-       
-                            <?php
-                                echo ' | ';
-                                echo html::anchor('#', __('Language') , array('id' => 'change_lang'));
-                                echo form::dropdown(array(
-                                    'name' => 'lang',
-                                    'id' => 'lang',
-                                    'style' => 'display:none;',
-                                    'translate' => false
-                                ) , i18n::$langs, Session::instance()->get('lang', 'en'));
-                            ?>
+                            <?php if (users::getAttr('user_id')): ?>
+                            
+                                  <?php echo __('Welcome') . ' ' .users::getAuthenticAttr('full_name'); ?>
+                                | <?php echo html::anchor('user/logout', __('Logout')); ?>
+                                | <?php echo html::anchor('#', __('Language') , array('id' => 'change_lang')); ?>
+                                  <?php
+                                    echo form::dropdown(array(
+                                        'name' => 'lang',
+                                        'id' => 'lang',
+                                        'style' => 'display:none;',
+                                        'translate' => false
+                                    ) , i18n::$langs, Session::instance()->get('lang', 'en'));
+                                  ?>
+
+                                  <?php if (!users::isAuthentic('user_id')) : ?>
+                                
+                                        <div>
+                                            Masquerading user as <?php echo users::getAttr('full_name'); ?>
+                                            <?php 
+                                                if (class_exists('UserManager_Controller')) 
+                                                {
+                                                    echo html::anchor('usermanager/restore', __('restore'));
+                                                }
+                                            ?>
+                                        </div>
+
+                                  <?php endif; ?>
+
+                                  <?php if (!users::isAuthentic('account_id')) : ?>
+
+                                        <div>
+                                            Masquerading account as <?php echo users::getAttr('Account', 'name'); ?>
+                                        </div>
+
+                                  <?php endif; ?>
 
                             <?php endif; ?>
 
-                            <?php if (!empty(users::$user)): ?>
-                            <!-- dash board -->
-                            <div class="dash">
-                                <?php if (class_exists('DashManager', TRUE)) echo DashManager::renderActions(); ?>
-                            </div>
-                        <?php endif; ?>
+                            <?php if (users::getAttr('user_id') AND class_exists('DashManager', TRUE)): ?>
+                            
+                                <!-- dash board -->
+                                <div class="dash">
+                                    <?php echo DashManager::renderActions(); ?>
+                                </div>
+
+                            <?php endif; ?>
                             
                         </div>
                         
@@ -87,7 +109,7 @@
                 <div class="wrapper">
       
                     <div class="nav">
-                        <?php if (!empty(users::$user)): ?>
+                        <?php if (users::getAttr('user_id')): ?>
                         <div id="navigation">
                             
                             <div class="navCategorySelection" >
@@ -167,13 +189,13 @@
             <!-- END OF CONTENT -->
 
             <div class="footer">
-
+                <small><a href="http://www.2600hz.org">powered by blue.box</a></small>
             </div>
             <!-- END OF FOOTER -->
 
         </div>
         <?php
-            if (class_exists('DashManager', TRUE) && isset(users::$user)) {
+            if (class_exists('DashManager', TRUE) && users::getAttr('user_id')) {
                 echo DashManager::renderDialogs();
             }
         ?>
@@ -187,4 +209,8 @@
 <!-- Execution Time: {execution_time} -->
 <!-- Memory Usage: {memory_usage} -->
 <!-- Included Files: {included_files} -->
+<!-- User ID: <?php echo users::getAuthenticAttr('user_id'); ?> -->
+<!-- Account ID: <?php echo users::getAuthenticAttr('account_id'); ?> -->
+<!-- Masq User ID: <?php echo users::getAttr('user_id'); ?> -->
+<!-- Masq Accoutn ID: <?php echo users::getAttr('user_id'); ?> -->
 <?php } ?>

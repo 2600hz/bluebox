@@ -36,9 +36,11 @@ class Auth_Doctrine_Driver extends Auth_Driver
      */
     public function login($username, $password, $remember, $requirePassword = TRUE)
     {
-        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         $user = Doctrine::getTable('User')->findOneByEmailAddress($username);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
         if ((($user) AND ($user['password'] === $password)) OR $requirePassword === FALSE)
         {
@@ -63,7 +65,7 @@ class Auth_Doctrine_Driver extends Auth_Driver
                 if (!$account)
                 {
                     kohana::log('error', 'User ' .$username . ' tried to login but has an invalid account id ' .$user['account_id']);
-
+                    
                     return FALSE;
                 }
             }
@@ -74,7 +76,11 @@ class Auth_Doctrine_Driver extends Auth_Driver
 
             $user['last_logged_ip'] = $this->getRealIpAddr();
 
+            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
             $user->save();
+
+            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
             if (!empty($user['debug_level']) AND ($user['debug_level'] <= 4) AND ($user['debug_level'] >= 0))
             {
@@ -99,9 +105,6 @@ class Auth_Doctrine_Driver extends Auth_Driver
      */
     public function force_login($username)
     {
-        // Complete the login
-        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
-
         $this->login($username, NULL, NULL, FALSE);
 
         return $this->complete_login($username);
@@ -115,9 +118,11 @@ class Auth_Doctrine_Driver extends Auth_Driver
      */
     public function password($username)
     {
-        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         $user = Doctrine::getTable('User')->findOneByEmailAddress($username);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
         return ($user ? $user->password : FALSE);
     }
@@ -130,9 +135,11 @@ class Auth_Doctrine_Driver extends Auth_Driver
     public function resetToken($username)
     {
 
-        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         $user = Doctrine::getTable('User')->findOneByEmailAddress($username);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
         if ($user)
         {
@@ -164,9 +171,11 @@ class Auth_Doctrine_Driver extends Auth_Driver
             return FALSE;
         }
 
-        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', true);
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         $user = Doctrine::getTable('User')->findOneByEmailAddress($username);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
         if (($user) && ($user->email_address == $username) && ($user->password_reset_token == $token))
         {

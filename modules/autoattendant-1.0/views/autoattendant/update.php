@@ -63,13 +63,16 @@
         <div class="field">
             <?php echo form::label('autoattendant[digit_timeout]', 'Inter-Digit Timeout:'); ?>
             <?php echo form::input('autoattendant[digit_timeout]'); ?>
-            <?php //javascript::codeBlock('$("#autoattendant_digit_timeout").spinner({max: 10, min: 1});'); ?>
         </div>
 
         <div class="field">
             <?php echo form::label('autoattendant[timeout]', 'No Entry Timeout:'); ?>
             <?php echo form::input('autoattendant[timeout]'); ?>
-            <?php //javascript::codeBlock('$("#autoattendant_timeout").spinner({max: 10, min: 1});'); ?>
+        </div>
+
+        <div class="field">
+            <?php echo form::label('autoattendant[registry][max-failures]', 'Max Retries:'); ?>
+            <?php echo form::input('autoattendant[registry][max-failures]', empty($autoattendant['registry']['max-failures']) ? 3 : $autoattendant['registry']['max-failures']); ?>
         </div>
 
     <?php echo form::close_section(); ?>
@@ -119,15 +122,7 @@
 
     <?php echo form::close_section(); ?>
 
-    <div class="buttons form_bottom">
-
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 </div>
 
 <?php jquery::addPlugin(array('dependent', 'spinner')); ?>

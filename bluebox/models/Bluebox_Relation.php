@@ -20,13 +20,13 @@ abstract class Bluebox_Relation extends Doctrine_Template
 
         $options = array('local' => $field, 'foreign' => $field);
 
-        if ($this->getOption('cascade', $this->cascade))
-        {
-            $options['onDelete'] = 'CASCADE';
-        }
-
         // Relate the plug-in to the base model (one to one)
         $this->_table->bind(array($this->baseModelName, $options), Doctrine_Relation::ONE);
+
+        if ($this->getOption('cascade', $this->cascade))
+        {
+            $options['cascade'] = array('delete');
+        }
 
         // Relate the base model to the plug-in (one/many to one)
         // Add relation to all extended models that may have already loaded
@@ -35,8 +35,8 @@ abstract class Bluebox_Relation extends Doctrine_Template
             if (is_subclass_of($class, $this->baseModelName) or ($class == $this->baseModelName))
             {
                 $relateTable = Doctrine::getTable($class);
-
-                $relateTable->bind(array($pluginModel, array('local' => $field, 'foreign' => $field)), $this->getOption('relationType', $this->relationType));
+                
+                $relateTable->bind(array($pluginModel, $options), $this->getOption('relationType', $this->relationType));
             }
         }
     }
@@ -49,7 +49,15 @@ abstract class Bluebox_Relation extends Doctrine_Template
 
         if (!$this->_table->hasColumn($field))
         {
-            $this->hasColumn($field, 'integer', 11, array('unsigned' => true));
+            $definition = $table->getColumnDefinition($field);
+
+            $length = $definition['length'];
+            
+            $type = $definition['type'];
+
+            $options = array_diff_key($definition, array_flip(array('type', 'length', 'autoincrement', 'primary')));
+
+            $this->hasColumn($field, $type, $length, $options);
         }
     }
 }

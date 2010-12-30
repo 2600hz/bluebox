@@ -1,8 +1,11 @@
 <div id="powerdns_edit_header" class="edit powerdns module_header">
-    <h2><span class="helptip"></span><?php echo __($title); ?></h2>
+
+    <h2><?php echo $title; ?></h2>
+    
 </div>
 
 <div id="powerdns_edit_form" class="txt-left form powerdns edit">
+    
     <?php echo form::open(); ?>
 
     <?php echo form::open_section('Domain'); ?>
@@ -119,10 +122,5 @@
 
     <?php echo form::close_section(); ?>
 
-    <div class="buttons form_bottom">
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 </div>

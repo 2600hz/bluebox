@@ -2,7 +2,8 @@
 
     dialplan::register('CallerId', 'conditioning');
 
-        dialplan::register('CallerId', 'prenumber');
+    dialplan::register('CallerId', 'prenumber');
+
 
     plugins::register('devicemanager/create', 'view', array('CallerId_Plugin', 'update'));
 
@@ -17,3 +18,5 @@
 
     plugins::register('externalxfer', 'save', array('CallerId_Plugin', 'save'));
 
+    
+    Event::add('bluebox.create.extension', array('CidLib', 'createExtension'));

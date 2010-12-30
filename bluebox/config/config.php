@@ -101,7 +101,7 @@ $config['extension_prefix'] = 'Bluebox_';
 $config['modules'] = array
 (
 	MODPATH.'auth-1.0',      // Authentication
-        MODPATH.'packagemanager-1.0'
+    MODPATH.'packagemanager-1.0'
 	// MODPATH.'forge',     // Form generation
 	// MODPATH.'kodoc',     // Self-generating documentation
 	// MODPATH.'media',     // Media caching and compression
@@ -158,4 +158,4 @@ $config['repositories'] = array();
 /**
  * Product display name. If you want to rebrand Bluebox with another name, change this
  */
-$config['product_name'] = 'Bluebox';
+$config['product_name'] = 'blue.box';

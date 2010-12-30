@@ -6,8 +6,22 @@
  */
 class Input extends Input_Core
 {
+    protected $unfiltered_inputs = array();
+
     public function __construct()
     {
+        $preserve = array('_REQUEST', '_GET', '_POST', '_FILES', '_COOKIE', '_SERVER', '_ENV', '_SESSION');
+
+        foreach ($preserve as $input)
+        {
+            if (!isset($GLOBALS[$input]))
+            {
+                continue;
+            }
+
+            $this->unfiltered_inputs[strtolower($input)] = $GLOBALS[$input];
+        }
+
         parent::__construct();
 
         // loop each of the request vars
@@ -46,4 +60,16 @@ class Input extends Input_Core
             }
         }
     }   
+
+    public function get_unfiltered($key)
+    {
+        $key = strtolower($key);
+
+        if (!array_key_exists($key, $this->unfiltered_inputs))
+        {
+            return array();
+        }
+        
+        return $this->unfiltered_inputs[$key];
+    }
 }

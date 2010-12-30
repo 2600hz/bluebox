@@ -39,9 +39,9 @@
     <br/>
 
     <div style="text-align:center">
-        <?php echo html::image(array('src' => 'globalmedia/visualize/' . $mediaId, 'width' => '400px')); ?>
+   <?php echo html::image(array('src' => 'globalmedia/visualize/' . $mediaId, 'width' => '400px', 'height' => '250px'), NULL, TRUE); ?>
         <br/>
-        <audio src="<?php echo url_Core::file('globalmedia/download/' . $mediaId . '//TRUE'); ?>" controls="controls">Your browser does not support HTML5 audio.</audio>
+        <audio src="<?php echo url_Core::file('globalmedia/download/' . $mediaId . '//TRUE', TRUE); ?>" controls="controls">Your browser does not support HTML5 audio.</audio>
     </div>
 
     <div style="text-align:center">

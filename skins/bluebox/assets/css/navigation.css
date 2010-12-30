@@ -66,6 +66,7 @@
     color:#666666;
     font-size:11px;
     line-height:1.6em;
+    visibility: hidden;
 }
 #navigation .navGroup .wrapper {
     height:87px;
@@ -179,7 +180,7 @@
   display: block;
   height: 36px;
   width: 37px;
-  background: url(../img/arrow.png) no-repeat 0 0;
+  background: url(../img/arrow.gif) no-repeat 0 0;
   text-indent: -9999px;
   position: absolute;
   top: 37px;

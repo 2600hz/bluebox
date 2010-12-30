@@ -1,0 +1,40 @@
+/* CSS Rules for Feature Codes */
+
+div.unused {
+  float: left;
+  border: 1px solid #444;
+  cursor: pointer;
+  margin: 0 5px;
+  padding: 0 2px;
+}
+
+div.section-used { display:none; }
+
+div.used {
+  float: left;
+  border: 1px solid #444;
+  margin: 5px 2px;
+  padding: 0 5px;
+  width: 97%;
+}
+
+div.section-xml div {
+  width: 100%;
+  float: left;
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+span.clear-section {
+  float: right;
+  cursor: pointer;
+  font-weight: bold;
+  border: 1px solid red;
+}
+
+div.section-xml textarea {
+  width: 95%;
+  margin: 0 5px 5px 5px;
+}
+
+div.section-noxml { display:none; }

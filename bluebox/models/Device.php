@@ -27,7 +27,7 @@ class Device extends Bluebox_Record
     public function setUp()
     {
         // RELATIONSHIPS
-        $this->hasOne('User', array('local' => 'user_id', 'foreign' => 'user_id'));
+        $this->hasOne('User', array('local' => 'user_id', 'foreign' => 'user_id', 'onDelete' => 'SET NULL'));
         $this->hasMany('DeviceNumber as Number', array('local' => 'device_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
 
         // BEHAVIORS

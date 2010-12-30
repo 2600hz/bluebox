@@ -21,6 +21,16 @@ class LocationManager_Plugin extends Bluebox_Plugin
             )
         );
 
+        // If there is a base model that contains an account_id,
+        // then we want to show locations only that relate to this account
+        $base = $this->getBaseModelObject();
+
+        if ($base and !empty($base['account_id']))
+        {
+            // Set a where clause, if we're playing plug-in to someone else
+            $grid->where('account_id = ', $base['account_id']);
+        }
+
         // Add the base model columns to the grid
         $grid->add('location_id', 'ID', array(
                 'hidden' => TRUE,
@@ -47,6 +57,20 @@ class LocationManager_Plugin extends Bluebox_Plugin
         $subview->grid = $grid->produce();
         $subview->gridMenu = html::anchor('/locationmanager/create' ,'<span>Add New Location</span>', array('class' => 'qtipAjaxForm'));
         
+        // Add our view to the main application
+        $this->views[] = $subview;
+    }
+
+    public function initialAccountLocation()
+    {
+        $subview = new View('locationmanager/initialAccountLocation');
+
+        $subview->tab = 'main';
+
+        $subview->section = 'location';
+
+        $subview->location = $this->input->post('location', array());
+
         // Add our view to the main application
         $this->views[] = $subview;
     }

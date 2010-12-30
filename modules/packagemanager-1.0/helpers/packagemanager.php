@@ -34,4 +34,52 @@ class packagemanager
 
         return $actions;
     }
+
+    public static function getPackageMessages($messages, $displayedIdentifier)
+    {
+        $html = '';
+
+        if(!$package = Package_Catalog::getPackageByIdentifier($displayedIdentifier))
+        {
+            return '';
+        }
+
+        $avaliable = Package_Catalog::getAvaliableVersions($package['packageName']);
+
+        $avaliable[$displayedIdentifier] = $package['version'];
+
+        foreach($messages as $type => $messageList)
+        {
+            foreach ($avaliable as $identifier => $version)
+            {
+                if (empty($messageList[$identifier]))
+                {
+                    continue;
+                }
+
+                $html .= '<div id="' .strtolower($package['packageName'] .'_' .$type) .'"';
+
+                $html .= ' class="';
+
+                $html .= ' ' .$type .'_message';
+
+                $html .= ' ' .$package['packageName'] .'_message packagemanager index module">';
+
+                $html .= __(ucfirst($type));
+
+                $html .= '<ul class="' .$type .'_list packagemanager index module">';
+
+                foreach($messageList[$identifier] as $message)
+                {
+                    $html .= '<li>' .__($message) .'</li>';
+                }
+
+                $html .= '</ul>';
+
+                $html .= '</div>';
+            }
+        }
+            
+        return $html;
+    }
 }

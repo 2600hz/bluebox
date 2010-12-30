@@ -217,10 +217,16 @@ class jquery
                 'ui.core.js',
                 'ui.spinner.js'
             ) ,
-            'css' => 'jquery/spinner.css'
+            'css' => 'jquery/ui.spinner.css'
         ),
         'autoGrow' => array(
             'js' => 'jquery.autoGrowInput.js'
+        ),
+        'uiCSS' => array(
+            'css' => 'ui.all.css'
+        ),
+        'colorEffects' => array (
+            'js' => 'jquery.color.js'
         )
     );
     /**

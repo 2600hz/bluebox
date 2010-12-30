@@ -36,42 +36,52 @@ class FreeSwitch_Trunk_Driver extends FreeSwitch_Base_Driver
      */
     public static function set($trunk)
     {
-        $plugins = $trunk['plugins'];
-
-        if (!empty($plugins['sipinterface']['sipinterface_id']))
+        if ($interfaceId = arr::get($trunk, 'plugins', 'sipinterface', 'sipinterface_id'))
         {
-            $interface = $plugins['sipinterface']['sipinterface_id'];
-
-            $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$interface, 'trunk_' . $trunk['trunk_id']);
+            $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$interfaceId, 'trunk_' . $trunk['trunk_id']);
 
             $xml->update('/param[@name="realm"]{@value="' . $trunk['server'] . '"}');
+
+            if ($registerProxy = arr::get($trunk, 'registry', 'registerProxy'))
+            {
+                $xml->update('/param[@name="register-proxy"]{@value="' .$registerProxy . '"}');
+            }
+            else
+            {
+                $xml->deleteNode('/param[@name="register-proxy"]');
+            }
+
+            if ($outboundProxy = arr::get($trunk, 'registry', 'outboundProxy'))
+            {
+                $xml->update('/param[@name="outbound-proxy"]{@value="' .$outboundProxy . '"}');
+            }
+            else
+            {
+                $xml->deleteNode('/param[@name="outbound-proxy"]');
+            }
         }
 
         $modified = $trunk->getModified(TRUE, TRUE);
 
-        if (!empty($modified['plugins']['sipinterface']['sipinterface_id']))
+        if ($oldInterfaceId = arr::get($modified, 'plugins', 'sipinterface', 'sipinterface_id'))
         {
-            $oldInterface = $modified['plugins']['sipinterface']['sipinterface_id'];
-
-            if (empty($interface) OR $interface != $oldInterface)
+            if (empty($interfaceId) OR $interfaceId != $oldInterfaceId)
             {
-                $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$oldInterface, 'trunk_' . $trunk['trunk_id']);
+                $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$oldInterfaceId, 'trunk_' . $trunk['trunk_id']);
 
                 $xml->deleteNode();
             }
 
         }
 
-        // Note - sip settings for trunks get added by the sip driver
+        // NOTE: Remaining settings for trunks get added by the appropriate modules
     }
 
     public static function delete($trunk)
     {
-        $plugins = $trunk['plugins'];
-
-        if (!empty($plugins['sipinterface']['sipinterface_id']))
+        if ($interfaceId = arr::get($trunk, 'plugins', 'sipinterface', 'sipinterface_id'))
         {
-            $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$plugins['sipinterface']['sipinterface_id'], 'trunk_' . $trunk['trunk_id']);
+            $xml = FreeSwitch::setSection('gateway', 'sipinterface_' .$interfaceId, 'trunk_' . $trunk['trunk_id']);
 
             $xml->deleteNode();
         }

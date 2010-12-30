@@ -6,7 +6,7 @@
     <div class="field">
         <?php
         echo form::label('path', 'Upload Path:');
-        echo form::dropdown('path', array_merge(array('' => '(root)'), filetree::file_tree_dir($soundPath, TRUE, '/8000$|16000$|32000$|48000$/')));
+echo form::dropdown('path', array_merge(array('' => '(root)'), filetree::file_tree_dir($soundPath, TRUE, '/8000$|16000$|32000$|48000$/')), $reqPath);
         ?>
     </div>
 

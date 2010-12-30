@@ -62,7 +62,7 @@ class Package_Operation_Verify extends Package_Operation
         {
             try
             {
-                kohana::log('debug', 'Running check method ' .get_class($configureInstance) .'::' .$checkMethod .'();');
+                Package_Message::log('debug', 'Running check method ' .get_class($configureInstance) .'::' .$checkMethod .'();');
 
                 $return = call_user_func(array($configureInstance, $checkMethod));
             }
