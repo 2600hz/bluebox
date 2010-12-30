@@ -9,15 +9,15 @@
 
     <div class="field">
     <?php
-        echo form::label('endpointdevice[brand]', 'Brand:');
-        echo form::input('endpointdevice[brand]');
-    ?>
-    </div>
+        echo form::label('endpointdevice[brand]', 'Phone:');
+        include(MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . "functions.php");
 
-    <div class="field">
-    <?php
-        echo form::label('endpointdevice[model]', 'Model:');
-        echo form::input('endpointdevice[model]');
+        $endpoint = new endpointman();
+
+        $list = $endpoint->get_devices_list();
+
+        echo form::dropdown('endpointdevice[brand]', $list);
+
     ?>
     </div>
 
