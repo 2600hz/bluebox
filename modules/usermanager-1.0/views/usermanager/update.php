@@ -82,7 +82,7 @@
         }
     ?>
 
-    <?php if (users::$user->user_type == User::TYPE_SYSTEM_ADMIN) : ?>
+    <?php if (users::getAttr('user_type') == User::TYPE_SYSTEM_ADMIN) : ?>
 
         <?php jquery::addPlugin('spinner'); ?>
     
@@ -100,14 +100,6 @@
 
     <?php endif; ?>
 
-    <div class="buttons form_bottom">
-
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 </div>
 

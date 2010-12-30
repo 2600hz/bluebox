@@ -72,7 +72,6 @@ class SofiaManager
 
         if(!$sipRegCache)
         {
-
             $eslManager = new EslManager();
             
             $cmd = 'sofia xmlstatus profile ' . $SIPInterface;
@@ -83,9 +82,10 @@ class SofiaManager
 
             $registrations = array();
 
-            if($xml !== 'Command execution failed.') {
-                $xml = simplexml_load_string($xml);
-                
+            if($xml !== 'Command execution failed.')
+            {
+                $xml = @simplexml_load_string($xml);
+
                 if ($xml AND $xml->registrations AND $xml->registrations->registration AND $xml->registrations->registration != '')
                 {
                     $registrations = $xml->registrations->registration;

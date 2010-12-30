@@ -15,11 +15,7 @@
 
     <?php if (isset($views)) echo subview::renderAsSections($views); ?>
 
-    <div class="buttons form_bottom">
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'No'); ?>
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Yes'); ?>
-    </div>
+    <?php echo form::close(form::BUTTONS_DELETE_CANCEL); ?>
 
-    <?php echo form::close(); ?>
 <?php endif; ?>
 </div>

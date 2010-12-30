@@ -44,8 +44,8 @@
 
                         <!-- Login manager -->
                         <div class="loginManager">
-                        <?php if (!empty(users::$user)): ?>
-                                <?php  echo __('Welcome') . ' ' . users::$user->first_name . ' ' . users::$user->last_name; ?>
+                        <?php if (users::getAttr('user_id')): ?>
+                                <?php  echo __('Welcome') . ' ' .users::getAttr('full_name'); ?>
                             |
                             <?php echo html::anchor('user/logout', __('Logout')); ?>
                         <?php endif; ?>
@@ -63,7 +63,7 @@
                             */
                         ?>
 
-                            <?php if (!empty(users::$user)): ?>
+                            <?php if (users::getAttr('user_id')): ?>
                             <!-- dash board -->
                             <div class="dash">
                                 <?php if (class_exists('DashManager', TRUE)) echo DashManager::renderActions(); ?>
@@ -88,7 +88,7 @@
                 <div class="wrapper">
       
                     <div class="nav">
-                        <?php if (!empty(users::$user)): ?>
+                        <?php if (users::getAttr('user_id')): ?>
                         <div id="navigation">
                             
                             <div class="navCategorySelection" >
@@ -174,7 +174,8 @@
 
         </div>
         <?php
-            if (class_exists('DashManager', TRUE) && isset(users::$user)) {
+            if (class_exists('DashManager', TRUE) && users::getAttr('user_id'))
+            {
                 echo DashManager::renderDialogs();
             }
         ?>

@@ -12,15 +12,14 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
 
     }
 
-    public static function dialplan($number) {
+    public static function dialplan($number)
+    {
         $xml = Telephony::getDriver()->xml;
 
         $destination = $number['Destination'];
+
         $registry = (array)$destination['registry'];
 
-        $vmdomain = 'voicemail_' .$destination['account_id'];
-        $domain = 'location_' . $destination['location_id'];
-        
         switch ($registry['feature']) {
             case 'forward_on':
                 $xmlText = <<<XML
@@ -46,44 +45,80 @@ XML;
                 break;
             
             case 'voicemail':
+
+                $vmdomain = 'voicemail_' .$destination['account_id'];
+
                 $xmlText = <<<XML
-<action application="answer"/>
-<action application="sleep" data="1000"/>
-<action application="voicemail" data="check default $vmdomain"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="voicemail" data="check default $vmdomain"/>
+        <action application="hangup"/>
+
 XML;
                 break;
 
-            // TODO: This is ghetto - should be changed to use mwi-account variable and split it apart w/ regexs
-            // That would allow voicemail #s to not match Caller ID #s AND would work with shared mailboxes AND would provide
-            // an extra layer of security. FIX.
             case 'voicemail_quickauth':
+
+                $vmdomain = 'voicemail_' .$destination['account_id'];
+
+                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+
                 $xmlText = <<<XML
-<action application="answer"/>
-<action application="sleep" data="1000"/>
-<action application="voicemail" data="check default $vmdomain \${caller_id_number}"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="voicemail" data="check default \$2 \$1"/>
+        <action application="hangup"/>
+        <anti-action application="answer"/>
+        <anti-action application="sleep" data="1000"/>
+        <anti-action application="voicemail" data="check default $vmdomain"/>
+        <anti-action application="hangup"/>
+
 XML;
                 break;
 
             case 'voicemail_noauth':
+                $vmdomain = 'voicemail_' .$destination['account_id'];
+
+                $xml->setXmlRoot($xml->getExtensionRoot());
+
+                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+
                 $xmlText = <<<XML
-<action application="answer"/>
-<action application="sleep" data="1000"/>
-<action application="set" data="voicemail_authorized=\${sip_authorized}"/>
-<action application="voicemail" data="check default $vmdomain \${caller_id_number}"/>
+                
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="set" data="voicemail_authorized=\${sip_authorized}"/>
+        <action application="voicemail" data="check default \$2 \$1"/>
+        <action application="hangup"/>
+        <anti-action application="answer"/>
+        <anti-action application="sleep" data="1000"/>
+        <anti-action application="voicemail" data="check default $vmdomain"/>
+        <anti-action application="hangup"/>
+
 XML;
                 break;
             
             case 'park':
                 $xmlText = <<<XML
-<action application="set" data="fifo_music=\$\${hold_music}"/>
-<action application="fifo" data="general@$domain in"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="valet_park" data="account_${destination['account_id']} auto in 1 10"/>
+        <action application="hangup"/>
+
 XML;
                 break;
             
             case 'unpark':
                 $xmlText = <<<XML
-<action application="answer"/>
-<action application="fifo" data="general@$domain out nowait"/>
+
+        <action application="answer"/>
+        <action application="sleep" data="1000"/>
+        <action application="valet_park" data="account_${destination['account_id']} ask 1 10 10000 ivr/ivr-enter_ext_pound.wav"/>
+        <action application="hangup"/>
+
 XML;
                 break;
             
@@ -97,14 +132,14 @@ XML;
             case 'delay_echo':
                 $xmlText = <<<XML
 <action application="answer"/>
-<action application="delay_echo" data="5000"/>
+<action application="delay_echo" data="1000"/>
 XML;
                 break;
             
             case 'tone_test':
                 $xmlText = <<<XML
 <action application="answer"/>
-<action application="playback" data="tone_stream://%(251,0,1004);loops=-1"/>
+<action application="playback" data="tone_stream://%(1000,0,2600);loops=-1"/>
 XML;
                 break;
             

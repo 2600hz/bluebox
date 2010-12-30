@@ -85,6 +85,7 @@ class Account extends Bluebox_Record
         // RELATIONSHIPS
         $this->hasMany('Location', array('local' => 'account_id', 'foreign' => 'account_id', 'cascade' => array('delete')));
         $this->hasMany('Context', array('local' => 'account_id', 'foreign' => 'account_id', 'cascade' => array('delete')));
+        $this->hasMany('User', array('local' => 'account_id', 'foreign' => 'account_id', 'cascade' => array('delete')));
 
         // BEHAVIORS
         $this->actAs('GenericStructure');

@@ -149,15 +149,20 @@ class MediaScanner {
 	    $mediaFile['description'] = 'Unknown';
 	  }
 
-	  $mediaFile['registry'] += self::getAudioInfo($filename);
-
-	  $mediaFile->save();
-
-	  // Add to list of "known" files
-	  $knownFiles[$mediaFile['file']] = array('mediafile_id' => $mediaFile['mediafile_id']
-						  ,'registry' => $mediaFile['registry']
-						  ,'path' => $soundPath . $mediaFile['file']
-						  );
+          try
+          {
+              $mediaFile['registry'] += self::getAudioInfo($filename);
+              $mediaFile->save();
+              // Add to list of "known" files
+              $knownFiles[$mediaFile['file']] = array('mediafile_id' => $mediaFile['mediafile_id']
+                                                      ,'registry' => $mediaFile['registry']
+                                                      ,'path' => $soundPath . $mediaFile['file']
+                                                      );
+          }
+          catch (Exception $e)
+          {
+             kohana::log('debug', 'Unable to save audio info: ' .$e->getMessage());
+          }
 	}
       }
 
@@ -191,6 +196,11 @@ class MediaScanner {
     public static function getAudioInfo($filename) {
       $id3 = new getID3();
       $info = $id3->analyze($filename);
+
+      if (!empty($info['error']))
+      {
+            throw new Exception(implode(' - ', $info['error']));
+      }
 
       switch($info['audio']['dataformat']) {
       case 'wav' :

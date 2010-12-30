@@ -8,6 +8,13 @@ class SimpleRoute_Plugin extends Bluebox_Plugin
 {
     protected $name = 'simpleroute';
 
+    protected $preloadModels = array('SimpleRoute');
+
+    public function buildAccountRelationships()
+    {
+        return TRUE;
+    }
+
     protected function viewSetup()
     {
         $this->subview = new View('simpleroute/apply');

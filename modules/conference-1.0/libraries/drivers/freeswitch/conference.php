@@ -4,6 +4,13 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($conference)
     {
+        $xml = FreeSwitch::setSection('conferences');
+    
+        foreach (Conference::$default_keymap as $action => $digits)
+        {
+            $xml->update('/caller-controls/group[@name="default-keymap"]/control[@action="' .$action .'"]{@digits="' .$digits .'"}');
+        }
+
         $xml = FreeSwitch::setSection('conference_profile', $conference['conference_id']);
 
         $xml->deleteChildren();

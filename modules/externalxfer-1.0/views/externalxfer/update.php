@@ -1,6 +1,6 @@
 <div id="external_xfer_update_header" class="update external_xfer module_header">
 
-    <h2><?php echo __($title); ?></h2>
+    <h2><?php echo $title; ?></h2>
     
 </div>
 
@@ -66,6 +66,25 @@
     </div>
 
     <?php echo form::close_section(); ?>
+
+    <?php echo form::open_section('Options'); ?>
+
+        <div class="field">
+            <?php echo form::label('externalxfer[registry][ignore_early_media]', 'Ignore Early Media:'); ?>
+            <?php echo form::checkbox('externalxfer[registry][ignore_early_media]'); ?>
+        </div>
+
+        <div class="field">
+            <?php echo form::label('externalxfer[registry][require_confirmation]', 'Confirm on Answer:'); ?>
+            <?php echo form::checkbox('externalxfer[registry][require_confirmation]'); ?>
+        </div>
+
+        <div class="field">
+            <?php echo form::label('externalxfer[registry][require_confirmation_timeout]', 'Wait for Confirmation:'); ?>
+            <?php echo form::input('externalxfer[registry][require_confirmation_timeout]'); ?> seconds
+        </div>
+
+    <?php echo form::close_section(); ?>
     
     <?php
         if (isset($views))
@@ -74,15 +93,7 @@
         }
     ?>
 
-    <div class="buttons form_bottom">
-
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 
 </div>
 
