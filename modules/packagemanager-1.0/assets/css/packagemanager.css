@@ -92,7 +92,7 @@ form.form .module_actions .packageAction {
     padding-left:25px;
     font-weight:normal;
 }
-.module_messages .warning_message {
+.module_messages .alert_message {
     -moz-border-radius-topleft:4px;
     -moz-border-radius-topright:4px;
     -moz-border-radius-bottomleft:4px;
@@ -105,12 +105,12 @@ form.form .module_actions .packageAction {
     font-size:12px;
     font-weight:bold;
 }
-.module_messages .warning_message ul {
+.module_messages .alert_message ul {
     padding-left:25px;
     font-weight:normal;
 }
 
-.module_messages .notice_message {
+.module_messages .info_message {
     -moz-border-radius-topleft:4px;
     -moz-border-radius-topright:4px;
     -moz-border-radius-bottomleft:4px;
@@ -123,12 +123,12 @@ form.form .module_actions .packageAction {
     font-size:12px;
     font-weight:bold;
 }
-.module_messages .notice_message ul {
+.module_messages .info_message ul {
     padding-left:25px;
     font-weight:normal;
 }
 
-.module_messages .ok_message {
+.module_messages .success_message {
     -moz-border-radius-topleft:4px;
     -moz-border-radius-topright:4px;
     -moz-border-radius-bottomleft:4px;
@@ -141,7 +141,7 @@ form.form .module_actions .packageAction {
     font-size:12px;
     font-weight:bold;
 }
-.module_messages .ok_message ul {
+.module_messages .success_message ul {
     padding-left:25px;
     font-weight:normal;
 }
@@ -179,10 +179,13 @@ form.form .module_actions .packageAction {
     width:100%;
 }
 
-
-
-
-
+/* Version dropdowns
+-------------------------------------------------------------- */
+.parameter_version .dropdown {
+    width: 130px;
+    min-width: 0px !important;
+    margin-right: 5px !important;
+}
 
 #question {
     display:none;

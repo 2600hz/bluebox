@@ -4,59 +4,55 @@
  * @author     K Anderson <bitbashing@gmail.com>
  * @license    Mozilla Public License (MPL)
  */
-class html extends html_Core {
+class html extends html_Core
+{
     /**
-     * @var bool When true the html helper methods echo the result instead of returning it
-     */
-    public static $inline = false;
-
-
-    public static function br($data = NULL, $extra = '')
-    {
-
-        // Append or add the classes
-        if (empty($data['class']))
-        {
-            $data['class'] = 'clr-left line-break';
-        } else {
-            $data['class'] = $data['class'] .' clr-left line-break';
-        }
-
-		$result = '<div'.html::attributes((array) $data).' '.$extra.'>&nbsp</div>';
-        return self::_output($result);
-    }
-
-    /**
-     * This is a simple wrapper to enforce the inline option, where if true the result of
-     * any html helper is either returned or echo.
+     * Creates a image link.
      *
-     * @param string $result
-     * @return string|void
+     * If the $src is an array with a 'module' key, the function will try to
+     * resolve the module's path and use the 'src' key as a relative path to
+     * the found module's directory. Uses the first found module directory.
+     *
+     * array('module' => 'module-name', src => 'assets/img/file.png') =>
+     *   'modules/module-name-vsn/assets/img/file.png'
+     *
+     * @param   string        image source, or an array of attributes
+     * @param   string|array  image alt attribute, or an array of attributes
+     * @param   boolean       include the index_page in the link
+     * @return  string
      */
-    private function _output($result = null)
+    public static function image($src = NULL, $alt = NULL, $index = FALSE)
     {
-        // Execute any delayed methods
-        if (!empty(self::$delayed_elements))
-        {
-            foreach (self::$delayed_elements as $method => $occurance)
-            {
-                foreach ($occurance as $number => $params)
-                {
-                    // First remove the delayed element so it does run in the recursion
-                    // If it is still unsatisfied it will set its self back....
-                    unset(self::$delayed_elements[$method][$number]);
+        // Create attribute list
+        $attributes = is_array($src) ? $src : array('src' => $src);
 
-                    try{
-                        call_user_func_array(array('self', $method), $params);
-                    } catch (Exception $e) { }
-                }
+        if ( ! empty($attributes['module']) )
+        {
+            $m = glob(MODPATH .$attributes['module'] .'*');
+            
+            if ( count($m) > 0 )
+            {
+                $attributes['src']  = 'modules' .DIRECTORY_SEPARATOR;
+                
+                $attributes['src'] .= basename($m[0]) .DIRECTORY_SEPARATOR;
+
+                $attributes['src'] .= ltrim($attributes['src'], DIRECTORY_SEPARATOR);
             }
         }
 
-        // If we should be displaying inline echo, otherwise return
-        if (self::$inline)
-            echo $result;
-        else
-            return $result;
+        unset($attributes['module']);
+
+        return parent::image($attributes, $alt, $index);
+    }
+
+    public static function token($string)
+    {
+        $string = preg_replace('/[^a-zA-Z0-9-_:.]+/imx', '_', $string);
+
+        $string = trim($string, '_');
+
+        // TODO: ensure it starts with a letter!
+
+        return strtolower($string);
     }
 }

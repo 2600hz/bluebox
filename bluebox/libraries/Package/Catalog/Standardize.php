@@ -6,7 +6,7 @@
  */
 class Package_Catalog_Standardize extends Package_Catalog
 {
-    protected static function packageData(&$metadata, $filepath)
+    public static function packageData(&$metadata, $filepath)
     {
         $metadata['directory'] = dirname($filepath);
 
@@ -15,7 +15,12 @@ class Package_Catalog_Standardize extends Package_Catalog
             $metadata['packageName'] = dirname(str_replace(DOCROOT, '', $filepath));
         }
 
-        $metadata['identifier'] = md5($metadata['packageName'] .$metadata['version']);
+        if (empty($metadata['identifier']))
+        {
+            //kohana::log('debug', 'Creating identifier from md5(\'' .$metadata['packageName'] .$metadata['version'] .'\');');
+            
+            $metadata['identifier'] = md5($metadata['packageName'] .$metadata['version']);
+        }
 
         if (empty($metadata['displayName']))
         {
@@ -31,7 +36,7 @@ class Package_Catalog_Standardize extends Package_Catalog
         {
             $metadata['required'] = array();
 
-            kohana::log('error', 'Package ' . $metadata['packageName'] . ' required parameter is poorly formated, ignoring');
+            Package_Message::log('error', 'Package ' . $metadata['packageName'] . ' required parameter is poorly formated, ignoring');
         }
 
         if(is_numeric($metadata['version']))
@@ -56,7 +61,7 @@ class Package_Catalog_Standardize extends Package_Catalog
         $metadata['datastore_id'] = NULL;
     }
 
-    protected static function navigation(&$metadata)
+    public static function navigation(&$metadata)
     {
         // if the navStructures array is missing or not an array build it from the individual values
         if (!isset($metadata['navStructures']) || !is_array($metadata['navStructures']))
@@ -70,7 +75,7 @@ class Package_Catalog_Standardize extends Package_Catalog
             }
             else if ($metadata['type'] == Package_Manager::TYPE_MODULE)
             {
-                 kohana::log('error', 'Package ' . $metadata['packageName'] . ' of type module does not have any valid navigation defined');
+                 Package_Message::log('error', 'Package ' . $metadata['packageName'] . ' of type module does not have any valid navigation defined');
             }
         }
 
@@ -87,7 +92,7 @@ class Package_Catalog_Standardize extends Package_Catalog
                 // each navigation structure must have the base url defined
                 if (empty($navStructure['navURL']))
                 {
-                    kohana::log('error', 'Package ' . $metadata['packageName'] . ' has defined invalid navigation, ignoring');
+                    Package_Message::log('error', 'Package ' . $metadata['packageName'] . ' has defined invalid navigation, ignoring');
 
                     unset($metadata['navStructures'][$key]);
 
@@ -120,7 +125,7 @@ class Package_Catalog_Standardize extends Package_Catalog
                 }
                 else if (!is_array($navStructure['navSubmenu']))
                 {
-                    kohana::log('error', 'Package ' . $metadata['packageName'] . ' defined an invalid submenu!');
+                    Package_Message::log('error', 'Package ' . $metadata['packageName'] . ' defined an invalid submenu!');
 
                     $metadata['navStructures'][$key]['navSubmenu'] = array();
                 }
@@ -137,7 +142,7 @@ class Package_Catalog_Standardize extends Package_Catalog
 
                         if (empty($submenu['url']))
                         {
-                            kohana::log('error', 'Package ' . $metadata['packageName'] . ' defined an invalid submenu item ' .$name);
+                            Package_Message::log('error', 'Package ' . $metadata['packageName'] . ' defined an invalid submenu item ' .$name);
 
                             continue;
                         }
@@ -186,12 +191,12 @@ class Package_Catalog_Standardize extends Package_Catalog
         );
     }
 
-    protected static function typeRestrictions(&$metadata)
+    public static function typeRestrictions(&$metadata)
     {
         switch($metadata['type'])
         {
             case Package_Manager::TYPE_DEFAULT:
-                kohana::log('alert', 'Package ' . $metadata['packageName'] . ' is using the default package type');
+                Package_Message::log('alert', 'Package ' . $metadata['packageName'] . ' is using the default package type');
 
                 break;
 
@@ -214,7 +219,7 @@ class Package_Catalog_Standardize extends Package_Catalog
             default:
                 $metadata['type'] = Package_Manager::TYPE_DEFAULT;
 
-                kohana::log('error', 'Package ' . $metadata['packageName'] . ' is using an invalid package type, set to default');
+                Package_Message::log('error', 'Package ' . $metadata['packageName'] . ' is using an invalid package type, set to default');
         }
     }
 }

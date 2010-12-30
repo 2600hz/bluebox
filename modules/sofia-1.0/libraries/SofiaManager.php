@@ -42,10 +42,14 @@ class SofiaManager
 
             $device = explode('@', $registration['user']);
 
+            if (empty($device[0]) OR empty($device[1]))
+            {
+                continue;
+            }
+
             $deviceUser = $device[0];
 
             $deviceDomain = $device[1];
-
 
             if($deviceUser == $user && $deviceDomain == $domain)
             {
@@ -68,8 +72,6 @@ class SofiaManager
 
         if(!$sipRegCache)
         {
-            Kohana::log('info', 'Using cached registration');
-
             $eslManager = new EslManager();
             
             $cmd = 'sofia xmlstatus profile ' . $SIPInterface;
@@ -78,13 +80,29 @@ class SofiaManager
 
             $xml = $eslManager->getResponse($result);
 
-            $xml = simplexml_load_string($xml);
+            $registrations = array();
 
-            $registrations = (array)$xml->registrations;
+            if($xml !== 'Command execution failed.')
+            {
+                $xml = @simplexml_load_string($xml);
+
+                if ($xml AND $xml->registrations AND $xml->registrations->registration AND $xml->registrations->registration != '')
+                {
+                    $registrations = $xml->registrations->registration;
+                }
+                else
+                {
+                    Kohana::log('info', 'No XML returned');
+                }
+            }
+            else
+            {
+                Kohana::log('info', $cmd .': '. 'Command execution failed.');
+            }
 
             $result = array();
 
-            foreach($registrations['registration'] as $r) // cast to array from stl
+            foreach($registrations as $r) // cast to array from stl
             {
                 $r = (array)$r;
 
@@ -93,10 +111,11 @@ class SofiaManager
                 $result[] = $r;
             }
 
-            return $result;
+            return $result;  //array ('user' => 'blah', '')
         } 
         else
         {
+            Kohana::log('info', 'Using cached registration');
             return $sipRegCache;
         }
     }

@@ -1,3 +1,3 @@
-[submodule "modules/provisioner-1.1/libraries"]
-	path = modules/provisioner-1.1/libraries
+[submodule "modules/endpointmanager-1.0/libraries"]
+	path = modules/endpointmanager-1.0/libraries
 	url = git@git.assembla.com:provisioner.git

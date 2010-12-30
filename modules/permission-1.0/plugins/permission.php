@@ -15,6 +15,7 @@ class Permission_Plugin extends Bluebox_Plugin
         }
 
         $allowed = Permissions::allow(Router::$controller, Router::$method);
+
         if(!$allowed) {
             url::redirect('permission/disabled');
         }

@@ -21,7 +21,12 @@ div#filelist {
 }
 
 div#fileedit {
+    float: left;
+    width: 695px;
+}
 
+#xmleditor #fileedit iframe {
+    width: 695px !important;
 }
 
 .php-file-tree {

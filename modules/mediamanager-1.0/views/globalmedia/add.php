@@ -24,6 +24,7 @@
         ?>
     </div>
 
+    <!-- Ignored
     <div class="field">
         <?php
         echo form::label('upload[8000]', 'Create 8kHz file');
@@ -51,10 +52,13 @@
         echo form::checkbox('upload[48000]', NULL, TRUE);
         ?>
     </div>
+    -->
 
     <div class="buttons form_bottom">
 
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
+        <?php echo form::button(array('name' => 'cancel'
+				      ,'class' => 'cancel small_red_button'
+				      ,'onclick' => 'window.location="' . url::site('globalmedia/index') . '";return false;'), 'Cancel'); ?>
 
         <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Upload'); ?>
 
@@ -63,5 +67,5 @@
 
     <?php echo form::close_section(); ?>
 
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 </div>

@@ -1,4 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
+
 class FeatureCode_Configure extends Bluebox_Configure
 {
     public static $version = 1.0;
@@ -15,11 +16,9 @@ class FeatureCode_Configure extends Bluebox_Configure
         'freeswitch' => 0.1
         ,'core' => 0.1
     );
-    public static $navIcon = 'assets/img/icons/mainSettingsX.png';
     public static $navLabel = 'Feature Codes';
     public static $navBranch = '/Applications/';
     public static $navURL = 'featurecode/index';
-
     public static $navSubmenu = array(
         'Search Feature Codes' => '/featurecode/index'
         ,'Add Feature Codes' => '/featurecode/create'

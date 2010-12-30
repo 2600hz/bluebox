@@ -185,4 +185,19 @@ class NumberManager_Controller extends Bluebox_Controller
     {
         return numbermanager::showPools($number_id);
     }
+
+    protected function save_prepare(&$object)
+    {
+        if (!empty($_POST['number']['class_type']))
+        {
+            $registryVar = 'number_' .strtolower(str_replace('Number', '', $_POST['number']['class_type']));
+
+            if (!empty($_POST[$registryVar]['registry']))
+            {
+                $object['registry'] = $_POST[$registryVar]['registry'];
+            }
+        }
+
+        parent::save_prepare($object);
+    }
 }

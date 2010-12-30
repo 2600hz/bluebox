@@ -8,16 +8,19 @@ class Package_Catalog_Datastore extends Package_Catalog
 {
     public static function import(&$metadata)
     {
-        $possibleModels = glob($metadata['directory'] . '/models/*.php', GLOB_MARK);
+        $metadata['models'] = glob($metadata['directory'] . '/models/*.php', GLOB_MARK);
 
-        if (!empty($possibleModels))
-        {
-            $metadata['models'] = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
-        }
-        else
-        {
-            $metadata['models'] = array();
-        }
+//        $possibleModels = glob($metadata['directory'] . '/models/*.php', GLOB_MARK);
+//
+//        if (!empty($possibleModels))
+//        {
+//            $metadata['models'] = Doctrine::filterInvalidModels($metadata['directory'] . '/models');
+//            //$metadata['models'] = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+//        }
+//        else
+//        {
+//            $metadata['models'] = array();
+//        }
 
         try
         {
@@ -43,13 +46,13 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if (!$package)
         {
-            kohana::log('debug', 'Creating new package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir']);
+            Package_Message::log('debug', 'Creating new package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir']);
 
             $package = new Package();
         }
         else
         {
-            kohana::log('debug', 'Updating package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir'] .' (' .$package['package_id'] .')');
+            Package_Message::log('debug', 'Updating package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir'] .' (' .$package['package_id'] .')');
         }
         
         $registryIgnoreKeys = array_flip(array(
@@ -91,7 +94,9 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if (!empty($metadata['models']))
         {
-            self::integrateNumberType($metadata['models'], $metadata['datastore_id']);
+            $models = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+
+            self::integrateNumberType($models, $metadata['datastore_id']);
         }
     }
 
@@ -101,14 +106,16 @@ class Package_Catalog_Datastore extends Package_Catalog
 
         if ($package)
         {
-            kohana::log('debug', 'Remove package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir'] .' (' .$package['package_id'] .')');
+            Package_Message::log('debug', 'Remove package entry for ' .$metadata['packageName'] .'@' .$metadata['basedir'] .' (' .$package['package_id'] .')');
 
             $package->delete();
         }
 
         if (!empty($metadata['models']))
         {
-            self::removeNumberType($metadata['models']);
+            $models = Doctrine::loadModels($metadata['directory'] . '/models', Doctrine::MODEL_LOADING_CONSERVATIVE);
+
+            self::removeNumberType($models);
         }
     }
 
@@ -121,7 +128,7 @@ class Package_Catalog_Datastore extends Package_Catalog
                 continue;
             }
 
-            Kohana::log('debug', 'Adding ' . $model . ' to NumberType');
+            Package_Message::log('debug', 'Adding ' . $model . ' to NumberType');
 
             try
             {
@@ -129,7 +136,7 @@ class Package_Catalog_Datastore extends Package_Catalog
 
                 if (!$numberType)
                 {
-                    Kohana::log('debug', 'Could not find ' . $model . ' in NumberType, adding as new number type');
+                    Package_Message::log('debug', 'Could not find ' . $model . ' in NumberType, adding as new number type');
 
                     $numberType = new NumberType();
 
@@ -163,7 +170,7 @@ class Package_Catalog_Datastore extends Package_Catalog
                 continue;
             }
 
-            Kohana::log('debug', 'Removing ' . $model . ' from NumberType after package uninstall');
+            Package_Message::log('debug', 'Removing ' . $model . ' from NumberType after package uninstall');
 
             try
             {

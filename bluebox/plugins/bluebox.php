@@ -233,7 +233,7 @@ abstract class Bluebox_Plugin
 
         if (!$this->addPluginData())
         {
-            return TRUE;
+            return FALSE;
         }
 
         return TRUE;
@@ -255,6 +255,8 @@ abstract class Bluebox_Plugin
         {
             return FALSE;
         }
+
+        return TRUE;
     }
 
     protected function viewSetup()
@@ -280,6 +282,8 @@ abstract class Bluebox_Plugin
     {
         $this->base = $this->getBaseModelObject();
 
+        $this->subview->set_global($this->name, array());
+
         if (!isset($this->base['plugins']))
         {
             return FALSE;
@@ -287,7 +291,7 @@ abstract class Bluebox_Plugin
 
         if (isset($this->base['plugins'][$this->name]))
         {
-            $this->subview->{$this->name} = $this->base['plugins'][$this->name];
+            $this->subview->set_global($this->name, $this->base['plugins'][$this->name]);
         }
 
         return TRUE;
@@ -346,6 +350,10 @@ abstract class Bluebox_Plugin
 
     protected function addPluginData()
     {
+        $validator = Bluebox_Controller::$validation;
+
+        $errorCount = count($validator->errors());
+        
         // Remove any empty keys, no need to store them
         $this->pluginData = array_filter($this->pluginData);
 
@@ -354,7 +362,17 @@ abstract class Bluebox_Plugin
             (array)$this->base['plugins'],
             array($this->name => $this->pluginData)
         );
+
+        if($this->validate($this->pluginData, $validator) === FALSE OR $errorCount != count($validator->errors()))
+        {
+            return FALSE;
+        }
         
+        return TRUE;
+    }
+
+    protected function validate($data, $validator)
+    {
         return TRUE;
     }
 }

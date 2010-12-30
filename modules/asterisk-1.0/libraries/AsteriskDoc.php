@@ -1,10 +1,13 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * Description of AsteriskDoc
- *
- * @author dschreiber
+ * @package    Asterisk
+ * @author     Darren Schreiber <d@d-man.org>
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ * @created    Oct 5, 2009
  */
-class AsteriskDoc {
+class AsteriskDoc
+{
     /**
      * An multi-dimensional array of strings that will be used in generating hte dialplan for a specific number/destination
      * @var array
@@ -52,25 +55,34 @@ class AsteriskDoc {
     /**
      * Set the internal pointer for what sections we're modifying
      */
-    public function &setPosition($filename, $context, $number = NULL, $autoload = TRUE) {
+    public function &setPosition($filename, $context, $number = NULL, $autoload = TRUE)
+    {
         $this->currentFilename = $filename;
+
         $this->currentContext = $context;
 
-        if ($number) {
+        if ($number)
+        {
             $this->currentNumber = $number;
-        } else {
+        }
+        else
+        {
             $this->currentNumber = '_X.';
         }
 
         // the general section is a special case
-        if ($context == 'general') {
+        if ($context == 'general')
+        {
             $this->fileCache[$filename][$context] = array();
+
             return array();
         }
 
         // Do we already have this context in memory? If so, do nothing. Otherwise, try and load it, or if that fails (or autoloading is off), create it.
-        if (!isset($this->fileCache[$filename][$context])) {
-            if ($autoload) {
+        if (!isset($this->fileCache[$filename][$context]))
+        {
+            if ($autoload)
+            {
                 // Try to load the existing context via the driver (psuedo-autoload)
                 $this->fileCache[$filename][$context] = Telephony::getDriver()
                                                                 ->load(array(
@@ -81,7 +93,8 @@ class AsteriskDoc {
             }
 
             // If the context is still empty, initialize it
-            if (!isset($this->fileCache[$filename][$context]) or !($this->fileCache[$filename][$context])) {
+            if (!isset($this->fileCache[$filename][$context]) or !($this->fileCache[$filename][$context]))
+            {
                 // Nothing loaded? Initialize a new section then.
                 $this->fileCache[$filename][$context] = array();
             }
@@ -92,34 +105,51 @@ class AsteriskDoc {
 
     public function get($filename, $context = NULL)
     {
-        if ($context) {
-            if (isset($this->fileCache[$filename]['context_' . $context])) {
+        if ($context)
+        {
+            if (isset($this->fileCache[$filename]['context_' . $context]))
+            {
                 return $this->fileCache[$filename]['context_' . $context];
-            } else {
+            }
+            else
+            {
                 return FALSE;
             }
         }
-        if (isset($this->fileCache[$filename])) {
+
+        if (isset($this->fileCache[$filename]))
+        {
             return $this->fileCache[$filename];
-        } else {
+        }
+        else
+        {
             return FALSE;
         }
     }
 
-    public function update($filename, $context, $var, $value, $add = TRUE) {
+    public function update($filename, $context, $var, $value, $add = TRUE)
+    {
         $cleanVar = str_replace('/', '\/', preg_quote($var));
-        if (is_string($add)) {
+
+        if (is_string($add))
+        {
             $add = "${var}=${add}";
         }
+
         $this->updateRegex($filename, $context, "/${cleanVar}[\s]*=>?.*/", "${var}=${value}", $add);
     }
 
-    public function append($filename, $context, $var, $value, $add = TRUE) {
+    public function append($filename, $context, $var, $value, $add = TRUE)
+    {
         $cleanVar = str_replace('/', '\/', preg_quote($var));
+
         $clearnValue = str_replace('/', '\/', preg_quote($value));
-        if (is_string($add)) {
+
+        if (is_string($add))
+        {
             $add = "${var}=${add}";
         }
+
         $this->updateRegex($filename, $context, "/${cleanVar}[\s]*=>?[\s]*${clearnValue}/", "${var}=${value}", $add);
     }
 
@@ -132,28 +162,41 @@ class AsteriskDoc {
         /$this->load($options);*/
 
         $context = & $this->fileCache[$filename][$contextName];
+
         $found = FALSE;
 
         // the general context is a special case
-        if ($contextName == 'general') {
+        if ($contextName == 'general')
+        {
             $lineParts = explode('=', $replace, 2);
-            if (!empty($lineParts) && count($lineParts) == 2 && !empty($lineParts[1])) {
+
+            if (!empty($lineParts) && count($lineParts) == 2 && !empty($lineParts[1]))
+            {
                 $ami = Telephony::getDriver()->ami;
+
                 $ami->queueConfigUpdate($filename, 'Delete', $contextName, $lineParts[0], $lineParts[1], array(
                     'match' =>  $lineParts[1],
                     'ignoreResponse' => AsteriskManager::AMI_DEL_FAIL1
                 ));
-            } else {
+            } 
+            else
+            {
                 Kohana::log('error', 'Unable to delete \'' . $line . '\' for [' . $context . '] in ' . $filename);
             }
-        } else {
+        } 
+        else
+        {
             // Is there anything loaded in memory to look at? If not, assume new file
-            if (!empty($context) && is_array($context)) {
+            if (!empty($context) && is_array($context))
+            {
                 // Cycle through all lines in $fileCache[$filename][$context] and run the regex
-                foreach($context as $k => $line) {
+                foreach($context as $k => $line)
+                {
                     // Look for matches and replace them accordingly
                     $context[$k] = preg_replace($search, $replace, $line, -1, $count);
-                    if (!empty($count)) {
+
+                    if (!empty($count))
+                    {
                         $found = TRUE;
                     }
                 }
@@ -161,10 +204,14 @@ class AsteriskDoc {
         }
 
         // if we did not locate what we are looking for add it, as this function is an "add or update"
-        if (!$found && $add !== FALSE) {
-            if (is_string($add)) {
+        if (!$found && $add !== FALSE)
+        {
+            if (is_string($add))
+            {
                 $context[]= $add;
-            } else {
+            } 
+            else
+            {
                 $context[] = $replace;
             }
         }
@@ -192,17 +239,19 @@ class AsteriskDoc {
         $context = &$this->setPosition($filename, $contextName, $extensionNumber, !isset($options['replace']));
 
         // If the $options['replace'] option is set, clobber existing filename/context entries.
-        if (isset($options['replace'])) {
-            $context = array();    // This effectively deletes the current context, too, if nothing gets added here
-        } else {
-
-        }
+        if (isset($options['replace'])) 
+        {
+            // This effectively deletes the current context, too, if nothing gets added here
+            $context = array();    
+        } 
 
         kohana::log('debug', "Set current filename to $filename, context to $contextName and extension to " . $this->currentNumber);
+        
         return $this;
     }
 
-    public function deleteContext($filename, $contextName) {
+    public function deleteContext($filename, $contextName)
+    {
         $this->createContext($filename, $contextName, NULL, array('replace' => TRUE));
     }
 
@@ -221,22 +270,30 @@ class AsteriskDoc {
         // TODO: If REPLACE is true, set a flag to search/replace this option somehow
         
         $context = $this->currentContext;
+
         $filename = $this->currentFilename;
+
         $number = $this->currentNumber;
 
-        if (!$context or !$filename) {
+        if (!$context or !$filename)
+        {
             Kohana::log('error', 'Can\'t add to a non-existant context/filename - use setPosition() first! (When trying to add ' . $command . ')');
+
             return FALSE;
         }
 
-        if (is_string($priorityName)) {
+        if (is_string($priorityName))
+        {
             $priorityName = 'n(' . $priorityName . ')';
-        } else if (!is_int($priorityName)){
+        } 
+        else if (!is_int($priorityName))
+        {
             $priorityName = 'n';
         }
 
         // STEP 3: Add to the context. Prefix with a NoOp() on any context that's empty automagically.
-        if ((!isset($this->fileCache[$filename][$context]) or (count($this->fileCache[$filename][$context]) == 0)) && $priorityName != 1) {
+        if ((!isset($this->fileCache[$filename][$context]) or (count($this->fileCache[$filename][$context]) == 0)) && $priorityName != 1)
+        {
             $this->fileCache[$filename][$context] = array('exten = ' . $number . ',1,NoOp');    // Add a NoOp at the top of all contexts
         }
         
@@ -258,18 +315,25 @@ class AsteriskDoc {
      * If $extensionNumber is not passed in, we'll default to _X., like:
      *      exten => _X.,1,NoOp
      */
-    public function createDialplanExtension($contextId, $numberId, $extensionNumber = NULL) {
+    public function createDialplanExtension($contextId, $numberId, $extensionNumber = NULL)
+    {
         // Make sure the extensions list for this context exists
         $this->createContext('extensions.conf', 'extensions_' . $contextId, $extensionNumber);
         
         // Delete any existing references to this particular extension number in the extensions list
         $this->deleteDialplanExtension($contextId, $extensionNumber);
-        $this->add('NoOp', 1, array('replace' => TRUE)); // Add a NoOp at the top of all numbers
-        $this->add('GoSub(number_' . $numberId . ',${EXTEN},1)', NULL, array('replace' => TRUE)); // Replace nay matching extension definitions
+
+        // Add a NoOp at the top of all numbers
+        $this->add('NoOp', 1, array('replace' => TRUE));
+
+        // Replace nay matching extension definitions
+        $this->add('GoSub(number_' . $numberId . ',${EXTEN},1)', NULL, array('replace' => TRUE));
+        
         $this->add('Return');
     }
 
-    public function deleteDialplanExtension($contextId, $extensionNumber) {
+    public function deleteDialplanExtension($contextId, $extensionNumber)
+    {
         // Despite this saying "create", by leaving a context empty, it will be deleted.
         //$this->createContext('extensions.conf', 'extensions_' . $contextId, $number);
 
@@ -279,7 +343,9 @@ class AsteriskDoc {
         // Delete any references to this destination/extensions
         //$exten = $extensionNumber;
         $regex = '/^exten[\s]*=?[\s]*' .preg_quote($extensionNumber) .',.*/';
+
         $context = preg_replace($regex, '', $context, -1, $count);
+
         /*if (preg_match('/^exten[\s]*=>?[\s]*(' .$exten .',.*)/', $cache, $matches)) {
             if ((count($matches) > 1) and ($matches[1] != '')) {
                 $ami->queueConfigUpdate($contextFile, 'Delete', $context, 'exten', $matches[1], array('match' =>  $matches[1]));
@@ -299,7 +365,8 @@ class AsteriskDoc {
      * @param integer $numberId
      * @return boolean
      */
-    public function createDestination($contextId, $numberId, $extensionNumber) {
+    public function createDestination($contextId, $numberId, $extensionNumber)
+    {
         // Create a route to this destination
         $this->createDialplanExtension($contextId, $numberId, $extensionNumber);   // This just makes sure the context exists and sets our current number
 
@@ -313,7 +380,8 @@ class AsteriskDoc {
     // Delete the reference to an extension. Unlike what createDestiantion() does, this DOES NOT
     // delete the destination's dialplan (in case it is in use by other contexts). You must do that manually
     // if you are sure that nobody else is utilizing this number!
-    public function deleteDestination($contextId, $extensionNumber, $numberId) {
+    public function deleteDestination($contextId, $extensionNumber, $numberId)
+    {
         // Remove any references in the extension list for this destination
         $this->deleteDialplanExtension($contextId, $extensionNumber);
 
@@ -324,7 +392,8 @@ class AsteriskDoc {
      * at the top of the context and then does a GoTo to the context's destinations list
      * @param integer $contextId
      */
-    public function createRoutableContext($contextId) {
+    public function createRoutableContext($contextId)
+    {
         // TODO: ADD SKIP FUNCTIONALITY HERE. Don't recreate this on the same run if we've already created this context, that's dumb.
         $this->createContext('extensions.conf', 'context_' . $contextId, NULL, array('replace' => TRUE));
 
@@ -345,10 +414,13 @@ class AsteriskDoc {
     public function reset()
     {
         $this->currentFilename = NULL;
+
         $this->currentContext = NULL;
+
         $this->currentNumber = NULL;
+
         $this->fileCache = array();
+        
         return TRUE;
     }
-
 }

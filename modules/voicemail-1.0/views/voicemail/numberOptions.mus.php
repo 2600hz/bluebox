@@ -1,27 +1,31 @@
-<div class="field">
+<?php echo form::open_section('Options'); ?>
 
-    <label for="number{{number_id}}_registry_skip_instructions" class="label" id="label_number{{number_id}}_registry_skip_instructions">Skip Voicemail Instructions:</label>
+    <div class="field">
 
-    <input type="checkbox" value="1" {{#skipInstructions}}checked="checked"{{/skipInstructions}} class="input" name="number{{number_id}}[registry][skipInstructions]" id="number{{number_id}}_registry_skip_instructions" />
+        <label for="number{{number_id}}_registry_skip_instructions" class="label" id="label_number{{number_id}}_registry_skip_instructions">Skip Voicemail Instructions:</label>
 
-    <fieldset class="hidden_inputs">
+        <input type="checkbox" value="1" {{#skipInstructions}}checked="checked"{{/skipInstructions}} class="input" name="number{{number_id}}[registry][skipInstructions]" id="number{{number_id}}_registry_skip_instructions" />
 
-        <input type="hidden" class=" hidden" value="0" name="__number{{number_id}}[registry][skipInstructions]">
+        <fieldset class="hidden_inputs">
 
-    </fieldset>
+            <input type="hidden" class=" hidden" value="0" name="__number{{number_id}}[registry][skipInstructions]">
 
-</div>
+        </fieldset>
 
-<div class="field">
+    </div>
 
-    <label for="number{{number_id}}_registry_skip_greeting" class="label" id="label_number{{number_id}}_registry_skip_greeting">Skip Voicemail Greeting:</label>
+    <div class="field">
 
-    <input type="checkbox" value="1" {{#skipGreeting}}checked="checked"{{/skipGreeting}} class="input" name="number{{number_id}}[registry][skipGreeting]" id="number{{number_id}}_registry_skip_greeting" />
+        <label for="number{{number_id}}_registry_skip_greeting" class="label" id="label_number{{number_id}}_registry_skip_greeting">Skip Voicemail Greeting:</label>
 
-    <fieldset class="hidden_inputs">
+        <input type="checkbox" value="1" {{#skipGreeting}}checked="checked"{{/skipGreeting}} class="input" name="number{{number_id}}[registry][skipGreeting]" id="number{{number_id}}_registry_skip_greeting" />
 
-        <input type="hidden" class=" hidden" value="0" name="__number{{number_id}}[registry][skipGreeting]">
+        <fieldset class="hidden_inputs">
 
-    </fieldset>
+            <input type="hidden" class=" hidden" value="0" name="__number{{number_id}}[registry][skipGreeting]">
 
-</div>
+        </fieldset>
+
+    </div>
+
+<?php echo form::close_section(); ?>

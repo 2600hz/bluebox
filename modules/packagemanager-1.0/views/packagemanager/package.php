@@ -20,44 +20,7 @@
 
     <div class="module_messages">
 
-        <?php foreach($messages as $type => $messageList): ?>
-
-            <?php if (empty($messageList[$packageName])) $messageList[$packageName] = array(); ?>
-
-            <div id ="<?php echo strtolower($packageName .'_' .$type); ?>" class="
-                <?php echo empty($messageList[$packageName]) ? 'hide' : ''; ?>
-
-                <?php echo $type; ?>_message
-                
-                <?php echo $packageName; ?>_message packagemanager index module">
-
-                <?php if (isset($error) && $type == 'ok') : ?>
-
-                    <?php echo __('Pending'); ?>
-
-                <?php elseif ($type == 'ok') : ?>
-
-                    <?php echo __('Complete'); ?>
-
-                <?php else : ?>
-
-                    <?php echo __(ucfirst($type)); ?>
-
-                <?php endif; ?>
-
-                <ul class="<?php echo $type; ?>_list packagemanager index module">
-
-                <?php foreach($messageList[$packageName] as $message): ?>
-
-                    <li><?php echo $message; ?></li>
-
-                <?php endforeach; ?>
-
-                </ul>
-
-            </div>
-
-        <?php endforeach; ?>
+        <?php echo packagemanager::getPackageMessages($messages, $identifier); ?>
 
     </div>
 

@@ -61,26 +61,39 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
                     {
                         $xml->update('/param[@name="password"]{@value="' .$plugins['sip']['password'] .'"}');
                     }
-
-                    // Assume we want to register if user/pass is specified
-                    // TODO: Make this a checkbox?
-                    $xml->update('/param[@name="register"]{@value="true"}');
                 } 
                 else
                 {
-                    // Assume we don't want to register if no user/pass is specified
-                    $xml->update('/param[@name="register"]{@value="false"}');
-
                     // Have to put something, so we'll just make it generic
                     $xml->update('/param[@name="username"]{@value="TCAPI_User"}');
                     
                     $xml->update('/param[@name="password"]{@value="TCAPI_User"}');
                 }
 
+                if (empty($plugins['sip']['register']))
+                {
+                    $xml->update('/param[@name="register"]{@value="false"}');
+                }
+                else
+                {
+                    $xml->update('/param[@name="register"]{@value="true"}');
+                }
+
+                // Add custom from domain, if set
+                if (!empty($plugins['sip']['from_domain'])) {
+                    $xml->update('/param[@name="from-domain"]{@value="' . $plugins['sip']['from_domain'] . '"}');
+                }
+                else
+                {
+                    $xml->deleteNode('/param[@name="from-domain"]');
+                }
+
                 // Route calls with no specific DID info to an inbound number
                 if (!empty($plugins['sip']['inbound'])) {
                     $xml->update('/param[@name="extension"]{@value="' .$plugins['sip']['inbound'] .'"}');
-                } else {
+                } else if (!empty($plugins['sip']['to_user'])) {
+                    $xml->update('/param[@name="extension"]{@value="auto_to_user"}');
+		} else {
                     $xml->deleteNode('/param[@name="extension"]');
                 }
 
@@ -97,6 +110,27 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
                 // Add auto_to_user support, allowing DID to be in a different spot
                 if (!empty($plugins['sip']['to_user'])) {
                     $xml->update('/param[@name="auto_to_user"]{@value="true"}');
+                }
+                else
+                {
+                    $xml->deleteNode('/param[@name="auto_to_user"]');
+                }
+
+                // Add auto_to_user support, allowing DID to be in a different spot
+                if (!empty($plugins['sip']['caller_id_field'])) {
+                    switch ($plugins['sip']['caller_id_field']) {
+                        case 'from':
+                            $xml->update('/param[@name="caller-id-in-from"]{@value="true"}');
+                            break;
+
+                        case 'rpid' :
+                            $xml->deleteNode('/param[@name="caller-id-in-from"]');
+                            break;
+
+                        case 'pid' :
+                            $xml->deleteNode('/param[@name="caller-id-in-from"]');
+                            break;
+                    }
                 }
                 else
                 {

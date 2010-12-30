@@ -1,11 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * Asterisk.php - Asterisk configuration driver
- * Created on Oct 5, 2009
- *
- * @author Karl Anderson
- * @package Asterisk_Driver
- * @license LGPL
+ * @package    Asterisk
+ * @author     K Anderson <bitbashing@gmail.com>
+ * @license    Mozilla Public License (MPL)
+ * @created    Oct 5, 2009
  */
 class Asterisk extends Telephony_Driver
 {
@@ -35,12 +33,16 @@ class Asterisk extends Telephony_Driver
     public static function getInstance()
     {
         // create a new instance if there isnt one already
-        if (!isset(self::$instance)) {
+        if (!isset(self::$instance))
+        {
             self::$instance = new self();
-            Kohana::log('debug', 'New instance of Asterisk telephony driver created.');
+
+            Kohana::log('debug', 'Asterisk -> New instance of Asterisk telephony driver created.');
+
             // reset all the accumulators in this driver
             self::reset();
         }
+
         // return this instance
         return self::$instance;
     }
@@ -56,20 +58,25 @@ class Asterisk extends Telephony_Driver
     public function load($options, $useCache = TRUE)
     {
         // sanity check on our necessary vars
-        if (empty($options['filename']) || empty($options['context'])) {
+        if (empty($options['filename']) || empty($options['context']))
+        {
             return FALSE;
-        } else {
+        } 
+        else
+        {
             extract($options);
         }
 
         // CACHE: check if this file's config section is already loaded and if we're allowed to use it
-        if ($useCache and isset(self::$instance->doc->fileCache[$filename][$context])) {
+        if ($useCache and isset(self::$instance->doc->fileCache[$filename][$context]))
+        {
             // Already loaded
-            Kohana::log('debug', 'Using cached file ' . $filename . ' for context ' . $context);
+            Kohana::log('debug', 'Asterisk -> Using cached file ' . $filename . ' for context ' . $context);
+            
             return self::$instance->doc->fileCache[$filename][$context];
         }
 
-        Kohana::log('debug', 'Loading file ' . $filename . ' for context ' . $context . ' into cache');
+        Kohana::log('debug', 'Asterisk -> Loading file ' . $filename . ' for context ' . $context . ' into cache');
 
         // get the asterisk manager interface
         $ami = self::$instance->ami;
@@ -81,7 +88,7 @@ class Asterisk extends Telephony_Driver
 
         // load the config section and store it in the active in-memory document
         self::$instance->doc->fileCache[$filename][$context] = $ami->loadConfigContext($filename, $context);
-        Kohana::log('debug', 'Loaded ' . $filename . ' / context ' . $context . ":\n" . print_r(self::$instance->doc->fileCache, TRUE));
+        //Kohana::log('debug', 'Loaded ' . $filename . ' / context ' . $context . ":\n" . print_r(self::$instance->doc->fileCache, TRUE));
 
         return self::$instance->doc->fileCache[$filename][$context];;
     }
@@ -89,65 +96,79 @@ class Asterisk extends Telephony_Driver
     public function save($options = NULL)
     {
         // Make sure there is something to do
-        if (empty(self::$instance->doc->fileCache)) {
-            Kohana::log('debug', 'Not saving - nothing was changed!');
+        if (empty(self::$instance->doc->fileCache))
+        {
+            Kohana::log('debug', 'Asterisk -> Not saving - nothing was changed!');
+            
             return TRUE;
         }
 
-        Kohana::log('debug', 'Saving queued changes to Asterisk config files (via AMI)');
+        Kohana::log('debug', 'Asterisk -> Saving queued changes to Asterisk config files (via AMI)');
 
         // get the asterisk manager interface
         $ami = self::$instance->ami;
 
         // make sure we are connected/can connect
-        if (!self::connectAMI($ami)) {
-            Kohana::log('error', 'Failed to connect to Asterisk AMI interface.');
+        if (!self::connectAMI($ami))
+        {
+            Kohana::log('error', 'Asterisk -> Failed to connect to Asterisk AMI interface.');
+            
             return FALSE;
         }
 
         // Loop through all the filenames and contexts that have changed
-        foreach(self::$instance->doc->fileCache as $filename => $contexts) {
+        foreach(self::$instance->doc->fileCache as $filename => $contexts)
+        {
             // Loop through all the config contexts
-            foreach($contexts as $context => $lines) {
+            foreach($contexts as $context => $lines)
+            {
                 // Remove this config section (ignoring any errors during) and re-create and empty one
-                if ($context != 'general') {
+                if ($context != 'general')
+                {
                     $ami->queueConfigUpdate($filename, 'DelCat', $context, NULL, NULL, array(
                         'ignoreResponse' => AsteriskManager::AMI_DEL_FAIL2
                     ));
                 }
+
                 // Only re-add this context if there's something actually in it
-                if ($lines) {
+                if ($lines)
+                {
                     // Go through and add the category and all associated lines back to the file
-                    if ($context != 'general') {
+                    if ($context != 'general')
+                    {
                         $ami->queueConfigUpdate($filename, 'NewCat', $context);
                     }
 
                     // Loop through all the updates for this config section
-                    foreach($lines as $lineNum => $line) {
-
+                    foreach($lines as $lineNum => $line)
+                    {
                         // try to split the update on the =
                         $lineParts = explode('=', $line, 2);
 
                         // if the split returned false (no = found) or fewer than two parts
-                        if (!empty($lineParts) && count($lineParts) == 2) {
+                        if (!empty($lineParts) && count($lineParts) == 2)
+                        {
                             $ami->queueConfigUpdate($filename, 'Append', $context, $lineParts[0], $lineParts[1], array(
                                 'skippredelete' => TRUE
                             ));
-                        } else {
-                            Kohana::log('error', 'Unable to queue \'' . $line . '\' for [' . $context . '] in ' . $filename);
+                        } 
+                        else
+                        {
+                            Kohana::log('error', 'Asterisk -> Unable to queue \'' . $line . '\' for [' . $context . '] in ' . $filename);
                         }
                     }
                 }
             }
 
             // Clear the internal queue of actions
-            try {
+            try
+            {
                 $ami->commitConfigUpdates();
             }
-
-            catch(AsteriskManager_Exception $e) {
+            catch(AsteriskManager_Exception $e)
+            {
                 // This is a place holder for later error checking
-                Kohana::log('error', 'Exception during commit for [' . $context . '] in ' . $filename . ': ' . $e->getMessage());
+                Kohana::log('error', 'Asterisk -> Exception during commit for [' . $context . '] in ' . $filename . ': ' . $e->getMessage());
             }
         }
     }
@@ -158,227 +179,91 @@ class Asterisk extends Telephony_Driver
         $ami = self::$instance->ami;
 
         // make sure we are connected/can connect
-        if (!self::connectAMI($ami)) {
-            Kohana::log('error', 'Failed to connect to Asterisk AMI interface.');
+        if (!self::connectAMI($ami))
+        {
+            Kohana::log('error', 'Asterisk -> Failed to connect to Asterisk AMI interface.');
+
             return FALSE;
         }
 
         $ami->send('reload');
+
         return TRUE;
     }
 
     public function render()
     {
+        
     }
 
     public function reset()
     {
         // Are we already instantiated? If not, create an instance.
-        if (!is_object(self::$instance->ami) || get_class(self::$instance->ami) != 'AsteriskManager') {
+        if (!is_object(self::$instance->ami) || get_class(self::$instance->ami) != 'AsteriskManager')
+        {
             self::$instance->ami = new AsteriskManager();
-        } else {
+        } 
+        else
+        {
             // We are instantiated - close any existing AMI connections
-            Kohana::log('debug', 'Disconnecting from active Asterisk server');
-            try {
+            Kohana::log('debug', 'Asterisk -> Disconnecting from active Asterisk server');
+
+            try
+            {
                 //self::$instance->ami->logoff();
             }
-            catch(Exception $e) {
-                // If we can't disconnect, no biggie. Ignore
-                
+            catch(Exception $e)
+            {
+                // If we can't disconnect, no biggie. Ignore    
             }
+
             self::$instance->ami->cancelConfigUpdates();
         }
 
         // Reset the in-memory config document
-        if (self::$instance->doc) {
+        if (self::$instance->doc)
+        {
             self::$instance->doc->reset();
-        } else {
+        } 
+        else
+        {
             self::$instance->doc = new AsteriskDoc();
         }
     }
 
-
-    /********************
-    * MACRO MANAGEMENT *
-    ********************/
-
-    /**
-     * Output the dialplan in memory (started with createDialplan() and added to with addToContext()) to the AMI interface
-     * or an Asterisk config file on disk.
-     * @return <type>
-     */
-    /*public static function flushDialplan()
-    {
-        kohana::log('debug', 'Generating dailplan');
-        $dailplanFile = 'extensions.conf';
-
-        // STEP 4: Get the AMI instance and ensure we are connected, and if
-        // so clean out any remaining/pending AMI commands
-        $ami = self::$instance->ami;
-        if (!self::connectAMI($ami)) return FALSE;
-        $ami->cancelConfigUpdates();
-
-        // Determine what context and extension we are using
-        $context = self::getCurrentContext();
-        $exten = self::getCurrentNumber();
-        
-        // sanity check our context and exten
-        if (empty($context) || empty($exten)) {
-            kohana::log('alert', 'Attempted to flush a dialplan without either a context or exten!');
-            return FALSE;
-        }
-
-        // STEP 5: Clean out or recreate this context in Asterisk
-        $ami->queueConfigUpdate($dailplanFile, 'DelCat', $context, NULL, NULL, array(
-            'ignoreResponse' => AsteriskManager::AMI_DEL_FAIL2
-        ));
-
-        if (count(self::$instance->queuedCommands) > 1) {
-            $ami->queueConfigUpdate($dailplanFile, 'NewCat', $context);
-
-            // STEP 6: Import all the pending commands to AMI
-            foreach(self::$instance->queuedCommands as $priority => $command) {
-                $dialplanStep = '>' .$exten .',';
-                if (reset(self::$instance->queuedCommands) == $command) {
-                    $dialplanStep.= '1';
-                } else {
-                    $dialplanStep.= 'n';
-                }
-                if (is_string($priority)) {
-                    $dialplanStep.= '(' . $priority . ')';
-                }
-                $dialplanStep.= ',' . $command;
-                $ami->queueConfigUpdate($dailplanFile, 'Append', $context, 'exten', $dialplanStep, array(
-                    'skippredelete' => TRUE
-                ));
-            }
-        }
-        
-        // STEP 7: Commit the AMI update to asterisk
-        try {
-            $ami->commitConfigUpdates();
-        } catch(AsteriskManager_Exception $e) {
-            Kohana::log('error', 'Exception during commit for [' . $context . '] in ' . $dailplanFile . ': ' . $e->getMessage());
-        }
-
-        // STEP 8: Clean up after ourselfs, like mother tought us...
-    }*/
-
-    /**********************************
-    * CONTEXT/DESTINATION MANAGEMENT *
-    **********************************/
-    /*public static function createContext ($context, $number, array $options = array()) {
-        // STEP 1: Clean up the queued commands to ensure there are no stragglers
-        self::resetQueuedCommands();
-        // STEP 2: Store the context and number in memory, for later flushing
-        $context = self::$instance->currentContext = $context;
-        $exten = self::$instance->currentNumber = $number;
-        kohana::log('debug', "Set current context to $context and number $exten");
-        return self::$instance;
-    }
-
-    public static function addToContext($command, $priorityName = NULL, array $options = array())
-    {
-        // STEP 3: Build a list of AMI commands to create this dialplan
-        if (is_string($priorityName)) {
-            self::$instance->queuedCommands[$priorityName] = $command;
-        } else {
-            self::$instance->queuedCommands[] = $command;
-        }
-    }*/
-
-    /*public static function flushContext() {
-        kohana::log('debug', 'Generating context');
-        $contextFile = 'extensions.conf';
-
-        // STEP 4: Get the AMI instance and ensure we are connected, and if
-        // so clean out any remaining/pending AMI commands
-        $ami = self::$instance->ami;
-        if (!self::connectAMI($ami)) return FALSE;
-        $ami->cancelConfigUpdates();
-
-        // Determine what context and extension we are using
-        $context = self::getCurrentContext();
-        $exten = self::$instance->doc->getCurrentNumber();
-
-        // sanity check our context and exten
-        if (empty($context) || empty($exten)) {
-            kohana::log('alert', 'Attempted to flush a context without either a context or exten!');
-            return FALSE;
-        }
-
-        // STEP 5: Get the current dialplan for this number
-        $options = array(
-            'filename' => $contextFile,
-            'context' => $context
-        );
-        
-        $contextCache = self::$instance->load($options, FALSE);
-        if (empty($contextCache)) {
-            // If there is no current steps for this number ensure its context
-            // is there by attempting to add it ignoring and the cat add fail
-            $ami->queueConfigUpdate($contextFile, 'NewCat', $context, NULL, NULL, array(
-                'ignoreResponse' => AsteriskManager::AMI_CAT_FAIL
-            ));
-        } else {
-            // If this number has steps defined then queue their removal
-            foreach($contextCache as $cache) {
-                if (preg_match('/^exten[\s]*=>?[\s]*(' .$exten .'.*)/', $cache, $matches)) {
-                    $ami->queueConfigUpdate($contextFile, 'Delete', $context, 'exten', $matches[1], array('match' =>  $matches[1]));
-                }               
-            }
-        }
-
-        if (count(self::$instance->queuedCommands) > 1) {
-            // output queued actions here
-            self::addToContext('Hangup');
-            foreach(self::$instance->queuedCommands as $priority => $command) {
-                $dialplanStep = '>' .$exten .',';
-                if (reset(self::$instance->queuedCommands) == $command) {
-                    $dialplanStep.= '1';
-                } else {
-                    $dialplanStep.= 'n';
-                }
-                if (is_string($priority)) {
-                    $dialplanStep.= '(' . $priority . ')';
-                }
-                $dialplanStep.= ',' . $command;
-                $ami->queueConfigUpdate($contextFile, 'Append', $context, 'exten', $dialplanStep, array(
-                    'skippredelete' => TRUE
-                ));
-            }
-        }
-        
-        // Clear the internal queue of actions
-        try {
-            $ami->commitConfigUpdates();
-        } catch(AsteriskManager_Exception $e) {
-            Kohana::log('error', 'Exception during commit for [' . $context . '] in ' . $contextFile . ': ' . $e->getMessage());
-        }
-    }*/
-
     private static function connectAMI($ami)
     {
         // is the $ami a valid AsteriskManager object?
-        if (!is_object($ami) || get_class($ami) != 'AsteriskManager') return FALSE;
+        if (!is_object($ami) || get_class($ami) != 'AsteriskManager')
+        {
+            return FALSE;
+        }
+
         // Are we already connected? Don't connect again.
-        if (!$ami->connected()) {
+        if (!$ami->connected())
+        {
             $config = array(
                 'host' => Kohana::config('asterisk.AmiHost') ,
                 'port' => Kohana::config('asterisk.AmiPort') ,
                 'username' => Kohana::config('asterisk.AmiUser') ,
                 'password' => Kohana::config('asterisk.AmiPass')
             );
+
             $ami->setConfig($config);
-            try {
+
+            try
+            {
                 $ami->connect();
             }
-            catch(AsteriskManager_Exception $e) {
+            catch(AsteriskManager_Exception $e)
+            {
                 // Server unavailable for whatever reason.
-                Kohana::log('error', 'Unable to connect to Asterisk AMI interface! ' . $e->getMessage());
+                Kohana::log('error', 'Unable to connect to Asterisk AMI interface: ' . $e->getMessage());
+
                 return FALSE;
             }
         }
+
         return TRUE;
     }
 }
