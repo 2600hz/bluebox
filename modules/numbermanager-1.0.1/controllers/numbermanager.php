@@ -79,11 +79,6 @@ class NumberManager_Controller extends Bluebox_Controller
                 'arguments' => 'number_id'
             )
         );
-        $grid->addAction('numbermanager/rebuild', 'Rebuild', array(
-                'arguments' => 'number_id',
-                'attributes' => array('class' => 'qtipAjaxForm')
-            )
-        );
         $grid->addAction('numbermanager/delete', 'Delete', array(
                 'arguments' => 'number_id'
             )
@@ -95,30 +90,6 @@ class NumberManager_Controller extends Bluebox_Controller
 
         // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
-    }
-
-    public function rebuild($number_id)
-    {
-        $this->loadBaseModel($number_id);
-
-        $this->number->markModified('number');
-
-        try
-        {
-            $this->number->save();
-
-            message::set('Number ' .$this->number['number'] .' dialplan rebuild complete!', 'success');
-
-            parent::save_succeeded($this->number);
-        }
-        catch (Exception $e)
-        {
-            message::set($e->getMessage());
-        }
-        
-        $this->returnQtipAjaxForm();
-
-        url::redirect(Router_Core::$controller);
     }
 
     public function create($class_type = NULL)
