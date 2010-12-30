@@ -1,106 +1,177 @@
 <?php
 
+require('getid3/getid3.php');
+
 class MediaScanner {
-    public static function NormalizeFSNames($filename) {
-        // NOTE: This is a FreeSWITCH-specific feature
-        // Trim the 8000/16000/32000/48000 from directory names
-        $filename = preg_replace('/\/8000\/|\/16000\/|\/32000\/|\/48000\//', '/', $filename);
-        return $filename;
+  public static $default_rates = array(8000, 16000, 32000, 48000);
+
+  public static function NormalizeFSNames($filename) {
+    // NOTE: This is a FreeSWITCH-specific feature
+    // Trim the 8000/16000/32000/48000 from directory names
+    $replace = '/\/' . implode('\/|\/', self::$default_rates) . '\//';
+    $filename = preg_replace($replace, '/', $filename);
+    return $filename;
+  }
+
+    public static function filterKnownFiles($file) {
+      $exists = file_exists($file['path']);
+
+      if ( empty($file['registry']) || empty($file['registry']['rates']) ) {
+	$file['registry']['rates'] = self::$default_rates;
+      } else {
+	$file['registry']['rates'] = array_merge($file['registry']['rates'], self::$default_rates);
+      }
+
+      foreach ( $file['registry']['rates'] as $rate ) {
+	if ( ! $exists ) {
+	  $base = basename($file['path']);
+	  $filename = str_replace($base, $rate . '/' . $base, $file['path']);
+	  $exists = file_exists($filename);
+	}
+      }
+
+      if ( ! $exists ) {
+	Doctrine_Query::create()
+	  ->delete('MediaFile')
+	  ->where('mediafile_id = ?', $file['mediafile_id'])
+	  ->limit(1)
+	  ->execute();
+      }
+
+      return $exists;
     }
 
-    public static function scan($soundPath, $fileTypes)
-    {
-        set_time_limit(0);
-        // TODO: Make this a queued event to scan all files. Only possible once.
+    public static function scan($soundPath, $fileTypes) {
+      set_time_limit(0);
 
-        /*
-         * Load everything into memory that we know about our existing sound files.
-         * This may seem expensive but it shouldn't be - the info is tiny and a full
-         * rescan will require all this data anyway.
-         */
+      // TODO: Make this a queued event to scan all files. Only possible once.
 
-        // Get the list of known files already in the system
-        $results = Doctrine::getTable('MediaFile')->findAll(Doctrine::HYDRATE_ARRAY);
-        $knownFiles = array();
-        foreach ($results as $result) {
-            $knownFiles[$result['mediafile_id']] = $result['file'];
-        }
+      /*
+       * Load everything into memory that we know about our existing sound files.
+       * This may seem expensive but it shouldn't be - the info is tiny and a full
+       * rescan will require all this data anyway.
+       */
 
-        // Scan for "known" files on disk. This is FreeSWITCH specific atm.
-        // TODO: Fix this. Download it from the web?
-        $descriptions = self::scanXml();
+      // Get the list of known files already in the system
+      $results = Doctrine_Query::create()
+	->select('m.mediafile_id, m.file, m.registry')
+	->from('MediaFile m')
+	->execute(NULL, Doctrine::HYDRATE_ARRAY);
 
-        /*
-         * Now compare what we know with what we find on disk and add any new stuff
-         */
+      $listedFiles = array();
 
-        // Initialize audio analysis routine
-        $audioFile = new AudioFile();
+      foreach ($results as $result) {
+	$listedFiles[$result['file']] = array('mediafile_id' => $result['mediafile_id']
+					      ,'registry' => $result['registry']
+					      ,'path' => $soundPath . $result['file']
+					      );
+      }
 
-        // Initialize iterator
-        $dir_iterator = new RecursiveDirectoryIterator($soundPath);
-        $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
+      kohana::log('debug', 'Found ' . count($listedFiles) . ' listed files');
 
-        // Read in a list of files already registered in the system
-        foreach ($iterator as $filename) if (preg_match('/^.+\.(' . implode('|', $fileTypes) . ')$/i', $filename) and ($filename->isFile())) {
-            $audioFile->loadFile($filename);
-            $shortname = str_replace($soundPath, '', self::NormalizeFSNames($filename));
+      if ( version_compare(PHP_VERSION, '5.2.3', '<') ) {
+	$knownFiles = array();
+	foreach ( $listedFiles as $idx => $file ) {
+	  if ( self::filterKnownFiles($file) ) {
+	    $knownFiles[$idx] = $file;
+	  }
+	}
+	kohana::log('debug', 'foreach: Of ' . count($listedFiles) . ' listed, kept ' . count($knownFiles));
+      } else {
+	$knownFiles = array_filter($listedFiles, "MediaScanner::filterKnownFiles");
+	kohana::log('debug', 'filter: Of ' . count($listedFiles) . ' listed, kept ' . count($knownFiles));
+      }
 
-            // Is this a new file or an existing one?
-            if ($mediafile_id = array_search($shortname, $knownFiles)) {
-                // Yes, existing file! Just make sure the rate is in here. Good enough for now.
-                $mediaFile = Doctrine::getTable('MediaFile')->find($mediafile_id);
+      // TODO: Fix this. Download descriptions from the web?
+      if (file_exists(MODPATH . 'mediamanager-1.0' . DIRECTORY_SEPARATOR . 'audio_descriptions.ini')) {
+	$fp = fopen(MODPATH . 'mediamanager-1.0' . DIRECTORY_SEPARATOR . 'audio_descriptions.ini', 'r');
+	while ($row = fgetcsv($fp)) {
+	  $descriptions[$row[0]] = $row[1];
+	}
+      } else {
+	$descriptions = array();
+      }
 
-                // Note that this is a bit dangerous and could use improvement.
-                // We assume that all other properties in the file we just found match the file already uploaded.
-                // That means if someone uploads the wrong audio file, it kinda messes things up big time.
-                if (!in_array($audioFile->wave_framerate, (array)$mediaFile['registry']['rates'])) {
-                    Kohana::log('debug', 'Updating ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
-                    $mediaFile['registry'] = array_merge_recursive($mediaFile['registry'], array('rates' => $audioFile->wave_framerate));;
-                    $mediaFile->save();
-                } else {
-                    Kohana::log('debug', 'SKIPPED - Nothing to update on ' . $shortname . " with sample rate " . $audioFile->wave_framerate . "... ");
-                }
+      /*
+       * Now compare what we know with what we find on disk and add any new stuff
+       */
+      // Initialize iterator
+      $dir_iterator = new RecursiveDirectoryIterator($soundPath);
+      $iterator = new RecursiveIteratorIterator($dir_iterator, RecursiveIteratorIterator::SELF_FIRST);
 
-            } else {
-                // NEW FILE! Do lots of stuff
-                $mediaFile = new MediaFile();
-                $mediaFile['file'] = $shortname;
-                $mediaFile['path'] = dirname($mediaFile['file']);   // We track the path separately to ease searching
-                $mediaFile['account_id'] = 1;
+      // Read in a list of files already registered in the system
+      $fileTypeMatch = '/^.+\.(' . implode('|', $fileTypes) . ')$/i';
+      $regex = new RegexIterator($iterator, $fileTypeMatch, RecursiveRegexIterator::GET_MATCH);
 
-                // See if we know this filename, description & category from the XML info
-                if (isset($descriptions[$shortname])) {
-                    $mediaFile['description'] = $descriptions[$shortname];
-                } else {
-                    $mediaFile['description'] = 'Unknown';
-                }
+      kohana::log('debug', 'Starting foreach for MediaScanner');
+      $starttime = microtime(TRUE);
 
-                Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
+      foreach ($regex as $fileinfo) {
+	$filename = $fileinfo[0];
 
-                $audioInfo = array( 'type' => $audioFile->wave_type,
-                                    'compression' => $audioFile->wave_compression,
-                                    'channels' => $audioFile->wave_channels,
-                                    'rates' => $audioFile->wave_framerate,
-                                    'byterate' => $audioFile->wave_byterate,
-                                    'bits' => $audioFile->wave_bits,
-                                    'size' => $audioFile->wave_size,
-                                    'length' => $audioFile->wave_length);
+	$shortname = str_replace($soundPath, '', self::NormalizeFSNames($filename));
+	$framerate = basename(dirname($filename));
 
-                $mediaFile['registry'] += $audioInfo;
+	// Is an existing one?
+	if ( isset($knownFiles[$shortname]) ) {
+	  $mediafile_id = $knownFiles[$shortname]['mediafile_id'];
+	  $registry = (array)$knownFiles[$shortname]['registry'];
 
-                $mediaFile->save();
+	  if ( ! in_array($framerate, (array)$registry['rates']) ) {
+	    //$info = self::getAudioInfo($filename);
+            $registry['rates'][] = $framerate;
+	    //$registry = arr::merge((array)$registry, $info);
 
-                // Add to list of "known" files
-                $knownFiles[$mediaFile['mediafile_id']] = $mediaFile['file'];
-            }
-        }
+	    Doctrine_Query::create()
+	      ->update('MediaFile m')
+	      ->set('m.registry', '?', serialize($registry))
+	      ->where('m.mediafile_id = ?', $mediafile_id)
+	      ->execute();
 
-        Kohana::log('debug', 'Finished scanning sound files in ' . $soundPath);
-        flush();exit();
+              kohana::log('debug', 'Updating ' . $filename . ' with sample rate ' . $framerate . '...');
+
+	    // Add to list of "known" files
+	    $knownFiles[$shortname]['registry'] = $registry;
+	  }
+	} else {
+	  kohana::log('debug', $filename . ' is a new file');
+
+	  // NEW FILE! Do lots of stuff
+	  $mediaFile = new MediaFile();
+	  $mediaFile['file'] = $shortname;
+	  $mediaFile['path'] = dirname($mediaFile['file']);   // We track the path separately to ease searching
+	  $mediaFile['account_id'] = 1;
+
+	  // See if we know this filename, description & category from the XML info
+	  if (isset($descriptions[$shortname])) {
+	    $mediaFile['description'] = $descriptions[$shortname];
+	  } else {
+	    $mediaFile['description'] = 'Unknown';
+	  }
+
+          try
+          {
+              $mediaFile['registry'] += self::getAudioInfo($filename);
+              $mediaFile->save();
+              // Add to list of "known" files
+              $knownFiles[$mediaFile['file']] = array('mediafile_id' => $mediaFile['mediafile_id']
+                                                      ,'registry' => $mediaFile['registry']
+                                                      ,'path' => $soundPath . $mediaFile['file']
+                                                      );
+          }
+          catch (Exception $e)
+          {
+             kohana::log('debug', 'Unable to save audio info: ' .$e->getMessage());
+          }
+	}
+      }
+
+      $endtime = microtime(TRUE);
+      kohana::log('debug', 'scan foreach took ' . ($endtime - $starttime) . ' msec');
+      Kohana::log('debug', 'Finished scanning sound files in ' . $soundPath);
     }
 
-    public static function scanXml() {
+    /*public static function scanXml() {
         $xml = simplexml_load_file('/usr/local/src/freeswitch/docs/phrase/phrase_en.xml');
         $knownFiles = self::processXml($xml, '/usr/local/freeswitch/sounds/');
         // Need to write this out
@@ -120,5 +191,61 @@ class MediaScanner {
         }
 
         return $knownFiles;
+    }*/
+
+    public static function getAudioInfo($filename) {
+      $id3 = new getID3();
+      $info = $id3->analyze($filename);
+
+      if (!empty($info['error']))
+      {
+            throw new Exception(implode(' - ', $info['error']));
+      }
+
+      switch($info['audio']['dataformat']) {
+      case 'wav' :
+	return array('type' => $info['audio']['dataformat']
+		     ,'compression' => $info['audio']['compression_ratio']
+		     ,'channels' => $info['audio']['channels']
+		     ,'rates' => array($info['audio']['streams'][0]['sample_rate'])
+		     ,'byterate' => $info['audio']['bitrate']
+		     ,'bits' => $info['audio']['bits_per_sample']
+		     ,'size' => $info['filesize']
+		     ,'length' => $info['playtime_seconds']
+		     );
+      case 'mp1' :
+	return array('type' => $info['audio']['dataformat']
+		     ,'compression' => $info['audio']['compression_ratio']
+		     ,'channels' => $info['audio']['channels']
+		     ,'rates' => array($info['audio']['streams'][0]['sample_rate'])
+		     ,'byterate' => $info['audio']['bitrate']
+		     ,'bits' => $info['audio']['bits_per_sample']
+		     ,'size' => $info['filesize']
+		     ,'length' => $info['playtime_seconds']
+		     );
+      case 'mp3' :
+	return array('type' => $info['audio']['dataformat']
+		     ,'compression' => $info['audio']['compression_ratio']
+		     ,'channels' => $info['audio']['channels']
+		     ,'rates' => array($info['audio']['sample_rate'])
+		     ,'byterate' => $info['audio']['bitrate']
+		     ,'bits' => NULL
+		     ,'size' => $info['filesize']
+		     ,'length' => $info['playtime_seconds']
+		     );
+      case 'ogg' :
+	return array('type' => $info['audio']['dataformat']
+		     ,'compression' => $info['audio']['compression_ratio']
+		     ,'channels' => $info['audio']['channels']
+		     ,'rates' => array($info['audio']['sample_rate'])
+		     ,'byterate' => $info['audio']['bitrate']
+		     ,'bits' => NULL
+		     ,'size' => $info['filesize']
+		     ,'length' => $info['playtime_seconds']
+		     );
+      default:
+	kohana::log('error', 'Unhandled media type(' . $info['audio']['dataformat'] . ') for file ' . $filename);
+	return array();
+      }
     }
 }

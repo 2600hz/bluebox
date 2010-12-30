@@ -14,7 +14,7 @@ abstract class Bluebox_Controller extends Template_Controller
     /**
      * @var float The bluebox core version
      */
-    public static $version = '1.0';
+    public static $version = '1.0.4-dev';
 
     protected $authBypass = array();
 
@@ -71,7 +71,7 @@ abstract class Bluebox_Controller extends Template_Controller
 
             $this->session->set('ajax.base_method', strtolower(Router::$method));
         }
-
+        
         // Instantiate internationalization
         $this->i18n = i18n::instance();
 
@@ -158,7 +158,7 @@ abstract class Bluebox_Controller extends Template_Controller
                 break;
 
             default:
-                if (request::is_ajax())
+                if (request::is_ajax() OR !empty($_REQUEST['qtipAjaxForm']))
                 {
                     $this->viewParams['template'] = 'ajax';
                 } 
@@ -246,7 +246,7 @@ abstract class Bluebox_Controller extends Template_Controller
         plugins::construct();
 
         // Setup anything related to authorizing the user
-        Event::run('bluebox.ready', $this);
+       Event::run('bluebox.ready', $this);
     }
 
     /**
@@ -331,56 +331,24 @@ abstract class Bluebox_Controller extends Template_Controller
 
         // load the defaults into the options array
         $options += array (
-            'submitString' => 'save',
-            'cancelString' => 'cancel',
+            'confirmKey' => self::SUBMIT_CONFIRM,
+            'denyKey' => self::SUBMIT_DENY,
             'requestVar' => 'submit'
         );
 
-        //$options['cancelString'] = __($options['cancelString']);
-
-        $options['submitString'] = __($options['submitString']);
-
-        // if the requestVar is empty then we will only check for the
-        // existance of any post vars
-        if (!empty($options['requestVar']))
+        if (!empty($_REQUEST[$options['requestVar']][$options['denyKey']]))
         {
-            // if the requestVar is not in the post then this is not
-            // submitted
-            if (empty($_REQUEST[$options['requestVar']]))
-            {
-                return FALSE;
-            } 
-            else
-            {
-                $requestVar = $_REQUEST[$options['requestVar']];
-            }
-
-            // if the requestVar matches the cancel string then we where
-            // canceled
-            if (strcasecmp($requestVar, $options['cancelString']) == 0)
-            {
-                return self::SUBMIT_DENY;
-            }
-
-            // if the requestVar matches the cancel string then we where
-            // submitted
-            if (strcasecmp($requestVar, $options['submitString']) == 0)
-            {
-                return self::SUBMIT_CONFIRM;
-            }
-
-            // no match for the cancel or submit but the requestVar was
-            // present, leave it up to the controller
-            return FALSE;
+            return self::SUBMIT_DENY;
         }
-
-        // if we got here it is because we only want to know if there are any
-        // post vars at all
-        if (sizeof($this->input->post()) != 0)
+        else if (!empty($_REQUEST[$options['requestVar']][$options['confirmKey']]))
+        {
+            return self::SUBMIT_CONFIRM;
+        }
+        else if (sizeof($this->input->post()) != 0)
         {
             return TRUE;
         }
-        
+
         return FALSE;
     }
     
@@ -411,7 +379,7 @@ abstract class Bluebox_Controller extends Template_Controller
                 {
                     $this->template->title = __($this->template->title);
                 }
-
+                
                 if (!empty($this->view->title))
                 {
                     $this->view->title = __($this->view->title);
@@ -469,14 +437,14 @@ abstract class Bluebox_Controller extends Template_Controller
             $this->template->content = new View('generic/blank');
 
             header("X-AjaxForm-Status: complete");
-            
+
             if(method_exists($this, 'qtipAjaxReturn'))
             {
                 $this->qtipAjaxReturn($object);
             }
 
             message::render(array(), array('growl' => TRUE, 'html' => FALSE));
-            
+
             $this->_render();
 
             flush();
@@ -558,7 +526,9 @@ abstract class Bluebox_Controller extends Template_Controller
             // Success - optionally set a delete message
             if (is_null($deleteMessage))
             {
-                message::set(get_class($object) . ' removed!', array(
+                $displayName = inflector::humanizeModelName(get_class($object));
+
+                message::set($displayName . ' removed!', array(
                     'type' => 'success'
                 ));
             } 
@@ -643,7 +613,9 @@ abstract class Bluebox_Controller extends Template_Controller
             // Success - optionally set a save message
             if (is_null($saveMessage))
             {
-                message::set(get_class($object) . ' saved!', array(
+                $displayName = inflector::humanizeModelName(get_class($object));
+
+                message::set($displayName .' saved!', array(
                     'type' => 'success'
                 ));
             } 
@@ -744,7 +716,7 @@ abstract class Bluebox_Controller extends Template_Controller
             $baseModel = ucfirst($this->baseModel);
         }
 
-        $this->view->title = ucfirst(Router::$method) .' ' .$baseModel;
+        $this->view->title = ucfirst(Router::$method) .' ' .inflector::humanizeModelName($baseModel);
 
         Event::run('bluebox.create_view', $this->view);
     }
@@ -758,7 +730,7 @@ abstract class Bluebox_Controller extends Template_Controller
 
         // Short hand for the baseModel
         $base = strtolower($baseModel);
-        
+
         if (is_null($id))
         {
             $this->$base = new $baseModel();
@@ -779,7 +751,7 @@ abstract class Bluebox_Controller extends Template_Controller
             }
         }
 
-        $this->view->base = $base;
+        $this->view->set_global('base', $base);
 
         Event::run('bluebox.load_base_model', $this->$base);
     }
@@ -794,7 +766,7 @@ abstract class Bluebox_Controller extends Template_Controller
         $base = strtolower($baseModel);
 
         // Allow our location object to be seen by the view
-        $this->view->$base = $this->$base;
+        $this->view->set_global($base, $this->$base);
 
         Event::run('bluebox.prepare_update_view', $this->view);
 
@@ -810,7 +782,9 @@ abstract class Bluebox_Controller extends Template_Controller
         }
 
         $base = strtolower($baseModel);
-        
+
+        $this->view->set_global($base, $this->$base);
+
         // Set the vars that the generic delete will be expecting
         $this->view->baseModel = strtolower($baseModel);
 

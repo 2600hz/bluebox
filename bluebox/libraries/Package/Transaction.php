@@ -38,7 +38,9 @@ class Package_Transaction
 
         if (empty($transaction[$operation]))
         {
-            throw new Package_Transaction_Exception('Transcation contains no packages for that operation');
+            Package_Message::set('No packages queued for operation ' .$operation);
+            
+            throw new Package_Transaction_Exception('No packages queued for operation ' .$operation);
         }
 
         foreach($transaction[$operation] as $identifier)
@@ -51,7 +53,7 @@ class Package_Transaction
             }
         }
 
-        throw new Package_Transaction_Exception('Transcation does not containt package');
+        throw new Package_Transaction_Exception('Transcation does not contain requested package ' .$name);
     }
 
     public function install($identifier)
@@ -90,7 +92,7 @@ class Package_Transaction
         {
             if ($operation == Package_Manager::OPERATION_UNINSTALL)
             {
-                kohana::log('debug', 'Sorting package ' .$operation .' transaction list by dependencies');
+                Package_Message::log('debug', 'Sorting package ' .$operation .' transaction list by dependencies');
 
                 Package_Dependency_Graph::determineUninstallOrder();
 
@@ -98,14 +100,17 @@ class Package_Transaction
             }
             else
             {
-                kohana::log('debug', 'Sorting package ' .$operation .' transaction list by requirements');
+                Package_Message::log('debug', 'Sorting package ' .$operation .' transaction list by requirements');
 
                 Package_Dependency_Graph::determineInstallOrder();
 
                 usort($identifiers, array('Package_Dependency_Graph', 'sortInstall'));
             }
 
-            Package_Operation::dispatch($operation, $identifiers);
+            if (!Package_Operation::dispatch($operation, $identifiers))
+            {
+                throw new Package_Transaction_Exception('Unable to complete ' .$operation . ' of selected packages');
+            }
         }
     }
 }

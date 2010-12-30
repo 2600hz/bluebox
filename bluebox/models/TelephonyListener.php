@@ -48,6 +48,8 @@ class TelephonyListener extends Doctrine_EventListener
 
     public function postTransactionCommit(Doctrine_Event $event)
     {
+	Event::run('telephony.postTransactionCommit', Bluebox_Record::getBaseTransactionObject());
+
         // A transaction just ended - we write out any configuration information set by the telephony driver now.
         // THIS IS WHERE WE UPDATE VIA THE SWITCH-SPECIFIC DRIVER!
         if (Kohana::config('telephony.driver') && Kohana::config('telephony.diskoutput'))
@@ -55,6 +57,12 @@ class TelephonyListener extends Doctrine_EventListener
             if (!empty(self::$changedModels))
             {
                 Kohana::log('debug', 'Telephony -> Creating config from saved models in memory.');
+
+                foreach (self::$changedModels as $change)
+                {
+                    Kohana::log('debug', 'Telephony -> Preparing to generate configurartion from ' .$change['action'] .' of '
+                            .get_class($change['record']) .' ' .implode(', ', $change['identifier']) .' with OID ' .$change['record']->getOid() .' on base model ' .get_class($change['baseModel']));
+                }
 
                 // Figure out what models were touched and either set or delete based on the action that was done to them
                 // NOTE: Make sure this occurs in the same order it occurred via Doctrine's transaction

@@ -4,20 +4,31 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($conference)
     {
+        $xml = FreeSwitch::setSection('conferences');
+    
+        foreach (Conference::$default_keymap as $action => $digits)
+        {
+            $xml->update('/caller-controls/group[@name="default-keymap"]/control[@action="' .$action .'"]{@digits="' .$digits .'"}');
+        }
+
         $xml = FreeSwitch::setSection('conference_profile', $conference['conference_id']);
 
         $xml->deleteChildren();
 
         $profile = arr::merge(Conference::$default_profile, $conference['profile']);
+        $registry = $conference['registry'];
 
         foreach ($profile as $parameter => $value)
         {
             $value = str_replace('/', '\/', $value);
             
+            if (isset($registry[$parameter])) {
+                $value = $registry[$parameter];
+            }
+
             $xml->update('/param[@name="' .$parameter .'"]{@value="' .$value .'"}');
         }
 
-        $registry = $conference['registry'];
         if( ! empty($registry['moh_type'])) {
             $value = str_replace('/', '\/', $registry['moh_type']);
             
@@ -37,6 +48,7 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
             
             $xml->update('/param[@name="pin"]{@value="' .$pin .'"}');
         }
+
     }
 
     public static function delete($conference)
@@ -51,6 +63,8 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
         $xml = Telephony::getDriver()->xml;
 
         $destination = $number['Destination'];
+
+        $xml->update('/action[@application="export"][@data="hold_music=silence"]');
 
         $xml->update('/action[@application="answer"]');
 

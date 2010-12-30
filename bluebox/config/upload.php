@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') OR die('No direct access allowed.');
 
-$config['directory'] = DOCROOT.'upload';
+$config['directory'] = '/var/www/html/upload';
  
 $config['create_directories'] = TRUE;
  

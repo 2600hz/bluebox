@@ -9,14 +9,13 @@
 
     <div id="fileedit">
         <B>Current File: </B><span id="filename">None</span>
-        <textarea id="textarea_1" cols="92" rows="45"></textarea>
+        <textarea id="textarea_1" cols="86" rows="45"></textarea>
     </div>
 </div>
 
 <small>Thanks to <a href="http://www.cdolivet.com/index.php?page=editArea" target="_blank">the folks who developed EditArea</a> for this great javascript editor.</small>
 
 <?php javascript::codeBlock(); ?>
-$(document).ready(function() {
     FileManager = {
         curfile:'',
         load: function(filename) {
@@ -47,7 +46,7 @@ $(document).ready(function() {
                 alert ('Need to load a file first.');
             }
         }
-    }
+    };
 
     editAreaLoader.init({
             id : "textarea_1"		// textarea id
@@ -57,8 +56,4 @@ $(document).ready(function() {
             ,save_callback: "FileManager.save"
             ,toolbar: "save, |, search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
     });
-
-
-});
-
 <?php javascript::blockEnd(); ?>

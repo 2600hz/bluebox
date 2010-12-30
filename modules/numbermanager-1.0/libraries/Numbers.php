@@ -68,6 +68,11 @@ class Numbers
 
         foreach ($numbers as $key => $number)
         {
+            if (empty($number['number_id']))
+            {
+                continue;
+            }
+            
             if (empty($_POST['numbers']['assigned'][$number['number_id']]))
             {
                 Kohana::log('debug', 'Disassociate number ' .$number['number'] .' (' .$number['number_id'] .') from ' .str_replace('Number', '', $base['Number'][$key]['class_type']) .' ' .$base['Number'][$key]['foreign_id']);
@@ -80,7 +85,7 @@ class Numbers
             {
                 if (isset($_POST['number' .$number['number_id']]['registry']))
                 {
-                    Kohana::log('debug', 'Updating registry for number ' .$number['number'] .' (' .$number['number_id'] .')');
+                    //Kohana::log('debug', 'Updating registry for number ' .$number['number'] .' (' .$number['number_id'] .')');
 
                     $base['Number'][$key]['registry'] = arr::merge(
                             $number['registry'],
@@ -90,7 +95,7 @@ class Numbers
 
                 if (isset($_POST['number' .$number['number_id']]['dialplan']))
                 {
-                    Kohana::log('debug', 'Updating dialplan for number ' .$number['number'] .' (' .$number['number_id'] .')');
+                    //Kohana::log('debug', 'Updating dialplan for number ' .$number['number'] .' (' .$number['number_id'] .')');
 
                     $base['Number'][$key]['dialplan'] = arr::merge(
                             $number['dialplan'],
@@ -103,10 +108,13 @@ class Numbers
         }
     }
 
-    public static function associateNumbers()
+    public static function associateNumbers(&$base = NULL)
     {
-        $base = Event::$data;
-
+        if (!$base)
+        {
+            $base = Event::$data;
+        }
+        
         if (empty($_POST['numbers']['assigned']))
         {
             return TRUE;
@@ -144,7 +152,7 @@ class Numbers
 
             if (isset($_POST['number' .$number_id]['registry']))
             {
-                Kohana::log('debug', 'Updating registry for number ' .$newNumber['number'] .' (' .$number_id .')');
+                //Kohana::log('debug', 'Updating registry for number ' .$newNumber['number'] .' (' .$number_id .')');
 
                 $newNumber['registry'] = arr::merge(
                         $newNumber['registry'],
@@ -154,7 +162,7 @@ class Numbers
 
             if (isset($_POST['number' .$number_id]['dialplan']))
             {
-                Kohana::log('debug', 'Updating dialplan for number ' .$newNumber['number'] .' (' .$number_id .')');
+                //Kohana::log('debug', 'Updating dialplan for number ' .$newNumber['number'] .' (' .$number_id .')');
 
                 $newNumber['dialplan'] = arr::merge(
                         $newNumber['dialplan'],
@@ -243,5 +251,95 @@ class Numbers
        {
             throw new Exception('Please assign this number to at least one number pool');
        }
+    }
+
+    public static function createExtensionNumber()
+    {
+        extract(Event::$data);
+
+        Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
+
+        try
+        {
+            if (empty($location_id))
+            {
+                $locations = Doctrine_Query::create()
+                    ->from('Location')
+                    ->where('account_id = ?', array($account_id))
+                    ->execute();
+
+                if (empty($locations[0]['location_id']))
+                {
+                    kohana::log('error', 'Unable to initialize device number: could not determine location_id');
+
+                    return;
+                }
+
+                $location_id = $locations[0]['location_id'];
+            }
+
+            $number = new Number();
+
+            $number['user_id'] = $user_id;
+
+            $number['number'] = $extension;
+
+            $number['location_id'] = $location_id;
+
+            $number['registry'] = array(
+                'ignoreFWD' => '0',
+                'ringtype' => 'ringing',
+                'timeout' => 20
+            );
+
+            $dialplan = array(
+                'terminate' => array(
+                    'transfer' => 0,
+                    'voicemail' => 0,
+                    'action' => 'hangup'
+                )
+            );
+
+            if (!empty($device['plugins']['voicemail']['mwi_box']))
+            {
+                $dialplan['terminate']['voicemail'] =
+                    $device['plugins']['voicemail']['mwi_box'];
+
+                $dialplan['terminate']['action'] = 'voicemail';
+            }
+
+            $number['dialplan'] = $dialplan;
+
+            $number['class_type'] = 'DeviceNumber';
+
+            $number['foreign_id'] = $device['device_id'];
+
+            $number['NumberContext']->fromArray(array(
+                0 => array('context_id' => $context_id)
+            ));
+
+            $numberType = Doctrine::getTable('NumberType')->findOneByClass('DeviceNumber');
+
+            if (empty($numberType['number_type_id']))
+            {
+                return;
+            }
+
+            $number['NumberPool']->fromArray(array(
+                0 => array('number_type_id' => $numberType['number_type_id'])
+            ));
+
+            $number['account_id'] = $account_id;
+
+            $number->save();
+        }
+        catch (Exception $e)
+        {
+            kohana::log('error', 'Unable to initialize device number: ' .$e->getMessage());
+
+            throw $e;
+        }
+
+        Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
     }
 }

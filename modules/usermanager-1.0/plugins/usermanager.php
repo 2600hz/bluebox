@@ -12,6 +12,8 @@ class UserManager_Plugin extends Bluebox_Plugin
 
         $subview->section = 'users';
 
+        $subview->user = $this->input->post('user', array());
+
         // Add our view to the main application
         $this->views[] = $subview;
     }
@@ -74,16 +76,15 @@ class UserManager_Plugin extends Bluebox_Plugin
         // then we want to show locations only that relate to this account
         $base = $this->getBaseModelObject();
 
-        if ($base and !empty($base['location_id'])) {
-
+        if ($base and !empty($base['location_id']))
+        {
             // Set a where clause, if we're playing plug-in to someone else
             $grid->where('location_id = ', $base['location_id']);
-
-        } else if ($base and !empty($base['account_id'])) {
-
+        } 
+        else if ($base and !empty($base['account_id']))
+        {
             // Set a where clause, if we're playing plug-in to someone else
             $grid->where('account_id = ', $base['account_id']);
-
         }
 
         // Add the base model columns to the grid
@@ -133,7 +134,7 @@ class UserManager_Plugin extends Bluebox_Plugin
                 'attributes' => array('class' => 'qtipAjaxForm')
             )
         );
-        if (users::$user->user_type == User::TYPE_SYSTEM_ADMIN) {
+        if (users::getAttr('user_type') == User::TYPE_SYSTEM_ADMIN) {
             $grid->addAction('usermanager/login', 'Login', array(
                 'arguments' => 'user_id'
             ));
@@ -146,97 +147,6 @@ class UserManager_Plugin extends Bluebox_Plugin
 
         // Add our view to the main application
         $this->views[] = $subview;
-    }
-
-    public function validate()
-    {
-        $valid = TRUE;
-        
-        $user = $this->input->post('user', array());
-
-        $base = $this->getBaseModelObject();
-
-        $validation = Bluebox_Controller::$validation;
-
-        if (!isset($user['username']))
-        {
-            $base['username'] = $_POST['user']['email_address'];
-        }
-
-        if (!empty($user['create_password']))
-        {
-            $base['password'] = $_POST['user']['create_password'];
-        }
-
-        if (Router::$method == 'create')
-        {
-            if (empty($user['create_password']))
-            {
-                $validation->add_error('user[create_password]', 'Please provide a password');
-
-                $valid = FALSE;
-            }
-
-            if (empty($user['confirm_password']))
-            {
-                $validation->add_error('user[confirm_password]', 'Please confirm your password');
-
-                $valid = FALSE;
-            }
-
-            if ($user['confirm_password'] !== $user['create_password'])
-            {
-                $validation->add_error('user[confirm_password]', 'Password does not match');
-
-                $valid = FALSE;
-            }
-
-        } 
-        else if (!empty($user['create_password']))
-        {
-            if (empty($user['confirm_password']))
-            {
-                $validation->add_error('user[confirm_password]', 'Please confirm your password');
-
-                $valid = FALSE;
-            }
-
-            if ($user['confirm_password'] !== $user['create_password'])
-            {
-                $validation->add_error('user[confirm_password]', 'Password does not match');
-
-                $valid = FALSE;
-            }
-        }
-        
-        $this->view->password = isset($user['create_password']) ? $user['create_password'] : '';
-
-        $this->view->confirm_password = isset($user['confirm_password']) ? $user['confirm_password'] : '';
-
-        $enforce = Kohana::config('core.pwd_complexity');
-
-        if (empty($enforce) || empty($_POST['user']['create_password']))
-        {
-            return $valid;
-        }
-
-        // at least one digit
-        if (!preg_match('/[0-9]{1,}/', $_POST['user']['create_password']))
-        {
-            $validation->add_error('user[create_password]', 'Password must contain digits and letters');
-
-            $valid = FALSE;
-        }
-
-        // at least one character
-        if (!preg_match('/[A-Za-z]{1,}/', $_POST['user']['create_password']))
-        {
-            $validation->add_error('user[create_password]', 'Password must contain digits and letters');
-
-            $valid = FALSE;
-        }
-
-        return $valid;
     }
 
     public function fullName($cell, $first_name, $last_name)

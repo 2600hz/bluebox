@@ -173,10 +173,27 @@ class netlists
             $netlist->NetListItem[] = $item;
         }
 
+        Event::run('bluebox.save_prepare', $netlist);
+
         // mark the parent dirty so we re-generate the acl xml
         $netlist->markModified('name');
+
+        Event::run('bluebox.pre_save', $netlist);
+
+        $result = $netlist->save();
         
-        return $netlist->save();
+        Event::run('bluebox.post_save', $netlist);
+
+        if ($result)
+        {
+            Event::run('bluebox.save_succeeded', $netlist);
+        }
+        else
+        {
+            Event::run('bluebox.save_failed', $netlist);
+        }
+
+        return $result;
     }
 
     public static function removeTrunkFromAuto($trunk)

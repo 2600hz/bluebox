@@ -21,6 +21,16 @@ class ContextManager_Plugin extends Bluebox_Plugin
             )
         );
 
+        // If there is a base model that contains an account_id,
+        // then we want to show locations only that relate to this account
+        $base = $this->getBaseModelObject();
+
+        if ($base and !empty($base['account_id']))
+        {
+            // Set a where clause, if we're playing plug-in to someone else
+            $grid->where('account_id = ', $base['account_id']);
+        }
+
         // Add the base model columns to the grid
         $grid->add('context_id', 'ID', array(
                 'hidden' => true,
@@ -50,6 +60,20 @@ class ContextManager_Plugin extends Bluebox_Plugin
         $subview->grid = $grid->produce();
         $subview->gridMenu = html::anchor('/contextmanager/create' ,'<span>Add New Context</span>', array('class' => 'qtipAjaxForm'));
         
+        // Add our view to the main application
+        $this->views[] = $subview;
+    }
+
+    public function initialAccountContext()
+    {
+        $subview = new View('contextmanager/initialAccountContext');
+
+        $subview->tab = 'main';
+
+        $subview->section = 'context';
+
+        $subview->context = $this->input->post('context', array());
+
         // Add our view to the main application
         $this->views[] = $subview;
     }

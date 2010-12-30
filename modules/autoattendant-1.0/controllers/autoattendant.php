@@ -84,7 +84,7 @@ class AutoAttendant_Controller extends Bluebox_Controller
             $numbers = Doctrine_Query::create()
                 ->select('n.number_id, n.number, d.name')
                 ->from('Number n, n.' .str_replace('Number', '', $numberType['class']) .' d')
-                ->whereNotIn('n.foreign_id', array(0, 'NULL'))
+                ->where('(n.foreign_id <> ? AND n.foreign_id IS NOT NULL)', array(0))
                 ->andWhereIn('n.class_type', array($numberType['class']))
                 ->orderBy('number')
                 ->execute(array(), Doctrine::HYDRATE_SCALAR);
@@ -94,9 +94,13 @@ class AutoAttendant_Controller extends Bluebox_Controller
                 continue;
             }
 
+            $displayName = str_replace('Number', '', $numberType['class']);
+
+            $displayName = inflector::humanizeModelName($displayName);
+
             $numberingOptions['number_pools'][] = array(
                 'value' => $numberType['class'],
-                'text' => $numberType['class']
+                'text' => $displayName
             );
             
             foreach($numbers as $number)
@@ -138,7 +142,7 @@ class AutoAttendant_Controller extends Bluebox_Controller
     {
         if (empty($keys))
         {
-            return '';
+            return 'None';
         }
 
         $options = '';
@@ -159,10 +163,12 @@ class AutoAttendant_Controller extends Bluebox_Controller
         
         if (empty($options))
         {
-            return 0;
+            return 'None';
         } 
         else
         {
+            $options = str_replace('\'', '', $options);
+
             return "<a title='Auto Attendant Options' tooltip='" .$options ."' class='addInfo' href='#'>" .count($keys) .'</a>';
         }
     }
@@ -180,7 +186,19 @@ class AutoAttendant_Controller extends Bluebox_Controller
                 return "<a title='Text to Speech' tooltip='" .$registry['tts_string'] ."' class='addInfo' href='#'>Text to Speech</a>";
 
             case 'audio':
-                return ''; //$registry['file_id'];
+                if (!class_exists('MediaFile') OR empty($registry['mediafile_id']))
+                {
+                     return '<span style="color:red">MISSING AUDIO FILE</span>';
+                }
+
+                $mediaFile = Doctrine::getTable('MediaFile')->find($registry['mediafile_id']);
+
+                if (!$mediaFile)
+                {
+                    return '<span style="color:red">MISSING AUDIO FILE</span>';
+                }
+
+                return str_replace(array('en/us/callie/'), '', $mediaFile['file']);
 
             default:
                 return 'unknown';

@@ -27,6 +27,8 @@ class NumberManager_Controller extends Bluebox_Controller
         );
         $grid->add('number_route', 'Routes to', array(
                 'width' => '250',
+                'search' => false,
+                'sortable' => false,
                 'callback' => array(
                     'arguments' => 'number_id',
                     'function' => array($this, '_showRoute')
@@ -36,6 +38,8 @@ class NumberManager_Controller extends Bluebox_Controller
         $grid->add('pools', 'Pools', array(
                 'width' => '42',
                 'align' => 'center',
+                'search' => false,
+                'sortable' => false,
                 'callback' => array(
                     'arguments' => 'number_id',
                     'function' => array($this, '_showPools')
@@ -45,6 +49,8 @@ class NumberManager_Controller extends Bluebox_Controller
         $grid->add('context', 'Contexts', array(
                 'width' => '70',
                 'align' => 'center',
+                'search' => false,
+                'sortable' => false,
                 'callback' => array(
                     'arguments' => 'number_id',
                     'function' => array($this, '_showContexts')
@@ -63,7 +69,8 @@ class NumberManager_Controller extends Bluebox_Controller
             )
         );
         $grid->addAction('numbermanager/rebuild', 'Rebuild', array(
-                'arguments' => 'number_id'
+                'arguments' => 'number_id',
+                'attributes' => array('class' => 'qtipAjaxForm')
             )
         );
         $grid->addAction('numbermanager/delete', 'Delete', array(
@@ -90,6 +97,8 @@ class NumberManager_Controller extends Bluebox_Controller
             $this->number->save();
 
             message::set('Number ' .$this->number['number'] .' dialplan rebuild complete!', 'success');
+
+            parent::save_succeeded($this->number);
         }
         catch (Exception $e)
         {
@@ -175,5 +184,20 @@ class NumberManager_Controller extends Bluebox_Controller
     public function _showPools($NULL, $number_id)
     {
         return numbermanager::showPools($number_id);
+    }
+
+    protected function save_prepare(&$object)
+    {
+        if (!empty($_POST['number']['class_type']))
+        {
+            $registryVar = 'number_' .strtolower(str_replace('Number', '', $_POST['number']['class_type']));
+
+            if (!empty($_POST[$registryVar]['registry']))
+            {
+                $object['registry'] = $_POST[$registryVar]['registry'];
+            }
+        }
+
+        parent::save_prepare($object);
     }
 }

@@ -68,13 +68,13 @@
 
                 <div class="buttons form_bottom">
                 <?php
-                    if(!empty($allowPrev)) {
-                        echo form::button(array('name' => 'prev', 'class' => 'prev small_red_button'), 'Prev');
+                    if(!empty($allowNext)) {
+                        echo form::button(array('name' => 'next', 'class' => 'save small_green_button'), 'Continue');
                     }
                 ?>
                 <?php
-                    if(!empty($allowNext)) {
-                        echo form::submit(array('name' => 'next', 'class' => 'save small_green_button'), 'Next');
+                    if(!empty($allowPrev)) {
+                        echo form::button(array('name' => 'prev', 'class' => 'prev small_red_button'), 'Back');
                     }
                 ?>
                 </div>

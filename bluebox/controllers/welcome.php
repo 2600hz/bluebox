@@ -9,5 +9,7 @@ class Welcome_Controller extends Bluebox_Controller {
     public function index()
     {
         $this->view->product = Kohana::config('core.product_name');
+
+        plugins::views($this);
     }
 }
