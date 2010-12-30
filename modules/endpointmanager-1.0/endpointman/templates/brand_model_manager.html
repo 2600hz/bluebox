@@ -1,0 +1,166 @@
+{include="global_header"}
+<style type="text/css">
+<!--
+.brand {
+	border: thin dotted #000;
+}
+.product {
+	border: thin dotted #000;
+}
+.model {
+	border: thin dotted #000;
+}
+.button_Enable {
+	background-color: #3C0;
+}
+.button_Disable {
+	background-color: #F00;
+}
+-->
+</style>
+<h3 align='center'><font color='red'>{$error}</font></h3>
+<center>
+<form action='config.php{$web_var}&display=epm_config' method='POST'>
+	<input type="submit" name="button_check_for_updates" value="<?=_('Check for Updates')?>"> 
+</form>
+</center>
+
+<br><br>
+
+{if condition="1 == 0"}
+<script type="text/javascript" src="/admin/modules/endpointman/templates/javascript/jquery.jstree.js"></script>
+<script type="text/javascript" class="source">
+$(function () {
+	$("#demo1").jstree({
+                 "core" : { "initially_open" : [ {loop name="brand2_list"}"brand_{$value.id}",{loop name="value.products"}"products_{$value.id}",{/loop}{/loop} ] },
+
+		"plugins" : [ "themes", "html_data", "checkbox" ]
+	});
+         $("#frmTree").submit(function () { generateHiddenFieldsForTree("demo1"); });
+
+});
+</script>
+<script>
+function generateHiddenFieldsForTree(treeId) {
+    var checked_ids = [];
+
+    $("#demo1").jstree("get_checked").each(function () {
+        var checkedId = this.id;
+        $("<input>").attr("type", "hidden").attr("name", checkedId).val("on").appendTo("#" + treeId);
+        checked_ids.push(this.id);
+    });
+    $("#hidden").val(checked_ids.join(","));
+}
+
+</script>
+<form id="frmTree" action="#" method="POST">
+{if condition="!isset($update_check)"}
+    <div id="demo1" class="demo">
+        <ul>
+            {loop name="brand2_list"}
+            <li id="brand_{$value.id}">
+                <a href="#">{$value.name}</a>
+                <ul>
+                    {loop name="value.products"}
+                    <li id="products_{$value.id}">
+                        <a href="#">{$value.long_name}</a>
+                        <ul>
+                            {loop name="value.models"}
+                            <li id="models_{$value.id}" {if condition="$value.enabled == '1'"}class="jstree-checked"{/if}>
+                                <a href="#">{$value.model}</a>
+
+                            </li>
+                            {/loop}
+                        </ul>
+                    </li>
+                    {/loop}
+                </ul>
+            </li>
+            {/loop}
+        </ul>
+    </div>
+    <input type="hidden" name="hidden" id="hidden" value="English">
+    <input type="submit" name="install-jstree" value="Install/Uninstall">
+{else}
+    <div id="demo1" class="demo">
+            <ul>
+                {loop name="brand2_list"}
+                <li id="brand_{$value.id}">
+                    <a href="#">{$value.name} <i>(<?=_('Package Last Modified')?> [{$value.cfg_ver}])</i></a>
+                    <ul>
+                        {loop name="value.products"}
+                        <li id="products_{$value.id}">
+                            <a href="#">{$value.long_name}</a>
+                        </li>
+                        {/loop}
+                    </ul>
+                </li>
+                {/loop}
+            </ul>
+        </div>
+        <input type="hidden" name="hidden" id="hidden" value="English">
+        <input type="submit" name="install-jstree" value="Update Checked">
+{/if}
+
+</form>
+{/if}
+{if condition="isset($installer)"}
+<script>
+function process_module_actions(actions) {
+	freepbx_modal_show('moduleBox');
+	urlStr = "config.php?type=tool&amp;display=epm_config&amp;quietmode=1&amp;handler=file&amp;file=installer.html.php&amp;module=endpointman&amp;type={$installer.type}&amp;id={$installer.id}";
+	urlStr += "&amp;rand="+Math.random ( );
+	for (var i in actions) {
+		urlStr += "&amp;moduleaction["+i+"]="+actions[i];
+	}
+	$('#moduleBox').html('<iframe src="'+urlStr+'"></iframe>');
+}
+function close_module_actions(goback) {
+	//freepbx_modal_close('moduleBox');
+	freepbx_modal_hide('moduleBox');
+	if (goback) {
+  		location.href = 'config.php?display=epm_config&amp;type=tool';
+	}
+}
+process_module_actions();
+</script>
+
+<div id="moduleBox" style="display:none;"></div> 
+
+{/if}
+{if condition="1 == 1"}
+    {loop name="brand2_list"}
+        <table width="100%" class="brand" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td colspan="2">{$value.name} (<?=_('Package Last Modified')?> [{$value.cfg_ver}]) <form action='config.php{$web_var}&display=epm_config' method='POST'><input type="hidden" name="brand" value="{$value.id}"><input type="submit" name="button_{if condition="$value.installed == '1'"}uninstall{else}install{/if}" class="button_{if condition="$value.installed == '1'"}Disable{else}Enable{/if}" value="{if condition="$value.installed == '1'"}<?=_('Uninstall')?>{else}<?=_('Install')?>{/if}">{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}New Package Modified [{$value.update_vers}]<input type="submit" name="button_update" class="button_update" value="<?=_('Update')?>">{/if}{/if}</form></td>
+            </tr>
+            <tr>
+                <td width="3%">&nbsp;</td>
+                <td width="97%">{loop name="value.products"}
+                    <table width="100%" class="product" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td colspan="2">{$value.long_name} {if condition="$value.cfg_ver != ''"}{/if} <form action='config.php{$web_var}&display=epm_config' method='POST'><input type="hidden" name="product" value="{$value.id}">{if condition="array_key_exists('update',$value)"}{if condition="$value.update == 1"}<input type="submit" name="button_update" class="button_update" value="Update">{/if}{/if}{if condition="$value.fw_type == 'install'"}<input type="submit" name="button_install_firmware" class="button_update" value="<?=_('Install Firmware')?>">{elseif condition="$value.fw_type == 'remove'"}<input type="submit" name="button_remove_firmware" class="button_update" value="<?=_('Remove Firmware')?>">{/if}{if condition="array_key_exists('update_fw',$value)"}{if condition="$value.update_fw == 1"}<input type="submit" name="button_update_firmware" class="button_update" value="<?=_('Update Firmware')?>">{/if}{/if}</form></td>
+                        </tr>
+                        <tr>
+                            <td width="4%">&nbsp;</td>
+                            <td width="96%">{loop name="value.models"}
+                                <table width="100%" class="model" border="0" cellspacing="0" cellpadding="0">
+                                    <tr>
+                                        <td>{$value.model} <form action='config.php{$web_var}&display=epm_config' method='POST'><input type="hidden" name="model" value="{$value.id}"><input type="submit" name="button_{if condition="$value.enabled == '1'"}disable{else}enable{/if}" class="button_{if condition="$value.enabled == '1'"}Disable{else}Enable{/if}" value="{if condition="$value.enabled == '1'"}<?=_('Disable')?>{else}<?=_('Enable')?>{/if}"></form></td>
+                                    </tr>
+                                </table>{/loop}</td>
+                        </tr>
+                    </table>{/loop}</td>
+            </tr>
+        </table>
+        <br />
+        <br />
+    {/loop}
+{/if}
+
+{include="global_footer"}
+
+  
+
+
+  

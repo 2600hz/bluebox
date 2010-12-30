@@ -134,7 +134,7 @@ class UserManager_Plugin extends Bluebox_Plugin
                 'attributes' => array('class' => 'qtipAjaxForm')
             )
         );
-        if (users::$user->user_type == User::TYPE_SYSTEM_ADMIN) {
+        if (users::getAttr('user_type') == User::TYPE_SYSTEM_ADMIN) {
             $grid->addAction('usermanager/login', 'Login', array(
                 'arguments' => 'user_id'
             ));

@@ -25,7 +25,9 @@ class Sofia_Controller extends Bluebox_Controller {
     private function showRegistrations($registrations) {
 
        
- 
+        if(sizeof($registrations) == 0) {
+            return;
+        }
         //$idx = array('call-id', 'user', 'contact', 'agent', 'status', 'host', 'network-ip', 'network-port', 'sip-auth-user', 'sip-auth-realm', 'mwi-account');
         $idx = array('user', 'contact', 'sip-auth-user', 'host', 'network-ip', 'network-port', 'interface');
 

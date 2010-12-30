@@ -4,12 +4,13 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($base)
     {
-        if (empty($base['plugins']['simpleroute']))
+        if (empty($base['plugins']['simpleroute']['patterns']))
         {
             return;
         }
 
         $simpleroute = $base['plugins']['simpleroute'];
+        $sip = $base['plugins']['sip'];
 
         foreach ($simpleroute['patterns'] as $simple_route_id => $options)
         {
@@ -69,7 +70,26 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
                 $xml->update($caller_id .'/action[@application="set"][@data="effective_caller_id_number=${outbound_caller_id_number}"]');
 
+                // Put Caller ID into the right place
+                if (isset($sip['caller_id_field'])) {
+                    if (($sip['caller_id_field'] == 'rpid') or ($sip['caller_id_field'] == 'pid')) {
+                        $xml->update($caller_id . '/action[@application="export"][@bluebox="caller_id_field"]{@data="sip_cid_type=' . $sip['caller_id_field'] . '"}');
+                    } else {
+                        // Assume Caller ID is default or elsewhere
+                        $xml->deleteNode($caller_id . '/action[@application="export"][@bluebox="caller_id_field"]');
+                    }
+                }
+
                 $dummy = '/condition[@field="destination_number"][@expression="' . $pattern . '"][@bluebox="pattern_' .$simple_route_id .'_out"]';
+
+                if (!empty($simpleroute['continue_on_fail']))
+                {
+                    $xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="failure_causes=NORMAL_CLEARING,ORIGINATOR_CANCEL,CRASH"}');
+                }
+                else
+                {
+                    $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
+                }
 
                 $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
             }

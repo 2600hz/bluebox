@@ -32,65 +32,53 @@ class InterfaceManager_Configure extends Bluebox_Configure
     
     public function postInstall()
     {
-        try
+        $this->addInterface('Authenticated SIP', '', '5060');
+
+        $this->addInterface('Authenticated SIP - NAT', '', '5070', TRUE, FALSE, TRUE);
+
+        $this->addInterface('Unauthenticated SIP', '', '5080', FALSE, FALSE);
+    }
+
+    public static function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $nat = FALSE, $context = 'Publicly Accessible')
+    {
+        Kohana::log('debug', 'Adding SIP interface for IP ' . $ip . ' on port ' . $port);
+
+        $sipInterface = new SipInterface();
+
+        $sipInterface['name'] = $name;
+
+        $sipInterface['ip_address'] = $ip;
+
+        $sipInterface['port'] = $port;
+
+        $sipInterface['auth'] = $auth;
+
+        $sipInterface['nat_type'] = 1;
+
+        $sipInterface['Context'] = Doctrine::getTable('Context')->findOneByName($context);
+
+        $sipInterface['nat_net_list_id'] = netlists::getSystemListId('nat.auto');
+
+        $sipInterface['inbound_net_list_id'] = ($use_inbound_acl ? netlists::getSystemListId('trunks.auto') : 0);
+
+        $sipInterface['register_net_list_id'] = 0;
+
+        $registry = array(
+            'options_ping' => $auth,
+            'force_rport' => $nat
+        );
+
+        $location = Doctrine::getTable('Location')->findOneByName('Main Location');
+
+        if (!empty($location['location_id']))
         {
-            $cmd = "/sbin/ifconfig";
-
-            $output = array();
-
-            exec($cmd, $output);
-
-            $interface = '';
-
-            foreach($output as $line)
-            {
-                if (preg_match('/^[^\s]+/', $line, $matches))
-                {
-                    $interface = $matches[0];
-
-                    continue;
-                }
-
-                if (preg_match('/inet addr:([^\s]+)/', $line, $matches))
-                {
-                    if(!filter_var($matches[1], FILTER_VALIDATE_IP))
-                    {
-                        continue;
-                    }
-
-                    if ($matches[1] != '127.0.0.1')
-                    {
-                        kohana::log('debug', 'Initializing a sip interfaces for ' .$interface .' with ip ' .$matches[1]);
-
-                        // By default, we assume a new install is going to want port 5060 on the local machine to be where all traffic comes into
-                        $sipInterface = new SipInterface();
-
-                        $sipInterface['name'] = 'Network Interface ' .$interface;
-
-                        $sipInterface['ip_address'] = $matches[1];
-
-                        $sipInterface['port'] = 5060;
-
-                        $sipInterface['auth'] = TRUE;
-
-                        $sipInterface['nat_type'] = 1;
-
-                        $sipInterface['Context'] = Doctrine::getTable('Context')->findOneByName('In-house Only');
-
-                        $sipInterface['nat_net_list_id'] = netlists::getSystemListId('nat.auto');
-
-                        $sipInterface['inbound_net_list_id'] = netlists::getSystemListId('trunks.auto');
-
-                        $sipInterface['register_net_list_id'] = 0;
-
-                        $sipInterface->save();
-                    }
-                }
-            }
+            $registry['force_register_domain'] = $location['location_id'];
         }
-        catch (Exception $e)
-        {
-            kohana::log('error', 'Unable to list networks for sip interfaces postInstall: ' .$e->getMessage());
-        }
+
+        $sipInterface['registry'] = $registry;
+
+        $sipInterface->save();
+
+        return TRUE;
     }
 }

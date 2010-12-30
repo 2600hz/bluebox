@@ -7,40 +7,29 @@
 class locations
 {    
     public static function dropdown($data, $selected = NULL, $extra = '')
-    {
+    {      
         // standardize the $data as an array, strings default to the class_type
-        if ( !is_array($data))
+        if ( !is_array($data) )
         {
             $data = array('name' => $data);
         }
 
         // add in all the defaults if they are not provided
-        $data += array(
-            'nullOption' => FALSE
+        $defaults = array(
+            'nullOption' => FALSE,
+            'multitenancy' => TRUE
         );
 
-        // append or insert the class
-        $data = arr::update($data, 'class', ' locations_dropdown');
-
-        // render a null option if its been set in data
-        if (!empty($data['nullOption']))
-        {
-            $options = array(0 => $data['nullOption']);
-        } 
-        else
-        {
-            $options = array();
-        }
+        $data = arr::merge($defaults, $data);
         
-        unset($data['nullOption']);
+        $options = Location::dictionary($data['multitenancy']);
 
-        // list all the locations from the location table
-        $locations = Doctrine::getTable('Location')->findAll(Doctrine::HYDRATE_ARRAY);
-
-        foreach ($locations as $location)
+        if ($data['nullOption'])
         {
-            $options[$location['location_id']] = $location['name'];// . ' (' . $location['domain'] .')';
+            array_unshift($options, $data['nullOption']);
         }
+
+        $data = array_diff($data, $defaults);
 
         // use kohana helper to generate the markup
         return form::dropdown($data, $options, $selected, $extra);

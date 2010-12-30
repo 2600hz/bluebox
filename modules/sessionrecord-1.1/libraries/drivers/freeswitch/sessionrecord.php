@@ -11,12 +11,12 @@ class FreeSwitch_SessionRecord_Driver extends FreeSwitch_Base_Driver
     {
     }
 
-    public static function conditioning()
+    public static function postroute()
     {
 
         $xml = FreeSWITCH::createExtension('sessionrecord');
 
-        $condition = '/condition[@field="destination_number"][@expression="^.+$"]';
+        $condition = '/condition';
 
         $xml->update($condition . '/action[@application="set"][@data="media_bug_answer_req=true"]');
 

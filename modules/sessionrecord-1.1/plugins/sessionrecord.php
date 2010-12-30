@@ -32,6 +32,9 @@ class SessionRecord_Plugin extends Bluebox_Plugin
         if ($base instanceof Xmlcdr) {
             if(file_exists(SessionRecord::getFile($base->uuid))) {
                 $details .= $this->playLink($base->uuid);
+            } elseif(file_exists(SessionRecord::getFile($base->bleg_uuid))) {
+                //Just in case the bleg_uuid (ie the bridge_uuid) was used...
+                $details .= $this->playLink($base->bleg_uuid);
             } else {
                 $details .= 'No file found';
             }

@@ -153,6 +153,33 @@ class PackageManager_Controller extends Bluebox_Controller
     public function repair_all()
     {
         $this->template->content = new View('generic/blank');
+
+        $catalog = Package_Manager::getDisplayList();
+
+        if (empty($catalog['Installed']))
+        {
+            return;
+        }
+
+        try
+        {
+            $transaction = Package_Transaction::beginTransaction();
+
+            foreach($catalog['Installed'] as $package)
+            {
+                $transaction->repair($package['identifier']);
+            }
+
+            $transaction->commit();
+
+            message::set('Repair all operation completed', 'success');
+        }
+        catch(Exception $e)
+        {
+            message::set($e->getMessage());
+        }
+
+        url::redirect(Router::$controller);
     }
 
     public function createRepo()

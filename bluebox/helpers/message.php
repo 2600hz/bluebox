@@ -110,7 +110,6 @@ class message
         self::set($text, $options);
     }
 
-
     /**
      * Renders set session flash messages
      *

@@ -22,6 +22,10 @@ class SimpleRoute extends Bluebox_Record
      */
     public function setUp()
     {
+        $this->hasOne('Account', array('local' => 'account_id', 'foreign' => 'account_id'));
+        
+        Doctrine::getTable('Account')->bind(array('SimpleRoute', array('local' => 'account_id', 'foreign' => 'account_id', 'cascade' => array('delete'))), Doctrine_Relation::MANY);
+
         $this->actAs('GenericStructure');
         $this->actAs('MultiTenant');
     }

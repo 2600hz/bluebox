@@ -3,15 +3,24 @@
 require('getid3/getid3.php');
 
 class MediaScanner {
-    public static function NormalizeFSNames($filename) {
-        // NOTE: This is a FreeSWITCH-specific feature
-        // Trim the 8000/16000/32000/48000 from directory names
-        $filename = preg_replace('/\/8000\/|\/16000\/|\/32000\/|\/48000\//', '/', $filename);
-        return $filename;
-    }
+  public static $default_rates = array(8000, 16000, 32000, 48000);
+
+  public static function NormalizeFSNames($filename) {
+    // NOTE: This is a FreeSWITCH-specific feature
+    // Trim the 8000/16000/32000/48000 from directory names
+    $replace = '/\/' . implode('\/|\/', self::$default_rates) . '\//';
+    $filename = preg_replace($replace, '/', $filename);
+    return $filename;
+  }
 
     public static function filterKnownFiles($file) {
-      $exists = FALSE;
+      $exists = file_exists($file['path']);
+
+      if ( empty($file['registry']) || empty($file['registry']['rates']) ) {
+	$file['registry']['rates'] = self::$default_rates;
+      } else {
+	$file['registry']['rates'] = array_merge($file['registry']['rates'], self::$default_rates);
+      }
 
       foreach ( $file['registry']['rates'] as $rate ) {
 	if ( ! $exists ) {
@@ -48,7 +57,9 @@ class MediaScanner {
 	->select('m.mediafile_id, m.file, m.registry')
 	->from('MediaFile m')
 	->execute(NULL, Doctrine::HYDRATE_ARRAY);
+
       $listedFiles = array();
+
       foreach ($results as $result) {
 	$listedFiles[$result['file']] = array('mediafile_id' => $result['mediafile_id']
 					      ,'registry' => $result['registry']
@@ -56,7 +67,20 @@ class MediaScanner {
 					      );
       }
 
-      $knownFiles = array_filter($listedFiles, "self::filterKnownFiles");
+      kohana::log('debug', 'Found ' . count($listedFiles) . ' listed files');
+
+      if ( version_compare(PHP_VERSION, '5.2.3', '<') ) {
+	$knownFiles = array();
+	foreach ( $listedFiles as $idx => $file ) {
+	  if ( self::filterKnownFiles($file) ) {
+	    $knownFiles[$idx] = $file;
+	  }
+	}
+	kohana::log('debug', 'foreach: Of ' . count($listedFiles) . ' listed, kept ' . count($knownFiles));
+      } else {
+	$knownFiles = array_filter($listedFiles, "MediaScanner::filterKnownFiles");
+	kohana::log('debug', 'filter: Of ' . count($listedFiles) . ' listed, kept ' . count($knownFiles));
+      }
 
       // TODO: Fix this. Download descriptions from the web?
       if (file_exists(MODPATH . 'mediamanager-1.0' . DIRECTORY_SEPARATOR . 'audio_descriptions.ini')) {
@@ -88,24 +112,26 @@ class MediaScanner {
 	$shortname = str_replace($soundPath, '', self::NormalizeFSNames($filename));
 	$framerate = basename(dirname($filename));
 
-	// Is this a new file or an existing one?
+	// Is an existing one?
 	if ( isset($knownFiles[$shortname]) ) {
 	  $mediafile_id = $knownFiles[$shortname]['mediafile_id'];
-	  $registry = $knownFiles[$shortname]['registry'];
+	  $registry = (array)$knownFiles[$shortname]['registry'];
 
-	  if ( ! in_array($framerate, $registry['rates']) ) {
-	    $registry = array_merge($registry, self::getAudioInfo($filename));
-
-	    Kohana::log('debug', 'Updating ' . $shortname . ' with sample rate ' . $framerate . '... ');
+	  if ( ! in_array($framerate, (array)$registry['rates']) ) {
+	    //$info = self::getAudioInfo($filename);
+            $registry['rates'][] = $framerate;
+	    //$registry = arr::merge((array)$registry, $info);
 
 	    Doctrine_Query::create()
-	      ->update('MediaFile')
-	      ->set('registry', '?', serialize($registry))
-	      ->where('mediafile_id = ?')
-	      ->execute($mediafile_id);
-	    unset($audioFile);
-	  } else {
-	    //Kohana::log('debug', 'SKIPPED - Nothing to update on ' . $shortname);
+	      ->update('MediaFile m')
+	      ->set('m.registry', '?', serialize($registry))
+	      ->where('m.mediafile_id = ?', $mediafile_id)
+	      ->execute();
+
+              kohana::log('debug', 'Updating ' . $filename . ' with sample rate ' . $framerate . '...');
+
+	    // Add to list of "known" files
+	    $knownFiles[$shortname]['registry'] = $registry;
 	  }
 	} else {
 	  kohana::log('debug', $filename . ' is a new file');
@@ -123,14 +149,20 @@ class MediaScanner {
 	    $mediaFile['description'] = 'Unknown';
 	  }
 
-	  Kohana::log('debug', 'Adding ' . $mediaFile['file'] . " to the database.");
-
-	  $mediaFile['registry'] += self::getAudioInfo($filename);
-
-	  $mediaFile->save();
-
-	  // Add to list of "known" files
-	  $knownFiles[$mediaFile['file']] = $mediaFile['mediafile_id'];
+          try
+          {
+              $mediaFile['registry'] += self::getAudioInfo($filename);
+              $mediaFile->save();
+              // Add to list of "known" files
+              $knownFiles[$mediaFile['file']] = array('mediafile_id' => $mediaFile['mediafile_id']
+                                                      ,'registry' => $mediaFile['registry']
+                                                      ,'path' => $soundPath . $mediaFile['file']
+                                                      );
+          }
+          catch (Exception $e)
+          {
+             kohana::log('debug', 'Unable to save audio info: ' .$e->getMessage());
+          }
 	}
       }
 
@@ -165,12 +197,27 @@ class MediaScanner {
       $id3 = new getID3();
       $info = $id3->analyze($filename);
 
+      if (!empty($info['error']))
+      {
+            throw new Exception(implode(' - ', $info['error']));
+      }
+
       switch($info['audio']['dataformat']) {
       case 'wav' :
 	return array('type' => $info['audio']['dataformat']
 		     ,'compression' => $info['audio']['compression_ratio']
 		     ,'channels' => $info['audio']['channels']
-		     ,'rates' => array($info['audio']['sample_rate'])
+		     ,'rates' => array($info['audio']['streams'][0]['sample_rate'])
+		     ,'byterate' => $info['audio']['bitrate']
+		     ,'bits' => $info['audio']['bits_per_sample']
+		     ,'size' => $info['filesize']
+		     ,'length' => $info['playtime_seconds']
+		     );
+      case 'mp1' :
+	return array('type' => $info['audio']['dataformat']
+		     ,'compression' => $info['audio']['compression_ratio']
+		     ,'channels' => $info['audio']['channels']
+		     ,'rates' => array($info['audio']['streams'][0]['sample_rate'])
 		     ,'byterate' => $info['audio']['bitrate']
 		     ,'bits' => $info['audio']['bits_per_sample']
 		     ,'size' => $info['filesize']

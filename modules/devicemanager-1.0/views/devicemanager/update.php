@@ -52,7 +52,7 @@
 
     <?php echo form::close_section(); ?>
 
-    <?php echo form::open_section('Outbound Call Routing'); ?>
+    <?php echo form::open_section('Call Routing'); ?>
 
         <div class="field">
             <?php
@@ -76,13 +76,5 @@
         }
     ?>
 
-    <div class="buttons form_bottom">
-        
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 </div>
