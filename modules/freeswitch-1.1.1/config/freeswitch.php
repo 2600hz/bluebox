@@ -21,6 +21,7 @@ $config['default_packages'] = array(
     'voicemail',
     'featurecode',
     'quickadd',
+    'regenerate',
     
     // Plugins
     'address',

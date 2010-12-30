@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class NetListRelation extends Bluebox_Relation
+class NetListItemRelation extends Bluebox_Relation
 {
-    protected $baseModelName = 'NetList';
+    protected $baseModelName = 'NetListItem';
 
     protected $relationType = Doctrine_Relation::ONE;
 
