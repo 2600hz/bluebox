@@ -107,7 +107,7 @@ class Package_Catalog
             }
         }
 
-        uksort($avaliableVersions, array('Package_Dependency', 'compareVersion'));
+        uasort($avaliableVersions, array('Package_Dependency', 'compareVersion'));
 
         return array_reverse($avaliableVersions);
     }

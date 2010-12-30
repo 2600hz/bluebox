@@ -1,5 +1,4 @@
-<?php
-defined('SYSPATH') or die('No direct access allowed.');
+<?php defined('SYSPATH') or die('No direct access allowed.');
 /*
 * Bluebox Modular Telephony Software Library / Application
 *
@@ -35,13 +34,16 @@ class GlobalMedia_Controller extends Bluebox_Controller
     public function __construct()
     {
         parent::__construct();
+
         $this->uploadPath = Kohana::config('upload.directory') . "/" . $this->session->get('user_id') . "/";
     }
 
     public function index()
     {
         $this->template->content = new View('globalmedia/index');
+
         javascript::add('php_file_tree_jquery.js');
+
         stylesheet::add('php_file_tree.css');
 
         // Collect a list of paths in the system, to be displayed as a list
@@ -117,16 +119,12 @@ class GlobalMedia_Controller extends Bluebox_Controller
 	    $this->exitQtipAjaxForm();
 	    url::redirect(Router_Core::$controller);
 	  } else {
-	    if ( empty($mf['registy']) || empty($mf['registry']['rate']) ) {
-	      $mf['registry']['rate'] = array();
-	      @unlink($mf['file']);
-	    } else {
+	    kohana::log('debug', 'Found db entry to delete: ' . print_r($mf, TRUE));
 
-                foreach ( $mf['registry']['rates'] as $rate ) {
-                  $f = Media::getMediaFilename($mf['path'] . $mf['file'], $rate, TRUE);
-                  @unlink($f);
-                }
-            }
+	    while ( ($fullPath = $this->locateFile($mf)) !== FALSE ) {
+	      $result = @unlink($fullPath);
+	      kohana::log('debug', 'Deleting ' . $fullPath . ' with result ' . ($result ? 'TRUE' : 'FALSE') );
+	    }
 
 	    Doctrine_Query::create()
 	      ->delete('MediaFile')
@@ -183,8 +181,11 @@ class GlobalMedia_Controller extends Bluebox_Controller
         $file = $this->locateFile($media);
 
         if (!$file) {
+	  kohana::log('debug', 'Failing to visualize ' . $mediaId);
             die();
         }
+
+	kohana::log('debug', 'Visualizing ' . $file);
 
         // Initialize audio analysis routine
         $audioFile = new AudioFile();
@@ -216,6 +217,8 @@ class GlobalMedia_Controller extends Bluebox_Controller
       } else {
 	$mime = 'audio/x-wav';
       }
+
+      kohana::log('debug', ($stream ? 'streaming' : 'downloading') . ' (' . $mime . ') ' . $name);
 
       header(sprintf('Content-type: %s', $mime));
       if (!$stream) {
@@ -288,7 +291,16 @@ class GlobalMedia_Controller extends Bluebox_Controller
     }
 
     private function upload($tmpfile, $shortname, $description = '', $replace = false) {
-        $audioInfo = MediaScanner::getAudioInfo($tmpfile);
+
+        try
+        {
+            $audioInfo = MediaScanner::getAudioInfo($tmpfile);
+        }
+        catch (Exception $e)
+        {
+            message::set('File error: ' .$e->getMessage());
+            return FALSE;
+        }
 
         $destfile = Media::getMediaFilename($shortname, $audioInfo['rates'][0], FALSE);  // Get whatever the proper name should be
         $dir = dirname($destfile);
@@ -335,7 +347,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 	    Kohana::log('debug', 'SKIPPED DB UPDATE - Nothing to update on ' . $shortname . " with sample rate " . $audioInfo['byterate'] . "... ");
 	  }
 	}
-	message::set('Successfully updated audio file in the system.');
+	message::set('Successfully updated audio file in the system.', 'success');
 
 	url::redirect(Router_Core::$controller . '/index');
       } else {
@@ -362,7 +374,7 @@ class GlobalMedia_Controller extends Bluebox_Controller
 
 	$mediaFile->save();
 
-	message::set('Successfully added audio file to the system.');
+	message::set('Successfully added audio file to the system.', 'success');
 
 	url::redirect(Router_Core::$controller . '/index');
       }

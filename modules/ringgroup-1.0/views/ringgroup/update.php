@@ -1,7 +1,7 @@
 <style>
     #ring_group_members { list-style-type: none; margin: 0; padding: 0; width:100%; float:left; margin:10px 0; max-height:225px; }
     #ring_group_members .ringgroup_member { margin: 0 3px 3px 3px; padding: 0.4em 1.5em; background: #FFFFFF; border:1px solid #CCCCCC; }
-    #ring_group_members .ringgroup_member .sort_handle { position: absolute; margin-left: -1.3em; }
+    #ring_group_members .ringgroup_member .sort_handle { float: left; margin-left: -1.3em; }
 
 
     #ring_group_members .ringgroup_member ul { width: 100%; }
@@ -66,15 +66,7 @@
         }
     ?>
 
-    <div class="buttons form_bottom">
-
-        <?php echo form::button(array('name' => 'submit', 'class' => 'cancel small_red_button'), 'Cancel'); ?>
-
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Save'); ?>
-
-    </div>
-
-    <?php echo form::close(); ?>
+    <?php echo form::close(TRUE); ?>
 
 </div>
 

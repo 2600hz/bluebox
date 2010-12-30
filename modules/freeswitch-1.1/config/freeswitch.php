@@ -11,7 +11,6 @@ $config['default_packages'] = array(
     // Modules
     'contextmanager',
     'locationmanager',
-    'mediamanager',
     'numbermanager',
     'trunkmanager',
     'autoattendant',
@@ -20,7 +19,9 @@ $config['default_packages'] = array(
     'ringgroup',
     'timeofday',
     'voicemail',
-
+    'featurecode',
+    'quickadd',
+    
     // Plugins
     'address',
     'callerid',
@@ -30,7 +31,8 @@ $config['default_packages'] = array(
     
     // Freeswitch
     'esl',
-    'mediaoption',
+    'mediafile',
+    'tts',
     'multitenant',
     'netlistmanager',
     'odbc',
@@ -47,7 +49,7 @@ $config['ESLAuth'] = 'ClueCon';
 
 $config['cfg_root'] = '/usr/local/freeswitch/conf';
 
-$config['audio_root'] = '/usr/local/freeswitch//sounds';
+$config['audio_root'] = '/usr/local/freeswitch/sounds';
 
 $config['filemap'][0] = array (
     // Where do the files go for this feature? Note, if you end with a / and set the id key
@@ -95,6 +97,11 @@ $config['filemap'][7] = array (
 $config['filemap'][8] = array (
     'filename' => $config['cfg_root'] .'/autoload_configs/xml_cdr.conf.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="xml_cdr.conf"][@description="XML CDR CURL logger"]'
+);
+
+$config['filemap'][9] = array (
+    'filename' => $config['cfg_root'] .'/jingle_profiles/bluebox_clients.xml',
+    'query' => '//document/section[@name="configuration"]/configuration[@name="dingaling.conf"]/profile'
 );
 
 // Base file - note that because the query string is //document, this section will contain

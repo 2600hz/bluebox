@@ -12,6 +12,8 @@
 
     <?php foreach ($catalog as $section => $packages) : ?>
 
+        <?php if(sizeof($packages) == 0) continue; ?>
+
         <?php echo form::open_section($section); ?>
 
             <?php foreach ($packages as $packageName => $package) : ?>
@@ -34,7 +36,7 @@
 
         <span style="padding:5px">&nbsp;</span>
 
-        <?php echo form::submit(array('name' => 'submit', 'class' => 'save small_green_button'), 'Update'); ?>
+        <?php echo form::confirm_button('Update'); ?>
 
     </div>
 

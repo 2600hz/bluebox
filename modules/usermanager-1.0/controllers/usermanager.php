@@ -58,7 +58,7 @@ class UserManager_Controller extends Bluebox_Controller
                 'arguments' => 'user_id'
             )
         );
-        if (users::$user['user_type'] == User::TYPE_SYSTEM_ADMIN) {
+        if (users::getAttr('user_type') == User::TYPE_SYSTEM_ADMIN) {
             $grid->addAction('usermanager/login', 'Login', array(
                 'arguments' => 'user_id'
             ));
@@ -74,30 +74,9 @@ class UserManager_Controller extends Bluebox_Controller
 
     public function login($userId)
     {
-        if (!empty(users::$user['user_type']) AND (users::$user['user_type'] == User::TYPE_SYSTEM_ADMIN))
+        if (users::getAttr('user_type') == User::TYPE_SYSTEM_ADMIN)
         {
-            Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
-
-            $user = Doctrine::getTable('User')->findOneByUserId($userId, Doctrine::HYDRATE_ARRAY);
-
-            if (!$user)
-            {
-                url::redirect('/');
-            }
-            
-            $session = Session::instance();
-            
-            if (!$session->get('user.sysadmin.user_type', FALSE))
-            {
-                $session->set('user.sysadmin.user_type', users::$user->user_type);
-            }
-
-            if (!$session->get('user.sysadmin.user_id', FALSE))
-            {
-                $session->set('user.sysadmin.user_id', users::$user->user_id);
-            }
-
-            Auth::instance()->force_login($user['email_address']);
+            users::masqueradeUser($userId);
 
             url::redirect('/');
         } 
@@ -107,6 +86,13 @@ class UserManager_Controller extends Bluebox_Controller
 
             die();
         }
+    }
+
+    public function restore()
+    {
+        users::restoreUser();
+
+        url::redirect('/');
     }
 
     public function userType($cell, $userType)
