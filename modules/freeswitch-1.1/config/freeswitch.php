@@ -21,14 +21,15 @@ $config['default_packages'] = array(
     'voicemail',
     'featurecode',
     'quickadd',
-    
+    'regenerate',
+
     // Plugins
     'address',
     'callerid',
     'simpleroute',
     'sip',
     'timezone',
-    
+
     // Freeswitch
     'esl',
     'mediafile',
