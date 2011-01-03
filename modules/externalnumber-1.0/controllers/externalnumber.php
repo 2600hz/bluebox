@@ -177,16 +177,14 @@ class ExternalNumber_Controller extends Bluebox_Controller
 
         $numberTypes = Doctrine::getTable('NumberType')->findAll();
 
-        $assignedPools = array();
-        
         foreach ($object['NumberPool'] as $numberPool)
         {
-            $assignedPools[] = $numberPool['number_type_id'];
+            $numberTypes = arr::filter_collection($numberTypes, 'number_type_id', $numberPool['number_type_id']);
         }
 
-        foreach ($numberTypes as $numberType)
+        if ($numberTypes)
         {
-            if (!in_array( $numberType['number_type_id'], $assignedPools))
+            foreach ($numberTypes as $numberType)
             {
                 $object['NumberPool'][]['number_type_id'] = $numberType['number_type_id'];
             }
