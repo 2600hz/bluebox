@@ -170,10 +170,16 @@ class MediaFile extends Bluebox_Record
                 return 'Invalid file extension (type)';
 
             case UPLOAD_ERR_OK:
-
                 if (!$this->get('file'))
                 {
-                    $this->set('file', $uploadedFile['name']);
+                    $uploadFilename = $uploadedFile['name'];
+
+                    if (Kohana::config('upload.remove_spaces') === TRUE)
+                    {
+                        $uploadFilename = preg_replace('/\s+/', '_', $uploadFilename);
+                    }
+                    
+                    $this->set('file', $uploadFilename);
                 }
 
                 if ($this->get('path'))
