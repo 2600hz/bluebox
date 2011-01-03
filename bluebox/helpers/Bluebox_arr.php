@@ -10,6 +10,35 @@ class arr extends arr_Core
 
     /**
      * Finds all sub arrays in $arrays with $paths whose value is equal to $value
+     *
+     * @param array $arrays [expected to be multidimensional]
+     * @param list $paths
+     * @param mixed $value
+     * @return mixed array|FALSE
+     */
+    public static function search_collection($arrays, $paths, $value = NULL)
+    {
+        $paths = func_get_args();
+
+        array_shift($paths);
+
+        $value = array_pop($paths);
+
+        $result = array();
+
+        foreach ($arrays as $pos => $array)
+        {
+            if (self::get_array($array, $paths) == $value)
+            {
+                $result[$pos] = $array;
+            }
+        }
+
+        return empty($result) ? FALSE : $result;
+    }
+
+    /**
+     * Finds all sub arrays in $arrays with $paths whose value is equal to $value
      * 
      * @param array $arrays [expected to be multidimensional]
      * @param list $paths
@@ -28,7 +57,7 @@ class arr extends arr_Core
 
         foreach ($arrays as $pos => $array)
         {
-            if (self::get_array($array, $paths) == $value)
+            if (self::get_array($array, $paths) != $value)
             {
                 $result[$pos] = $array;
             }
