@@ -40,6 +40,8 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
         // Go create the number related stuff for each context it is assigned to
         if ($obj->NumberContext)
         {
+            $assignedContexts = array();
+            
             foreach ($obj->NumberContext as $context)
             {
                 // Add any "global" hooks that come before the processing of any numbers (this is per context)
@@ -49,9 +51,28 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
 
                 // Add any "global" hooks that come after the processing of any numbers (this is per context)
                 dialplan::end('context_' .$context['context_id']);
+
+                $assignedContexts[] = $context['context_id'];
             }
 
-            if ($obj['type'] == Number::TYPE_EXTERNAL)
+            // Changed the operation of setting the pools that cause existings
+            // pool records to be used, where we used to unset (delete) them, so
+            // we need to ensure we dont orphan numbers when changing contexts
+            $contexts = Doctrine::getTable('Context')->findAll();
+
+            $xml = Telephony::getDriver()->xml;
+            
+            foreach ($contexts as $context)
+            {
+                if (!in_array($context['context_id'], $assignedContexts))
+                {
+                    $xml->setXmlRoot(sprintf('//document/section[@name="dialplan"]/context[@name="context_%s"]/extension[@name="%s"]', $context['context_id'], 'main_number_' .$obj['number_id']));
+
+                    $xml->deleteNode();
+                }
+            }
+
+            if ($obj['type'] == Number::TYPE_EXTERNAL AND !empty($obj->NumberContext[0]['context_id']))
             {
                 $xml = Freeswitch::setSection('number_route', $obj['number_id']);
 
