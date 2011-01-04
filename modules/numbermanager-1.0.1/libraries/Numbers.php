@@ -200,7 +200,7 @@ class Numbers
         foreach($base->NumberContext as $pos => $context)
         {
             if (empty($context['context_id'])
-                    OR !arr::filter_collection($assigned_contexts, 'context_id', $context['context_id']))
+                    OR !arr::search_collection($assigned_contexts, 'context_id', $context['context_id']))
             {
                 unset($base->NumberContext[$pos]);
             }
@@ -232,7 +232,7 @@ class Numbers
         foreach($base->NumberPool as $pos => $pool)
         {
             if (empty($pool['number_type_id'])
-                    OR !arr::filter_collection($assigned_pool, 'number_type_id', $pool['number_type_id']))
+                    OR !arr::search_collection($assigned_pool, 'number_type_id', $pool['number_type_id']))
             {
                 unset($base->NumberPool[$pos]);
             }
@@ -244,7 +244,7 @@ class Numbers
 
             if ($number_type_id = arr::get($numberType, 'number_type_id'))
             {
-                if(!arr::filter_collection($base->NumberPool, 'number_type_id', $number_type_id))
+                if(!arr::search_collection($base->NumberPool, 'number_type_id', $number_type_id))
                 {
                     $numberPool = new NumberPool();
 
