@@ -148,6 +148,9 @@ fStashPopFail() {
     echo "you need to resolve the conflicts by hand and call"
     echo "'git stash drop' manually once you are sure you have"
     echo "resolved the conflicts."
+    echo
+    echo "If there are conflicts with the stashed changes you"
+    echo "could try running: git checkout stash@{0} {dir_of_file}"
     echo    
     exit 1
 }
