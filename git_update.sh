@@ -1,5 +1,5 @@
 #!/bin/bash
-trap "fStashPop" 1 2 5 15
+trap "fStashPop" 0 1 2 5 15
 
 fWelcome() {
     clear
@@ -158,4 +158,4 @@ clear
 
 fWelcome
 
-fStash && fFetch && fMerge && fSubModule && fStashPop
+fStash && fFetch && fMerge && fSubModule
