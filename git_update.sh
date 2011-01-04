@@ -155,6 +155,8 @@ fStashPopFail() {
     exit 1
 }
 
+cd `dirname $0`
+
 current_branch="`git status | grep 'On branch' | cut -d ' ' -f 4`"
 
 clear
