@@ -718,8 +718,7 @@ class Installer_Controller extends Bluebox_Controller
         if (stristr($databaseOptions['type'], 'sqlite'))
         {
             $databaseOptions['host'] = $this->session->get('installer.dbPathName');
-var_dump($databaseOptions['host']);
-var_dump(file_exists($databaseOptions['host']));
+
             if (!file_exists($databaseOptions['host']))
             {
                 message::set('SQLite path does not exist or can not be read!');
@@ -1545,7 +1544,7 @@ var_dump(file_exists($databaseOptions['host']));
             // Because the file upload dir has php constant we need to handle it as a one-off...
             if ($result[2][0] == 'directory')
             {
-                $result[5][0] = str_replace('\'upload\'', '', $result[5][0]);
+                $result[5][0] = str_replace('\'uploads\'', '', $result[5][0]);
 
                 $result[3][0] = rtrim($result[3][0], '\'"`') . '\'';
                 
