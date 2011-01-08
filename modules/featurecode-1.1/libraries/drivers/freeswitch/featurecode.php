@@ -21,6 +21,21 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
         $registry = (array)$destination['registry'];
 
         switch ($registry['feature']) {
+            case 'ivr_return':
+                $xml->deleteChildren();
+
+                $condition = '/condition[@field="${ivr_path}"][@expression="(.*)-(.*)-.*+$"][@break="never"]';
+
+                $xml->setXmlRoot($xml->getExtensionRoot() .$condition);
+
+                $xml->update('/action[@application="set"][@data="ivr_path=$1"]');
+                $xml->update('/action[@application="transfer"][@data="$2"]');
+
+                $xml->update('/anti-action[@application="set"][@data="ivr_path="]');
+                $xml->update('/anti-action[@application="transfer"][@data="${vm-operator-extension}"]');
+
+                break;
+
             case 'forward_on':
                 $xmlText = <<<XML
 XML;
@@ -151,7 +166,10 @@ XML;
                 break;
             }
 
-        $xml->replaceWithXml($xmlText);
+        if (isset($xmlText))
+        {
+            $xml->replaceWithXml($xmlText);
+        }
 
     }
 
