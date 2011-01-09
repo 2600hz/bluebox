@@ -14,7 +14,7 @@ abstract class Bluebox_Controller extends Template_Controller
     /**
      * @var float The bluebox core version
      */
-    public static $version = '1.0';
+    public static $version = '1.0.4-dev';
 
     protected $authBypass = array();
 
@@ -246,7 +246,7 @@ abstract class Bluebox_Controller extends Template_Controller
         plugins::construct();
 
         // Setup anything related to authorizing the user
-        Event::run('bluebox.ready', $this);
+       Event::run('bluebox.ready', $this);
     }
 
     /**

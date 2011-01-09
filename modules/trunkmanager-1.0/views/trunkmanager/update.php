@@ -20,7 +20,7 @@
         <div class="field">
         <?php
             echo form::label('trunk[type]', 'Trunk Type:');
-            echo form::dropdown('trunk[type]', empty($supportedTrunkTypes) ? array() : $supportedTrunkTypes);
+            echo form::dropdown('trunk[type]', $supportedTrunkTypes);
         ?>
         </div>
 
@@ -31,6 +31,30 @@
         ?>
         </div>
 
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'trunk[registry][registerProxy]',
+                    'hint' => 'Leave blank if same as server'
+                ),
+                'Register Proxy:'
+            );
+            echo form::input('trunk[registry][registerProxy]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                    'for' => 'trunk[registry][outboundProxy]',
+                    'hint' => 'Leave blank if same as server'
+                ),
+                'Outbound Proxy:'
+            );        
+            echo form::input('trunk[registry][outboundProxy]');
+        ?>
+        </div>
+    
     <?php echo form::close_section(); ?>
 
     <?php 

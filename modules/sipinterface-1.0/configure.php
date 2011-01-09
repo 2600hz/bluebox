@@ -32,63 +32,15 @@ class InterfaceManager_Configure extends Bluebox_Configure
     
     public function postInstall()
     {
-        try
-        {
-            $cmd = "/sbin/ifconfig";
+        $this->addInterface('Authenticated SIP', '', '5060');
 
-            $output = array();
+        $this->addInterface('Authenticated SIP - NAT', '', '5070', TRUE, FALSE, TRUE);
 
-            exec($cmd, $output);
-
-            $interface = '';
-
-            $ips = array();
-
-            foreach($output as $line)
-            {
-                if (preg_match('/^[^\s]+/', $line, $matches))
-                {
-                    $interface = $matches[0];
-
-                    continue;
-                }
-
-                if (preg_match('/inet[^0-9]*([^\s]+)/', $line, $matches))
-                {
-                    if(!filter_var($matches[1], FILTER_VALIDATE_IP))
-                    {
-                        continue;
-                    }
-
-                    kohana::log('debug', 'Found a valid interface at ' .$interface .' with ip ' .$matches[1]);
-
-                    if (($matches[1] != '127.0.0.1') and (!preg_match('/^169.254./', $matches[1]))) // No localhost or auto-assigned IPs
-                    {
-                        $ips[] = $matches[1];
-                    }
-                }
-            }
-
-            $ips = array_unique($ips);
-        }
-        catch (Exception $e)
-        {
-            kohana::log('error', 'Unable to list networks for sip interfaces postInstall: ' .$e->getMessage());
-        }
-
-        if (count($ips) > 0) foreach ($ips as $ip) {
-            $this->addInterface('Authenticated SIP on ' . $ip, $ip, '5060');
-
-            $this->addInterface('Unauthenticated SIP on ' . $ip, $ip, '5080', FALSE, FALSE);
-        } else {
-            // If no known IP addresses, leave IP address blank (FreeSWITCH will auto-detect)
-            $this->addInterface('Authenticated SIP', '', '5060');
-
-            $this->addInterface('Unauthenticated SIP', '', '5080', FALSE, FALSE);
-        }
+        $this->addInterface('Unauthenticated SIP', '', '5080', FALSE, FALSE);
     }
 
-    private function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $context = 'Publicly Accessible') {
+    public static function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $nat = FALSE, $context = 'Publicly Accessible')
+    {
         Kohana::log('debug', 'Adding SIP interface for IP ' . $ip . ' on port ' . $port);
 
         $sipInterface = new SipInterface();
@@ -110,6 +62,20 @@ class InterfaceManager_Configure extends Bluebox_Configure
         $sipInterface['inbound_net_list_id'] = ($use_inbound_acl ? netlists::getSystemListId('trunks.auto') : 0);
 
         $sipInterface['register_net_list_id'] = 0;
+
+        $registry = array(
+            'options_ping' => $auth,
+            'force_rport' => $nat
+        );
+
+        $location = Doctrine::getTable('Location')->findOneByName('Main Location');
+
+        if (!empty($location['location_id']))
+        {
+            $registry['force_register_domain'] = $location['location_id'];
+        }
+
+        $sipInterface['registry'] = $registry;
 
         $sipInterface->save();
 
