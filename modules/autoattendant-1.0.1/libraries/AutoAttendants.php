@@ -31,22 +31,6 @@ class AutoAttendants
         $account_id = Event::$data['account_id'];
         $location_id = Event::$data['Location'][0]['location_id'];
         $user_id = Event::$data['Location'][0]['User'][0]['user_id'];
-        /*if (empty($location_id))
-        {
-            $locations = Doctrine_Query::create()
-                ->from('Location')
-                ->where('account_id = ?', array($account_id))
-                ->execute();
-
-            if (empty($locations[0]['location_id']))
-            {
-                kohana::log('error', 'Unable to initialize device number: could not determine location_id');
-
-                return;
-            }
-
-            $location_id = $locations[0]['location_id'];
-        }*/
 
 
         // TODO: THIS NEEDS TO BE MOVED to the Feature Code module once we can ensure these items happen in order!
@@ -112,6 +96,77 @@ class AutoAttendants
             $number['account_id'] = $account_id;
 
             $number->save();
+        }
+        catch (Exception $e)
+        {
+            kohana::log('error', 'Unable to initialize device number: ' .$e->getMessage());
+
+            throw $e;
+        }
+
+        Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+        Doctrine::getTable('FeatureCode')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+
+
+        $ivrFeatureCode = new FeatureCode();
+
+        $ivrFeatureCode['name'] = 'Check voicemail';
+        $ivrFeatureCode['registry'] = array('feature' => 'ivr_return');
+        $ivrFeatureCode['account_id'] = $account_id;
+        $ivrFeatureCode->save();
+
+        try
+        {
+            $ivrNumber = new Number();
+
+            $ivrNumber['user_id'] = $user_id;
+
+            $ivrNumber['number'] = '2097';
+
+            $ivrNumber['location_id'] = $location_id;
+
+            $ivrNumber['registry'] = array(
+                'ignoreFWD' => '0',
+                'ringtype' => 'ringing',
+                'timeout' => 20
+            );
+
+            $dialplan = array(
+                'terminate' => array(
+                    'transfer' => 0,
+                    'voicemail' => 0,
+                    'action' => 'hangup'
+                )
+            );
+
+            $ivrNumber['dialplan'] = $dialplan;
+
+            $ivrNumber['class_type'] = 'FeatureCodeNumber';
+
+            $ivrNumber['foreign_id'] = $ivrFeatureCode['feature_code_id'];
+
+            $context = Doctrine::getTable('Context')->findOneByNameAndAccountId('Outbound Routes', $account_id);
+
+            $ivrNumber['NumberContext']->fromArray(array(
+                0 => array('context_id' => $context['context_id'])
+            ));
+
+            $numberType = Doctrine::getTable('NumberType')->findOneByClass('FeatureCodeNumber');
+
+            if (empty($numberType['number_type_id']))
+            {
+                return;
+            }
+
+            $ivrNumber['NumberPool']->fromArray(array(
+                0 => array('number_type_id' => $numberType['number_type_id'])
+            ));
+
+            $ivrNumber['account_id'] = $account_id;
+
+            $ivrNumber->save();
         }
         catch (Exception $e)
         {
@@ -221,7 +276,8 @@ class AutoAttendants
         $autoAttendant['account_id'] = $account_id;
 
         $autoAttendant['keys'] = array(array('digits' => '*', 'number_id' => $number['number_id']),
-                                       array('digits' => '9', 'number_id' => $vm_number['number_id']));
+                                       array('digits' => '9', 'number_id' => $vm_number['number_id']),
+                                       array('digits' => '0', 'number_id' => $ivrNumber['number_id']));
 
         $autoAttendant['plugins'] = array('media' => array('type' => 'text_to_speech', 'tts_voice' => 'Flite/kal', 'tts_text' => 'Thank you for calling. Please dial the extension you wish to reach.'));
 
