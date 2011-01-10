@@ -2,6 +2,12 @@
 
 class FeatureCodeManager
 {
+    public static function initializeFeatureCode()
+    {
+//        extract(Event::$data);
+
+    }
+
     public static function addFeatureCode($number, $xml)
     {
     }

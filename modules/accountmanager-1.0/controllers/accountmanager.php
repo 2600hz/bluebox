@@ -148,7 +148,7 @@ class AccountManager_Controller extends Bluebox_Controller
                 if (!empty($_POST['context']['private']))
                 {
                     $contexts[] = array(
-                        'name' => empty($_POST['context']['private_name']) ? 'In-house Only' : $_POST['context']['private_name'],
+                        'name' => empty($_POST['context']['private_name']) ? 'Outbound Routes' : $_POST['context']['private_name'],
                         'locked' => FALSE,
                         'registry' => array('type' => 'private')
                     );
@@ -157,7 +157,7 @@ class AccountManager_Controller extends Bluebox_Controller
                 if (!empty($_POST['context']['public']))
                 {
                     $contexts[] = array(
-                        'name' => empty($_POST['context']['public_name']) ? 'Publicly Accessible' : $_POST['context']['public_name'],
+                        'name' => empty($_POST['context']['public_name']) ? 'Inbound Routes' : $_POST['context']['public_name'],
                         'locked' => FALSE,
                         'registry' => array('type' => 'public')
                     );
@@ -180,6 +180,9 @@ class AccountManager_Controller extends Bluebox_Controller
             $object['Location'][0]['User'][0]['account_id'] = $object['account_id'];
 
             $object['Location'][0]['User'][0]->save();
+
+            // Initialize sample data
+            Event::run('bluebox.account.initialize', $object);
 
 
             Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);

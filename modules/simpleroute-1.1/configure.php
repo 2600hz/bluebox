@@ -33,14 +33,18 @@ class SimpleRoute_1_1_Configure extends Bluebox_Configure
     
     public function postInstall()
     {
+        Doctrine::getTable('SimpleRoute')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
         foreach (SimpleRouteLib::importConfigRoutes() as $route)
         {
             $simpleRoute = new SimpleRoute;
 
             $simpleRoute->fromArray($route);
 
+            $simpleRoute['account_id'] = 1;
+
             $simpleRoute->save();
         }
+    Doctrine::getTable('SimpleRoute')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
     }
 
     public function migrate()
