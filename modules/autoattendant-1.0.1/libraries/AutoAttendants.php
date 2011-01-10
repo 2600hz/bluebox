@@ -32,18 +32,16 @@ class AutoAttendants
         $location_id = Event::$data['Location'][0]['location_id'];
         $user_id = Event::$data['Location'][0]['User'][0]['user_id'];
 
+        users::masqueradeAccount($account_id);
+
 
         // TODO: THIS NEEDS TO BE MOVED to the Feature Code module once we can ensure these items happen in order!
-
-        Doctrine::getTable('FeatureCode')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
-
-        Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         $featureCode = new FeatureCode();
         
         $featureCode['name'] = 'Check voicemail';
         $featureCode['registry'] = array('feature' => 'voicemail_quickauth');
-        $featureCode['account_id'] = $account_id;
+        //$featureCode['account_id'] = $account_id;
         $featureCode->save();
 
         try
@@ -76,7 +74,7 @@ class AutoAttendants
 
             $number['foreign_id'] = $featureCode['feature_code_id'];
 
-            $context = Doctrine::getTable('Context')->findOneByNameAndAccountId('Outbound Routes', $account_id);
+            $context = Doctrine::getTable('Context')->findOneByName('Outbound Routes');
 
             $number['NumberContext']->fromArray(array(
                 0 => array('context_id' => $context['context_id'])
@@ -93,7 +91,7 @@ class AutoAttendants
                 0 => array('number_type_id' => $numberType['number_type_id'])
             ));
 
-            $number['account_id'] = $account_id;
+            //$number['account_id'] = $account_id;
 
             $number->save();
         }
@@ -104,17 +102,13 @@ class AutoAttendants
             throw $e;
         }
 
-        Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
-
-        Doctrine::getTable('FeatureCode')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
-
 
 
         $ivrFeatureCode = new FeatureCode();
 
-        $ivrFeatureCode['name'] = 'Check voicemail';
+        $ivrFeatureCode['name'] = 'Return from IVR';
         $ivrFeatureCode['registry'] = array('feature' => 'ivr_return');
-        $ivrFeatureCode['account_id'] = $account_id;
+        //$ivrFeatureCode['account_id'] = $account_id;
         $ivrFeatureCode->save();
 
         try
@@ -147,7 +141,7 @@ class AutoAttendants
 
             $ivrNumber['foreign_id'] = $ivrFeatureCode['feature_code_id'];
 
-            $context = Doctrine::getTable('Context')->findOneByNameAndAccountId('Outbound Routes', $account_id);
+            $context = Doctrine::getTable('Context')->findOneByName('Outbound Routes');
 
             $ivrNumber['NumberContext']->fromArray(array(
                 0 => array('context_id' => $context['context_id'])
@@ -164,7 +158,7 @@ class AutoAttendants
                 0 => array('number_type_id' => $numberType['number_type_id'])
             ));
 
-            $ivrNumber['account_id'] = $account_id;
+            //$ivrNumber['account_id'] = $account_id;
 
             $ivrNumber->save();
         }
@@ -175,19 +169,11 @@ class AutoAttendants
             throw $e;
         }
 
-        Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
-
-        Doctrine::getTable('FeatureCode')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
-
 
 
 
 
         // TODO: THIS NEEDS TO BE MOVED to the Voicemail module once we can ensure these items happen in order!
-
-        Doctrine::getTable('Voicemail')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
-
-        Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         $voicemail = new Voicemail();
 
@@ -226,7 +212,7 @@ class AutoAttendants
 
             $vm_number['foreign_id'] = $voicemail['voicemail_id'];
 
-            $context = Doctrine::getTable('Context')->findOneByNameAndAccountId('Outbound Routes', $account_id);
+            $context = Doctrine::getTable('Context')->findOneByName('Outbound Routes');
 
             $vm_number['NumberContext']->fromArray(array(
                 0 => array('context_id' => $context['context_id'])
@@ -243,7 +229,7 @@ class AutoAttendants
                 0 => array('number_type_id' => $vm_numberType['number_type_id'])
             ));
 
-            $vm_number['account_id'] = $account_id;
+            //$vm_number['account_id'] = $account_id;
 
             $vm_number->save();
         }
@@ -254,14 +240,6 @@ class AutoAttendants
             throw $e;
         }
 
-        Doctrine::getTable('Number')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
-
-        Doctrine::getTable('Voicemail')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
-
-
-
-
-        Doctrine::getTable('AutoAttendant')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
 
         $autoAttendant = new AutoAttendant();
 
@@ -269,11 +247,11 @@ class AutoAttendants
         $autoAttendant['description'] = 'Main Company Auto-Attendant';
         $autoAttendant['timeout'] = 5;
         $autoAttendant['digit_timeout'] = 3;
-        $context = Doctrine::getTable('Context')->findOneByNameAndAccountId('Inbound Routes', $account_id);
+        $context = Doctrine::getTable('Context')->findOneByName('Inbound Routes');
         $autoAttendant['extension_context_id'] = $context['context_id'];
 
         $autoAttendant['extension_digits'] = (integer)4;
-        $autoAttendant['account_id'] = $account_id;
+        //$autoAttendant['account_id'] = $account_id;
 
         $autoAttendant['keys'] = array(array('digits' => '*', 'number_id' => $number['number_id']),
                                        array('digits' => '9', 'number_id' => $vm_number['number_id']),
@@ -285,7 +263,7 @@ class AutoAttendants
 
         Event::run('bluebox.autoattendant.initialize', $autoAttendant);        // Let anyone who cares initialize things related to auto-attendants
 
-        Doctrine::getTable('AutoAttendant')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+        users::restoreAccount();
 
     }
 }
