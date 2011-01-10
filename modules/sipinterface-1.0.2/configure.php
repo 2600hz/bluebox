@@ -39,7 +39,7 @@ class InterfaceManager_1_0_2_Configure extends Bluebox_Configure
         $this->addInterface('Unauthenticated SIP', '', '5080', FALSE, FALSE);
     }
 
-    public static function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $nat = FALSE, $context = 'Publicly Accessible')
+    public static function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $nat = FALSE, $context = 'Inbound Routes')
     {
         Kohana::log('debug', 'Adding SIP interface for IP ' . $ip . ' on port ' . $port);
 
@@ -55,10 +55,13 @@ class InterfaceManager_1_0_2_Configure extends Bluebox_Configure
 
         $sipInterface['nat_type'] = 1;
 
-        $sipInterface['Context'] = Doctrine::getTable('Context')->findOneByName($context);
+        Kohana::log('debug', 'got here2');
+        //$sipInterface['Context'] = Doctrine::getTable('Context')->findOneByName($context);
 
+        Kohana::log('debug', 'got here');
         $sipInterface['nat_net_list_id'] = netlists::getSystemListId('nat.auto');
 
+        Kohana::log('debug', 'got here');
         $sipInterface['inbound_net_list_id'] = ($use_inbound_acl ? netlists::getSystemListId('trunks.auto') : 0);
 
         $sipInterface['register_net_list_id'] = 0;
@@ -68,6 +71,7 @@ class InterfaceManager_1_0_2_Configure extends Bluebox_Configure
             'force_rport' => $nat
         );
 
+        Kohana::log('debug', 'got here3');
         $location = Doctrine::getTable('Location')->findOneByName('Main Location');
 
         if (!empty($location['location_id']))
@@ -75,6 +79,7 @@ class InterfaceManager_1_0_2_Configure extends Bluebox_Configure
             $registry['force_register_domain'] = $location['location_id'];
         }
 
+        Kohana::log('debug', 'got here4');
         $sipInterface['registry'] = $registry;
 
         $sipInterface->save();
