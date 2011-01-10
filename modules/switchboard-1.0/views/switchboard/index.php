@@ -29,19 +29,17 @@ $result = $swdb->get();
 $VoircemailRows = $result->as_array();
 
 ?>
-
 <style>
-<?php $DivHt = "100"; ?>
-.sb-extin{float:left;width: 155px;height:<?=$DivHt?>px;background-color: #fff;padding-left:5px;}
-.sb-extout{float:left;width: 155px;height:<?=$DivHt?>px;background-color: #fff;padding-left:5px;}
-.sb-callcont{border: 2px solid #0088cc;height: <?=$DivHt?>px;float: left;}
-.sb-confcont{border: 2px solid #00cccc;height: <?=$DivHt?>px;float: left;}
-.sb-autocont{border: 2px solid #88ff99;height: <?=$DivHt?>px;float: left;}
-.sb-vmcont{border: 2px solid #00ff88;height: <?=$DivHt?>px;float: left;}
+.sb-extin{float:left;width: 155px;height:100px;background-color: #fff;padding-left:5px;}
+.sb-extout{float:left;width: 155px;height:100px;background-color: #fff;padding-left:5px;}
+.sb-callcont{border: 2px solid #0088cc;height: 100px;float: left;}
+.sb-confcont{border: 2px solid #00cccc;height: 100px;float: left;}
+.sb-autocont{border: 2px solid #88ff99;height: 100px;float: left;}
+.sb-vmcont{border: 2px solid #00ff88;height: 100px;float: left;}
 
-.sbarrow{float:left;height:<?=$DivHt?>px;}
-.sb-grp{height:<?=$DivHt?>px;border: 1px solid #000;float: left;}
-.sb-title{height:<?=$DivHt?>px;float: left;}
+.sbarrow{float:left;height:100px;}
+.sb-grp{height:100px;border: 1px solid #000;float: left;}
+.sb-title{height:100px;float: left;}
 .sb-trunk{width: 125px;height: 175px;border: 1px solid #000;float: left;background-color: #acacac;}
 
 .DeviceItem{width: 150px;height: 40px;border: 1px solid #000;float: left;background-color: #ffffcc;padding-top: 10px;}
@@ -52,10 +50,10 @@ $VoircemailRows = $result->as_array();
 .devcallin{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/devincall.gif');height: 20px;width: 23px;}
 .devcallout{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/devoutcall.gif');height: 20px;width: 23px;}
 
-.calldividercall{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/connectgreen.gif');float:left;height:<?=$DivHt?>px;width: 26px;}
+.calldividercall{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/connectgreen.gif');float:left;height:100px;width: 26px;}
 .calldividertrunk{
 background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/connecttrunk.gif');
-float:left;height:<?=$DivHt?>px;width: 26px;font-size: 10px;line-height:12px;
+float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
 }
 
 .nocallsop{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/nocallsop.gif');width: 550px;height:550px;}
@@ -71,6 +69,8 @@ float:left;height:<?=$DivHt?>px;width: 26px;font-size: 10px;line-height:12px;
 	<input type="hidden" value="" name="suuid" size="50" id="idssuid">
 	 <div id="debug_tab" style="width: 900px;padding-bottom:15px;">
             <div style="width: 900px;">
+	    
+		<input type="button" value=" Show Types " onclick="ShowDebug();" />
 		<input type="button" value=" Clear Selected " onclick="clearselected();" />
 		<?php echo form::input(array('id' => 'manual_entry_param', 'value' => '','size' =>'80', 'type'=>'hidden')); ?>
 		<?php echo form::input(array('id' => 'manual_entry_kill', 'value' => '','size' =>'80', 'type'=>'hidden')); ?>
@@ -236,8 +236,8 @@ function ShowDebug() {
 	}
 	for(var idex=0;idex<g_ChanList.length;idex++) {
 			
-			OutBug = OutBug + "grpname: " + g_ChanList[idex]['grpname'] ;
-			OutBug = OutBug + "grptype: " + g_ChanList[idex]['grptype'] ;
+			OutBug = OutBug + "<li>grpname: " + g_ChanList[idex]['grpname'] ;
+			OutBug = OutBug + "<li>grptype: " + g_ChanList[idex]['grptype'] ;
 	}
 	
 	document.getElementById('debugsw').innerHTML = OutBug;
@@ -470,12 +470,14 @@ function selectuuid(inelement,inuuid) {
 			//let see if we have any of the trunk ips related in name
 			var UsingTrunkName = ChanToTrunkName( InChanArray['name'] );
 			var newTrunkName = '<br /><br />' + verticalText(UsingTrunkName);
+			
 			if( DivType != "call" && UsingTrunkName != "") {
-			RetHTML = RetHTML + '</div><div class="calldividertrunk">' + newTrunkName + '</div>';
+				RetHTML = RetHTML + '<div class="calldividertrunk">' + newTrunkName + '</div>';
 			}
 			if( DivType != "call" && UsingTrunkName == "") {
-			RetHTML = RetHTML + '</div><div class="calldividercall">' + newTrunkName + '</div>';
+			RetHTML = RetHTML + '<div class="calldividercall">' + newTrunkName + '</div>';
 			}
+			
 			RetHTML = RetHTML + '<div class="sb-extin" id="'+CurrentID +'" onclick="selectuuid(this,' + "'" +  CurrentID + "'" + ');">';
 			RetHTML = RetHTML + "" +  InChanArray['cid_name'] + "<br />";
 			RetHTML = RetHTML + "" +  InChanArray['cid_num'] + "<br />";
@@ -497,6 +499,9 @@ function selectuuid(inelement,inuuid) {
 			}
 			if( DivType == "call" && UsingTrunkName != "") {
 			RetHTML = RetHTML + '</div><div class="calldividertrunk">' + newTrunkName + '</div>';
+			}
+			if( DivType != "call") {
+			RetHTML = RetHTML + '</div>';
 			}
 		}
 		
@@ -520,17 +525,32 @@ function selectuuid(inelement,inuuid) {
 		return RetHTML;
 	}
 	
+	function UUIDSub( InUUID ) {
+		//this is the same as getconfuuid I seperated just incase I need to change it
+		var RetVal = "";
+		var SData = InUUID.split("-");
+		return SData[SData.length-1];
+	}
+	
 	function GroupData(ArrayIn) {
 		var grptype 	= "";
 		var searchtype 	= "";
 		var retgrptype 	= "";
-		if( ArrayIn['application_data'].substr(0,11) == "conference_" 		) {  grptype = "conference";searchtype = "conference_" +GetConfUUIDPart(ArrayIn['uuid'] );  }
+		var TheUUID 	= "";
+		if( ArrayIn['call_uuid'] == "" ) {
+			TheUUID = UUIDSub(ArrayIn['uuid']);
+		}
+		else {
+			TheUUID = UUIDSub(ArrayIn['call_uuid']);
+		}
+		
+		if( ArrayIn['application_data'].substr(0,11) == "conference_" 		) {  grptype = "conference";searchtype = "conference_" +GetConfUUIDPart(TheUUID );  }
 		if( ArrayIn['application_data'].substr(0,15) == "auto_attendant_" 	) {  grptype = "auto_attendant"; searchtype = "auto_attendant_" + ArrayIn['application_data'];  }
-		if( ArrayIn['application_data'].substr(0,5) == "sofia" 			) {  grptype = "call"; searchtype = ArrayIn['call_uuid'];  }
-		if( ArrayIn['application_data'].substr(0,4) == "user" 			) {  grptype = "call"; searchtype = ArrayIn['call_uuid'];  }
-		if( ArrayIn['application_data'].substr(0,4) == "local" 			) {  grptype = "call"; searchtype = ArrayIn['call_uuid'];  }
-		if( ArrayIn['application_data'].substr(0,18) == "default voicemail_" 	) {  grptype = "voicemail"; searchtype = "voicemail" + ArrayIn['uuid'];  }
-		if( grptype == "" 									) {  grptype = "call"; searchtype = ArrayIn['call_uuid'];  }
+		if( ArrayIn['application_data'].substr(0,5) == "sofia" 			) {  grptype = "call"; searchtype = TheUUID;  }
+		if( ArrayIn['application_data'].substr(0,4) == "user" 			) {  grptype = "call"; searchtype = TheUUID;  }
+		if( ArrayIn['application_data'].substr(0,4) == "local" 			) {  grptype = "call"; searchtype = TheUUID;  }
+		if( ArrayIn['application_data'].substr(0,18) == "default voicemail_" 	) {  grptype = "voicemail"; searchtype = "voicemail" + TheUUID;  }
+		if( grptype == "" 									) {  grptype = "call"; searchtype = TheUUID;  }
 		
 		
 		for(var idex=0;idex<g_GroupsHTML.length;idex++) {
@@ -575,7 +595,7 @@ function selectuuid(inelement,inuuid) {
 		var RetVal = "";
 		var SData = InVal.split("-");
 		
-		return SData[SData.length];
+		return SData[SData.length-1];
 	}
 	
 	function verticalText(inText) {
@@ -617,4 +637,34 @@ function selectuuid(inelement,inuuid) {
 </script>
 <?php
     jquery::addPlugin('tabs');
+?>
+
+<?
+/*
+
+[from cell to ring group]
+uuid,direction,created,created_epoch,name,state,cid_name,cid_num,ip_addr,dest,application,application_data,dialplan,context,read_codec,read_rate,read_bit_rate,write_codec,write_rate,write_bit_rate,secure,hostname,presence_id,presence_data,callstate,callee_name,callee_num,callee_direction,call_uuid
+
+94015fba-1cca-11e0-8376-97aafcc20fcd,
+inbound,2011-01-10 09:02:01,1294671721,sofia/sipinterface_9/9362302026@216.82.225.24,CS_EXECUTE,WIRELESS CALLER,9362302026,216.82.225.24,9365854358,bridge,{ignore_early_media=true}user/132@192.168.1.9:_:{ignore_early_media=true}user/170@192.168.1.9,XML,context_4,PCMU,8000,64000,PCMU,8000,64000,,svn,9362302026@216.82.225.24,,EARLY,,,,
+
+9406f4b6-1cca-11e0-837a-97aafcc20fcd,
+outbound,2011-01-10 09:02:01,1294671721,sofia/sipinterface_9/sip:132@192.168.1.5,CS_CONSUME_MEDIA,WIRELESS CALLER,9362302026,216.82.225.24,132,,,XML,context_4,,,,,,,,svn,132@192.168.1.9,,RINGING,Home,9365854358,RECV,
+9406f1be-1cca-11e0-8379-97aafcc20fcd
+
+94074d62-1cca-11e0-837c-97aafcc20fcd,
+outbound,2011-01-10 09:02:01,1294671721,sofia/sipinterface_9/sip:170@192.168.1.100:63194,CS_CONSUME_MEDIA,WIRELESS CALLER,9362302026,216.82.225.24,170,,,XML,context_4,,,,,,,,svn,170@192.168.1.9,,RINGING,Home,9365854358,RECV,
+94074150-1cca-11e0-837b-97aafcc20fcd
+
+
+
+
+
+
+
+
+
+
+
+*/
 ?>
