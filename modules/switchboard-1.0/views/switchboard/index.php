@@ -49,10 +49,12 @@ $VoircemailRows = $result->as_array();
 .TrunkLable{width: 150px;border-bottom: 1px solid #acacac;padding-top: 2px;padding-right: 2px;font-weight: bold;color: #fff;}
 .tsdiv{text-align: left;font-weight: bold;color: #fff;width: 150px;}
 
-
+.devcallin{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/devincall.gif');height: 20px;width: 23px;}
+.devcallout{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/devoutcall.gif');height: 20px;width: 23px;}
 
 .calldividercall{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/connectgreen.gif');float:left;height:<?=$DivHt?>px;width: 26px;}
-.calldividertrunk{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/connecttrunk.gif');
+.calldividertrunk{
+background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/connecttrunk.gif');
 float:left;height:<?=$DivHt?>px;width: 26px;font-size: 10px;line-height:12px;
 }
 
@@ -181,16 +183,16 @@ function UpdateDeviceList() {
 		for(var ichan=0;ichan<g_ChanList.length;ichan++) {
 				//		callee_name callee_num cid_name  cid_num
 			if( g_DevListArray[idex] == g_ChanList[ichan]['callee_name'] ) {
-				document.getElementById('stats'+ g_DevListArray[idex]).innerHTML = "1: in call";
+				document.getElementById('stats'+ g_DevListArray[idex]).innerHTML = '<div class="devcallin"></div>';
 			}
 				if( g_DevListArray[idex] == g_ChanList[ichan]['callee_num'] ) {
-			document.getElementById('stats'+ g_DevListArray[idex]).innerHTML = "2: in call";
+			document.getElementById('stats'+ g_DevListArray[idex]).innerHTML = '<div class="devcallin"></div>';
 			}
 				if( g_DevListArray[idex] == g_ChanList[ichan]['cid_name'] ) {
-			document.getElementById('stats'+ g_DevListArray[idex]).innerHTML = "3: in call";
+			document.getElementById('stats'+ g_DevListArray[idex]).innerHTML =  '<div class="devcallout"></div>';
 			}
 			if( g_DevListArray[idex] == g_ChanList[ichan]['cid_num'] ) {
-				document.getElementById('stats'+ g_DevListArray[idex]).innerHTML = "4: in call";
+				document.getElementById('stats'+ g_DevListArray[idex]).innerHTML = '<div class="devcallout"></div>';
 			}
 		}
 	}
