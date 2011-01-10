@@ -94,15 +94,22 @@ class Core_Configure extends Bluebox_Configure
         }
 
         $skin->free(TRUE);
+
+        Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+        Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
     }
 
     public static function createDefaultNetlists()
     {
+        Doctrine::getTable('NetList')->getRecordListener()->get('MultiTenant')->setOption('disabled', TRUE);
         $netList = new NetList();
 
         $netList['name'] = 'Private/Local Network (auto)';
 
         $netList['system_list'] = 'rfc1918.auto';
+
+        $netList['account_id'] = 1;
 
         $netList->save(TRUE);
 
@@ -113,6 +120,8 @@ class Core_Configure extends Bluebox_Configure
 
         $netList['system_list'] = 'nat.auto';
 
+        $netList['account_id'] = 1;
+
         $netList->save(TRUE);
 
 
@@ -121,6 +130,8 @@ class Core_Configure extends Bluebox_Configure
         $netList['name'] = 'Local Network (auto)';
 
         $netList['system_list'] = 'localnet.auto';
+
+        $netList['account_id'] = 1;
 
         $netList->save(TRUE);
 
@@ -131,6 +142,8 @@ class Core_Configure extends Bluebox_Configure
 
         $netList['system_list'] = 'loopback.auto';
 
+        $netList['account_id'] = 1;
+
         $netList->save(TRUE);
 
 
@@ -139,6 +152,8 @@ class Core_Configure extends Bluebox_Configure
         $netList['name'] = 'Trunks (auto)';
 
         $netList['system_list'] = 'trunks.auto';
+
+        $netList['account_id'] = 1;
 
         $netList->save(TRUE);
 
@@ -154,6 +169,10 @@ class Core_Configure extends Bluebox_Configure
             )
         );
 
+        $netList['account_id'] = 1;
+
         $netList->save(TRUE);
+
+        Doctrine::getTable('NetList')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
     }
 }
