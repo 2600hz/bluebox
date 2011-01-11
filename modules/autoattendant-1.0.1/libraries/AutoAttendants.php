@@ -32,9 +32,6 @@ class AutoAttendants
         $location_id = Event::$data['Location'][0]['location_id'];
         $user_id = Event::$data['Location'][0]['User'][0]['user_id'];
 
-        users::masqueradeAccount($account_id);
-
-
         // TODO: THIS NEEDS TO BE MOVED to the Feature Code module once we can ensure these items happen in order!
 
         $featureCode = new FeatureCode();
@@ -262,8 +259,5 @@ class AutoAttendants
         $autoAttendant->save();
 
         Event::run('bluebox.autoattendant.initialize', $autoAttendant);        // Let anyone who cares initialize things related to auto-attendants
-
-        users::restoreAccount();
-
     }
 }
