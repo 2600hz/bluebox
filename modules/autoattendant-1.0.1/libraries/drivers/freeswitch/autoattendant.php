@@ -62,7 +62,7 @@ class FreeSwitch_AutoAttendant_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/action[@application="answer"]');
 
-        $xml->update('/action[@application="set"][@data="ivr_path=${ivr_path}-${destination_number}"]');
+        $xml->update('/action[@application="set"][@data="ivr_path=${ivr_path}-${destination_number} XML ${context}"]');
 
         $xml->update('/action[@application="ivr"]{@data="auto_attendant_' .$destination['auto_attendant_id'] .'"}');
     }
