@@ -181,15 +181,23 @@ class AccountManager_Controller extends Bluebox_Controller
 
             $object['Location'][0]['User'][0]->save();
 
-            // Initialize sample data
-            Event::run('bluebox.account.initialize', $object);
-
-
             Doctrine::getTable('Location')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
             Doctrine::getTable('User')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
 
             Doctrine::getTable('Context')->getRecordListener()->get('MultiTenant')->setOption('disabled', FALSE);
+
+            if (!empty($object['account_id']))
+            {
+                $users_account_id = users::getAttr('account_id');
+
+                users::masqueradeAccount($object['account_id']);
+
+                // Initialize sample data
+                Event::run('bluebox.account.initialize', $object);
+
+                users::masqueradeAccount($users_account_id);
+            }
         }
 
         parent::post_save($object);
