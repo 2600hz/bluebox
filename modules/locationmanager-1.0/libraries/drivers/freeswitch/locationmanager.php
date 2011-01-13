@@ -6,17 +6,12 @@ class FreeSwitch_LocationManager_Driver extends FreeSwitch_Base_Driver
     {
         $xml = Telephony::getDriver()->xml;
 
-        Kohana::log("debug", "Setting areacode..." . get_class($base));
-
         if($base instanceof Location)
         {
-            Kohana::log("debug", "this is a location");
             foreach($base['User'] as $user)
             {
-                Kohana::log("debug", "this is a user");
                 foreach($user['Device'] as $device)
                 {
-                    Kohana::log("debug", "this is a device");
                     self::setAreacode($device, $xml);
                 }
             }
@@ -31,8 +26,6 @@ class FreeSwitch_LocationManager_Driver extends FreeSwitch_Base_Driver
     {
         if($device instanceof Device)
         {
-            Kohana::log("debug", "Writing area code to device...");
-
             $domain = '$${location_' . $device['User']['location_id'] .'}';
 
             FreeSwitch::setSection('user', $domain, $device['device_id']);
