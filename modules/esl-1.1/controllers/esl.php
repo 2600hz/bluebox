@@ -401,7 +401,12 @@ class Esl_Controller extends Bluebox_Controller
                         break;
 
                     case "esl/logviewer":
-                        $logfile = "/usr/local/freeswitch/log/freeswitch.log";
+                        //Do some nifty magic to get freeswitch root path
+                        $confpath = Kohana::config('freeswitch.cfg_root');
+                        preg_match('/.+(?=\/conf$)/', $confpath, $output);
+                        $basepath = $output[0];
+                        
+                        $logfile = $basepath . "/log/freeswitch.log";
                         if(!isset($_SESSION["esl"]["logviewer_pos"])) {
                             $logviewer_pos = filesize($logfile) - 1200;
                             if($logviewer_pos < 0) {
