@@ -30,7 +30,9 @@ class FreeSwitch_LocationManager_Driver extends FreeSwitch_Base_Driver
 
             FreeSwitch::setSection('user', $domain, $device['device_id']);
 
-            $xml->update('/variables/variable[@name="areacode"]{@value="' . $device['User']['Location']['registry']['areacode'] .'"}');
+            if(isset($device['User']['Location']['registry']['areacode'])) {
+                $xml->update('/variables/variable[@name="areacode"]{@value="' . $device['User']['Location']['registry']['areacode'] .'"}');
+            }
         }
     }
 
