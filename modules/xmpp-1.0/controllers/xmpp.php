@@ -58,4 +58,15 @@ class Xmpp_Controller extends Bluebox_Controller
         $this->view->outboundPatterns = Doctrine::getTable('SimpleRoute')->findAll(Doctrine::HYDRATE_ARRAY);
         $this->view->contexts = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
     }
+
+    public function  post_save(&$object)
+    {
+        $eslManager = EslManager::getInstance();
+
+        if($eslManager->isConnected())
+        {
+            $result = $eslManager->reload('mod_dingaling');
+        }
+        parent::post_save($object);
+    }
 }
