@@ -164,9 +164,11 @@ class Esl_Controller extends Bluebox_Controller
     public function fluxresponse() {
         //Turn off the view
         $this->auto_render = FALSE;
+
+        //Turned off for cpu usage
         //Set the timeout for the http request (in seconds)
         //Until flux handles firefox correctly, set this to 5
-        $TIMEOUT = 5;
+        //$TIMEOUT = 5;
 
         $response = array();
 
@@ -174,289 +176,294 @@ class Esl_Controller extends Bluebox_Controller
 
         $subscribers = $_POST['subscribers'];
 
-        $starttime = time();
-        $exectime = 0;
-        while(sizeof($response) == 0 && $exectime < $TIMEOUT) {
-            foreach ($subscribers as $subscriber) {
-                switch($subscriber) {
-                    case "esl/numactivecalls":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->calls();
-                            $text = $eslManager->getResponse($result);
-                            preg_match("/[0-9]+(?=\stotal\.)/", $text, $output);
-                            $event = array("name" => $subscriber, "data" => array($output[0]));
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("N\\A"));
-                        }
-                        
-                        break;
+        //Turned off for cpu usage
+        //$starttime = time();
+        //$exectime = 0;
+        //while(sizeof($response) == 0 && $exectime < $TIMEOUT) {
 
-                    case "esl/numactivemodules":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->show('modules');
-                            $text = $eslManager->getResponse($result);
-                            preg_match("/[0-9]+(?=\stotal\.)/", $text, $output);
-                            $event = array("name" => $subscriber, "data" => array($output[0]));
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("N\\A"));
-                        }
+        foreach ($subscribers as $subscriber) {
+            switch($subscriber) {
+                case "esl/numactivecalls":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->calls();
+                        $text = $eslManager->getResponse($result);
+                        preg_match("/[0-9]+(?=\stotal\.)/", $text, $output);
+                        $event = array("name" => $subscriber, "data" => array($output[0]));
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("N\\A"));
+                    }
 
-                        break;
+                    break;
 
-                    case "esl/numactivechannels":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->channels();
-                            $text = $eslManager->getResponse($result);
-                            preg_match("/[0-9]+(?=\stotal\.)/", $text, $output);
-                            $event = array("name" => $subscriber, "data" => array($output[0]));
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("N\\A"));
-                        }
+                case "esl/numactivemodules":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->show('modules');
+                        $text = $eslManager->getResponse($result);
+                        preg_match("/[0-9]+(?=\stotal\.)/", $text, $output);
+                        $event = array("name" => $subscriber, "data" => array($output[0]));
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("N\\A"));
+                    }
 
-                        break;
-                    case "esl/channels":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->channels();
-                            $text = $eslManager->getResponse($result);
-                            $event = array("name" => $subscriber, "data" => array($text));
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("N\\A"));
-                        }
+                    break;
 
-                        break;
+                case "esl/numactivechannels":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->channels();
+                        $text = $eslManager->getResponse($result);
+                        preg_match("/[0-9]+(?=\stotal\.)/", $text, $output);
+                        $event = array("name" => $subscriber, "data" => array($output[0]));
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("N\\A"));
+                    }
 
-                    case "esl/numactivecodecs":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->show('codecs');
-                            $text = $eslManager->getResponse($result);
-                            preg_match("/[0-9]+(?=\stotal\.)/", $text, $output);
-                            $event = array("name" => $subscriber, "data" => array($output[0]));
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("N\\A"));
-                        }
+                    break;
 
-                        break;
+                case "esl/channels":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->channels();
+                        $text = $eslManager->getResponse($result);
+                        $event = array("name" => $subscriber, "data" => array($text));
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("N\\A"));
+                    }
 
-                    case "esl/modules":
-                        if($eslManager->isConnected()){
-                            $result = $eslManager->show('modules');
-                            $text = $eslManager->getResponse($result);
-                            preg_match_all("/(?<=\,)mod_[A-Za-z_0-9]+(?=,)/", $text, $output, PREG_PATTERN_ORDER);
+                    break;
 
-                            if(isset($output)) {
+                case "esl/numactivecodecs":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->show('codecs');
+                        $text = $eslManager->getResponse($result);
+                        preg_match("/[0-9]+(?=\stotal\.)/", $text, $output);
+                        $event = array("name" => $subscriber, "data" => array($output[0]));
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("N\\A"));
+                    }
 
-                                // A dirty hack to eliminate duplicates
-                                $matches = array();
-                                foreach($output[0] as $value) {
-                                    $matches[$value] = 1337;
-                                }
+                    break;
 
-                                $text = "";
-                                foreach($matches as $key => $value) {
-                                    $text .= $key . ',';
-                                }
+                case "esl/modules":
+                    if($eslManager->isConnected()){
+                        $result = $eslManager->show('modules');
+                        $text = $eslManager->getResponse($result);
+                        preg_match_all("/(?<=\,)mod_[A-Za-z_0-9]+(?=,)/", $text, $output, PREG_PATTERN_ORDER);
+
+                        if(isset($output)) {
+
+                            // A dirty hack to eliminate duplicates
+                            $matches = array();
+                            foreach($output[0] as $value) {
+                                $matches[$value] = 1337;
                             }
-                            else {
-                                $text = "No modules found... I think something is broken.";
-                            }
-
-                            $event = array("name" => $subscriber, "data" => array($text));
-                        }
-                        else{
-                            $event=array("name" => $subscriber, "data" => array("Freeswitch not loaded.."));
-                        }
-
-                        break;
-
-                    case "esl/sipinterfaces":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->sofia('status');
-                            $text = $eslManager->getResponse($result);
-                            $event = array("name" => $subscriber, "data" => array($text));
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("N\\A"));
-                        }
-
-                        break;
-
-                    case "esl/calls":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->calls();
-                            $text = $eslManager->getResponse($result);
-                            $event = array("name" => $subscriber, "data" => array($text));
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("N\\A"));
-                        }
-
-                        break;
-
-                    case "esl/activecalls":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->calls();
-                            $text = $eslManager->getResponse($result);
-
-                            $output = explode("\n", $text);
-
-
-
-                            $event = array("name" => $subscriber, "data" => array($text));
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("N\\A"));
-                        }
-
-                        break;
-
-                    case "esl/uptime":
-                        if($eslManager->isConnected()) {
-                            $result = $eslManager->status();
-                            $text = $eslManager->getResponse($result);
-                            preg_match("/[0-9]+(?=\syear)/", $text, $output);
-                            $years = $output[0];
-                            preg_match("/[0-9]+(?=\sday)/", $text, $output);
-                            $days = $output[0];
-                            preg_match("/[0-9]+(?=\shour)/", $text, $output);
-                            $hours = $output[0];
-                            preg_match("/[0-9]+(?=\sminute)/", $text, $output);
-                            $mins = $output[0];
-                            preg_match("/[0-9]+(?=\ssecond)/", $text, $output);
-                            $secs = $output[0];
 
                             $text = "";
-
-                            if($years > 0) {
-                                $text .= $years . " year";
-
-                                //Plurar check
-                                if($years > 1) {
-                                    $text .= "s";
-                                }
-
-                                //check if there will be another field
-                                if($days + $hours + $mins > 0) {
-                                    $text .= ", ";
-                                }
-                            }
-                            if($days > 0) {
-                                $text .= $days . " day";
-
-                                //Plurar check
-                                if($days > 1) {
-                                    $text .= "s";
-                                }
-
-                                //check if there will be another field
-                                if($hours + $mins > 0) {
-                                    $text .= ", ";
-                                }
-                            }
-                            if($hours > 0) {
-                                $text .= $hours . " hour";
-
-                                //Plurar check
-                                if($hours > 1) {
-                                    $text .= "s";
-                                }
-
-                                //check if there will be another field
-                                if($mins > 0) {
-                                    $text .= ", ";
-                                }
-                            }
-                            if($mins > 0) {
-                                $text .= $mins . " minute";
-
-                                //Plurar check
-                                if($mins > 1) {
-                                    $text .= "s";
-                                }
-                            }
-                            if($mins + $hours + $days + $years == 0 && $secs > 0) {
-                                $text .= "<0 minutes";
-                            }
-
-                            $event = array("name" => $subscriber, "data" => array($text));
-                            
-                        }
-                        // Can't connect to Freeswitch
-                        else {
-                            $event = array("name" => $subscriber, "data" => array("(Server is down)"));
-                        }
-
-                        break;
-
-                    case "esl/logviewer":
-                        //Do some nifty magic to get freeswitch root path
-                        $confpath = Kohana::config('freeswitch.cfg_root');
-                        preg_match('/.+(?=\/conf$)/', $confpath, $output);
-                        $basepath = $output[0];
-                        
-                        $logfile = $basepath . "/log/freeswitch.log";
-                        if(!isset($_SESSION["esl"]["logviewer_pos"])) {
-                            $logviewer_pos = filesize($logfile) - 1200;
-                            if($logviewer_pos < 0) {
-                                $logviewer_pos = 0;
+                            foreach($matches as $key => $value) {
+                                $text .= $key . ',';
                             }
                         }
                         else {
-                            $logviewer_pos = $_SESSION["esl"]["logviewer_pos"];
+                            $text = "No modules found... I think something is broken.";
                         }
+
+                        $event = array("name" => $subscriber, "data" => array($text));
+                    }
+                    else{
+                        $event=array("name" => $subscriber, "data" => array("Freeswitch not loaded.."));
+                    }
+
+                    break;
+
+                case "esl/sipinterfaces":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->sofia('status');
+                        $text = $eslManager->getResponse($result);
+                        $event = array("name" => $subscriber, "data" => array($text));
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("N\\A"));
+                    }
+
+                    break;
+
+                case "esl/calls":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->calls();
+                        $text = $eslManager->getResponse($result);
+                        $event = array("name" => $subscriber, "data" => array($text));
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("N\\A"));
+                    }
+
+                    break;
+
+                case "esl/activecalls":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->calls();
+                        $text = $eslManager->getResponse($result);
+
+                        $output = explode("\n", $text);
+
+
+
+                        $event = array("name" => $subscriber, "data" => array($text));
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("N\\A"));
+                    }
+
+                    break;
+
+                case "esl/uptime":
+                    if($eslManager->isConnected()) {
+                        $result = $eslManager->status();
+                        $text = $eslManager->getResponse($result);
+                        preg_match("/[0-9]+(?=\syear)/", $text, $output);
+                        $years = $output[0];
+                        preg_match("/[0-9]+(?=\sday)/", $text, $output);
+                        $days = $output[0];
+                        preg_match("/[0-9]+(?=\shour)/", $text, $output);
+                        $hours = $output[0];
+                        preg_match("/[0-9]+(?=\sminute)/", $text, $output);
+                        $mins = $output[0];
+                        preg_match("/[0-9]+(?=\ssecond)/", $text, $output);
+                        $secs = $output[0];
 
                         $text = "";
 
-                        $log_pointer = fopen($logfile, "r");
-                        fseek($log_pointer, $logviewer_pos);
+                        if($years > 0) {
+                            $text .= $years . " year";
 
-                        //Skip to the first complete line....
-                        while(($char = fgetc($log_pointer)))
-                            if ($char == "\n") break;
+                            //Plurar check
+                            if($years > 1) {
+                                $text .= "s";
+                            }
 
-                        while(!feof($log_pointer)) {
-                            $line = fgets($log_pointer);
-                            if(trim($line) != "")
-                                $text .= $line;
+                            //check if there will be another field
+                            if($days + $hours + $mins > 0) {
+                                $text .= ", ";
+                            }
                         }
-                        
-                        $_SESSION["esl"]["logviewer_pos"] = ftell($log_pointer);
-                        fclose($log_pointer);
+                        if($days > 0) {
+                            $text .= $days . " day";
+
+                            //Plurar check
+                            if($days > 1) {
+                                $text .= "s";
+                            }
+
+                            //check if there will be another field
+                            if($hours + $mins > 0) {
+                                $text .= ", ";
+                            }
+                        }
+                        if($hours > 0) {
+                            $text .= $hours . " hour";
+
+                            //Plurar check
+                            if($hours > 1) {
+                                $text .= "s";
+                            }
+
+                            //check if there will be another field
+                            if($mins > 0) {
+                                $text .= ", ";
+                            }
+                        }
+                        if($mins > 0) {
+                            $text .= $mins . " minute";
+
+                            //Plurar check
+                            if($mins > 1) {
+                                $text .= "s";
+                            }
+                        }
+                        if($mins + $hours + $days + $years == 0 && $secs > 0) {
+                            $text .= "<0 minutes";
+                        }
+
                         $event = array("name" => $subscriber, "data" => array($text));
-                        break;
 
-                    default:
-                        $event = NULL;
-                        break;
-                }
+                    }
+                    // Can't connect to Freeswitch
+                    else {
+                        $event = array("name" => $subscriber, "data" => array("(Server is down)"));
+                    }
 
-                if(isset($event)) {
-                   if(isset($_SESSION["esl"][$subscriber])) {
-                        if($_SESSION["esl"][$subscriber] == $event["data"]) {
-                            continue;
+                    break;
+
+                case "esl/logviewer":
+                    //Do some nifty magic to get freeswitch root path
+                    $confpath = Kohana::config('freeswitch.cfg_root');
+                    preg_match('/.+(?=\/conf$)/', $confpath, $output);
+                    $basepath = $output[0];
+
+                    $logfile = $basepath . "/log/freeswitch.log";
+                    if(!isset($_SESSION["esl"]["logviewer_pos"])) {
+                        $logviewer_pos = filesize($logfile) - 1200;
+                        if($logviewer_pos < 0) {
+                            $logviewer_pos = 0;
                         }
-                   }
+                    }
+                    else {
+                        $logviewer_pos = $_SESSION["esl"]["logviewer_pos"];
+                    }
 
-                   $_SESSION["esl"][$subscriber] = $event["data"];
-                   $response[] = $event;
-                }
+                    $text = "";
+
+                    $log_pointer = fopen($logfile, "r");
+                    fseek($log_pointer, $logviewer_pos);
+
+                    //Skip to the first complete line....
+                    while(($char = fgetc($log_pointer)))
+                        if ($char == "\n") break;
+
+                    while(!feof($log_pointer)) {
+                        $line = fgets($log_pointer);
+                        if(trim($line) != "")
+                            $text .= $line;
+                    }
+
+                    $_SESSION["esl"]["logviewer_pos"] = ftell($log_pointer);
+                    fclose($log_pointer);
+                    $event = array("name" => $subscriber, "data" => array($text));
+                    break;
+
+                default:
+                    $event = NULL;
+                    break;
             }
 
-            $exectime = time() - $starttime;
+            if(isset($event)) {
+               if(isset($_SESSION["esl"][$subscriber])) {
+                    if($_SESSION["esl"][$subscriber] == $event["data"]) {
+                        continue;
+                    }
+               }
+
+               $_SESSION["esl"][$subscriber] = $event["data"];
+               $response[] = $event;
+            }
+
        }
-       
+
+       // Turned off for cpu usage
+       //  $exectime = time() - $starttime;
+       //}
+
        echo json_encode($response);
        flush();
        die();
