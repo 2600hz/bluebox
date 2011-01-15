@@ -61,19 +61,30 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
             $contexts = Doctrine::getTable('Context')->findAll();
 
             $xml = Telephony::getDriver()->xml;
-            
+
+            $xp = new DOMXPath($xml);
+
             foreach ($contexts as $context)
             {
                 if (!in_array($context['context_id'], $assignedContexts))
                 {
-                    $xml->setXmlRoot(sprintf('//document/section[@name="dialplan"]/context[@name="context_%s"]/extension[@name="%s"]', $context['context_id'], 'main_number_' .$obj['number_id']));
+                    $search = sprintf('//document/section[@name="dialplan"]/context[@name="context_%s"]/extension[@name="%s"]', $context['context_id'], 'main_number_' .$obj['number_id']);
 
-                    $xml->deleteNode();
+                    if($xp->query($search))
+                    {
+                        kohana::log('debug', 'FreeSWITCH -> REMOVING NUMBER ' .$obj['number'] .' (' .$obj['number_id'] .') FROM CONTEXT ' .$context['context_id']);
+
+                        $xml->setXmlRoot($search);
+                        
+                        $xml->deleteNode();
+                    }
                 }
             }
 
             if ($obj['type'] == Number::TYPE_EXTERNAL AND !empty($obj->NumberContext[0]['context_id']))
             {
+                kohana::log('debug', 'FreeSWITCH -> ADDING NUMBER ' .$obj['number'] .' (' .$obj['number_id'] .') TO NUMBER ROUTE');
+
                 $xml = Freeswitch::setSection('number_route', $obj['number_id']);
 
                 // Dialplans are a bit different - we don't want to keep anything that is currently in an extension, in the event it's totally changed
@@ -88,6 +99,8 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
             }
             else
             {
+                kohana::log('debug', 'FreeSWITCH -> REMOVING NUMBER ' .$obj['number'] .' (' .$obj['number_id'] .') FROM NUMBER ROUTE');
+
                 Freeswitch::setSection('number_route', $obj['number_id'])->deleteNode();
             }
         }
