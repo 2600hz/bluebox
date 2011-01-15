@@ -195,7 +195,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         {
             return;
         }
-        
+
         $xml->update('/action[@application="answer"]');
 
         $xml->update('/action[@application="voicemail"]{@data="default voicemail_' .$voicemail['account_id'] .' ' .$voicemail['mailbox'] .'"}');
