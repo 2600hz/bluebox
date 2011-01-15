@@ -314,10 +314,10 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
             $elements = $xp->query($xml->preUpdate(''));
 
-            if (count($elements) == 1)
+            if (count($elements) == 1 AND ($node = $elements->item(0)))
             {
                 $node = $elements->item(0);
-
+                
                 $parentNode = $node->parentNode;
 
                 $parentNode->removeChild($node);
