@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 fUsage () {
     echo "Usage: $0 -y [--webuser=www] [--softswitch_dir=/usr/local/freeswitch/conf/]"
     exit 1
