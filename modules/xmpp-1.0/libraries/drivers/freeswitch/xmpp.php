@@ -128,7 +128,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
 	        <action application="set" data="bypass_media=false"/>
 		<action application="info"/>
 	</condition>
-        <condition field="\${gtalk_call}" expression="^true$"> <!-- Only do this if we haven't already handled this call -->
+        <condition field="\${gtalk_call}" expression="^true$">
             	<anti-action application="set" data="gtalk_call=true"/>
 		<anti-action application="answer"/>
 		<anti-action application="sleep" data="1000"/>
