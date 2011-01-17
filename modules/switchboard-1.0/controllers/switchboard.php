@@ -37,7 +37,7 @@ class switchboard_Controller extends Bluebox_Controller
 {
     public function index()
     {
-        stylesheet::add('esl', 50);
+        stylesheet::add('switchboard', 50);
         javascript::add('pubsub.js', 50);
 
         $this->view->sofia_status = '';
