@@ -8,4 +8,4 @@
 
     plugins::register('locationmanager', 'save', array('LocationManager_Plugin', 'save'));
 
-    Event::add('bluebox.create.extension', array('LocationManager', 'updateAreacode'));
+    Event::add('bluebox.create.extension', array('LocationManager', 'createExtension'));
