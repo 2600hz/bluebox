@@ -11,12 +11,15 @@
     <?php echo form::open_section('XMPP Login Information'); ?>
 
         <div class="field">
-            <?php echo form::label('xmpp[name]', 'Name:'); ?>
-            <?php echo form::input('xmpp[name]'); ?>
+           <?php echo form::label(array('for' => 'xmpp[name]',
+                                        'help' => 'This field cannot contain any special characters'), 'Name:'); ?>
+           <?php echo form::input('xmpp[name]'); ?>
         </div>
 
         <div class="field">
-            <?php echo form::label('xmpp[login]', 'Login:'); ?>
+            <?php echo form::label(array('for' => 'xmpp[login]',
+                                         'help' => 'If this is a Google Voice account, the user name should have /talk appended.' .
+                                                   '<br><br><u>Example</u><br>#####@gmail.com/talk'), 'Login:'); ?>
             <?php echo form::input('xmpp[login]'); ?>
         </div>
         <div class="field">
@@ -27,7 +30,7 @@
             <?php echo form::label(array('for' => 'xmpp[registry][loginserver]',
                                          'help' => 'This is the server that is used to authenticate the username and password.' .
                                                    '<br>The login server <i>may</i> differ from the outboud server.' .
-                                                   '<br><br><u>Example</u><br> For Google Voice, this setting should be: talk.google.com'),
+                                                   '<br><br><u>Example</u><br>For Google Voice, this setting should be: talk.google.com'),
                                    'Server:'); ?>
             <?php echo form::input('xmpp[registry][loginserver]', 'talk.google.com'); ?>
         </div>

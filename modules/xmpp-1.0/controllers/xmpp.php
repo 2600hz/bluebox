@@ -59,25 +59,15 @@ class Xmpp_Controller extends Bluebox_Controller
         $this->view->contexts = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
     }
 
-    public function post_save(&$object)
+    public function  save_succeeded(&$object)
     {
-        $eslManager = EslManager::getInstance();
-
-        if($eslManager->isConnected())
-        {
-            $result = $eslManager->reload('mod_dingaling');
-        }
-        parent::post_save($object);
+        Event::run('freeswitch.reload.dingaling');
+        parent::save_succeeded($object);
     }
 
-    public function post_delete(&$object)
+    public function  delete_succeeded(&$object)
     {
-        $eslManager = EslManager::getInstance();
-
-        if($eslManager->isConnected())
-        {
-            $result = $eslManager->reload('mod_dingaling');
-        }
-        parent::post_delete($object);
+        Event::run('freeswitch.reload.dingaling');
+        parent::delete_succeeded($object);
     }
 }

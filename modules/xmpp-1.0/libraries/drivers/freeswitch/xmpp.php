@@ -24,10 +24,26 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
         $xml->update('/param[@name="password"]{@value="' . $xmppData['registry']['password'] . '"}');
         $xml->update('/param[@name="server"]{@value="' . $xmppData['registry']['loginserver'] . '"}');
         $xml->update('/param[@name="dialplan"]{@value="' . $xmppData['registry']['dialplan'] . '"}');
-        $xml->update('/param[@name="message"]{@value="' . $xmppData['registry']['message'] . '"}');
+
+        $message = $xmppData['registry']['message'];
+
+        if($message == "")
+        {
+            $message = "Bluebox";
+        }
+
+        $xml->update('/param[@name="message"]{@value="' . $message . '"}');
         $xml->update('/param[@name="rtp-ip"]{@value="' . $xmppData['registry']['rtpip'] . '"}');
         $xml->update('/param[@name="auto-login"]{@value="' . ($xmppData['registry']['autologin'] == 1 ? 'true' : 'false') . '"}');
-        $xml->update('/param[@name="auto-reply"]{@value="' . $xmppData['registry']['autoreply'] . '"}');
+
+        $autoreply = $xmppData['registry']['autoreply'];
+
+        if($autoreply == "")
+        {
+            $autoreply = "This is an auto-reply";
+        }
+
+        $xml->update('/param[@name="auto-reply"]{@value="' . $autoreply . '"}');
         $xml->update('/param[@name="sasl"]{@value="' . $xmppData['registry']['sasl'] . '"}');
         $xml->update('/param[@name="tls"]{@value="' . ($xmppData['registry']['tls'] == 1 ? 'true' : 'false') . '"}');
         $xml->update('/param[@name="use-rtp-timer"]{@value="' . ($xmppData['registry']['usertptimer'] == 1 ? 'true' : 'false') . '"}');
