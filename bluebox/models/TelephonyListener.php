@@ -99,6 +99,8 @@ class TelephonyListener extends Doctrine_EventListener
                     }
                 }
 
+                self::$changedModels = array();
+
                 Telephony::save();
 
                 // If configured, tell the telephony engine to reload it's configs immediately
