@@ -77,71 +77,6 @@ class switchboard_Controller extends Bluebox_Controller
         $eslManager = new EslManager();
         
         switch ($event) {
-            case 'switchboard/reloadacl':
-                if($eslManager->isConnected()) {
-                    $result = $eslManager->reloadacl();
-                    $response = $eslManager->getResponse($result);
-                }
-                // Can't connect to Freeswitch
-                else {
-                    $response = "Cannot connect to Freeswitch";
-                }
-                break;
-
-            case 'switchboard/reloadxml':
-                if($eslManager->isConnected()) {
-                    $result = $eslManager->reloadxml();
-                    $response = $eslManager->getResponse($result);
-                }
-                // Can't connect to Freeswitch
-                else {
-                    $response = "Cannot connect to Freeswitch";
-                }
-                break;
-        
-            case 'switchboard/reloadsofia':
-                if($eslManager->isConnected()) {
-                    $result = $eslManager->reload('mod_sofia');
-                    $response = $eslManager->getResponse($result);
-                }
-                // Can't connect to Freeswitch
-                else {
-                    $response = "Cannot connect to Freeswitch";
-                }
-                break;
-
-            case 'switchboard/reloadDingaling':
-                if($eslManager->isConnected()) {
-                    $result = $eslManager->reload('mod_dingaling');
-                    $response = $eslManager->getResponse($result);
-                }
-                // Can't connect to Freeswitch
-                else {
-                    $response = "Cannot connect to Freeswitch";
-                }
-                break;
-            case 'switchboard/reinitializeNAT':
-                if($eslManager->isConnected()) {
-                    $result = $eslManager->nat('reinit');
-                    $response = $eslManager->getResponse($result);
-                }
-                // Can't connect to Freeswitch
-                else {
-                    $response = "Cannot connect to Freeswitch";
-                }
-                break;
-
-            case 'switchboard/republishNAT':
-                if($eslManager->isConnected()) {
-                    $result = $eslManager->nat('republish');
-                    $response = $eslManager->getResponse($result);
-                }
-                // Can't connect to Freeswitch
-                else {
-                    $response = "Cannot connect to Freeswitch";
-                }
-                break;
-
             case 'switchboard/manual_entry':
                 if($eslManager->isConnected()) {
                     $result = $eslManager->sendRecv("api " . $_POST['param']);
@@ -457,3 +392,4 @@ class switchboard_Controller extends Bluebox_Controller
        die();
     }
 }
+
