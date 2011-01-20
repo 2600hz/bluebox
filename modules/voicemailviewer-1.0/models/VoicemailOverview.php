@@ -1,4 +1,5 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
 class VoicemailOverview extends Bluebox_Record {
   public function setTableDefinition() {
     $this->setTableName('voicemail_overview');
