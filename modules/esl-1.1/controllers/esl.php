@@ -40,30 +40,6 @@ class Esl_Controller extends Bluebox_Controller
         stylesheet::add('esl', 50);
         javascript::add('pubsub.js', 50);
 
-        $this->view->sofia_status = '';
-        $sipInterface = Doctrine::getTable('SipInterface')->findAll();
-        foreach($sipInterface as $interface)
-        {
-            $this->view->sofia_status .= form::button(array(
-                'id' => 'sofia_profile',
-                'class' => 'eslEvent',
-                'value' => 'SIP Interface ' . $interface->sipinterface_id .' Status',
-                'param' => 'sipinterface_' . $interface->sipinterface_id
-            ));
-        }
-
-        $this->view->trunk_status = '';
-        $trunks = Doctrine::getTable('Trunk')->findAll();
-        foreach($trunks as $trunk)
-        {
-            $this->view->trunk_status .= form::button(array(
-                'id' => 'gateway_profile',
-                'class' => 'eslEvent',
-                'value' => 'Trunk ' . $trunk->trunk_id .' Status',
-                'param' => 'trunk_' . $trunk->trunk_id
-            ));
-        }
-
         //CLEAR THE ESL SESSION
         $_SESSION['esl'] = array();
 
@@ -74,7 +50,7 @@ class Esl_Controller extends Bluebox_Controller
         $this->auto_render = FALSE;
         $event = $_POST['event'];
         
-        $eslManager = new EslManager();
+        $eslManager = EslManager::getInstance();
         
         switch ($event) {
             case 'esl/reloadacl':
@@ -154,7 +130,6 @@ class Esl_Controller extends Bluebox_Controller
                 break;
         }
 
-
         echo $response;
         flush();
         die();
@@ -162,24 +137,18 @@ class Esl_Controller extends Bluebox_Controller
 
 
     public function fluxresponse() {
-        //Turn off the view
+        // Turn off the view
         $this->auto_render = FALSE;
 
-        //Turned off for cpu usage
-        //Set the timeout for the http request (in seconds)
-        //Until flux handles firefox correctly, set this to 5
-        //$TIMEOUT = 5;
+        // Turn down log level
+        $log_level = Kohana::config('core.log_threshold');
+        Kohana::config_set('core.log_threshold', 2);
 
         $response = array();
 
-        $eslManager = new EslManager();
+        $eslManager = EslManager::getInstance();
 
         $subscribers = $_POST['subscribers'];
-
-        //Turned off for cpu usage
-        //$starttime = time();
-        //$exectime = 0;
-        //while(sizeof($response) == 0 && $exectime < $TIMEOUT) {
 
         foreach ($subscribers as $subscriber) {
             switch($subscriber) {
@@ -412,6 +381,16 @@ class Esl_Controller extends Bluebox_Controller
                     $basepath = $output[0];
 
                     $logfile = $basepath . "/log/freeswitch.log";
+
+                    if(!file_exists($logfile))
+                    {
+                        if(!file_exists($logfile = '/var/log/freeswitch/freeswitch.log'))
+                        {
+                            // If you still can't find the log file, just give up
+                            break;
+                        }
+                    }
+
                     if(!isset($_SESSION["esl"]["logviewer_pos"])) {
                         $logviewer_pos = filesize($logfile) - 1200;
                         if($logviewer_pos < 0) {
@@ -460,9 +439,8 @@ class Esl_Controller extends Bluebox_Controller
 
        }
 
-       // Turned off for cpu usage
-       //  $exectime = time() - $starttime;
-       //}
+       // Restore log level
+       Kohana::config_set('core.log_threshold', $log_level);
 
        echo json_encode($response);
        flush();
