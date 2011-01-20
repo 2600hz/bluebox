@@ -7,10 +7,10 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
   public $baseModel = 'VoicemailMessage';
 
   public function index() {
-    $user = users::$user;
-    $domain = 'voicemail_1';
+    $account_id = users::getAttr('account_id');
+    $domain = 'voicemail_' .$account_id;
 
-    $mailboxes = VoicemailManager::getMailboxes($user->_data['account_id']);
+    $mailboxes = VoicemailManager::getMailboxes($account_id);
 
     // ghetto multibox support
     try {
