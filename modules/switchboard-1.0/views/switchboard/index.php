@@ -223,7 +223,13 @@ background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images
 		echo "g_TrunkArray[g_TrunkCount] = '" . $TrunkRows[$idex]->trunk_id . "';\n";
 		echo "g_TrunkNameArray[g_TrunkCount] = '" . addslashes( $TrunkRows[$idex]->name ). "';\n";
 		echo "g_TrunkIpArray[g_TrunkCount] = '" . $TrunkRows[$idex]->server . "';\n";
+		if( array_key_exists( 'username',$ExtraArray['sip']) )
+		{
 		echo "g_TrunkStatusMathArray[g_TrunkCount++] = '" . $ExtraArray['sip']['username']   . "@" . $TrunkRows[$idex]->server . "';\n";
+		}else{
+		echo "g_TrunkStatusMathArray[g_TrunkCount++] = '@" . $TrunkRows[$idex]->server . "';\n";
+		}
+		
 	}
 	?>
 	
@@ -235,7 +241,36 @@ background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images
 	}
 	?>
 	
-		
+//if in this list then it is recording otherwise it is not recording
+var g_RecordingList = new Array();
+	
+	
+function RemoveFromRecordingArray( uuid ) {
+	var TempRecArray = new Array();
+	var TempChanX = 0;
+	for(var idex=0;idex<g_RecordingList.length;idex++) {
+		if( g_RecordingList[idex] != uuid ) {
+			TempRecArray[TempChanX++] = g_RecordingList[idex];
+		}
+	}
+	g_RecordingList = TempRecArray;
+	TempChanArray = "";
+}
+	
+function AddToRecordingArray( uuid ) {
+	var ix = g_RecordingList.length +1;
+	g_RecordingList[ix] = uuid;
+}
+function IsRecording( inuuid ) {
+	for(var ix=0;ix<g_RecordingList.length;ix++) {
+		if(  g_RecordingList[ix] == inuuid) {
+			return true;
+		}
+	}
+	return false;
+}	
+	
+	
 function IsInTheContext( InContext ) {
 	for(var ix=0;ix<g_ContextArray.length;ix++) {
 		if(  g_ContextArray[ix] == InContext) {
@@ -340,7 +375,7 @@ function ChanToTrunkName(InnameString,inDataString) {
 function TrunkParseStatus( Inval ) {
 	if( Inval.indexOf("FAIL_WAIT") != -1){ return 'TrunkItemB'; } 
 	if( Inval.indexOf("REGED") != -1){ return 'TrunkItemG'; } 
-	if( Inval.indexOf("UNREGED") != -1){ return 'TrunkItemU'; } 
+	if( Inval.indexOf("UNREGED") != -1){ return 'TrunkItemG'; } 
 	if( Inval.indexOf("REGISTER") != -1){ return 'TrunkItemU'; } 
 	if( Inval.indexOf("FAILED") != -1){ return 'TrunkItemB'; } 
 	if( Inval.indexOf("FAILED (retry") != -1){ return 'TrunkItemB'; } 
