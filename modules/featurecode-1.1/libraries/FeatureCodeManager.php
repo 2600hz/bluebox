@@ -65,7 +65,7 @@ class FeatureCodeManager
 
             $number['user_id'] = users::getAttr('user_id');
 
-            $number['number'] = '9898';
+            $number['number'] = '9999';
 
             $number['location_id'] = $location_id;
 
