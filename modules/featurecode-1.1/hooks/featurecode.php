@@ -4,5 +4,5 @@
 
     Event::add('numbermanager.collectNumberTargets', array('FeatureCodeManager', 'provideNumberTargets'));
 
-//    Event::add('bluebox.account.initialize', array('FeatureCodeManager', 'initializeFeatureCode'));
+    Event::add('bluebox.account.initialize', array('FeatureCodeManager', 'initializeFeatureCode'));
     
