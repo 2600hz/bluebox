@@ -77,7 +77,7 @@ XML;
 
                 $vmdomain = 'voicemail_' .$destination['account_id'];
 
-                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_from_user}@${sip_from_host} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
 
                 $xmlText = <<<XML
 
@@ -98,7 +98,7 @@ XML;
 
                 $xml->setXmlRoot($xml->getExtensionRoot());
 
-                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_from_user}@${sip_from_host} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
 
                 $xmlText = <<<XML
                 
