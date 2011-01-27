@@ -2,7 +2,7 @@
 
 class LocationManager_Plugin extends Bluebox_Plugin
 {
-    protected $name = 'location';
+    protected $name = 'locationmanager';
     
     public function index()
     {

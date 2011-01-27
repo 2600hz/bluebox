@@ -21,6 +21,21 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
         $registry = (array)$destination['registry'];
 
         switch ($registry['feature']) {
+            case 'ivr_return':
+                $xml->deleteChildren();
+
+                $condition = '/condition[@field="${ivr_path}"][@expression="(.*)-(.*)-.*+$"][@break="never"]';
+
+                $xml->setXmlRoot($xml->getExtensionRoot() .$condition);
+
+                $xml->update('/action[@application="set"][@data="ivr_path=$1"]');
+                $xml->update('/action[@application="transfer"][@data="$2"]');
+
+                $xml->update('/anti-action[@application="set"][@data="ivr_path="]');
+                $xml->update('/anti-action[@application="transfer"][@data="${vm-operator-extension}"]');
+
+                break;
+
             case 'forward_on':
                 $xmlText = <<<XML
 XML;
@@ -62,7 +77,7 @@ XML;
 
                 $vmdomain = 'voicemail_' .$destination['account_id'];
 
-                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_from_user}@${sip_from_host} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
 
                 $xmlText = <<<XML
 
@@ -83,7 +98,7 @@ XML;
 
                 $xml->setXmlRoot($xml->getExtensionRoot());
 
-                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_auth_username}@${sip_auth_realm} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
+                $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_from_user}@${sip_from_host} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
 
                 $xmlText = <<<XML
                 
@@ -151,7 +166,10 @@ XML;
                 break;
             }
 
-        $xml->replaceWithXml($xmlText);
+        if (isset($xmlText))
+        {
+            $xml->replaceWithXml($xmlText);
+        }
 
     }
 

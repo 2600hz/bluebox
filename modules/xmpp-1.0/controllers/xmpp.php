@@ -58,4 +58,16 @@ class Xmpp_Controller extends Bluebox_Controller
         $this->view->outboundPatterns = Doctrine::getTable('SimpleRoute')->findAll(Doctrine::HYDRATE_ARRAY);
         $this->view->contexts = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
     }
+
+    public function  save_succeeded(&$object)
+    {
+        Event::run('freeswitch.reload.dingaling');
+        parent::save_succeeded($object);
+    }
+
+    public function  delete_succeeded(&$object)
+    {
+        Event::run('freeswitch.reload.dingaling');
+        parent::delete_succeeded($object);
+    }
 }

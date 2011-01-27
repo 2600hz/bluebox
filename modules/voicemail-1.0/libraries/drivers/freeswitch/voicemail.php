@@ -162,6 +162,8 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         $xml->update('/action[@application="set"][@bluebox="settingEndBridge"][@data="hangup_after_bridge=true"]');
         
         $xml->update('/action[@application="set"][@bluebox="settingFail"][@data="continue_on_fail=true"]');
+
+	$xml->update('/action[@application="set"][@bluebox="autoPlay"][@data="vm_auto_play=false"]');
     }
 
     public static function postnumber()
@@ -193,7 +195,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         {
             return;
         }
-        
+
         $xml->update('/action[@application="answer"]');
 
         $xml->update('/action[@application="voicemail"]{@data="default voicemail_' .$voicemail['account_id'] .' ' .$voicemail['mailbox'] .'"}');

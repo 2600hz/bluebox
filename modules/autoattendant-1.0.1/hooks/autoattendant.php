@@ -7,3 +7,6 @@
     plugins::register('autoattendant/edit', 'view', array('Media_Plugin', 'update'));
 
     plugins::register('autoattendant', 'save', array('Media_Plugin', 'save'));
+
+    Event::add('bluebox.account.initialize', array('AutoAttendants', 'initSampleData'));
+    

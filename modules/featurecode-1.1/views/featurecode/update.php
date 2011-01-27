@@ -27,6 +27,7 @@
             <?php echo form::dropdown('featurecode[registry][feature]', 
                     array(//'forward_on' => 'Call-Forward Activate',
                           //'forward_off' => 'Call-Forward Disable',
+                          'ivr_return' => 'Return to last AutoAttendant',
                           'redial' => 'Redial',
                           'call_return' => 'Call Return',
                           'voicemail' => 'Check Voicemail',

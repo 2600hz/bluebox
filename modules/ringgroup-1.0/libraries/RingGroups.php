@@ -2,6 +2,11 @@
 
 class RingGroups
 {
+    public static function provideNumberOptions()
+    {
+        Event::$data['RingGroupNumber'] = 'ringgroup/numberOptions.mus';
+    }
+
     public static function provideNumberTargets()
     {
         $target_objects = array();

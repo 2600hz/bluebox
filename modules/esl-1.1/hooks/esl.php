@@ -7,3 +7,5 @@
     Event::add('freeswitch.reload.xmlcdr', array('EslManager', 'eventReloadXMLCDR'));
 
     Event::add('freeswitch.reload.sofia', array('EslManager', 'eventReloadSofia'));
+
+    Event::add('freeswitch.reload.dingaling', array('EslManager', 'eventReloadDingaling'));

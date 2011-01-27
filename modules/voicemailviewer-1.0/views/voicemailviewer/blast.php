@@ -49,11 +49,11 @@ echo form::open();
 <div class="clear"></div>
 
 
-<?php echo '<div>' .  form::dropdown('file_id', Media::files())  . '</div>'; ?>
+<?php echo '<div>' . mediafiles::dropdown('file_id')  . '</div>'; ?>
 
 <?php echo'<div>' .  form::submit('confirm', 'Blast') . '</div>';?>
 </fieldset>
 <?php echo form::close('');?>
-<a href="<?= url::site('voicemailviewer/index') ?>">Cancel</a>
+<a href="<?php echo url::site('voicemailviewer/index')?>">Cancel</a>
 </div>
 
