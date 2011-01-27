@@ -12,7 +12,7 @@ class EndpointManager_Plugin extends Bluebox_Plugin
         parent::addPluginData();
 
         if((isset($_REQUEST['endpointdevice']['mac_address'])) && ($_REQUEST['endpointdevice']['mac_address'] != "")) {
-            include(MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . "functions.php");
+            include_once(MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . "functions.php");
             $endpoint = new endpointman();
             $phone_info = array();
             if($endpoint->mac_check_clean($_REQUEST['endpointdevice']['mac_address'])) {

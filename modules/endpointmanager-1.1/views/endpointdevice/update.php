@@ -10,7 +10,7 @@
     <div class="field">
     <?php
         echo form::label('endpointdevice[brand]', 'Phone:');
-        include(MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . "functions.php");
+        include_once(MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . "functions.php");
 
         $endpoint = new endpointman();
 

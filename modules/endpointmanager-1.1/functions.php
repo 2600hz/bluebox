@@ -17,7 +17,9 @@ class endpointman {
     public $global_cfg = "";
 
     function  __construct() {
-        define("PHONE_MODULES_PATH", MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR);
+        if (!defined("PHONE_MODULES_PATH")) {
+		define("PHONE_MODULES_PATH", MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR);
+	}
         $this->main_path = MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR;
         $this->mod_path = MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . 'endpoint' . DIRECTORY_SEPARATOR;
         $this->global_cfg['config_location'] = "/tftpboot/";
