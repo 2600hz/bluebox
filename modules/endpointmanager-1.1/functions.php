@@ -84,8 +84,17 @@ class endpointman {
         $provisioner_lib->timezone = date_offset_get(new DateTime);
 
         //Server IP
-        $provisioner_lib->server[1]['ip'] = $_SERVER["SERVER_ADDR"];
-        $provisioner_lib->server[1]['port'] = 5060;
+        if (isset($phone_info['host'])) {
+            $provisioner_lib->server[1]['ip'] = $phone_info['host'];
+        } else {
+            $provisioner_lib->server[1]['ip'] = $_SERVER["SERVER_ADDR"];
+        }
+
+        if (isset($phone_info['port'])) {
+            $provisioner_lib->server[1]['port'] = $phone_info['port'];
+        } else {
+            $provisioner_lib->server[1]['port'] = 5060;
+        }
 
         //Provide alternate Configuration file instead of the one from the hard drive
         //$endpoint->config_files_override['$mac.cfg'] = "{\$srvip}\n{\$admin_pass|0}\n{\$test.line.1}";
