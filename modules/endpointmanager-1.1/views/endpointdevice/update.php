@@ -21,11 +21,4 @@
     ?>
     </div>
 
-    <div class="field">
-    <?php
-        echo form::label();
-        echo form::button('Configure', 'Configure');
-    ?>
-    </div>
-
 <?php echo form::close_section(); ?>
