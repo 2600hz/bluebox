@@ -4,7 +4,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'EndpointDevice';
 
-    public function generate($file, $mac_address)
+    public function generate($mac_address)
     {
         $this->auto_render = false;
     }

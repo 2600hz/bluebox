@@ -21,4 +21,12 @@
     ?>
     </div>
 
+    <div class="field">
+    <?php
+        echo form::label('endpointdevice[display_name]', 'Display Name:');
+        echo form::input('endpointdevice[display_name]');
+
+    ?>
+    </div>
+
 <?php echo form::close_section(); ?>
