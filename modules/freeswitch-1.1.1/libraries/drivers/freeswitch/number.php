@@ -70,7 +70,7 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
                 {
                     $search = sprintf('//document/section[@name="dialplan"]/context[@name="context_%s"]/extension[@name="%s"]', $context['context_id'], 'main_number_' .$obj['number_id']);
 
-                    if($xp->query($search))
+                    if($xp->query($search)->length)
                     {
                         kohana::log('debug', 'FreeSWITCH -> REMOVING NUMBER ' .$obj['number'] .' (' .$obj['number_id'] .') FROM CONTEXT ' .$context['context_id']);
 
