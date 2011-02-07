@@ -38,7 +38,9 @@
                           'echo' => 'Echo Test',
                           'delay_echo' => 'Delayed Echo Test',
                           'tone_test' => 'Miliwatt Tone Test',
-                          'hold_music' => 'Hold Music Test'));
+                          'hold_music' => 'Hold Music Test',
+                          'eavesdrop' => 'Eavesdrop'
+                        ));
             ?>
         </div>
 

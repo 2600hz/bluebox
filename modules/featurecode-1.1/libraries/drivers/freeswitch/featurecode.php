@@ -164,6 +164,11 @@ XML;
 <action application="playback" data="\$\${hold_music}"/>
 XML;
                 break;
+
+            case 'eavesdrop' :
+                $xmlText = <<<XML
+XML;
+
             }
 
         if (isset($xmlText))
