@@ -8,10 +8,11 @@ class Location extends Bluebox_Record
         ),
         'domain' => array (
             'required' => 'Domain is required',
-            'unique' => 'This domain already exists'
+            'unique' => 'This domain already exists',
+            'chars' => 'Only letters, numbers, dot, and hyphen'
         )
     );
-    
+
     /**
      * Sets the table name, and defines table columns.
      */
@@ -46,9 +47,19 @@ class Location extends Bluebox_Record
         $unlimit = Session::instance()->get('bluebox.delete.unlimit', FALSE);
 
         if (!$unlimit AND count($this->getTable()->findAll()) <= 1)
-	{
-	    throw new Exception ('You can not delete the only location for this account');
-	}
+	    {
+	        throw new Exception ('You can not delete the only location for this account');
+    	}
+    }
+
+    public function preValidate(Doctrine_Event $event)
+    {
+        $record = &$event->getInvoker();
+
+        if (empty($record['domain']) || !preg_match('/^[0-9a-zA-Z\.-]*$/D', $record['domain']))
+        {
+            $this->getErrorStack()->add('domain', 'chars');
+        }
     }
 
     public static function dictionary($multitenancy = TRUE)
