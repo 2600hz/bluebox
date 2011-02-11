@@ -260,7 +260,7 @@ $(function()
                          }
 
                          // FOR DEMO
-                         //removeDeviceFromDropdown('add', reply.data.device_id);
+                         removeDeviceFromDropdown('add', reply.data.device_id);
                          restoreHint($('.' + saveType + '-text-field'));
 
                          $('.agent-' + reply.data.agent_id).find('.agent-user-name').html(reply.data.name);
@@ -309,7 +309,7 @@ $(function()
                         {
                             addAgentHTML(agent.agent_id, agent.name);
                             // FOR DEMO
-                            //removeDeviceFromDropdown('add', agent.device_id);
+                            removeDeviceFromDropdown('add', agent.device_id);
                         });
                     }
                     else
@@ -386,7 +386,7 @@ $(function()
                         $('.menu-bottom-wrapper').append($editMenu);
 
                         // FOR DEMO
-                        //addDeviceToDropdown('edit', reply.data.device_id);
+                        addDeviceToDropdown('edit', reply.data.device_id);
 
                         $editMenu.find('#edit-device-selected').find('.add-device-' + reply.data.device_id).attr('selected', 'selected');
                         $editMenu.find('#edit-device-selected').attr('olddeviceid', reply.data.device_id);
