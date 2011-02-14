@@ -206,7 +206,6 @@ XML;
 
 XML;
                 break;
->>>>>>> Stashed changes:modules/featurecode-1.1/libraries/drivers/freeswitch/featurecode.php
             }
 
         if (isset($xmlText))
