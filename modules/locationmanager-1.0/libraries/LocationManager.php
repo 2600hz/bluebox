@@ -1,39 +1,13 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
-class LocationManager {
-    public function setAreacode($base)
+class LocationManager
+{
+    public static function createExtension()
     {
-        if($base instanceof Device)
-        {
-            $domain = '$${location_' . $base['User']['location_id'] .'}';
+        extract(Event::$data);
 
-            $xml = Telephony::getDriver()->xml;
+        $plugin = array('locationmanager' => array());
 
-            FreeSwitch::setSection('user', $domain, $base['device_id']);
-
-            if(isset($base['User']['Location']['registry']['areacode']))
-            {
-                $xml->update('/variables/variable[@name="areacode"]{@value="' . $base['User']['Location']['registry']['areacode'] .'"}');
-            }
-            else {
-                $xml->update('/variables/variable[@name="areacode"]{@value=""}');
-            }
-        }
-    }
-
-
-    public function updateAreacode()
-    {
-        $base = Event::$data;
-
-        if(isset($base))
-        {
-            if(isset($base['device']))
-            {
-                LocationManager::setAreacode($base['device']);
-            }
-        }
+        $device['plugins'] = arr::merge($device['plugins'], $plugin);
     }
 }
-
-?>

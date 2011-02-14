@@ -28,37 +28,48 @@ $swdb->select('name,voicemail_id,mailbox');
 $result = $swdb->get();
 $VoircemailRows = $result->as_array();
 
+$DevListHeight = count($DeviceRows) * 80;
+if( $DevListHeight < 500 ){ $DevListHeight= 500;}
 ?>
 <style>
-.sb-extin{float:left;width: 155px;height:100px;background-color: #fff;padding-left:5px;}
-.sb-extout{float:left;width: 155px;height:100px;background-color: #fff;padding-left:5px;}
-.sb-callcont{border: 2px solid #0088cc;height: 100px;float: left;}
-.sb-confcont{border: 2px solid #00cccc;height: 100px;float: left;}
-.sb-autocont{border: 2px solid #88ff99;height: 100px;float: left;}
-.sb-vmcont{border: 2px solid #00ff88;height: 100px;float: left;}
 
-.sbarrow{float:left;height:100px;}
-.sb-grp{height:100px;border: 1px solid #000;float: left;}
-.sb-title{height:100px;float: left;}
-.sb-trunk{width: 125px;height: 175px;border: 1px solid #000;float: left;background-color: #acacac;}
 
-.DeviceItem{width: 150px;height: 40px;border: 1px solid #000;float: left;background-color: #ffffcc;padding-top: 10px;}
-.TrunkItem{width: 150px;min-height: 60px;border: 1px solid #000;float: left;background-color: #99cccc;}
-.TrunkLable{width: 150px;border-bottom: 1px solid #acacac;padding-top: 2px;padding-right: 2px;font-weight: bold;color: #fff;}
-.tsdiv{text-align: left;font-weight: bold;color: #fff;width: 150px;}
-
-.devcallin{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/devincall.gif');height: 20px;width: 23px;}
-.devcallout{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/devoutcall.gif');height: 20px;width: 23px;}
-
-.calldividercall{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/connectgreen.gif');float:left;height:100px;width: 26px;}
+.calldividercall{background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/connectgreen.gif');float:left;height:100px;width: 26px;}
 .calldividertrunk{
-background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/connecttrunk.gif');
-float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
+	background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/connecttrunk.gif');
+	float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
 }
+.nocallsop{background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/nocallsop.gif');width: 550px;min-height: <?=$DevListHeight;?>px}
 
-.nocallsop{background: url('<?php url::base(); ?>/modules/switchboard-1.0/assets/images/nocallsop.gif');width: 550px;height:550px;}
-.devstat{float: right;padding-left: 3px;}
 
+
+
+.TrunkItemU{width: 150px;min-height: 75px;float: left;background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/trunk_unknown_bg.gif');}
+.TrunkItemG{width: 150px;min-height: 75px;float: left;background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/trunk_good_bg.gif');}
+.TrunkItemB{width: 150px;min-height: 75px;float: left;background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/trunk_bad_bg.gif');}
+.TrunkItemL{width: 150px;min-height: 75px;float: left;background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/trunk_unknown_bg.gif');}
+.TrunkDivider{width: 150px;min-height: 15px;float: left;}
+.TrunkLable{width: 150px;font-weight: bold;color: #fff;text-align: center;}
+.tsdiv{text-align: left;font-weight: bold;color: #000;width: 150px;}
+
+
+
+.DeviceItem{
+width: 150px;height: 80px;float: left;
+background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/leftitems_bgsmall.gif');
+}
+.DeviceItemSel{
+width: 150px;height: 80px;float: left;
+background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/leftitems_bgsmall_sel.gif');
+}
+.DeviceItemhead{width: 150px;height: 14px;color: #fff;text-align: center;font-size: 10px;float: left;}
+.DeviceItemlt{width: 7px;height: 66px;float: left;}
+.devstat{float: bottom;width: 140px;;height: 20px;text-align: right;}
+.devcallin{background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/devincall.gif');height: 20px;width: 23px;float:right;}
+.devcallout{background: url('<?=url::base();?>/modules/switchboard-1.0/assets/images/devoutcall.gif');height: 20px;width: 23px;float:right;}
+
+.opspanleft{width: 10px;float: left;}
+.opspanleftItem{width: 10px;height: 80px;float: left;}
 </style>
 <div class="column-container" style="min-height:800px;">
     <div class="column-sides">
@@ -69,9 +80,7 @@ float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
 	<input type="hidden" value="" name="suuid" size="50" id="idssuid">
 	 <div id="debug_tab" style="width: 900px;padding-bottom:15px;">
             <div style="width: 900px;">
-	    
-		<input type="button" value=" Show Types " onclick="ShowDebug();" />
-		<input type="button" value=" Clear Selected " onclick="clearselected();" />
+		<!--<input type="button" value=" Clear Selected " onclick="clearselected();" />-->
 		<?php echo form::input(array('id' => 'manual_entry_param', 'value' => '','size' =>'80', 'type'=>'hidden')); ?>
 		<?php echo form::input(array('id' => 'manual_entry_kill', 'value' => '','size' =>'80', 'type'=>'hidden')); ?>
 		<?php echo form::input(array('id' => 'manual_entry_park', 'value' => '','size' =>'80', 'type'=>'hidden')); ?>
@@ -85,7 +94,7 @@ float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
 		
 		<?php echo form::button(array('id' => 'manual_kill', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Kill--'));?>
 		<?php echo form::button(array('id' => 'manual_park', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Park--'));?>
-		<?php echo form::button(array('id' => 'manual_hold', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Hold--'));?>
+		<?php echo form::button(array('id' => 'manual_hold', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Put On Hold--'));?>
 		<?php echo form::button(array('id' => 'manual_xfer', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Xfer--'));?>
 		 <?php echo form::button(array('id' => 'manual_record', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Record--'));?>
 		 <div style="float: right;">
@@ -106,20 +115,37 @@ float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
 	<?php
 	for($idex=0;$idex<count($DeviceRows);$idex++) {
 		$ExtraArray = unserialize( $DeviceRows[$idex]->plugins );
+		$SipOrInternalNumber="";
 		
-		$t= $ExtraArray['callerid']['internal_number'];
+		if( array_key_exists( 'internal_number',$ExtraArray['callerid']) )
+		{
+			$SipOrInternalNumber= $ExtraArray['callerid']['internal_number'];
+		}else {
+				
+			if( array_key_exists( 'username',$ExtraArray['sip']) )
+			{
+				$SipOrInternalNumber= $ExtraArray['sip']['username'];
+			}
+		}
+		
+		if( $SipOrInternalNumber != "" ) {
 		$Ctx = "context_" . $DeviceRows[$idex]->context_id;
-		echo "<div class=\"DeviceItem\" id=\"device" . $t . "\" onclick=\"SelectDevice('device" . $t . "','" . $t . "','" . $Ctx . "');\">" . $DeviceRows[$idex]->name . "<div id=\"stats$t\" class=\"devstat\"></div></div>";
+		echo "<div class=\"DeviceItem\" id=\"device" . $SipOrInternalNumber . "\" 
+		onclick=\"SelectDevice('device" . $SipOrInternalNumber . "','" . $SipOrInternalNumber . "','" . $Ctx . "');\">
+		<div class=\"DeviceItemhead\">$SipOrInternalNumber</div>
+		<div class=\"DeviceItemlt\"></div>" . $DeviceRows[$idex]->name . 
+		"<div id=\"stats$SipOrInternalNumber\" class=\"devstat\"></div></div>";
+		}
 	}
 	?>
 	</div>
-	<div style="width:590px;min-height:550px;float:left;border: 1px solid #000;">
-	<div id="op-channels"></div>
+	<div style="width:595px;min-height:550px;float:left;">
+	<div id="op-channels" style="width:595px;min-height:550px;float:left;"></div>
 	</div>
 	<div id="TrunkList" style="width:150px;float:left;min-height: 500px;">
 	<?php
 	for($idex=0;$idex<count($TrunkRows);$idex++) {
-		echo "<div class=\"TrunkItem\"><div class=\"TrunkLable\">" . $TrunkRows[$idex]->name . "</div><div class=\"tsdiv\" id=\"ts" . $TrunkRows[$idex]->trunk_id  .  "\"></div></div>";
+		echo "<div class=\"TrunkItemL\"  id=\"ts" . $TrunkRows[$idex]->trunk_id  .  "\"><div class=\"TrunkLable\">" . $TrunkRows[$idex]->name . "</div><div class=\"tsdiv\" id=\"tst" . $TrunkRows[$idex]->trunk_id  .  "\"></div></div><div class=\"TrunkDivider\"></div>";
 	}
 	?>
 	</div>
@@ -140,26 +166,39 @@ float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
     var g_DevID = "";
     var g_DevContext = "";
     var g_DevDivID = "";
-    
-    // this is used to get the epoc time differance from the web server to the client.
-    var EpocServer = <?=date("U"); ?>;
-    var d = new Date();
-    var EpocClient = (d.getTime()-d.getMilliseconds())/1000;
-    var EpocDiff = EpocServer - EpocClient;
+    var g_EpocDiff = getEpocTimeDiff();
+
+
     
     var g_DeviceCount = 0;
     var g_DevListArray = new Array();
     //--------------------------------------------------------------  Items to javascript
     // could make all this stuff object/classes at some point.
     <?php
+	$g_OpsPanLeftPadLength = "<div class=\"opspanleft\">";
 	for($idex=0;$idex<count($DeviceRows);$idex++) {
 		$ExtraArray = unserialize( $DeviceRows[$idex]->plugins );
+		$SipOrInternalNumber= "";
+		if( array_key_exists( 'internal_number',$ExtraArray['callerid']) )
+		{
+			$SipOrInternalNumber= $ExtraArray['callerid']['internal_number'];
+		}else {
 		
-		$t= $ExtraArray['callerid']['internal_number'];
-		$Ctx = "context_" . $DeviceRows[$idex]->context_id;
-		echo "g_DevListArray[g_DeviceCount++] = '$t';\n";
+			if( array_key_exists( 'username',$ExtraArray['sip']) )
+			{
+				$SipOrInternalNumber= $ExtraArray['sip']['username'];
+			}
+		}
+		if( $SipOrInternalNumber!= "" ) {
+			$Ctx = "context_" . $DeviceRows[$idex]->context_id;
+			echo "g_DevListArray[g_DeviceCount++] = '$SipOrInternalNumber';\n";
+			$g_OpsPanLeftPadLength .= "<div class=\"opspanleftItem\"></div>";
+			
+		}
 	}
+	$g_OpsPanLeftPadLength .= "</div>";
 	?>
+	var g_OpsPanLeftFiller = '<?=$g_OpsPanLeftPadLength?>';
 	
 	var g_TrunkCount = 0;
 	var g_TrunkArray = new Array();
@@ -176,7 +215,48 @@ float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
 	}
 	?>
 
-    
+	//Disable some stuff until proper selections are made
+	
+function CheckButtonStates() {
+	document.getElementById('manual_kill').disabled = true;
+	document.getElementById('manual_park').disabled = true;
+	document.getElementById('manual_hold').disabled = true;
+	document.getElementById('manual_xfer').disabled = true;
+	document.getElementById('manual_record').disabled = true;
+	document.getElementById('manual_sound').disabled = true;
+	
+	if( g_SelectedUUID1 != "" ) {
+	
+		document.getElementById('manual_kill').disabled = false;
+		document.getElementById('manual_park').disabled = false;
+		document.getElementById('manual_hold').disabled = false;
+		document.getElementById('manual_record').disabled = false;
+		document.getElementById('manual_sound').disabled = false;
+		
+		if( g_DevID != "" ) {
+			document.getElementById('manual_xfer').disabled = false;
+		}
+	}
+}
+
+function inValidateGlobalUUID() {
+	if( isUUIDStillValid( g_SelectedUUID1) == false ) {
+		g_SelectedUUID1 = "";
+	}
+}
+
+function isUUIDStillValid( inuuid ) {
+	for(var ichan=0;ichan<g_ChanList.length;ichan++) {
+		if(  g_ChanList[ichan]['uuid']  == inuuid) {
+			return true;
+		}
+		if(  g_ChanList[ichan]['call_uuid']  == inuuid) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function UpdateDeviceList() {
 	for(var idex=0;idex<g_DevListArray.length;idex++) {
 		document.getElementById('stats'+ g_DevListArray[idex]).innerHTML = "idle";
@@ -202,31 +282,50 @@ function UpdateTrunkList(indata) {
 	for(var idex=0;idex<g_TrunkArray.length;idex++) {
 		var trunkSipLoc = indata.indexOf( g_TrunkStatusMathArray[idex] ) + g_TrunkStatusMathArray[idex].length;
 		var trunkStatsChunk = indata.substr(trunkSipLoc,16);
-		document.getElementById('ts'+ g_TrunkArray[idex]).innerHTML ="" + TrunkParseStatus( trunkStatsChunk );
+		var TrunkClassStatus = TrunkParseStatus( trunkStatsChunk );
+		var TrunkClassStatusText = TrunkParseStatusText( trunkStatsChunk )
+		document.getElementById('ts'+ g_TrunkArray[idex]).setAttribute("class",TrunkClassStatus);
+		document.getElementById('tst'+ g_TrunkArray[idex]).innerHTML = '&nbsp;&nbsp;' + TrunkClassStatusText;
 	}
 }
 
-function ChanToTrunkName(InnameString) {
+//this will compare all the trunk ips and the trunk_ids and return a name
+function ChanToTrunkName(InnameString,inDataString) {
 	var nameString = '' + InnameString; //simple conversion of there is an issue
+	var nameStringData = '' + inDataString;//
 	for(var idex=0;idex<g_TrunkArray.length;idex++) {
+	
 		if( nameString.indexOf( g_TrunkIpArray[idex] ) != -1 ) {
 			return g_TrunkNameArray[idex];
 		}
-		if( nameString.indexOf( 'trunk_' + g_TrunkArray[idex] ) != -1 ) {
+		var trunkconcate = "trunk_" + g_TrunkArray[idex];
+		
+		if( nameString.indexOf(  trunkconcate ) != -1 ||  nameStringData.indexOf(  trunkconcate ) != -1) {
 			return g_TrunkNameArray[idex];
 		}
 	}
 	return "";
 }
 
+//Parse the esl sip respone and look for key words
 function TrunkParseStatus( Inval ) {
-	if( Inval.indexOf("FAIL_WAIT") != -1){ return '<img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/trunkred.gif" /> Failed: Waiting'; } 
-	if( Inval.indexOf("REGED") != -1){ return '<img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/trunkgreen.gif" /> UP'; } 
-	if( Inval.indexOf("UNREGED") != -1){ return '<img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/trunkyellow.gif" /> Failed: Waiting'; } 
-	if( Inval.indexOf("REGISTER") != -1){ return '<img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/trunkyellow.gif" /> Failed: Waiting'; } 
-	if( Inval.indexOf("FAILED") != -1){ return '<img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/trunkred.gif" />Failed'; } 
-	if( Inval.indexOf("FAILED (retry") != -1){ return '<img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/trunkred.gif" /> Failed: Retry'; } 
-	return "unknown";
+	if( Inval.indexOf("FAIL_WAIT") != -1){ return 'TrunkItemB'; } 
+	if( Inval.indexOf("REGED") != -1){ return 'TrunkItemG'; } 
+	if( Inval.indexOf("UNREGED") != -1){ return 'TrunkItemU'; } 
+	if( Inval.indexOf("REGISTER") != -1){ return 'TrunkItemU'; } 
+	if( Inval.indexOf("FAILED") != -1){ return 'TrunkItemB'; } 
+	if( Inval.indexOf("FAILED (retry") != -1){ return 'TrunkItemB'; } 
+	return "TrunkItemU";
+}
+
+function TrunkParseStatusText( Inval ) {
+	if( Inval.indexOf("FAIL_WAIT") != -1){ return 'FAIL_WAIT'; } 
+	if( Inval.indexOf("REGED") != -1){ return 'REGED'; } 
+	if( Inval.indexOf("UNREGED") != -1){ return 'UNREGED'; } 
+	if( Inval.indexOf("REGISTER") != -1){ return 'REGISTER'; } 
+	if( Inval.indexOf("FAILED") != -1){ return 'FAILED'; } 
+	if( Inval.indexOf("FAILED (retry") != -1){ return 'FAILED (retry)'; } 
+	return "Unknown";
 }
 
 function ShowDebug() {
@@ -245,13 +344,27 @@ function ShowDebug() {
 
 
 function SelectDevice( divid,devid,devcontext ) {
-	document.getElementById(divid).style.backgroundColor = "#ffff00";
-	if( g_DevDivID != "" ) {
-		document.getElementById(g_DevDivID).style.backgroundColor = "#ffffcc";
+
+	//document.getElementById(divid).style.backgroundColor = "#ffff00";
+	if( g_DevDivID == divid ) {
+		//we are unslecting the device
+		document.getElementById(g_DevDivID).setAttribute("class","DeviceItem");
+		divid = "";
+		devid = "";
+		devcontext = "";
+	}
+	else
+	{
+		document.getElementById(divid).setAttribute("class","DeviceItemSel");
+		if( g_DevDivID != "" ) {
+			//document.getElementById(g_DevDivID).style.backgroundColor = "#ffffcc";
+			document.getElementById(g_DevDivID).setAttribute("class","DeviceItem");
+		}
 	}
 	g_DevDivID = divid;
 	g_DevID = devid;
 	g_DevContext = devcontext;
+	CheckButtonStates() ;
 	RebuildCommands( g_SelectedUUID1 ); // need to rebuild the string since we changed the xfer or new device
 }
 
@@ -278,28 +391,53 @@ function clearselected() {
 	g_SelectedUUID1 = "";
 }
 
-
+//this is called to sey up the ESL commands
 function RebuildCommands( inuuid ) {
+	var HoldStatus = GetHoldStatusOffOn( inuuid );
+	document.getElementById('manual_hold').innerHTML = "--Put On Hold--";
+	if( HoldStatus == "off " ) {
+		document.getElementById('manual_hold').innerHTML = "--Take off Hold--";
+	}
+	
 	document.getElementById('idssuid').value = inuuid;
 	document.getElementById('manual_entry_param').value = "uuid_kill " + inuuid;
 	document.getElementById('manual_entry_park').value = "uuid_kill " + inuuid;
 	document.getElementById('manual_entry_kill'	).value = "uuid_park " + inuuid;
-	document.getElementById('manual_entry_hold').value = "uuid_hold " + inuuid;
+	document.getElementById('manual_entry_hold').value = "uuid_hold " + HoldStatus + inuuid;
 	document.getElementById('manual_entry_xfer'	).value = "uuid_transfer " + inuuid + " -both " + g_DevID + " xml " + g_DevContext;
 	var sndfile = document.getElementById('media_widget_file_list').value
 	document.getElementById('manual_entry_sound').value = "uuid_broadcast " + inuuid + " " + sndfile + " both";
 	document.getElementById('manual_entry_record').value = "uuid_record " + inuuid + " start /usr/local/freeswitch/recordings"+ inuuid + "wav";
+	CheckButtonStates() ;
+}
 
-
+//this will check the callstate and see if we hold or hold off( unhold) the call
+function GetHoldStatusOffOn(inuuid) {
+	var retVal = "";
+	for(var idex=0;idex<g_ChanList.length;idex++) {
+			if(g_ChanList[idex]['callstate'] == "HELD" && g_ChanList[idex]['uuid'] == inuuid ) {
+			return "off ";
+			}
+	}
+	return retVal;
 }
 
 function selectuuid(inelement,inuuid) {
-	RebuildCommands( inuuid ) ;
+
+	if( inuuid == g_SelectedUUID1 ) {
+		document.getElementById(g_SelectedUUID1).style.backgroundColor = "#ffffff";
+		g_SelectedUUID1 = "";
+		RebuildCommands( g_SelectedUUID1 ) ;
+		return;
+	}
+
+	
 	document.getElementById(inuuid).style.backgroundColor = "#ffff00";
 	if(  g_SelectedUUID1 != "" ) {
 		document.getElementById(g_SelectedUUID1).style.backgroundColor = "#ffffff";
 	}
 	g_SelectedUUID1 = inuuid;
+	RebuildCommands( g_SelectedUUID1 ) ;
 }
     
     $(function() {
@@ -353,10 +491,14 @@ function selectuuid(inelement,inuuid) {
 	
 	  $.subscribe("switchboard/channels", function(channels) {
 		var BuiltChanHTML = buildchanhtml( channels )
-		if( BuiltChanHTML == "" ){ BuiltChanHTML = '<div class="nocallsop"></div>';}
-            $("#op-channels").html(BuiltChanHTML);
-	    RefreshSelectedDivs();
-	    UpdateDeviceList() ;
+		if( BuiltChanHTML == "" ){ BuiltChanHTML = '<div id=\"divnocallsop\"class="nocallsop"></div>';}
+            $("#op-channels").html(g_OpsPanLeftFiller + BuiltChanHTML);
+	    inValidateGlobalUUID(); // if the uuid is not it the list anymore set the global selected UUID to nothing
+	    RefreshSelectedDivs();	//since we have a new set of data we need to reselect the divs because they have been rewritten
+	    UpdateDeviceList();		//This will update the devices on the left status, idle, inbound outbound etc..
+	    RebuildCommands();		// this repopulates the commands with the UUID
+	    //this is needed because of multiple updates
+	    setTimeout( "RebuildCommands();",500); // some times we have lag
         });
 
 	 $.subscribe("switchboard/sipinterfaces", function(interfaces) {
@@ -405,18 +547,20 @@ function selectuuid(inelement,inuuid) {
 		for(var idex=0;idex<g_GroupsHTML.length;idex++) {
 			//build lead in div for type
 			var myblocktype = GetBlockType( g_GroupsHTML[idex] ) ;
+			var GroupCount = CountItemsInGroup(g_GroupsHTML[idex] );
+			
 			if( myblocktype == "call" ) {
-				RetHTML = RetHTML + '<div class="sb-callcont"><div class="sb-title"><div class="sbarrow"><img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/callintintcat.gif"></div></div>';
+				RetHTML = RetHTML + '<div class="sb-callcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?=url::base(); ?>modules/switchboard-1.0/assets/images/callintintcat.gif"></div></div>';
 			}
 			if( myblocktype == "conference" ) {
-				RetHTML = RetHTML + '<div class="sb-confcont"><div class="sb-title"><div class="sbarrow"><img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/confcat.gif"></div></div>';
+				RetHTML = RetHTML + '<div class="sb-confcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?=url::base(); ?>modules/switchboard-1.0/assets/images/confcat.gif"></div></div>';
 			}
 			if( myblocktype == "auto_attendant" ) {
-				RetHTML = RetHTML + '<div class="sb-autocont"><div class="sb-title"><div class="sbarrow"><img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/autocat.gif"></div></div>';
+				RetHTML = RetHTML + '<div class="sb-autocont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?=url::base(); ?>modules/switchboard-1.0/assets/images/autocat.gif"></div></div>';
 			}
 			
 			if( myblocktype == "voicemail" ) {
-				RetHTML = RetHTML + '<div class="sb-vmcont"><div class="sb-title"><div class="sbarrow"><img src="<?php url::base(); ?>/modules/switchboard-1.0/assets/images/vmcat.gif"></div></div>';
+				RetHTML = RetHTML + '<div class="sb-vmcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?=url::base(); ?>modules/switchboard-1.0/assets/images/vmcat.gif"></div></div>';
 			}
 			
 			if( myblocktype == "unknown" ) {
@@ -455,20 +599,16 @@ function selectuuid(inelement,inuuid) {
 	
 	function BuildCallDivHTML( InChanArray,id,DivType ) {
 		var RetHTML = "";
-		var CurrentID = "";
+		var CurrentID = InChanArray['uuid'] ;
 		
-		if( InChanArray['call_uuid'] == ""){
-			CurrentID = InChanArray['uuid'] ;
-		}
-		else
-		{
+		if( CurrentID == "" || CurrentID == "" || CurrentID == "none" || CurrentID == "undefined" ) {
 			CurrentID = InChanArray['call_uuid'] ;
 		}
-
+		
 		if(  InChanArray['direction']  == "inbound" ) {
 		
 			//let see if we have any of the trunk ips related in name
-			var UsingTrunkName = ChanToTrunkName( InChanArray['name'] );
+			var UsingTrunkName = ChanToTrunkName( InChanArray['name'] ,InChanArray['application_data']);
 			var newTrunkName = '<br /><br />' + verticalText(UsingTrunkName);
 			
 			if( DivType != "call" && UsingTrunkName != "") {
@@ -489,10 +629,10 @@ function selectuuid(inelement,inuuid) {
 			
 			RetHTML = RetHTML + "Call State:" +  InChanArray['callstate'] + "<br />";
 			
-			if( getTrunkName(InChanArray['application_data']) != false) {
-				RetHTML = RetHTML + "Trunk: " +  getTrunkName(InChanArray['application_data'] )+ "<br />";
-			}
-			
+			//if( getTrunkName(InChanArray['application_data']) != false) {
+			//	RetHTML = RetHTML + "Trunk: " +  getTrunkName(InChanArray['application_data'] )+ "<br />";
+			//}
+			RetHTML = RetHTML + "CT: " +  DivType+ "<br />";
 			
 			if( DivType == "call" && UsingTrunkName == "") {
 			RetHTML = RetHTML + '</div><div class="calldividercall">' + newTrunkName + '</div>';
@@ -506,10 +646,22 @@ function selectuuid(inelement,inuuid) {
 		}
 		
 		if(  InChanArray['direction']  == "outbound" ) {
+			var UsingTrunkName = ChanToTrunkName( InChanArray['name'] ,InChanArray['application_data']);
+			var newTrunkName = '<br /><br />' + verticalText(UsingTrunkName);
+			
+			
+			if( DivType == "call" && UsingTrunkName != "") {
+				RetHTML = RetHTML + '<div class="calldividertrunk">' + newTrunkName + '</div>';
+			}
+			if( DivType == "call" && UsingTrunkName == "") {
+				RetHTML = RetHTML + '<div class="calldividercall">' + newTrunkName + '</div>';
+			}
+			
 			RetHTML = RetHTML + '<div class="sb-extout" id="'+ CurrentID +'" onclick="selectuuid(this,' + "'" +  CurrentID  + "'" + ');">';
 			RetHTML = RetHTML + "" +  InChanArray['callee_name'] + "<br />";
 			RetHTML = RetHTML + "" +  InChanArray['callee_num'] + "<br />";
 			RetHTML = RetHTML + '<div id="' + id + '"><script>DivClickTimer(' + InChanArray['created_epoch']+' ,' + id + ');<\/script>' +  '</div>';
+			RetHTML = RetHTML + "CT: " +  DivType+ "<br />";
 			if( DivType == "voicemail") {
 				RetHTML = RetHTML + "Voicemail: " +  InChanArray['dest'] + "<br />";
 			}
@@ -525,32 +677,53 @@ function selectuuid(inelement,inuuid) {
 		return RetHTML;
 	}
 	
-	function UUIDSub( InUUID ) {
-		//this is the same as getconfuuid I seperated just incase I need to change it
-		var RetVal = "";
-		var SData = InUUID.split("-");
-		return SData[SData.length-1];
+	function CountItemsInGroup(GroupNameIn ) {
+		var retVal = "";
+		var grpoutcnt = 0;
+		for(var idex=0;idex<g_ChanList.length;idex++) {
+			if(g_ChanList[idex]['grpname'] ==GroupNameIn ) {
+			grpoutcnt++; 
+			}
+		}
+		if( grpoutcnt > 3 ){retVal = "2";}
+		if( grpoutcnt > 6 ){retVal = "3";}
+		if( grpoutcnt > 9 ){retVal = "4";}
+		return retVal;
 	}
 	
 	function GroupData(ArrayIn) {
 		var grptype 	= "";
 		var searchtype 	= "";
 		var retgrptype 	= "";
-		var TheUUID 	= "";
-		if( ArrayIn['call_uuid'] == "" ) {
-			TheUUID = UUIDSub(ArrayIn['uuid']);
-		}
-		else {
+		var TheUUID 	= UUIDSub(ArrayIn['uuid']);
+
+		if( TheUUID == "" || TheUUID == "" || TheUUID == "none" || TheUUID == "undefined" ) {
 			TheUUID = UUIDSub(ArrayIn['call_uuid']);
 		}
 		
-		if( ArrayIn['application_data'].substr(0,11) == "conference_" 		) {  grptype = "conference";searchtype = "conference_" +GetConfUUIDPart(TheUUID );  }
-		if( ArrayIn['application_data'].substr(0,15) == "auto_attendant_" 	) {  grptype = "auto_attendant"; searchtype = "auto_attendant_" + ArrayIn['application_data'];  }
-		if( ArrayIn['application_data'].substr(0,5) == "sofia" 			) {  grptype = "call"; searchtype = TheUUID;  }
-		if( ArrayIn['application_data'].substr(0,4) == "user" 			) {  grptype = "call"; searchtype = TheUUID;  }
-		if( ArrayIn['application_data'].substr(0,4) == "local" 			) {  grptype = "call"; searchtype = TheUUID;  }
-		if( ArrayIn['application_data'].substr(0,18) == "default voicemail_" 	) {  grptype = "voicemail"; searchtype = "voicemail" + TheUUID;  }
-		if( grptype == "" 									) {  grptype = "call"; searchtype = TheUUID;  }
+		if( ArrayIn['application_data'].substr(0,11) == "conference_" ) {  
+			grptype = "conference";searchtype = "conference_" +GetConfUUIDPart(TheUUID );  
+		}
+		if( ArrayIn['application_data'].substr(0,15) == "auto_attendant_") {  
+			grptype = "auto_attendant"; searchtype = "auto_attendant_" + ArrayIn['application_data'];  
+		}
+		if( ArrayIn['application_data'].substr(0,5) == "sofia") {  
+			grptype = "call"; searchtype = TheUUID;  
+		}
+		if( ArrayIn['application_data'].substr(0,4) == "user") {  
+			grptype = "call"; searchtype = TheUUID;  
+		}
+		if( ArrayIn['application_data'].substr(0,4) == "local") {  
+			grptype = "call"; searchtype = TheUUID;  
+		}
+		if( ArrayIn['application_data'].substr(0,18) == "default voicemail_" 	) {  
+			grptype = "voicemail"; searchtype = "voicemail" + TheUUID;  
+		}
+		
+		//lets set it to something so it shows since we didnt find a match we will you call
+		if( grptype == "" ) {  
+			grptype = "call"; searchtype = TheUUID;  
+		}
 		
 		
 		for(var idex=0;idex<g_GroupsHTML.length;idex++) {
@@ -584,6 +757,7 @@ function selectuuid(inelement,inuuid) {
 		return false;
 	}
 	
+	//used for determining the type of block the call is in
 	function GetBlockType( InVal ) {
 		if( typeof ( InVal) == "undefined" 		) { return "unknown"; } 
 		if( InVal.substr(0,11) == "conference_" 		) {  return "conference"; }
@@ -591,13 +765,28 @@ function selectuuid(inelement,inuuid) {
 		if( InVal.substr(0,9) == "voicemail" 		) {  return "voicemail";}
 		return "call";
 	}
+	
+	//this breaks the UUID up by "-" and returns the last part
 	function GetConfUUIDPart( InVal ) {
 		var RetVal = "";
 		var SData = InVal.split("-");
-		
 		return SData[SData.length-1];
 	}
 	
+	//this breaks the UUID up by "-" and returns the last part
+	function UUIDSub( InUUID ) {
+		//this is the same as getconfuuid I seperated just incase I need to change it
+		var RetVal = "";
+		var SData = InUUID.split("-");
+		return SData[SData.length-1];
+	}
+	
+	
+	
+	//------------------------------------------------------   Misc Functions ------------------------------------------//
+	
+	//this is used for putting spaces between every letter in a trunk name.
+	//so when we render the trunk images the text will flows down
 	function verticalText(inText) {
 		var retVal = "";
 		for(var i=0;i< inText.length;i++) {
@@ -606,7 +795,11 @@ function selectuuid(inelement,inuuid) {
 		return retVal;
 	}
 	
-	//------------------------------------------------------   Timer Functions ------------------------------------------//
+	
+	
+	
+	
+	//------------------------------------------------------   Timer Functions For clocks------------------------------------------//
 	function DivClickTimer( InStartPoc,divid ) {
 		try{ //need to do this cos the timer might have went away before the funtion got called
 		document.getElementById( divid).innerHTML = ShowTime( InStartPoc );
@@ -616,7 +809,7 @@ function selectuuid(inelement,inuuid) {
 	function ShowTime( InEpoc ) {
 		var d = new Date(); 
 		var newtime = (d.getTime()-d.getMilliseconds())/1000;
-		newtime = EpocDiff + newtime;
+		newtime = g_EpocDiff + newtime;
 		return secondsToTime( newtime - InEpoc);
 	}
 	
@@ -634,37 +827,16 @@ function selectuuid(inelement,inuuid) {
 		if(  seconds < 10 ){fs = "0";}
 		return hours + ":" + fm + minutes + ":" + fs + seconds;
 	}
+	
+	// this is used to get the epoc time differance from the web server to the client.
+	//we get the servers epoc and the client epoc at time of the page render.
+	function getEpocTimeDiff() {
+		var EpocServer = <?=date("U"); ?>;
+		var d = new Date();
+		var EpocClient = (d.getTime()-d.getMilliseconds())/1000;
+		return  EpocServer - EpocClient;
+	}
 </script>
 <?php
     jquery::addPlugin('tabs');
-?>
-
-<?
-/*
-
-[from cell to ring group]
-uuid,direction,created,created_epoch,name,state,cid_name,cid_num,ip_addr,dest,application,application_data,dialplan,context,read_codec,read_rate,read_bit_rate,write_codec,write_rate,write_bit_rate,secure,hostname,presence_id,presence_data,callstate,callee_name,callee_num,callee_direction,call_uuid
-
-94015fba-1cca-11e0-8376-97aafcc20fcd,
-inbound,2011-01-10 09:02:01,1294671721,sofia/sipinterface_9/9362302026@216.82.225.24,CS_EXECUTE,WIRELESS CALLER,9362302026,216.82.225.24,9365854358,bridge,{ignore_early_media=true}user/132@192.168.1.9:_:{ignore_early_media=true}user/170@192.168.1.9,XML,context_4,PCMU,8000,64000,PCMU,8000,64000,,svn,9362302026@216.82.225.24,,EARLY,,,,
-
-9406f4b6-1cca-11e0-837a-97aafcc20fcd,
-outbound,2011-01-10 09:02:01,1294671721,sofia/sipinterface_9/sip:132@192.168.1.5,CS_CONSUME_MEDIA,WIRELESS CALLER,9362302026,216.82.225.24,132,,,XML,context_4,,,,,,,,svn,132@192.168.1.9,,RINGING,Home,9365854358,RECV,
-9406f1be-1cca-11e0-8379-97aafcc20fcd
-
-94074d62-1cca-11e0-837c-97aafcc20fcd,
-outbound,2011-01-10 09:02:01,1294671721,sofia/sipinterface_9/sip:170@192.168.1.100:63194,CS_CONSUME_MEDIA,WIRELESS CALLER,9362302026,216.82.225.24,170,,,XML,context_4,,,,,,,,svn,170@192.168.1.9,,RINGING,Home,9365854358,RECV,
-94074150-1cca-11e0-837b-97aafcc20fcd
-
-
-
-
-
-
-
-
-
-
-
-*/
 ?>

@@ -69,6 +69,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
             if (empty($base['plugins']['voicemail']['mwi_box']))
             {
+                 $xml->deleteNode('/variables/variable[@name="mwi-account"]');
                  $xml->deleteNode('/params/param[@name="mwi-account"]');
             }
             else
@@ -77,10 +78,12 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
                 if (!$voicemail)
                 {
+                    $xml->deleteNode('/variables/variable[@name="mwi-account"]');
                     $xml->deleteNode('/params/param[@name="mwi-account"]');
                 }
                 else
                 {
+                    $xml->update('/variables/variable[@name="mwi-account"]{@value="' .$voicemail['mailbox'] .'@voicemail_' . $base['account_id'] .'"}');
                     $xml->update('/params/param[@name="mwi-account"]{@value="' .$voicemail['mailbox'] .'@voicemail_' . $base['account_id'] .'"}');
                 }
             }
@@ -103,6 +106,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
             $xml = FreeSwitch::setSection('user', $domain, $base['device_id']);
 
+            $xml->deleteNode('/variables/variable[@name="mwi-account"]');
             $xml->deleteNode('/params/param[@name="mwi-account"]');
         }
     }
@@ -195,7 +199,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         {
             return;
         }
-        
+
         $xml->update('/action[@application="answer"]');
 
         $xml->update('/action[@application="voicemail"]{@data="default voicemail_' .$voicemail['account_id'] .' ' .$voicemail['mailbox'] .'"}');
