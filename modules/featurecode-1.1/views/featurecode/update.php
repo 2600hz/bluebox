@@ -38,7 +38,12 @@
                           'echo' => 'Echo Test',
                           'delay_echo' => 'Delayed Echo Test',
                           'tone_test' => 'Miliwatt Tone Test',
-                          'hold_music' => 'Hold Music Test'));
+                          'hold_music' => 'Hold Music Test',
+                          'eavesdrop' => 'Eavesdrop',
+                          'uuid_standby' => 'Call Center - UUID Standby',
+                          'agent_login' => 'Call Center - Agent Login',
+                          'agent_logout' => 'Call Center - Agent Logout'));
+
             ?>
         </div>
 

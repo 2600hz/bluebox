@@ -121,6 +121,17 @@ $config['filemap'][10] = array (
     'query' => '//document/section[@name="routes"]/context[@name="multitenant_routing_context"]'
 );
 
+$config['filemap'][11] = array (
+    'filename' => $config['cfg_root'] .'/autoload_configs/callcenter.conf.xml',
+    'query' => '//document/section[@name="configuration"]/configuration[@name="callcenter.conf"][@description="CallCenter"]'
+);
+
+$config['filemap'][12] = array (
+    'filename' => $config['cfg_root'] .'/autoload_configs/distributor.conf.xml',
+    'query' => '//document/section[@name="configuration"]/configuration[@name="distributor.conf"]/lists'
+);
+
+
 // Base file - note that because the query string is //document, this section will contain
 // the remaining document and any includes for other filemap sections
 /*$config['filemap'][] = array (

@@ -164,6 +164,48 @@ XML;
 <action application="playback" data="\$\${hold_music}"/>
 XML;
                 break;
+
+            case 'eavesdrop' :
+                $xmlText = <<<XML
+XML;
+
+            case 'uuid_standby':
+                $num = $number['number'];
+
+                $xmlText = <<<XML
+    <action application="set" data="res=\${callcenter_config(agent set uuid \${caller_id_number}@\${domain_name} '\${uuid}')}" />
+    <action application="set" data="res=\${callcenter_config(agent set type \${caller_id_number}@\${domain_name} 'uuid-standby')}" />
+    <action application="set" data="res=\${callcenter_config(agent set status \${caller_id_number}@\${domain_name} 'Available (On Demand)')}" />
+    <action application="set" data="res=\${callcenter_config(agent set state \${caller_id_number}@\${domain_name} 'Waiting')}" />
+    <action application="set" data="cc_warning_tone=tone_stream://%(200,0,500,600,700)"/>
+    <action application="answer" />
+    <action application="playback" data="\$\${hold_music}"/>
+    <action application="transfer" data="$num"/>
+
+XML;
+                break;
+
+            case 'agent_login':
+                $xmlText = <<<XML
+    <action application="set" data="res=\${callcenter_config(agent set status \${caller_id_number}@\${domain_name} 'Available')}" />
+    <action application="answer" data=""/>
+    <action application="sleep" data="500"/>
+    <action application="playback" data="ivr/ivr-you_are_now_logged_in.wav"/>
+    <action application="hangup" data=""/>
+
+XML;
+                break;
+
+            case 'agent_logout':
+                $xmlText = <<<XML
+    <action application="set" data="res=\${callcenter_config(agent set status \${caller_id_number}@\${domain_name} 'Logged Out')}" />
+    <action application="answer" data=""/>
+    <action application="sleep" data="500"/>
+    <action application="playback" data="ivr/ivr-you_are_now_logged_out.wav"/>
+    <action application="hangup" data=""/>
+
+XML;
+                break;
             }
 
         if (isset($xmlText))
