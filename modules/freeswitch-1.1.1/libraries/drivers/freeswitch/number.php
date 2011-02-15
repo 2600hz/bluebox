@@ -95,6 +95,8 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
 
                 $xml->update($condition .'/action[@application="set"][@data="vm-operator-extension=' .$obj['number'] .'"]');
 
+                $xml->update($condition .'/action[@application="set"][@data="force_transfer_context=context_' .$obj->NumberContext[0]['context_id'] .'"]');
+
                 $xml->update($condition. '/action[@application="transfer"]{@data="' .$obj['number'] .' XML context_' .$obj->NumberContext[0]['context_id'] .'"}');
             }
             else
