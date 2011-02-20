@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/installer/assets/css/forms.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/installer/assets/css/installer.css" media="screen" />
     <?php echo $js; ?>
-    <?php echo html::link('skins/installer/assets/img/favicon.ico', 'icon', 'image/x-icon'); ?>
+    <?php echo html::link('/bluebox/skins/bluebox/assets/img/favicon.ico', 'icon', 'image/x-icon'); ?>
 </head>
 <body>
     <div class="container">
