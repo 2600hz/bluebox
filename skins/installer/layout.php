@@ -23,7 +23,7 @@
                 ?>
                 |
                 <?php
-                    echo html::anchor('http://www.2600hz.org', __('Wiki'), array(
+                    echo html::anchor('http://help.2600hz.org', __('Wiki'), array(
                         'title' => 'Find answers on the wiki for common problems.',
                         'target' => '_blank'
                     ));
