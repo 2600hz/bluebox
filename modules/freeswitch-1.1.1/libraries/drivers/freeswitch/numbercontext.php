@@ -36,7 +36,7 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
      */
     public static function set($base)
     {
-        if (empty($base['Number']['number_id']) | empty($base['context_id']))
+        if (empty($base['Number']['number_id']) || empty($base['context_id']))
         {
             return;
         }
