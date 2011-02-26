@@ -100,6 +100,15 @@
         </div>
     </div>
 </div>
+<div id="data" class="hidden">
+    <div id="mediafile">
+        <?php 
+		$dropdown = mediafiles::dropdown(array('class' => 'dropdown')); 
+		$dropdown = preg_replace('/\s\([^\(\)]*\)(?=<\/option>)/', '', $dropdown);
+		echo $dropdown;
+	?>
+    </div>
+</div>
 <br><br><br>
 <div class="browser-warning">
      This page was developed for Firefox, and may not function correctly in other browsers.

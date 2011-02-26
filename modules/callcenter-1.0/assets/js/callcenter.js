@@ -706,6 +706,13 @@ $(function()
                                 $(this).attr('selected', 'selected')
                             }
                         });
+                        $queue.find('.queue-option-moh > option').each(function()
+                        {
+                            if($(this).val() == queue.registry.moh)
+                            {
+                                $(this).attr('selected', 'selected')
+                            }
+                        });
                     });
 
                     // Make sure that the queues are loaded,
@@ -792,11 +799,16 @@ $(function()
                             '                   <option value="system">Honor tier wait time</option>' +
                             '               </select>' +
                             '           </div>' +
-                            '       </span>' +
+			    '           <div class="queue-option">' +
+	 	            '               <div class="queue-option-title">Music on Hold</div>' +
+			    '               <select class="queue-option-moh queue-option-field">' +
+			    '                   <option value="$${hold_music}">Default MOH</option>' +
+			    '               </select>' +
+			    '           </div>' +
                             '       </span>' +
                             '    </div>' +
                             '</div>';
-
+	
         //Set the id to -1 to cancel out the add
         var $newTier = addItem('tier', 0, $newQueue.find('.tiers'), queueOptions);
         $newTier.find('.tier-bar').addClass('queue-options-tier');
@@ -805,6 +817,8 @@ $(function()
         {
             restoreHint($(this));
         });
+
+	$newTier.find('.queue-option-moh').append($('#data #mediafile .dropdown').html());
 
         return $newQueue;
     }
@@ -1092,7 +1106,7 @@ $(function()
                 '","max_wait_time":"' + ((($key = $queue.find('.queue-option-max-wait')).hasClass('text-empty')) ? 0 : $key.val()) +
                 '","max_wait_time_with_no_agent":"' + ((($key = $queue.find('.queue-option-max-wait-no-agent')).hasClass('text-empty')) ? 0 : $key.val()) +
                 '","max_wait_time_with_no_agent_time_reached":"' + ((($key = $queue.find('.queue-option-max-wait-no-agent-reached')).hasClass('text-empty')) ? 0 : $key.val()) +
-                '"}}';
+                '","moh-sound":"' + $queue.find('.queue-option-moh').val().replace('/\//g', '//') + '"}}';
     }
 
     function tierToJSON($tier)
