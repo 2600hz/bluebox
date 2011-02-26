@@ -24,6 +24,14 @@ class FreeSwitch_Queue_Driver extends FreeSwitch_Base_Driver
 
             $xml->update($queue_root . '/param[@name="' . $key . '"]{@value="' . $val . '"}');
         }
+
+	$esl = EslManager::getInstance();
+
+	if($esl->isConnected())
+	{
+		$esl->reloadxml();
+		$esl->reload('mod_callcenter');
+	}
     }
 
     public static function delete($base)
@@ -35,5 +43,17 @@ class FreeSwitch_Queue_Driver extends FreeSwitch_Base_Driver
         $xml->setXmlRoot($xml_root . '/queues/queue[@name="queue_' . $base['queue_id'] . '"]');
 
         $xml->deleteNode();
+    }
+
+    public static function dialplan($number)
+    {
+	$xml = Telephony::getDriver()->xml;
+
+	$destination = $number['Destination'];
+
+	if($id = arr::get($destination, 'queue_id'))
+	{
+		$xml->update('/action[@application="callcenter"]{@data="queue_' . $id . '"}');
+	}
     }
 }
