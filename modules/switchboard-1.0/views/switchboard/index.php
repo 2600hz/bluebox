@@ -465,8 +465,8 @@ function RebuildCommands( inuuid ) {
 	
 	document.getElementById('idssuid').value = inuuid;
 	document.getElementById('manual_entry_param').value = "uuid_kill " + inuuid;
-	document.getElementById('manual_entry_park').value = "uuid_kill " + inuuid;
-	document.getElementById('manual_entry_kill'	).value = "uuid_park " + inuuid;
+	document.getElementById('manual_entry_kill').value = "uuid_kill " + inuuid;
+	document.getElementById('manual_entry_park'	).value = "uuid_park " + inuuid;
 	document.getElementById('manual_entry_hold').value = "uuid_hold " + HoldStatus + inuuid;
 	document.getElementById('manual_entry_xfer'	).value = "uuid_transfer " + inuuid + " -both " + g_DevID + " xml " + g_DevContext;
 	var sndfile = document.getElementById('media_widget_file_list').value
