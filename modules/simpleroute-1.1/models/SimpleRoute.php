@@ -14,7 +14,7 @@ class SimpleRoute extends Bluebox_Record
         $this->hasColumn('simple_route_id', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'primary' => true, 'autoincrement' => true));
         $this->hasColumn('name', 'string', 80, array('notnull' => true, 'notblank' => true));
         $this->hasColumn('type', 'integer', 11, array('default' => self::TYPE_SIMPLE));
-        $this->hasColumn('patterns', 'array',  NULL, array('default' => array(NULL)));
+        $this->hasColumn('patterns', 'array', 1000, array('default' => array(NULL)));
     }
 
     /**
