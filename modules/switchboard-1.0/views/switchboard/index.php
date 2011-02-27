@@ -1,4 +1,4 @@
-<?
+<?php defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Switchboard - a Moded version of ESL... all the real work was done by the team that made ESL :)
  *
@@ -12,21 +12,33 @@
 
 // need to load all the Data for devices/trunks/voicemails.
 
+
 $swdb = new Database();
 $swdb->from('device');
 $swdb->select('name,context_id,device_id,plugins');
+$swdb->where('account_id',users::getAttr('account_id'));
 $result = $swdb->get();
 $DeviceRows = $result->as_array();
 
 $swdb->from('trunk');
 $swdb->select('name,trunk_id,server,plugins');
+$swdb->where('account_id',users::getAttr('account_id'));
 $result = $swdb->get();
 $TrunkRows = $result->as_array();
 
 $swdb->from('voicemail');
 $swdb->select('name,voicemail_id,mailbox');
+$swdb->where('account_id',users::getAttr('account_id'));
 $result = $swdb->get();
 $VoircemailRows = $result->as_array();
+
+
+$swdb->from('context');
+$swdb->select('context_id,account_id');
+$swdb->where('account_id',users::getAttr('account_id'));
+$result = $swdb->get();
+$ContextRows = $result->as_array();
+
 
 $DevListHeight = count($DeviceRows) * 80;
 if( $DevListHeight < 500 ){ $DevListHeight= 500;}
@@ -34,20 +46,20 @@ if( $DevListHeight < 500 ){ $DevListHeight= 500;}
 <style>
 
 
-.calldividercall{background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/connectgreen.gif');float:left;height:100px;width: 26px;}
+.calldividercall{background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/connectgreen.gif');float:left;height:100px;width: 26px;}
 .calldividertrunk{
-	background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/connecttrunk.gif');
+	background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/connecttrunk.gif');
 	float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
 }
-.nocallsop{background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/nocallsop.gif');width: 550px;min-height: <?=$DevListHeight;?>px}
+.nocallsop{background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/nocallsop.gif');width: 550px;min-height: <?php echo $DevListHeight;?>px}
 
 
 
 
-.TrunkItemU{width: 150px;min-height: 75px;float: left;background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/trunk_unknown_bg.gif');}
-.TrunkItemG{width: 150px;min-height: 75px;float: left;background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/trunk_good_bg.gif');}
-.TrunkItemB{width: 150px;min-height: 75px;float: left;background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/trunk_bad_bg.gif');}
-.TrunkItemL{width: 150px;min-height: 75px;float: left;background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/trunk_unknown_bg.gif');}
+.TrunkItemU{width: 150px;min-height: 75px;float: left;background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/trunk_unknown_bg.gif');}
+.TrunkItemG{width: 150px;min-height: 75px;float: left;background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/trunk_good_bg.gif');}
+.TrunkItemB{width: 150px;min-height: 75px;float: left;background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/trunk_bad_bg.gif');}
+.TrunkItemL{width: 150px;min-height: 75px;float: left;background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/trunk_unknown_bg.gif');}
 .TrunkDivider{width: 150px;min-height: 15px;float: left;}
 .TrunkLable{width: 150px;font-weight: bold;color: #fff;text-align: center;}
 .tsdiv{text-align: left;font-weight: bold;color: #000;width: 150px;}
@@ -56,17 +68,17 @@ if( $DevListHeight < 500 ){ $DevListHeight= 500;}
 
 .DeviceItem{
 width: 150px;height: 80px;float: left;
-background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/leftitems_bgsmall.gif');
+background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/leftitems_bgsmall.gif');
 }
 .DeviceItemSel{
 width: 150px;height: 80px;float: left;
-background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/leftitems_bgsmall_sel.gif');
+background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/leftitems_bgsmall_sel.gif');
 }
 .DeviceItemhead{width: 150px;height: 14px;color: #fff;text-align: center;font-size: 10px;float: left;}
 .DeviceItemlt{width: 7px;height: 66px;float: left;}
 .devstat{float: bottom;width: 140px;;height: 20px;text-align: right;}
-.devcallin{background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/devincall.gif');height: 20px;width: 23px;float:right;}
-.devcallout{background: url('<?=url::base();?>/modules/switchboard-1.0/assets/images/devoutcall.gif');height: 20px;width: 23px;float:right;}
+.devcallin{background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/devincall.gif');height: 20px;width: 23px;float:right;}
+.devcallout{background: url('<?php echo url::base();?>/modules/switchboard-1.0/assets/images/devoutcall.gif');height: 20px;width: 23px;float:right;}
 
 .opspanleft{width: 10px;float: left;}
 .opspanleftItem{width: 10px;height: 80px;float: left;}
@@ -198,7 +210,7 @@ background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/leftite
 	}
 	$g_OpsPanLeftPadLength .= "</div>";
 	?>
-	var g_OpsPanLeftFiller = '<?=$g_OpsPanLeftPadLength?>';
+	var g_OpsPanLeftFiller = '<?php echo $g_OpsPanLeftPadLength?>';
 	
 	var g_TrunkCount = 0;
 	var g_TrunkArray = new Array();
@@ -211,12 +223,64 @@ background: url('<?=url::base(); ?>modules/switchboard-1.0/assets/images/leftite
 		echo "g_TrunkArray[g_TrunkCount] = '" . $TrunkRows[$idex]->trunk_id . "';\n";
 		echo "g_TrunkNameArray[g_TrunkCount] = '" . addslashes( $TrunkRows[$idex]->name ). "';\n";
 		echo "g_TrunkIpArray[g_TrunkCount] = '" . $TrunkRows[$idex]->server . "';\n";
+		if( array_key_exists( 'username',$ExtraArray['sip']) )
+		{
 		echo "g_TrunkStatusMathArray[g_TrunkCount++] = '" . $ExtraArray['sip']['username']   . "@" . $TrunkRows[$idex]->server . "';\n";
+		}else{
+		echo "g_TrunkStatusMathArray[g_TrunkCount++] = '@" . $TrunkRows[$idex]->server . "';\n";
+		}
+		
 	}
 	?>
-
-	//Disable some stuff until proper selections are made
 	
+	var g_ContextCount = 0;
+	var g_ContextArray = new Array();
+	<?php
+	for($idex=0;$idex<count($ContextRows);$idex++) {
+		echo "g_ContextArray[g_ContextCount++] = 'context_" . $ContextRows[$idex]->context_id . "';\n";
+	}
+	?>
+	
+//if in this list then it is recording otherwise it is not recording
+var g_RecordingList = new Array();
+	
+	
+function RemoveFromRecordingArray( uuid ) {
+	var TempRecArray = new Array();
+	var TempChanX = 0;
+	for(var idex=0;idex<g_RecordingList.length;idex++) {
+		if( g_RecordingList[idex] != uuid ) {
+			TempRecArray[TempChanX++] = g_RecordingList[idex];
+		}
+	}
+	g_RecordingList = TempRecArray;
+	TempChanArray = "";
+}
+	
+function AddToRecordingArray( uuid ) {
+	var ix = g_RecordingList.length +1;
+	g_RecordingList[ix] = uuid;
+}
+function IsRecording( inuuid ) {
+	for(var ix=0;ix<g_RecordingList.length;ix++) {
+		if(  g_RecordingList[ix] == inuuid) {
+			return true;
+		}
+	}
+	return false;
+}	
+	
+	
+function IsInTheContext( InContext ) {
+	for(var ix=0;ix<g_ContextArray.length;ix++) {
+		if(  g_ContextArray[ix] == InContext) {
+			return true;
+		}
+	}
+	return false;
+}	
+
+//Disable some stuff until proper selections are made
 function CheckButtonStates() {
 	document.getElementById('manual_kill').disabled = true;
 	document.getElementById('manual_park').disabled = true;
@@ -311,7 +375,7 @@ function ChanToTrunkName(InnameString,inDataString) {
 function TrunkParseStatus( Inval ) {
 	if( Inval.indexOf("FAIL_WAIT") != -1){ return 'TrunkItemB'; } 
 	if( Inval.indexOf("REGED") != -1){ return 'TrunkItemG'; } 
-	if( Inval.indexOf("UNREGED") != -1){ return 'TrunkItemU'; } 
+	if( Inval.indexOf("UNREGED") != -1){ return 'TrunkItemG'; } 
 	if( Inval.indexOf("REGISTER") != -1){ return 'TrunkItemU'; } 
 	if( Inval.indexOf("FAILED") != -1){ return 'TrunkItemB'; } 
 	if( Inval.indexOf("FAILED (retry") != -1){ return 'TrunkItemB'; } 
@@ -441,7 +505,6 @@ function selectuuid(inelement,inuuid) {
 }
     
     $(function() {
-       // $("#tabs").tabs();
 
         $(".switchboardEvent").click(function() {
             $.publish("switchboard/" + this.id, []);
@@ -511,18 +574,17 @@ function selectuuid(inelement,inuuid) {
 
         $.flux("fluxresponse");
     });
-    
+
+
 	// this is where alot of the dirty work is done.
     	function buildchanhtml( indata ) {
-	
 		var NewData = indata.split("\n");
 		var RetHTML = "";
 		var NameCols = "";
 		var ChanList = new Array();
 		
-		
 		for(var idex=0;idex<NewData.length;idex++) {
-			if( NewData[idex].substr(0,4) == "uuid" && NameCols == "")
+			if(  NewData[idex].substr(0,4) == "uuid" && NameCols == "")
 			{
 				NameCols =NewData[idex] + ',grpname,grptype' ;
 				continue;
@@ -533,8 +595,18 @@ function selectuuid(inelement,inuuid) {
 				ChanList[idex-1] = splitLoadChan( NameCols, NewData[idex]+ ',grpname,grptype' );
 			 }
 		}
+		//lets filter the array based on context
 		
-	
+		var TempChanArray = new Array();
+		var TempChanX = 0;
+		for(var idex=0;idex<ChanList.length;idex++) {
+			var InCon = IsInTheContext( ChanList[idex]['context'] );
+			if( InCon == true ) {
+				TempChanArray[TempChanX++] = ChanList[idex];
+			}
+		}
+		ChanList = TempChanArray;
+		TempChanArray = "";
 		g_GroupsHTML = new Array();
 		g_GroupsHTMLTop = -1;
 		// lets group all the items by type: conference,auto attendent,call,etc..
@@ -550,17 +622,17 @@ function selectuuid(inelement,inuuid) {
 			var GroupCount = CountItemsInGroup(g_GroupsHTML[idex] );
 			
 			if( myblocktype == "call" ) {
-				RetHTML = RetHTML + '<div class="sb-callcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?=url::base(); ?>modules/switchboard-1.0/assets/images/callintintcat.gif"></div></div>';
+				RetHTML = RetHTML + '<div class="sb-callcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/callintintcat.gif"></div></div>';
 			}
 			if( myblocktype == "conference" ) {
-				RetHTML = RetHTML + '<div class="sb-confcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?=url::base(); ?>modules/switchboard-1.0/assets/images/confcat.gif"></div></div>';
+				RetHTML = RetHTML + '<div class="sb-confcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/confcat.gif"></div></div>';
 			}
 			if( myblocktype == "auto_attendant" ) {
-				RetHTML = RetHTML + '<div class="sb-autocont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?=url::base(); ?>modules/switchboard-1.0/assets/images/autocat.gif"></div></div>';
+				RetHTML = RetHTML + '<div class="sb-autocont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/autocat.gif"></div></div>';
 			}
 			
 			if( myblocktype == "voicemail" ) {
-				RetHTML = RetHTML + '<div class="sb-vmcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?=url::base(); ?>modules/switchboard-1.0/assets/images/vmcat.gif"></div></div>';
+				RetHTML = RetHTML + '<div class="sb-vmcont'+GroupCount+'"><div class="sb-title"><div class="sbarrow"><img src="<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/vmcat.gif"></div></div>';
 			}
 			
 			if( myblocktype == "unknown" ) {
@@ -579,7 +651,6 @@ function selectuuid(inelement,inuuid) {
 	
 	//This will take the first chunk of data and use for the key part of the value
 	function splitLoadChan( inHeaderList,inDataList) {
-		
 		var listNamesArray = inHeaderList.split(",");
 		var listValuesArray = inDataList.split(",");
 		var RetArray = new Array();
@@ -831,12 +902,12 @@ function selectuuid(inelement,inuuid) {
 	// this is used to get the epoc time differance from the web server to the client.
 	//we get the servers epoc and the client epoc at time of the page render.
 	function getEpocTimeDiff() {
-		var EpocServer = <?=date("U"); ?>;
+		var EpocServer = <?php echo date("U"); ?>;
 		var d = new Date();
 		var EpocClient = (d.getTime()-d.getMilliseconds())/1000;
 		return  EpocServer - EpocClient;
 	}
 </script>
 <?php
-    jquery::addPlugin('tabs');
+    //end of content
 ?>
