@@ -11,7 +11,7 @@ class FreeSwitch_CallsSetting_Driver extends FreeSwitch_Base_Driver {
         $xml->update('/settings/param[@name="default-template"]{@value="bluebox"}');
         $xml->update('/settings/param[@name="legs"]{@value="a"}');
         $xml->update('/settings/param[@name="rotate-on-hup"]{@value="true"}');
-        $xml->replaceWithText(Kohana::config('calls.defaulttemplate'),'/templates/template[@name="bluebox"]');
+        $xml->replaceWithXml(Kohana::config('calls.defaulttemplate'),'/templates/template[@name="bluebox"]');
   
     }
 
