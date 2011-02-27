@@ -46,6 +46,7 @@ Use the buttons below to send requests directly to FreeSWITCH. You can get help 
             <div id="show">
                 <?php echo form::button(array('id' => 'show_codec', 'class' => 'eslEvent', 'value' => 'Codecs'));?>
                 <?php echo form::button(array('id' => 'show_modules', 'class' => 'eslEvent','value' => 'Modules'));?>
+                <?php echo form::button(array('id' => 'show_files', 'class' => 'eslEvent','value' => 'File Format Support'));?>
             </div>
 
         <h3><a href="#">NAT</a></h3>
