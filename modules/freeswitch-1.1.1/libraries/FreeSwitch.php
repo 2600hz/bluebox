@@ -148,6 +148,18 @@ class FreeSwitch extends Telephony_Driver
 
             try
             {
+                if (file_exists($fileOptions['filename']) AND ($DFSWait = kohana::config('freeswitch.dfs_wait_time')))
+                {
+                    while (!file_get_contents($fileOptions['filename']) AND $DFSWait)
+                    {
+                        kohana::log('debug', 'Waiting for data blocks to replicate to this node...');
+
+                        usleep(250);
+
+                        $DFSWait--;
+                    }
+                }
+
                 $oldConfig->load($fileOptions['filename']);
             } 
             catch (Exception $e)
@@ -277,7 +289,7 @@ class FreeSwitch extends Telephony_Driver
             /* upgrades, system migration or just playing with chmod might result in not being able to write to the file */
             if((!file_exists($file)) or is_writable($file)) 
             {
-                $fp = fopen($file, 'w');
+                $fp = fopen($file, kohana::config('freeswitch.fopen_mode'));
 
                 fputs ($fp, $includeDoc->saveXML());
 

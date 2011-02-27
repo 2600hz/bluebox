@@ -75,6 +75,11 @@ class EslManager
         self::getInstance()->reload('mod_sofia');
     }
 
+    public static function eventReloadDingaling()
+    {
+        self::getInstance()->reload('mod_dingaling');
+    }
+
     /*
      * Clean up connection when script is done executing.
      * If connected, try to disconnect.

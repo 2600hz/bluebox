@@ -67,6 +67,11 @@
             <?php echo numbering::selectContext('device[context_id]'); ?>
         </div>
 
+        <div class="field">
+            <?php echo form::label('device[registry][anonymous_reject]', 'Reject Anonymous Calls'); ?>
+            <?php echo form::checkbox('device[registry][anonymous_reject]'); ?>
+        </div>
+
     <?php echo form::close_section(); ?>
 
     <?php

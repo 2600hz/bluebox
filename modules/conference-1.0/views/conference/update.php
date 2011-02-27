@@ -35,13 +35,6 @@
 
         <div class="field">
         <?php
-            echo form::label('conference[registry][record]', 'Record conference?');
-            echo form::checkbox('conference[registry][record]');
-        ?>
-        </div>
-
-        <div class="field">
-        <?php
             echo form::label('conference[registry][moh_type]', 'Pre-Conference Music');
             echo form::dropdown('conference[registry][moh_type]', array('local_stream://moh' => 'Music On Hold', 'silence' => 'Silence'));
         ?>
@@ -51,6 +44,23 @@
         <?php
             echo form::label('conference[registry][energy-level]', 'Minimum Energy Level');
             echo form::input('conference[registry][energy-level]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                'for' =>'conference[registry][size-limit]',
+                'hint' => 'Leave blank or zero for unlimited'
+            ), 'Max Participants');
+            echo form::input('conference[registry][size-limit]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label('conference[registry][record]', 'Record conference?');
+            echo form::checkbox('conference[registry][record]');
         ?>
         </div>
 

@@ -3,7 +3,7 @@
 class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($base)
-    {
+    {   
         $xml = Telephony::getDriver()->xml;
 
         if ($base instanceof Device)
@@ -23,7 +23,12 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/params/param[@name="password"]{@value="' .$sip['password'] .'"}');
 
-            $xml->update('/params/param[@name="dial-string"]{@value="' . '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}"}');
+	    if (!$dialstring = arr::get($sip, 'dial-string'))
+	    {
+                $dialstring = '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}';
+	    }
+
+            $xml->update('/params/param[@name="dial-string"]{@value="' . $dialstring . '"}');
 
             if ($base['context_id'] > 0)
             {

@@ -12,6 +12,10 @@
 
             <?php echo form::input('simpleroute[patterns][' .$pattern['simple_route_id'] .'][prepend]'); ?>
 
+            <span style="padding:0 10px 0;">Prepend location area code?</span>
+
+            <?php echo form::checkbox('simpleroute[patterns][' . $pattern['simple_route_id']  .'][append_areacode]'); ?>
+
         </div>
 
     <?php endforeach; ?>

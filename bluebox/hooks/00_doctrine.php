@@ -2,6 +2,8 @@
 
 class DoctrineHook
 {
+    const DB_KEY = 'BlueboxDB';
+
     public static function bootstrapDoctrine()
     {
         $type = Kohana::config('database.default.connection.type');
@@ -93,7 +95,7 @@ class DoctrineHook
         ));
 
         // Awaken the overlord...
-        $manager = Doctrine_Manager::connection($dsn, 'BlueboxDB');
+        $manager = Doctrine_Manager::connection($dsn, self::DB_KEY);
 
        // This is needed for reserved key words like 'key' or 'value', addeds back ticks, etc...
         $manager->setAttribute(Doctrine::ATTR_QUOTE_IDENTIFIER, true); 

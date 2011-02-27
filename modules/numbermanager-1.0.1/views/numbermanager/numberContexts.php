@@ -33,7 +33,7 @@
                                     'class' => 'number_context_option'
                                 ),
                                 $context_id,
-                                (bool)arr::filter_collection($number['NumberContext'], 'context_id', $context_id)
+                                (bool)arr::search_collection($number['NumberContext'], 'context_id', $context_id)
                             );
                         ?>
 

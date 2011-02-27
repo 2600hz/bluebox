@@ -1,4 +1,4 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 define('VM_BOXCOUNT_EXPECTED', 4);
 define('VM_BOXCOUNT_NEW', 0);
@@ -8,7 +8,7 @@ define('VM_BOXCOUNT_SAVED_URGENT', 3);
 
 class VoicemailManager {
   public static function getCount($mailbox, $domain) {
-    $eslManager = new EslManager();
+    $eslManager = EslManager::getInstance();
 
     $cmd = sprintf('vm_boxcount %s@%s|all', $mailbox, $domain);
 
@@ -29,7 +29,7 @@ class VoicemailManager {
   }
 
   public static function updateVMTables($user, $domain) {
-    $eslManager = new EslManager();
+    $eslManager = EslManager::getInstance();
     $cmd = sprintf('vm_list %s@%s xml', $user, $domain);
 
     $call = $eslManager->api($cmd);
@@ -128,8 +128,8 @@ class VoicemailManager {
     return array_map('vm_get_mailbox', $boxes);
   }
 
-  public static function getDomain($account_id = NULL) {
-    return 'voicemail_1';
+  public static function getDomain($account_id = 1) {
+    return 'voicemail_' . $account_id;
   }
 
   public static function blast($mailbox, $domain, $file) {
@@ -137,14 +137,14 @@ class VoicemailManager {
 
     $inject = sprintf('voicemail_inject %s@%s %s %s %s', $mailbox, $domain, $file, '4000', 'Voicemail');
 
-    $eslManager = new EslManager();
+    $eslManager = EslManager::getInstance();
     $result = $eslManager->getResponse($eslManager->api($inject));
     return $result;
   }
 
   public static function delete($user, $domain, $uuid) {
     //vm_delete,<id>@<domain>[/profile] [<uuid>],vm_delete,mod_voicemail
-    $eslManager = new EslManager();
+    $eslManager = EslManager::getInstance();
     $resp = $eslManager->getResponse($eslManager->api(sprintf('vm_delete %s@%s %s', $user, $domain, $uuid)));
     kohana::log('debug', 'VM Delete returned ' . $resp);
   }

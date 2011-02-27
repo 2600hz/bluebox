@@ -27,7 +27,7 @@
                                 'id' => 'numberType_' .$numberType['number_type_id'],
                             ),
                             $numberType['number_type_id'],
-                            (bool)arr::filter_collection($number['NumberPool'], 'number_type_id', $numberType['number_type_id'])
+                            (bool)arr::search_collection($number['NumberPool'], 'number_type_id', $numberType['number_type_id'])
                         );
                     ?>
 
