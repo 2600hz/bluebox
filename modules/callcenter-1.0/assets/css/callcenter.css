@@ -1,0 +1,437 @@
+.hidden
+{
+    display: none;
+}
+
+.callcenter-wrapper
+{
+    display: block;
+    width: 100%;
+    height: 500px;
+    margin: 0px;
+    padding: 6px;
+}
+
+.pane
+{
+    float: left;
+    width: 30.6%;
+    height: 100%;
+}
+
+.focused-pane
+{
+    width: 67.4%;
+}
+
+.left-pane
+{
+    margin-right: 3px;
+}
+
+.right-pane
+{
+    margin-left: 3px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    border: 2px solid #676767;
+}
+
+.queues-wrapper
+{
+    margin-top: 15px;
+    height: 470px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.queue-wrapper
+{
+    width: 100%;
+    padding: 5px 0px 5px 0px;
+}
+
+.queue
+{
+    margin: 0px 15px 0px 15px;
+    -webkit-border-radius: 11px;
+    -moz-border-radius: 11px;
+    border-radius: 11px;
+    border: 1px solid black;
+    background: #676767;
+}
+
+.queue-bar
+{
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    background: url("../../../../skins/bluebox/assets/img/buttonLargeMiddle.png" );
+    border: none;
+    height: 30px;
+}
+
+.queue-bar-text
+{
+    text-align: right;
+    font-weight: bold;
+    color: white;
+    position: relative;
+    top: 19%;
+    right: 10px;
+}
+
+.queue-content
+{
+    height: 412px;
+    margin-top: 13px;
+}
+
+.tiers-wrapper
+{
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.tier-wrapper
+{
+    width: 100%;
+    padding: 5px 0px 5px 0px;
+}
+
+.tier
+{
+    margin-left: 15px;
+    margin-right: 15px;
+    -webkit-border-radius: 11px;
+    -moz-border-radius: 11px;
+    border-radius: 11px;
+    border: 1px solid black;
+    background: #FFFFFF;
+}
+
+.tier-bar
+{
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    background: url("../../../../skins/bluebox/assets/img/buttonSmallMiddle.png" );
+    border: none;
+    padding: 1px 4px 1px 4px;
+}
+
+.tier-bar-text
+{
+    text-align: right;
+    font-weight: bold;
+    color: #FFFFFF;
+    position: relative;
+    top: 0px;
+    right: 5px;
+}
+
+.tier-content
+{
+    height: 365px;
+    overflow: hidden;
+}
+
+.action-buttons
+{
+    text-align: right;
+    margin: 6px 15px 6px 15px;
+}
+
+.button
+{
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    background-image: url("../../../../skins/bluebox/assets/img/buttonSmallMiddle.png" );
+    border: none;
+    padding: 1px 4px 1px 4px;
+    font-weight: bold;
+    color: white;
+}
+
+.menu-bar-wrapper
+{
+    height: 100%
+}
+
+.menu-bar
+{
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+    border: 2px solid #676767;
+}
+
+.menu-top-wrapper
+{
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    border-radius: 12px;
+    height: 75px;
+    background: #676767;
+}
+
+.menu-bottom-wrapper
+{
+    height: 425px;
+}
+
+.menu-selector-wrapper
+{
+    width: 300px;
+    height: 32px;
+    padding-top: 6px;
+}
+
+.menu-selector-button-holder
+{
+    float: left;
+    width: 30%;
+    text-align: center;
+}
+
+.menu-selector-button
+{
+    width: 85%;
+}
+
+.menu-search-bar-wrapper
+{
+    width: 266px;
+}
+
+.menu-search-bar
+{
+    padding: 2px;
+    margin-left: 5%;
+    width: 90%;
+    margin-right: 5%;
+    height: 20px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    background: #FFFFFF;
+}
+
+.menu-search-bar-mag-lens
+{
+    display: inline;
+    position: relative;
+    top: 2px;
+    left: 5px;
+    padding-right: 15px;
+    margin-right: 3px;
+    background-image: url("../../../../skins/bluebox/assets/img/nicebutton/lens.gif" );
+    background-repeat: no-repeat;
+}
+
+#menu-search-bar-text
+{
+    width: 200px;
+    vertical-align: middle;
+    height: 18px;
+    padding-top: 1px;
+    padding-left: 5px;
+    font-size: 10px;
+    margin-left: 5px;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid black;
+}
+
+.text-empty
+{
+    color: #A0A0A0;
+    font-style: italic;
+}
+
+.text-typed
+{
+    color: #000000;
+    font-style: normal;
+}
+
+.menu
+{
+    height: 425px;
+}
+
+.menu-title
+{
+    font-size: 20px;
+    text-align: center;
+    font-weight: bolder;
+}
+
+.menu-agents
+{
+    padding: 8px;
+}
+
+.menu-agents-agents-wrapper
+{
+    height: 405px;
+    border: 1px solid #676767;
+    padding-left: 5px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.agent
+{
+    height: 30px;
+    cursor: pointer;
+}
+
+.agent-user-icon
+{
+    float: left;
+    position: relative;
+    top: 5px;
+    left: 6px;
+    height: 16px;
+    padding-left: 15px;
+    background-image: url("../../../../skins/bluebox/assets/img/nicebutton/user.gif" );
+    background-repeat: no-repeat;
+}
+
+.agent-user-name
+{
+    float: left;
+    position: relative;
+    top: 1px;
+    left: 10px;
+    margin-left: 5px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.add-form
+{
+    margin-top: 10px;
+}
+
+.add-field-label
+{
+    font-weight: bold;
+    margin-top: 5px;
+    margin-left: 32px;
+}
+
+.add-field-wrapper
+{
+    text-align: center;
+}
+
+.add-text-field
+{
+    width: 200px;
+    font-size: 11px;
+}
+
+.add-select-field
+{
+    width: 208px;
+    font-size: 11px;
+}
+
+.add-buttons
+{
+    margin-top: 25px;
+}
+
+.add-button-wrapper
+{
+    text-align: center;
+}
+
+.queue-options-title
+{
+    text-align: center;
+    font-size: 16px;
+    font-weight: bolder;
+    margin-bottom: 5px;
+}
+
+.queue-options
+{
+    width: 100%;
+    text-align: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 325px;
+}
+
+.queue-options-pane
+{
+    padding-right: 25px;
+    padding-left: 25px;
+    display: inline-block;
+    width: 160px;
+    vertical-align: top;
+}
+
+.queue-option
+{
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.queue-option-title
+{
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.queue-option-field
+{
+    font-size: 11px;
+}
+
+.tier-agents
+{
+    height: 100%;
+}
+
+.tier-agents-wrapper
+{
+    display: inline-block;
+    border: 1px solid #676767;
+    height: 347px;
+    width: 193px;
+    margin: 9px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.ghost-agent
+{
+    background-color: blue;
+}
+
+.queue-bar-toggle
+{
+    color: #FFFFFF;
+    float: left;
+    position: relative;
+    top: 7px;
+    left: 11px;
+    font-size: 12px;
+}
+
+.tier-bar-toggle
+{
+    color: #FFFFFF;
+    float: left;
+    position: relative;
+    top: 2px;
+    left: 6px;
+    font-size: 11px;
+}
