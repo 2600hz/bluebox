@@ -1,3 +1,3 @@
-<?= $vms_grid ?>
+<?php echo $vms_grid ?>
 <hr />
-<?= $list_grid ?>
+<?php echo $list_grid ?>

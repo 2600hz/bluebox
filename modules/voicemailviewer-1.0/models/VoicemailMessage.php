@@ -1,4 +1,5 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
 class VoicemailMessage extends Bluebox_Record
 {
 	public function setTableDefinition()

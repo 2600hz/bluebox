@@ -1,3 +1,4 @@
+<?php defined('SYSPATH') or die('No direct access allowed.'); ?>
 <div class="form">
 <?php echo form::open();?>
 <fieldset>
@@ -10,4 +11,5 @@ echo form::submit('voicemail_settings', Kohana::lang('voicemail.save'));
 echo form::close('');
 ?>
 </fieldset>
-</form>
+<?php echo form::close();?>
+</div>
