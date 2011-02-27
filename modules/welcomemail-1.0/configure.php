@@ -9,13 +9,10 @@ class Welcomemail_Configure extends Bluebox_Configure
     public static $license = 'MPL';
     public static $summary = 'Sends a friendly welcome email when devices are set up';
     public static $default = true;
-    public static $type = Package_Manager::TYPE_MODULE;
+    public static $type = Package_Manager::TYPE_PLUGIN;
     public static $required = array( 
 		'devicemanager'=>1.0,
 		'core' => 0.1);
-    public static $navBranch = '/Organization/';
-    public static $navURL = '/welcomemail';
-    public static $navSubmenu = array ();
 
 }
 
