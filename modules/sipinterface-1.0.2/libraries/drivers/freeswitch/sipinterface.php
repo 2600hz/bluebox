@@ -232,6 +232,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             $xml->deleteNode('/settings/param[@name="NDLB-force-rport"]');
         }
 
+        // Enable log auth failures by default.
+        if (arr::get($base, 'registry', 'log_auth_failures'))
+        {
+            $xml->update('/settings/param[@name="log-auth-failures"]{@value="true"}');
+        }
+        else
+        {
+            $xml->deleteNode('/settings/param[@name="log-auth-failures"]');
+        }
+
         // Enable compact headers by default. With all the Codecs FS now supports we see lots of
         // bad behavior re: UDP packets that are too large and get fragmented
         if (arr::get($base, 'registry', 'compact_headers'))
