@@ -124,6 +124,10 @@ class Esl_Controller extends Bluebox_Controller
                 $result = $eslManager->show('modules');
                 break;
 
+                        case 'show_files':
+                $result = $eslManager->show('file');
+                break;
+
             case 'nat_status':
                 $result = $eslManager->nat('status');
                 break;

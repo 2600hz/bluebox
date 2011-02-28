@@ -29,7 +29,7 @@ class endpointman {
         $list = array();
         echo "<pre>";
         $master = $this->xml2array($this->mod_path . "master.xml");
-        foreach($master['data']['brands'] as $data) {
+        if ($master) foreach($master['data']['brands'] as $data) {
             $list[$data['name']] = array();
             $brands = $this->xml2array($this->mod_path . $data['directory'] . DIRECTORY_SEPARATOR . "brand_data.xml");
             $brand_list = $this->fix_single_array_keys($brands['data']['brands']['family_list']['family']);
