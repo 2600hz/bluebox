@@ -123,4 +123,15 @@ class timezone
 
         return $structure;
     }
+    
+    public static function getUTCOffset($tz)
+    {
+        $timezone = new DateTimeZone($tz);
+
+        $time = new DateTime('now', $timezone);
+
+        $offset = $timezone->getOffset($time);
+
+        return $offset;
+    }
 }
