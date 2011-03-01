@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class TimeOfDay_Configure extends Bluebox_Configure
+class TimeOfDay_1_0_1_Configure extends Bluebox_Configure
 {
     public static $version = '1.0.1';
     public static $packageName = 'timeofday';
