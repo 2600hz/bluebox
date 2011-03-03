@@ -12,7 +12,8 @@ class Queue extends Bluebox_Record
 
     public function setUp()
     {
-        $this->hasMany('Tier', array('local' => 'queue_id', 'foreign' => 'queue_id', 'cascade' => array('delete')));
+        $this->hasMany('QueueNumber as Number', array('local' => 'queue_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
+	$this->hasMany('Tier', array('local' => 'queue_id', 'foreign' => 'queue_id', 'cascade' => array('delete')));
 
         $this->actAs('GenericStructure');
         $this->actAs('TelephonyEnabled');

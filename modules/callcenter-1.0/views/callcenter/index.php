@@ -12,13 +12,13 @@
                     <div class="menu-top">
                         <div class="menu-selector-wrapper">
                             <div class="menu-selector">
-                                <div class="menu-selector-button-holder">
+                                <div class="menu-selector-agents-holder">
                                     <input type="button" id="menu-select-agents" class="button menu-selector-button menu-select-small-menu" value="Agents"/>
                                 </div>
-                                <div class="menu-selector-button-holder">
+                                <div class="menu-selector-add-holder">
                                     <input type="button" id="menu-select-add" class="button menu-selector-button menu-select-small-menu" value="Add"/>
                                 </div>
-                                <div class="menu-selector-button-holder">
+                                <div class="menu-selector-manage-holder">
                                     <input type="button" id="menu-select-manage" class="button menu-selector-button menu-select-big-menu" value="Manage"/>
                                 </div>
                             </div>
@@ -32,6 +32,7 @@
                     </div>
                 </div>
                 <div class="menu-bottom-wrapper">
+                    <div class="menu-separator"></div>
                     <div class="menu-agents menu" menu="agents">
                         <div class="menu-agents-agents-wrapper">
                             <div class="agents"></div>
@@ -99,4 +100,16 @@
         </div>
     </div>
 </div>
-<br><br>
+<div id="data" class="hidden">
+    <div id="mediafile">
+        <?php 
+		$dropdown = mediafiles::dropdown(array('class' => 'dropdown')); 
+		$dropdown = preg_replace('/\s\([^\(\)]*\)(?=<\/option>)/', '', $dropdown);
+		echo $dropdown;
+	?>
+    </div>
+</div>
+<br><br><br>
+<div class="browser-warning">
+     This page was developed for Firefox, and may not function correctly in other browsers.
+</div>

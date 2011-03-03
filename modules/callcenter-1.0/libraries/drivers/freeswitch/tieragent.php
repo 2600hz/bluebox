@@ -17,6 +17,14 @@ class FreeSwitch_TierAgent_Driver extends FreeSwitch_Base_Driver
         $tier_xml .= '{@level="' . $base['Tier']['level'] . '"}{@position="' . $base['position'] . '"}';
 
         $xml->update($tier_xml);
+
+	$esl = EslManager::getInstance();
+
+	if($esl->isConnected())
+	{
+		$esl->reloadxml();
+		$esl->reload('mod_callcenter');
+	}
     }
 
     public static function delete($base)
