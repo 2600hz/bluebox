@@ -269,6 +269,19 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             $xml->deleteNode('/settings/param[@name="force-register-db-domain"]');
         }
 
+        if ($protocol = arr::get($base, 'registry', 'protocol'))
+        {
+            $xml->update('/settings/param[@name="contact-params"]{@value="tport=' . $protocol . '"}');
+            $xml->update('/settings/param[@name="register-transport"]{@value="' . $protocol . '"}');
+            $xml->update('/settings/param[@name="bind-params"]{@value="transport=' . $protocol . '"}');
+        }
+        else
+        {
+            $xml->deleteNode('/settings/param[@name="contact-params"]');
+            $xml->deleteNode('/settings/param[@name="register-transport"]');
+            $xml->deleteNode('/settings/param[@name="bind-params"]');
+        }
+
         // Set relevant ACLs
         if ($aclList = netlists::getListName($base['nat_net_list_id']))
         {
