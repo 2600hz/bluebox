@@ -21,11 +21,11 @@ class FreeSwitch_MediaOption_Driver extends FreeSwitch_Base_Driver
 
             if (empty($mediaoption['bypass_media']))
             {
-                $xml->update('/variables/variable[@name="bypass_media"]{@value="no"}');
+                $xml->deleteNode('/variables/variable[@name="bypass_media"]');
             }
             else
             {
-                $xml->update('/variables/variable[@name="bypass_media"]{@value="yes"}');
+                $xml->update('/variables/variable[@name="bypass_media"]{@value="true"}');
             }
         }
     }
