@@ -28,9 +28,13 @@ class EndpointManager_Plugin extends Bluebox_Plugin
                 $phone_info['line'][1]['ext'] = $device['plugins']['sip']['username'];
                 $phone_info['line'][1]['description'] = $device['plugins']['endpointdevice']['display_name'];
                 $phone_info['line'][1]['secret'] = $device['plugins']['sip']['password'];
-                $phone_info['host'] = $dns;      // Replace this with the DNS location of this tenant/user
-                $phone_info['port'] = 5060;
-                $phone_info['timezone'] = "-8";
+
+		// Replace this with the DNS location of this tenant/user - only if the host varible has not been defined
+                $phone_info['host'] = (($host = arr::get($device, 'plugins', 'endpointdevice', 'host')) ? $host : $dns);
+              
+		$phone_info['port'] = (($port = arr::get($device, 'plugins', 'endpointdevice', 'port')) ? $port : 5060);
+                
+		$phone_info['timezone'] = "-8";
                 $endpoint->prepare_configs($phone_info);
             } else {
                 return false;
