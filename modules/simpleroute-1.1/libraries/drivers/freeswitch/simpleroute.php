@@ -43,13 +43,6 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
                 $condition = '/condition[@field="destination_number"][@expression="' .$pattern . '"][@bluebox="pattern_' .$simple_route_id .'"]';
 
-                $areacode = '${areacode}';
-
-                if(empty($options['append_areacode']) || !isset($options['append_areacode']))
-                {
-                    $areacode = '';
-                }
-
                 if (!empty($options['prepend']))
                 {
                     $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' . $options['prepend'] . '"}');
@@ -98,7 +91,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
                     $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
                 }
 
-                $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}' . $areacode . '$1"}');
+                $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
             }
         }
     }
