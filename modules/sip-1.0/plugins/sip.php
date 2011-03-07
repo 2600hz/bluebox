@@ -52,16 +52,7 @@ class Sip_Plugin extends Bluebox_Plugin
         return TRUE;
     }
     
-    protected function addPluginData()
-    {
-        $dialstring = '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}';
-
-        $pluginInjection = array('dial-string' => $dialstring);
-
-        $this->pluginData = arr::merge($this->pluginData, $pluginInjection);
-
-	return parent::addPluginData();
-    }
+    
     
     protected function validate($data, $validator)
     {
