@@ -28,7 +28,7 @@ class Redbox_Plugin extends Bluebox_Plugin
 
     protected function addSubView()
     {
-        $this->subview->contexts = Doctrine::getTable('Context')->findAll(Doctrine::HYDRATE_ARRAY);
+        $this->subview->redboxes = Doctrine::getTable('Redbox')->findAll(Doctrine::HYDRATE_ARRAY);
 
         parent::addSubView();
     }
