@@ -24,13 +24,6 @@
         ?>
         </div>
 
-        <div class="field">
-        <?php
-            echo form::label('location[registry][areacode]', 'Area code:');
-            echo form::input('location[registry][areacode]', isset($location['registry']['areacode']) ? $location['registry']['areacode'] : '');
-        ?>
-        </div>
-
     <?php echo form::close_section(); ?>
 
     <?php 
