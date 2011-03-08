@@ -29,11 +29,28 @@ class EndpointManager_Plugin extends Bluebox_Plugin
                 $phone_info['line'][1]['description'] = $device['plugins']['endpointdevice']['display_name'];
                 $phone_info['line'][1]['secret'] = $device['plugins']['sip']['password'];
 
-		// Replace this with the DNS location of this tenant/user - only if the host varible has not been defined
-                $phone_info['host'] = (($host = arr::get($device, 'plugins', 'endpointdevice', 'host')) ? $host : $dns);
+		$phone_info['host'] = $dns;
+		$phone_info['port'] = 5060;
+
+		$phone_info['options'] = array();
+
+		// Is a Redbox in use?
+		if (arr::get($device, 'plugins', 'endpointdevice', 'host')) {
+	                $phone_info['line'][1]['options']['enable_outbound_proxy_server'] = 1;
+	                $phone_info['line'][1]['options']['outbound_proxy_server'] = arr::get($device, 'plugins', 'endpointdevice', 'host');
               
-		$phone_info['port'] = (($port = arr::get($device, 'plugins', 'endpointdevice', 'port')) ? $port : 5060);
-                
+			$phone_info['line'][1]['options']['outbound_proxy_server_port'] = (($port = arr::get($device, 'plugins', 'endpointdevice', 'port')) ? $port : 5060);
+
+			$phone_info['options']['voice_vlan_enable'] = ($vlan_enable = arr::get($device, 'plugins', 'endpointdevice', 'vlan') ? $vlan_enable : '0');
+			$phone_info['options']['voice_vlan_id'] = ($voice_vlan = arr::get($device, 'plugins', 'endpointdevice', 'voice_vlan') ? $voice_vlan : '0');
+			$phone_info['options']['data_vlan_enable'] = $vlan_enable;
+			$phone_info['options']['data_vlan_id'] = ($data_vlan = arr::get($device, 'plugins', 'endpointdevice', 'data_vlan') ? $data_vlan : '4095');
+		} else {
+		}
+
+		$phone_info['options']['update_mode'] = 4;
+		$phone_info['options']['update_frequency'] = 5;	// every 5 minutes
+ 
 		$phone_info['timezone'] = "-8";
                 $endpoint->prepare_configs($phone_info);
             } else {
