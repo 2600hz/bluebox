@@ -135,8 +135,6 @@ class navigation
         // init our array, get the module name, and clean up the skin name
         $lookIn = array();
 
-        $name = $navStructure['module'];
-
         $skin = str_replace('skins/', '', skins::getSkin());
 
         // make sure we are dealing with our defualt sizes
@@ -163,10 +161,17 @@ class navigation
                 break;
         }
 
-        // basepath for searching within a module
-        $basePath = MODPATH . $name . '/assets/img/icons/' .$size .'/';
+        $name = $navStructure['module'];
 
-        $baseURL = url::base() . $name . '/assets/img/icons/' .$size .'/';
+        // get the package information to determine the
+        // basepath for searching within a module
+        $packageRec = doctrine::getTable('Package')->findOneByName($name);
+
+        if ($packageRec)
+        {
+                $moddir = substr($packageRec->basedir, strpos($packageRec->basedir, '/'), strlen($packageRec->basedir));
+                $basePath = MODPATH . $moddir . '/assets/img/icons/' .$size .'/';
+                $baseURL = url::base() . 'modules' . $moddir . '/assets/img/icons/' .$size .'/';
 
         // see if the module provides an icon for this skin
         if (empty($allowSkinSpecific) || (is_array($allowSkinSpecific) && array_key_exists($name, $allowSkinSpecific)))
@@ -178,6 +183,7 @@ class navigation
         if (empty($restrictToSkin) || (is_array($restrictToSkin) && array_key_exists($name, $restrictToSkin)))
         {
             $lookIn[$baseURL . $name . '.png' ] = $basePath . $name . '.png';
+        }
         }
 
         // basepath for searching the skin
@@ -351,6 +357,29 @@ class navigation
     }
 
     /**
+	* Add a submenu option to the specified controller.  If no controller is supplied, then getController
+	* is called to attempt to determine the current controller
+	*
+	* @return boolean True if the menu option was successfully added
+	* @param string Menu item Text
+	* @param string Meny item URL
+	* @param string module Name [optional]
+	*/
+	public static function addSubmenuOption($module, $label, $url)
+	{
+		$itemmenu = array();
+		$itemmenu[$label] = array('url' => $url, 'disabled' => false, 'entry' => '');
+		foreach (self::$navigation[$module] as $key => $attributes)
+		{
+			if(strtolower(substr($attributes['navURL'], 0, strpos($attributes['navURL'], '/'))) == strtolower($module))
+			{
+				self::$navigation[$module][$key]['navSubmenu'] = $itemmenu + self::$navigation[$module][$key]['navSubmenu'];
+			}
+		}
+	}
+
+
+	/**
      * Get the controller.  If no uri is supplied then the current controller is retrieved but
      * be carefull if you request it to early it will be NULL.  If you want to know if it is
      * valid check if event system.routing has run.
