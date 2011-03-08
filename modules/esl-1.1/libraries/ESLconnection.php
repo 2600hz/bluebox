@@ -379,6 +379,6 @@ class ESLconnection extends FS_Socket {
     private function _throwError($errorMessage)
     {
         message::set("ESL {$errorMessage}", 'alert');
-        throw new Exception("ESL {$errorMessage}");
+        throw new ESLException("ESL {$errorMessage}");
     }
 }
