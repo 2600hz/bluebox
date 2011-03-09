@@ -28,6 +28,7 @@ class EndpointManager_Plugin extends Bluebox_Plugin
                 $phone_info['line'][1]['ext'] = $device['plugins']['sip']['username'];
                 $phone_info['line'][1]['description'] = $device['plugins']['endpointdevice']['display_name'];
                 $phone_info['line'][1]['secret'] = $device['plugins']['sip']['password'];
+                $phone_info['line'][1]['subscribe_mwi'] = 1; // Todo - map this properly to voicemail boxes
 
 		$phone_info['host'] = $dns;
 		$phone_info['port'] = 5060;
