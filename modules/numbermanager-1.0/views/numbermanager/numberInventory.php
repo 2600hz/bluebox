@@ -112,7 +112,7 @@
             number: $(this).find('.number_datastore').val(),
             class_type: $(this).find('.number_class_datastore').val(),
             registry:{
-                timeout: 30
+                timeout: 20
             }
         }
 
