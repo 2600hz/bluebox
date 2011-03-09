@@ -34,7 +34,7 @@ class EndpointManager_Plugin extends Bluebox_Plugin
 
 		$phone_info['options'] = array();
 
-		// Is a Redbox in use?
+		// Is a Redbox or proxy in use?
 		if (arr::get($device, 'plugins', 'endpointdevice', 'proxy_ip')) {
 	                $phone_info['line'][1]['options']['enable_outbound_proxy_server'] = 1;
 	                $phone_info['line'][1]['options']['outbound_proxy_server'] = arr::get($device, 'plugins', 'endpointdevice', 'proxy_ip');
@@ -48,7 +48,10 @@ class EndpointManager_Plugin extends Bluebox_Plugin
 			$phone_info['options']['data_vlan_enable'] = ($vlan_enable ? $vlan_enable : '0');
 			$phone_info['options']['data_vlan_id'] = (($data_vlan = arr::get($device, 'plugins', 'endpointdevice', 'data_vlan')) ? $data_vlan : '4095');
 		} else {
-	                $phone_info['line'][1]['options'] = array();
+	                $phone_info['line'][1]['options']['enable_outbound_proxy_server'] = 0;
+              
+			$phone_info['options']['voice_vlan_enable'] = 0;
+			$phone_info['options']['data_vlan_enable'] = 0;
 		}
 
 		$phone_info['options']['update_mode'] = 4;
