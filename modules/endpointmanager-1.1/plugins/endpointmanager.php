@@ -46,6 +46,7 @@ class EndpointManager_Plugin extends Bluebox_Plugin
 			$phone_info['options']['data_vlan_enable'] = $vlan_enable;
 			$phone_info['options']['data_vlan_id'] = ($data_vlan = arr::get($device, 'plugins', 'endpointdevice', 'data_vlan') ? $data_vlan : '4095');
 		} else {
+	                $phone_info['line'][1]['options'] = array();
 		}
 
 		$phone_info['options']['update_mode'] = 4;
