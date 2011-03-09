@@ -17,7 +17,7 @@ class EndpointManager_Plugin extends Bluebox_Plugin
             $endpoint = new endpointman();
             $phone_info = array();
             if($endpoint->mac_check_clean($device['plugins']['endpointdevice']['mac_address'])) {
-                $dns = $device['User']['Location']['domain'];
+                $dns = (string)$device['User']['Location']['domain'];
 
                 $key = explode("|",$device['plugins']['endpointdevice']['brand']);
                 $phone_info['brand'] = $key[0];
