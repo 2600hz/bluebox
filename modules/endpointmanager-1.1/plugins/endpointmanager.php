@@ -42,13 +42,11 @@ class EndpointManager_Plugin extends Bluebox_Plugin
 			$phone_info['line'][1]['options']['outbound_proxy_server_port'] = (($port = arr::get($device, 'plugins', 'endpointdevice', 'proxy_port')) ? $port : 5060);
 
 			$vlan_enable = arr::get($device, 'plugins', 'endpointdevice', 'vlan');
-			$voice_vlan = arr::get($device, 'plugins', 'endpointdevice', 'voice_vlan');
-			$data_vlan = arr::get($device, 'plugins', 'endpointdevice', 'data_vlan') ? $data_vlan : '4095');
 
 			$phone_info['options']['voice_vlan_enable'] = ($vlan_enable ? $vlan_enable : '0');
-			$phone_info['options']['voice_vlan_id'] = ($voice_vlan ? $voice_vlan : '0');
+			$phone_info['options']['voice_vlan_id'] = (($voice_vlan = arr::get($device, 'plugins', 'endpointdevice', 'voice_vlan')) ? $voice_vlan : '0');
 			$phone_info['options']['data_vlan_enable'] = ($vlan_enable ? $vlan_enable : '0');
-			$phone_info['options']['data_vlan_id'] = ($data_vlan ? $data_vlan : '4095');
+			$phone_info['options']['data_vlan_id'] = ((arr::get($device, 'plugins', 'endpointdevice', 'data_vlan') ? $data_vlan : '4095');
 		} else {
 	                $phone_info['line'][1]['options'] = array();
 		}
