@@ -57,6 +57,8 @@ class EndpointManager_Plugin extends Bluebox_Plugin
 
 		$phone_info['options']['update_mode'] = 4;
 		$phone_info['options']['update_frequency'] = 5;	// every 5 minutes
+		$phone_info['options']['update_method'] = 'http';	// todo: make this configurable
+		$phone_info['options']['update_server'] = 'http://' . $dns . '/provision/';	// todo: make this match blue.box, not the DNS name?
  
 		$phone_info['timezone'] = "-8";
                 $endpoint->prepare_configs($phone_info);
