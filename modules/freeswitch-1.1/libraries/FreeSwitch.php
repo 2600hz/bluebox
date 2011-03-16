@@ -81,6 +81,7 @@ class FreeSwitch extends Telephony_Driver
         'voicemail' => '//document/section[@name="configuration"]/configuration[@name="voicemail.conf"]/profiles/profile[@name="%s"]',
         'xmlcdr' => '//document/section[@name="configuration"]/configuration[@name="xml_cdr.conf"][@description="XML CDR CURL logger"]',
         'odbc' => '//document/section[@name="odbc"]',
+        'cdr_csv' => '//document/section[@name="configuration"]/configuration[@name="cdr_csv.conf"][@description="CDR CSV Format"]',
     );
 
     public static function getInstance()

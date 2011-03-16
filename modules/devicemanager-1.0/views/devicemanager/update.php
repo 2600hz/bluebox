@@ -61,10 +61,15 @@
                         'hint' => 'Default outbound call context',
                         'help' => 'This field determines the phone numbers a user can call. All phone numbers and SIP trunks associated with the selected context can be dialed by this user.<BR><BR>Note that, in most cases, the user\'s device must authenticate in order for this to work. Note that if this is not set, the context for the default interface a call is received on is used instead.'
                     ),
-                    'Default Context:'
+                    'Outbound Context:'
                 );
             ?>
             <?php echo numbering::selectContext('device[context_id]'); ?>
+        </div>
+
+        <div class="field">
+            <?php echo form::label('device[registry][anonymous_reject]', 'Reject Anonymous Calls'); ?>
+            <?php echo form::checkbox('device[registry][anonymous_reject]'); ?>
         </div>
 
     <?php echo form::close_section(); ?>

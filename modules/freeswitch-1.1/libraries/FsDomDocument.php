@@ -544,6 +544,7 @@ class FsDomDocument extends DOMDocument
         // Delete anything already there
         $this->deleteChildren($query);
 
+
         // Grab an XPath pointer to the query we just ran
         /*$xp = new DOMXPath($this);
 
@@ -553,6 +554,26 @@ class FsDomDocument extends DOMDocument
         $base->appendChild($newXmlFragment);
 
         Kohana::log('debug', 'End XML Replace');
+    }
+
+    public function replaceWithText($newText, $query = '')
+    {
+        // Create the base if it doesn't already exist. Delete all children of the base
+
+        $this->set($query);
+
+        $this->deleteChildren($query);
+
+        $query = $this->preUpdate($query);
+
+        // Grab an XPath pointer to the query we just ran
+        $xp = new DOMXPath($this);
+
+        $base = $xp->query($query);
+
+        $newTextNode = $this->createTextNode($newText);
+
+        $base->item(0)->appendChild($newTextNode);
     }
 
 

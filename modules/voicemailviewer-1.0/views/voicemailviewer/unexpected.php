@@ -1,1 +1,1 @@
-<h3><?= $unexpected_msg ?></h3>
+<h3><?php echo $unexpected_msg ?></h3>

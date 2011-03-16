@@ -173,13 +173,13 @@ fUpdateBlueboxPerm() {
     echo "# chmod -R g+w modules/asterisk-*/config/asterisk.php"
     chmod -R g+w modules/asterisk-*/config/asterisk.php
 
-    [ ! -d upload/ ] && echo "# mkdir upload/" && mkdir -p upload/ 2>&1
+    [ ! -d uploads/ ] && echo "# mkdir uploads/" && mkdir -p uploads/ 2>&1
 
-    echo "# chgrp -R $webuser upload/"
-    chgrp -R $webuser upload/
+    echo "# chgrp -R $webuser uploads/"
+    chgrp -R $webuser uploads/
 
-    echo "# chmod -R g+w upload/"
-    chmod -R g+w upload/
+    echo "# chmod -R g+w uploads/"
+    chmod -R g+w uploads/
 }
 
 fFixSoundsPerms() {

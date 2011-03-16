@@ -10,9 +10,9 @@ class Bluebox_Tenant
     {
         $account = new Account();
 
-        $account->name = (isset($options['name']) ? $options['name'] : 'New Account');
+        $account['name'] = (isset($options['name']) ? $options['name'] : 'New Account');
 
-        $account->type = (isset($options['type']) ? $options['type'] : Account::TYPE_NORMAL);
+        $account['type'] = (isset($options['type']) ? $options['type'] : Account::TYPE_NORMAL);
 
         $account->save();
 
@@ -27,11 +27,11 @@ class Bluebox_Tenant
         
         $location = new Location();
 
-        $location->account_id = $accountId;
+        $location['account_id'] = $accountId;
 
-        $location->name = (isset($options['name']) ? $options['name'] : 'Main Location');
+        $location['name'] = (isset($options['name']) ? $options['name'] : 'Main Location');
 
-        $location->domain = $domain;
+        $location['domain'] = $domain;
 
         $location->save();
 
@@ -42,23 +42,23 @@ class Bluebox_Tenant
     {
         $user = new User();
 
-        $user->first_name = (isset($options['first']) ? $options['first'] : 'Account');
+        $user['first_name'] = (isset($options['first']) ? $options['first'] : 'Account');
 
-        $user->last_name = (isset($options['last']) ? $options['last'] : 'Admin');
+        $user['last_name'] = (isset($options['last']) ? $options['last'] : 'Admin');
 
-        $user->username = (isset($options['username']) ? $options['username'] : 'admin@localhost');
+        $user['username'] = (isset($options['username']) ? $options['username'] : 'admin@localhost');
 
         // Use username as email address is no email is specified
-        $user->email_address = (isset($options['email']) ? $options['email'] : $user->username);
+        $user['email_address'] = (isset($options['email']) ? $options['email'] : $user->username);
 
         // Create a random password if none is given
-        $user->password = (isset($options['password']) ? $options['password'] : substr(mdr(rand(1000000, 9999999)), 0, 5));
+        $user['password'] = (isset($options['password']) ? $options['password'] : substr(mdr(rand(1000000, 9999999)), 0, 5));
 
-        $user->user_type = (isset($options['user_type']) ? $options['user_type'] : User::TYPE_ACCOUNT_ADMIN);
+        $user['user_type'] = (isset($options['user_type']) ? $options['user_type'] : User::TYPE_ACCOUNT_ADMIN);
 
-        $user->location_id = $locationId;
+        $user['location_id'] = $locationId;
 
-        $user->account_id = $accountId;
+        $user['account_id'] = $accountId;
 
         $user->save();
 
@@ -71,25 +71,25 @@ class Bluebox_Tenant
 
         $context = new Context();
 
-        $context->name = 'In-house Only';
+        $context['name'] = 'Outbound Routes';
 
-        $context->locked = FALSE;
+        $context['locked'] = FALSE;
 
-        $context->account_id = $accountId;
+        $context['account_id'] = $accountId;
 
-        $context->registry = array('type' => 'private');
+        $context['registry'] = array('type' => 'private');
 
         $context->save();
 
         $context = new Context();
 
-        $context->name = 'Publicly Accessible';
+        $context['name'] = 'Inbound Routes';
 
-        $context->locked = FALSE;
+        $context['locked'] = FALSE;
 
-        $context->account_id = $accountId;
+        $context['account_id'] = $accountId;
 
-        $context->registry = array('type' => 'public');
+        $context['registry'] = array('type' => 'public');
 
         $context->save();
 
@@ -234,18 +234,18 @@ class Bluebox_Tenant
 
             if ($skin)
             {
-                $site->skin_id = $skin->skin_id;
+                $site['skin_id'] = $skin['skin_id'];
             }
         }
         
         // Create default site setttings
-        $site->url = $url;
+        $site['url'] = $url;
 
-        $site->homepage = '/welcome';
+        $site['homepage'] = '/welcome';
 
-        $site->wildcard = $wildcard;
+        $site['wildcard'] = $wildcard;
 
-        $site->default = $default;
+        $site['default'] = $default;
 
         $site->save();
 

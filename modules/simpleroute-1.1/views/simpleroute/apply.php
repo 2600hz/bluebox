@@ -64,13 +64,6 @@
 
         <div class="field">
         <?php
-            echo form::label('simpleroute[area_code]', 'Local Area Code:');
-            echo form::input('simpleroute[area_code]');
-        ?>
-        </div>
-
-        <div class="field">
-        <?php
             echo form::label(array(
                     'for' => 'simpleroute[continue_on_fail]',
                     'hint' => 'If this route fails progress to the next'

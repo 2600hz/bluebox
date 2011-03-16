@@ -66,11 +66,20 @@ class FreeSwitch_Conference_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/action[@application="export"][@data="hold_music=silence"]');
 
+        if($limit = arr::get($destination, 'registry', 'size-limit'))
+        {
+            $xml->update('/action[@application="limit"]{@data="hash conference ' .$destination['conference_id'] .' ' .$limit .' !USER_BUSY"}');
+        }
+        else
+        {
+            $xml->deleteNode('/action[@application="limit"]');
+        }
+
         $xml->update('/action[@application="answer"]');
 
         // Pause for a second on answer, to avoid audio clipping
         $xml->update('/action[@application="sleep"]{@data="1000"}');
-        
+
         $xml->update('/action[@application="conference"]{@data="conference_' .$destination['conference_id'] . '@conference_' .$destination['conference_id'] .'"}');
     }
 }

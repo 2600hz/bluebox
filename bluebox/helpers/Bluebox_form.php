@@ -31,6 +31,11 @@ class form extends form_Core
      */
     private static $repopulateValues = array();
 
+    public static function getRepopulateValue($name, $value)
+    {
+        return self::_attemptRepopulate($name, $value);
+    }
+
     /**
      * Generates an opening HTML form tag.
      *

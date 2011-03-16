@@ -51,7 +51,9 @@ class Sip_Plugin extends Bluebox_Plugin
 
         return TRUE;
     }
-
+    
+    
+    
     protected function validate($data, $validator)
     {
         $base = $this->getBaseModelObject();

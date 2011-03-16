@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/installer/assets/css/forms.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>skins/installer/assets/css/installer.css" media="screen" />
     <?php echo $js; ?>
-    <?php echo html::link('skins/installer/assets/img/favicon.ico', 'icon', 'image/x-icon'); ?>
+    <?php echo html::link('skins/bluebox/assets/img/favicon.ico', 'icon', 'image/x-icon'); ?>
 </head>
 <body>
     <div class="container">
@@ -23,11 +23,19 @@
                 ?>
                 |
                 <?php
-                    echo html::anchor('http://www.2600hz.org', __('Wiki'), array(
+                    echo html::anchor('http://wiki.2600hz.org', __('Wiki'), array(
                         'title' => 'Find answers on the wiki for common problems.',
                         'target' => '_blank'
                     ));
                 ?>
+				|
+                <?php
+                    echo html::anchor('http://help.2600hz.org', __('Help'), array(
+                        'title' => 'Find answers on the wiki for common problems.',
+                        'target' => '_blank'
+                    ));
+                ?>
+
             </div>
         </div>
         <!-- END OF HEADER -->

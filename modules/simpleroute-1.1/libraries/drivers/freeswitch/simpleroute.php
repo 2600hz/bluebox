@@ -45,7 +45,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
                 if (!empty($options['prepend']))
                 {
-                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' .$options['prepend'] . '"}');
+                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' . $options['prepend'] . '"}');
                 }
                 else
                 {

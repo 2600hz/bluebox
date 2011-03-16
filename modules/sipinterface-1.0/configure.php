@@ -39,7 +39,7 @@ class InterfaceManager_Configure extends Bluebox_Configure
         $this->addInterface('Unauthenticated SIP', '', '5080', FALSE, FALSE);
     }
 
-    public static function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $nat = FALSE, $context = 'Publicly Accessible')
+    public static function addInterface($name, $ip = '', $port = 5060, $auth = TRUE, $use_inbound_acl = TRUE, $nat = FALSE, $context = 'Inbound Routes')
     {
         Kohana::log('debug', 'Adding SIP interface for IP ' . $ip . ' on port ' . $port);
 

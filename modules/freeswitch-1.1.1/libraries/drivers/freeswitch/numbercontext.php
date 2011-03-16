@@ -36,6 +36,11 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
      */
     public static function set($base)
     {
+        if (empty($base['Number']['number_id']) || empty($base['context_id']))
+        {
+            return;
+        }
+
         $xml = Telephony::getDriver()->xml;
 
         // Reference to our XML document, context and extension. Creates the extension & context if does not already exist

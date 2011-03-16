@@ -46,20 +46,27 @@ class FreeSwitch_RingGroup_Driver extends FreeSwitch_Base_Driver
 
         $xml->update('/action[@application="export"][@bluebox="sipCalleeIdNumber"]{@data="sip_callee_id_number=' .$number['number'] .'"}');
 
+        $xml->update('/action[@application="export"][@bluebox="settingContinueOnTimeout"]{@data="originate_continue_on_timeout=true"}');
+
         $dialstring = '';
 
         foreach ($destination['members'] as $member)
         {
-            if (!empty($member['options']))
+            if (!empty($member['options']) OR !empty($numberOptions['timeout']))
             {
-                $dialstring .= '{';
+                $dialstring .= '[';
 
                 foreach ($member['options'] as $parameter => $value)
                 {
                     $dialstring .= $parameter .'=' .$value .',';
                 }
 
-                $dialstring = rtrim($dialstring, ',') .'}';
+                if(!empty($numberOptions['timeout']))
+                {
+                    $dialstring .= 'leg_timeout=' .$numberOptions['timeout'];
+                }
+
+                $dialstring = rtrim($dialstring, ',') .']';
             }
             
             $dialstring .= $member['bridge'] .$memberSeperator;

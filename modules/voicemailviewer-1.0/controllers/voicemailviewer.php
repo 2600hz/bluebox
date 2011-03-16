@@ -1,16 +1,15 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 class VoicemailViewer_Controller extends Bluebox_Controller {
-  public $domain;
   protected $authBypass = array('service');
 
   public $baseModel = 'VoicemailMessage';
 
   public function index() {
-    $user = users::$user;
-    $domain = 'voicemail_1';
+    $account_id = users::getAttr('account_id');
+    $domain = 'voicemail_' .$account_id;
 
-    $mailboxes = VoicemailManager::getMailboxes($user->_data['account_id']);
+    $mailboxes = VoicemailManager::getMailboxes($account_id);
 
     // ghetto multibox support
     try {
@@ -78,7 +77,7 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
 
     $this->loadBaseModel($uuid);
 
-    if ($action = $this->submitted(array('submitString' => 'delete'))) {
+    if (($action = $this->submitted(array('submitString' => 'delete')))) {
       Event::run('bluebox.deleteOnSubmit', $action);
 
       if ( ($action == self::SUBMIT_CONFIRM) ) {
@@ -157,7 +156,8 @@ class VoicemailViewer_Controller extends Bluebox_Controller {
    *  voicemail_inject is used to add an arbitrary sound file to a users voicemail mailbox.
    */
   public function blast() {
-    $domain = VoicemailManager::getDomain();
+    $account_id = users::getAttr('account_id');
+    $domain = VoicemailManager::getDomain($account_id);
 
     $this->view->mailboxes = VoicemailManager::getAllMailboxes();
 

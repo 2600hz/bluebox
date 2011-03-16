@@ -232,6 +232,16 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             $xml->deleteNode('/settings/param[@name="NDLB-force-rport"]');
         }
 
+        // Enable log auth failures by default.
+        if (arr::get($base, 'registry', 'log_auth_failures'))
+        {
+            $xml->update('/settings/param[@name="log-auth-failures"]{@value="true"}');
+        }
+        else
+        {
+            $xml->deleteNode('/settings/param[@name="log-auth-failures"]');
+        }
+
         // Enable compact headers by default. With all the Codecs FS now supports we see lots of
         // bad behavior re: UDP packets that are too large and get fragmented
         if (arr::get($base, 'registry', 'compact_headers'))
@@ -267,6 +277,19 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
             $xml->deleteNode('/settings/param[@name="force-register-domain"]');
 
             $xml->deleteNode('/settings/param[@name="force-register-db-domain"]');
+        }
+
+        if ($protocol = arr::get($base, 'registry', 'protocol'))
+        {
+            $xml->update('/settings/param[@name="contact-params"]{@value="tport=' . $protocol . '"}');
+            $xml->update('/settings/param[@name="register-transport"]{@value="' . $protocol . '"}');
+            $xml->update('/settings/param[@name="bind-params"]{@value="transport=' . $protocol . '"}');
+        }
+        else
+        {
+            $xml->deleteNode('/settings/param[@name="contact-params"]');
+            $xml->deleteNode('/settings/param[@name="register-transport"]');
+            $xml->deleteNode('/settings/param[@name="bind-params"]');
         }
 
         // Set relevant ACLs
@@ -314,10 +337,10 @@ class FreeSwitch_SipInterface_Driver extends FreeSwitch_Base_Driver
 
             $elements = $xp->query($xml->preUpdate(''));
 
-            if (count($elements) == 1)
+            if (count($elements) == 1 AND ($node = $elements->item(0)))
             {
                 $node = $elements->item(0);
-
+                
                 $parentNode = $node->parentNode;
 
                 $parentNode->removeChild($node);

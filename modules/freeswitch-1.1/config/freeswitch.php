@@ -21,14 +21,15 @@ $config['default_packages'] = array(
     'voicemail',
     'featurecode',
     'quickadd',
-    
+    'regenerate',
+
     // Plugins
     'address',
     'callerid',
     'simpleroute',
     'sip',
     'timezone',
-    
+
     // Freeswitch
     'esl',
     'mediafile',
@@ -102,6 +103,11 @@ $config['filemap'][8] = array (
 $config['filemap'][9] = array (
     'filename' => $config['cfg_root'] .'/jingle_profiles/bluebox_clients.xml',
     'query' => '//document/section[@name="configuration"]/configuration[@name="dingaling.conf"]/profile'
+);
+
+$config['filemap'][] = array (
+    'filename' => $config['cfg_root'] .'/autoload_configs/cdr_csv.conf.xml',
+    'query' => '//document/section[@name="configuration"]/configuration[@name="cdr_csv.conf"][@description="CDR CSV Format"]'
 );
 
 // Base file - note that because the query string is //document, this section will contain
