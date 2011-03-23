@@ -261,6 +261,6 @@ class FS_Socket
      */
     private function _throwError($errorMessage)
     {
-        throw new Exception("Socket {$errorMessage}");
+        throw new ESL_Exception("Socket {$errorMessage}");
     }
 }
