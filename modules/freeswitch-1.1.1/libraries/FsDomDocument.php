@@ -276,16 +276,12 @@ class FsDomDocument extends DOMDocument
         foreach ($elements as $element) if ($element != "")
         {
             // Put slashes back
-            $element = str_replace('__SLASH__', '/', $element);
-
+            $element = str_replace(array('__SLASH__', '\@'), array('/', '@'), $element);
             $this->newAttrs = array();
-
-            $elements = $xp->query($element, $currentnode);
-
-            $element = str_replace('\@', '@', $element);
+            $foundpath = $xp->query($element, $currentnode);
 
             // Does path not exist (0 elements)?
-            if ($elements->length == 0)
+            if ($foundpath->length == 0)
             {
                 // Add any attributes in XPath to element
                 // I checked for non quoted params, and didnt find any...
@@ -307,7 +303,7 @@ class FsDomDocument extends DOMDocument
             {
                 // Path already exists so far, traverse existing path
                 // NOTE: We assume only one possible entry is returned. This may be a mistake...?
-                $currentnode = $elements->item(0);
+                $currentnode = $foundpath->item(0);
             }
         }
 

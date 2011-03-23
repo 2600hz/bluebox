@@ -1151,13 +1151,13 @@ class jgrid
         // Include the base alias when checking for collisions
         $existingAlias[$this->baseAlias] = '';
         // Attempt to find an unused char in the model name to use as the alias
-        foreach(str_split($model) as $alias) {
+/*        foreach(str_split($model) as $alias) {
             $alias = strtolower($alias);
             if (!array_key_exists($alias, $existingAlias)) {
                 $this->query['model'][$model] = $alias;
                 return $alias;
             }
-        }
+        } */
         // If amazingly there were no chars in the model name that didnt have a collision then use
         // the whole alphabet (HIGHLY unlikely)
         $possibleAlias = array(
