@@ -41,16 +41,20 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
                 $xml->deleteChildren();
 
-                $condition = '/condition[@field="destination_number"][@expression="' .$pattern . '"][@bluebox="pattern_' .$simple_route_id .'"]';
+		foreach (array_keys($pattern) AS $pattern_index) 
+		{
 
-                if (!empty($options['prepend']))
-                {
-                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' . $options['prepend'] . '"}');
-                }
-                else
-                {
-                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend="}');
-                }
+	                $condition = '/condition[@field="destination_number"][@break="never"][@expression="' .$pattern[$pattern_index] . '"][@bluebox="pattern_' .$simple_route_id . '_part_' . ($pattern_index+1) .'"]';
+
+	                if (!empty($options['prepend']))
+	                {
+	                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' . $options['prepend'] . '"}');
+	                }
+	                else
+	                {
+	                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend="}');
+	                }
+		}
 
                 if (!empty($simpleroute['caller_id_name']))
                 {
@@ -80,18 +84,21 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
                     }
                 }
 
-                $dummy = '/condition[@field="destination_number"][@expression="' . $pattern . '"][@bluebox="pattern_' .$simple_route_id .'_out"]';
-
-                if (!empty($simpleroute['continue_on_fail']))
+		foreach (array_keys($pattern) AS $pattern_index) 
                 {
-                    $xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="failure_causes=NORMAL_CLEARING,ORIGINATOR_CANCEL,CRASH"}');
-                }
-                else
-                {
-                    $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
-                }
+	                $dummy = '/condition[@field="destination_number"][@break="never"][@expression="' . $pattern[$pattern_index] . '"][@bluebox="pattern_' .$simple_route_id . '_part_' . ($pattern_index+1) .'_out"]';
 
-                $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
+	                if (!empty($simpleroute['continue_on_fail']))
+	                {
+	                    $xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="failure_causes=NORMAL_CLEARING,ORIGINATOR_CANCEL,CRASH"}');
+	                }
+	                else
+	                {
+	                    $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
+	                }
+
+	                $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
+		}
             }
         }
     }
