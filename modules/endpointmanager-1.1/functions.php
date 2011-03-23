@@ -96,12 +96,14 @@ class endpointman {
             $provisioner_lib->server[1]['port'] = 5060;
         }
 
+	$provisioner_lib->options = $phone_info['options'];
+
         //Provide alternate Configuration file instead of the one from the hard drive
         //$endpoint->config_files_override['$mac.cfg'] = "{\$srvip}\n{\$admin_pass|0}\n{\$test.line.1}";
 
         //Pretend we have three lines, we could just have one line or 20...whatever the phone supports
         foreach($phone_info['line'] as $line) {
-            $provisioner_lib->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description']);
+            $provisioner_lib->lines[$line['line']] = array('ext' => $line['ext'], 'secret' => $line['secret'], 'displayname' => $line['description'], 'options' => $line['options']);
         }
 
         $provisioner_lib->root_dir = MODPATH . 'endpointmanager-1.1' . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR;

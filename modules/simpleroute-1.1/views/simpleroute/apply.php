@@ -12,10 +12,6 @@
 
             <?php echo form::input('simpleroute[patterns][' .$pattern['simple_route_id'] .'][prepend]'); ?>
 
-            <span style="padding:0 10px 0;">Prepend location area code?</span>
-
-            <?php echo form::checkbox('simpleroute[patterns][' . $pattern['simple_route_id']  .'][append_areacode]'); ?>
-
         </div>
 
     <?php endforeach; ?>
@@ -63,13 +59,6 @@
         <?php
             echo form::label('simpleroute[caller_id_number]', 'Caller ID Number:');
             echo form::input('simpleroute[caller_id_number]');
-        ?>
-        </div>
-
-        <div class="field">
-        <?php
-            echo form::label('simpleroute[area_code]', 'Local Area Code:');
-            echo form::input('simpleroute[area_code]');
         ?>
         </div>
 
