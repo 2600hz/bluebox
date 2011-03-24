@@ -99,7 +99,7 @@ class SimpleRoute_Controller extends Bluebox_Controller
             throw new Exception('You must provide at least one pattern');
         }
 
-        $object['patterns'] = $patterns;
+        $object['patterns'] = array_values($patterns);
 
         parent::pre_save($object);
     }

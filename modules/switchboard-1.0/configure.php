@@ -1,9 +1,9 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class Switchboard_1_0_0_Configure extends Bluebox_Configure
 {
-    public static $version = 1.1;
+    public static $version = 1.0;
     public static $packageName = 'switchboard';
-    public static $displayName = 'switchboard';
+    public static $displayName = 'Switchboard';
     public static $author = '<ul><li>Mell Rosandich</li></ul>';
     public static $vendor = 'Bluebox';
     public static $license = 'MPL';

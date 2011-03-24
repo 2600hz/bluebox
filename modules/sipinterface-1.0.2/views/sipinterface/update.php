@@ -33,11 +33,27 @@
 
         <div class="field">
         <?php
+            echo form::label('sipinterface[registry][protocol]', 'SIP Traffic Protocol:');
+            echo form::dropdown('sipinterface[registry][protocol]', array('0' => 'Both','udp' => 'UDP Only','tcp' => 'TCP Only'));
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
             echo form::label(array('for' => 'sipinterface[ext_ip_address]',
                                    'hint' => 'Leave blank to auto-detect',
                                    'help' => 'The external IP address is used in SIP headers to specify where packets should be routed to/from when talking with external/remote servers. This is very important - incorrectly setting this is very often the cause of one-way audio, since SIP packets will sometimes successfully make it back and forth but the SDP will have an invalid address for audio.'),
                              'External SIP IP Address:');
             echo form::input('sipinterface[ext_ip_address]');
+        ?>
+        </div>
+
+        <div class="field">
+        <?php
+            echo form::label(array('for' => 'sipinterface[registry][log_auth_failures]',
+                                   'help' => 'Write to logfile when authentication fails (e.g. wrong login/pass). Used by fail2ban',
+                                   ), 'Log authentication failures:');
+            echo form::checkbox('sipinterface[registry][log_auth_failures]');
         ?>
         </div>
 

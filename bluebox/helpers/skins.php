@@ -60,7 +60,11 @@ class skins {
         else
         {
             // Find skin based on URL or IP
-            $host = $_SERVER['SERVER_NAME'];
+            if (isset($_SERVER['SERVER_NAME'])) {
+	            $host = $_SERVER['SERVER_NAME'];
+            } else {
+                    $host = "127.0.0.1";
+            }
 
             /*
              * TODO: IP-based skin support is not yet enabled. Need to decide precedence when a hostname exists
