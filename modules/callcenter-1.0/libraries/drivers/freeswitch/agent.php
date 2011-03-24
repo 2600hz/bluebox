@@ -26,6 +26,13 @@ class FreeSwitch_Agent_Driver extends FreeSwitch_Base_Driver
         }
 
         $xml->update($agent_xml);
+
+	//Set directory entry
+	$domain = '$${location_' . $location_id .'}';
+
+	FreeSwitch::setSection('user', $domain, $base['Device']['device_id']);
+
+	$xml->update('/variables/variable[@name="agent_id"]{@value="' . $base['agent_id'] .'"}');
     }
 
     public static function delete($base)
@@ -37,5 +44,12 @@ class FreeSwitch_Agent_Driver extends FreeSwitch_Base_Driver
         $xml->setXmlRoot($xml_root . '/agents/agent[@name="agent_' . $base['agent_id'] . '"]');
 
         $xml->deleteNode();
+
+	//Delete directory entry
+	$domain = '$${location_' . $location_id .'}';
+
+	FreeSwitch::setSection('user', $domain, $base['Device']['device_id']);
+
+        $xml->deleteNode('/variables/variable[@name="agent_id"]');
     }
 }
