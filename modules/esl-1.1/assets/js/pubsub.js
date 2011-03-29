@@ -68,7 +68,6 @@
 
                                 error: function(error) {
                                         //Ignore and try again
-                                        console.log("Whoops... error");
                                         setTimeout('polling()', 1000);
                                 }
 	        	});
