@@ -165,9 +165,22 @@ XML;
 XML;
                 break;
 
-            case 'eavesdrop' :
-                $xmlText = <<<XML
+            case 'eavesdrop':
+
+                $xml->setXmlRoot($xml->getExtensionRoot());
+		$xml->deleteChildren();
+
+                $condition = '/condition[@field="destination_number"][@expression="^' . $number['number'] . '(.+)$"]';
+                $xml->setXmlRoot($xml->getExtensionRoot() . $condition);
+
+		$xmlText = <<<XML
+
+	<action application="answer"/>
+	<action application="eavesdrop" data="\${hash(select/spymap/$1)}"/> 
+        <action application="hangup" data=""/>
+      
 XML;
+		break;
 
             case 'uuid_standby':
                 $num = $number['number'];
