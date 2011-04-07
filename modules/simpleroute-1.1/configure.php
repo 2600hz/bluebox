@@ -51,7 +51,7 @@ class SimpleRoute_1_1_Configure extends Bluebox_Configure
     {
         $conn = Doctrine_Manager::connection();
 
-        if (!$conn->import->tableExists(array('simple_route')))
+        if (!$conn->import->tableExists('simple_route'))
         {
             Doctrine::createTablesFromArray(array('SimpleRoute'));
 
