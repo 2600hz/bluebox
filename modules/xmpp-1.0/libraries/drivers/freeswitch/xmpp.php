@@ -61,7 +61,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
         foreach ($xmppData['registry']['patterns'] as $simple_route_id => $options) {
             foreach ($xmppData['registry']['contexts'] as $context_id => $enabled) {
 	    	//dingaling_1_pattern_1
-                $xml = FreeSwitch::createExtension($xmppData['xmpp_id'] .'_pattern_' .$simple_route_id, 'dingaling', 'context_' .$context_id);
+                $xml = FreeSwitch::createExtension($xmppData['xmpp_id'] .'_pattern_' .$simple_route_id, 'main', 'context_' .$context_id);
 
                 if (empty($enabled)) {
                     $xml->deleteNode();
@@ -102,7 +102,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
         //Delete dialplans
         foreach ($xmppData['registry']['patterns'] as $simple_route_id => $options) {
             foreach ($xmppData['registry']['contexts'] as $context_id => $enabled) {
-                $xml = FreeSwitch::createExtension($xmppData['xmpp_id'] .'_pattern_' . $simple_route_id, 'dingaling', 'context_' .$context_id);
+                $xml = FreeSwitch::createExtension($xmppData['xmpp_id'] .'_pattern_' . $simple_route_id, 'main', 'context_' .$context_id);
 
                 $xml->deleteNode();
             }
