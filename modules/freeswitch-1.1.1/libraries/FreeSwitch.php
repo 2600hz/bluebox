@@ -606,8 +606,14 @@ class FreeSwitch extends Telephony_Driver
             // This is a new extension we are creating - search for where to put it by finding the last item above it
             $insert_position = array_search($section, $sections);
 
+	    if($insert_position === FALSE)
+	    {
+		echo "Section not found!";
+		die();
+	    }
+
             // Keep going up the document from the bottom until we find the right section
-            while ($insert_position >= 0 and ($elements->length == 0))
+	    while ($insert_position >= 0 and ($elements->length == 0))
             {
                 $elements = $xp->query('//document/section[@name="dialplan"]/context[@name="' . $context . '"]/extension[starts-with(@name,"' . $sections[$insert_position] . '_")]');
 
