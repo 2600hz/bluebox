@@ -461,6 +461,115 @@ class arr extends arr_Core
         return $merged;
     }
 
+    /**
+     * Sorts an array of associative arrays (in a format similar to a resultset of database records)
+     *
+     * @param array Array to sort
+     * @param mixed Key(s) to sort on, can either be a string to pass a single key, or an array list of keys
+     * @param string Method of sorting. Options:
+     *      lowtohigh - Sort from lowest to highest value
+     *      hightolow - Sort from highest to lowest value
+     *      natcase - Case sensitive natural sort
+     *      natcasein - Case insensitive natural sort
+     * @param string Delimiter to use to separate key values for sort.  By default, a vertical bar is used,
+     *      but if vertical bars are a possible consquential piece of key data, it may be set to something else.
+     * @return boolean True if sort was successfull, false if not.
+     *
+     */
+    public static function alsort(array &$arr, $keys, $strategy='lowtohigh', $delimiter='|')
+    {
+        $sort_arr = array();
+        foreach ($arr as $key => $values)
+        {
+                if (is_array($keys))
+                {
+                        $valuestr = '';
+                        if (is_array($keys))
+                                foreach ($keys as $valuekey)
+                                {
+                                        $valuestr .= $values[$valuekey] . $delimiter;
+                                }
+                        else
+                                $valuestr = $values[$keys];
+                        $sort_arr[$key] = $valuestr;
+                }
+                else
+                        $sort_arr[$key] = $values[$keys];
+        }
+        switch ($strategy)
+        {
+                case 'lowtohigh':
+                        $result = asort($sort_arr);
+                        break;
+                case 'hightolow':
+                        $result = arsort($sort_arr);
+                        break;
+                case 'natcase':
+                        $result = natsort($sort_arr);
+                        break;
+                case 'natcasein':
+                        $result = natcasesort($sort_arr);
+                        break;
+        }
+        if (!$result)
+                return false;
+
+        $result_arr = array();
+        foreach ($sort_arr as $sort_key => $sortval)
+        {
+                $result_arr[$sort_key] = $arr[$sort_key];
+        }
+        $arr = $result_arr;
+        return true;
+    }
+
+    /**
+     * Filters an array of associative arrays (in a format similar to a resultset of database records)
+     *
+     * Filtering is variable type sensitive, so a integer value of 1 does not equal string '1' or boolean True
+     *
+     * @param array Array to filter
+     * @param mixed Key(s) to filter on. Can be in one of the following forms:
+     *      List of ('keyname' => filtervalue) or
+     *      List of ('keyname') => array(filtervalue1, filtervalue2, filtervalue3)
+     * @param string Filter mode. Options:
+     *      include - Include if one or more of the values in the key list are matched
+     *      exclude - Exclude if one or more of the values in the key list are matched
+     * @return boolean True if filter was successfull, false if not.
+     *
+     */
+    public static function alfilter(array &$arr, $filter_arr, $mode = 'include')
+    {
+        $returnarr = array();
+        foreach ($arr as $key => $value_arr)
+        {
+                foreach ($filter_arr as $field => $valuelist)
+                {
+                        if (is_array($valuelist))
+                        {
+                                foreach ($valuelist as $filtervalue)
+                                {
+                                        if ($value_arr[$field] === $filtervalue && $mode === 'include')
+                                        {
+                                                $returnarr[$key] = $value_arr;
+                                                continue 2;
+                                        }
+                                }
+                                if ($mode === 'exclude')
+                                        $returnarr[$key] = $value_arr;
+                        }
+                        elseif ($value_arr[$field] === $valuelist)
+                                if ($mode === 'include')
+                                        $returnarr[$key] = $value_arr;
+                        elseif ($mode === 'exclude')
+                                        $returnarr[$key] = $value_arr;
+                }
+        }
+        $arr = $returnarr;
+        return true;
+    }
+
+
 
 
 
