@@ -153,7 +153,6 @@ abstract class Package_Configure
      * Post-install routine for this module.
      *
      * Do any post-installation configuration that should happen after ALL modules have installed.
-     * This is the safest place to do things that may depend on other modules.
      *
      * You do not need to override this class if you are not adding additional functionality to it.
      *
@@ -164,6 +163,20 @@ abstract class Package_Configure
         $this->noMethodMethod(__FUNCTION__);
     }
 
+    /**
+     * Finalize-install routine for this module.
+     *
+     * Do any post-installation configuration that should happen after ALL modules have installed and the models commited to the db.
+     * This is the safest place to do things that may depend on other modules.
+     *
+     * You do not need to override this class if you are not adding additional functionality to it.
+     *
+     * @return array | NULL Array of failures, or NULL if everything is OK
+     */
+    public function finalizeInstall()
+    {
+        $this->noMethodMethod(__FUNCTION__);
+    }
     /**********************
     * MIGRATION ROUTINES *
     **********************/
