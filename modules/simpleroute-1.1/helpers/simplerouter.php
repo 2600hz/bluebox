@@ -37,20 +37,27 @@ class simplerouter
         {
             case 'freeswitch':
                 // Loop each rule and build a regex
-                $pattern = '';
+                $pattern = Array();
 
                 foreach ($patterns as $rule)
                 {
                     if (!$convert)
                     {
-                        $pattern .= $rule .'|';
+                        array_push($pattern, $rule);
 
                         continue;
                     }
 
                     if (preg_match('/^[0-9]*$/', $rule))
                     {
-                        $pattern .= '^' . $rule . '$|';
+			if (preg_match('/\(/',$rule)) 
+			{
+	                        array_push($pattern, '^' . $rule . '$');
+			} 
+			else 
+			{
+				array_push($pattern, '^(' . $rule . ')$');
+			}
 
                         continue;
                     }
@@ -63,12 +70,19 @@ class simplerouter
                     }
                     
                     // Convert the short hand into regex
-                    $pattern .= '^' . $rule . '$|';
+		    if (preg_match('/\(/',$rule)) 
+		    {
+			array_push($pattern, '^' . $rule . '$');
+		    } 
+		    else 
+		    {
+			array_push($pattern, '^(' . $rule . ')$');
+		    }
                 }
 
                 // we added a pipe on the end of every rule so remove the last one
                 //$pattern = str_replace(array('{', '}'), array('\{', '\}'), $pattern);
-                return rtrim($pattern, '|');
+                return $pattern;
                 
             case 'asterisk':
                 // Loop each rule and build a regex
@@ -257,6 +271,16 @@ class simplerouter
                         $pattern[$key] = '{0,1}';
 
                         break;
+
+		    case '+':
+		    	$pattern[$key] = '\+';
+
+			break;
+
+		    case '*':
+		    	$pattern[$key] = '\*';
+
+			break;
                 }
 
                 // update the rule so we process this correctly

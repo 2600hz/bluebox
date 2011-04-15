@@ -233,7 +233,7 @@ class filesystem
         // check tmp file for read/write capabilities
         $rm = file_exists($path);
 
-        $f = @fopen($path, 'c');
+        $f = @fopen($path, 'w');
 
         if ($f === FALSE)
         {
