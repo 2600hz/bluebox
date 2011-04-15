@@ -53,8 +53,11 @@ class FreeSwitch_NumberContext_Driver extends FreeSwitch_Base_Driver {
 
             // Dialplans are a bit different - we don't want to keep anything that is currently in an extension, in the event it's totally changed
             $xml->deleteChildren();
-
-            // Check what number they dialed
+	    
+	    // Escaping '*' and '+' characters to allow users to use numbers with these chars in it. Otherwise these chars are interpreted  as a regex.	
+            $base['Number']['number'] = str_replace(array('*','+'), array('\*','\+'), $base['Number']['number']);   
+            
+	    // Check what number they dialed
             $xml->update('/condition[@field="destination_number"]{@expression="^' .$base['Number']['number'] .'$"}');
 
             // Now that the extension and condition fields are created for this number, set our root to inside the condition
