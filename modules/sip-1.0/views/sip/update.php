@@ -115,6 +115,22 @@
 
 <?php echo form::close_section(); ?>
 
+<script type="text/javascript">
+
+	$(function() {
+		var trim = function() {
+			var string = $(this).val();
+			string = string.replace(/^\s+/,"");
+			string = string.replace(/\s+$/,"");
+			$(this).val(string);
+		}
+
+		$('#sip_password').change(trim);
+		$('#sip_username').change(trim);
+	});
+
+</script>
+
 <?php if (empty($sip['username']) AND isset($trunk_options)): ?>
 
     <?php jquery::addPlugin(array('scrollTo', 'colorEffects')); ?>
