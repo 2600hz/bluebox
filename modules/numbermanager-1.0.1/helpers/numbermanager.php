@@ -138,11 +138,17 @@ class numbermanager
             case 'Device':
                 return html::anchor('devicemanager/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_device'));
 
+                break;
+
             case 'Conference':
                 return html::anchor('conference/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_conference'));
 
+                break;
+
             case 'Voicemail':
                 return html::anchor('voicemail/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_voicemail'));
+
+                break;
 
             case 'AutoAttendant':
                 return html::anchor('autoattendant/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_AutoAttendant'));
@@ -150,16 +156,23 @@ class numbermanager
             case 'RingGroup':
                 return html::anchor('ringgroup/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_RingGroup'));
 
+                break;
+
             case 'TimeOfDay':
                 return html::anchor('timeofday/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_TimeOfDay_Route'));
 
+                break;
+                
             case 'ExternalXfer':
                 return html::anchor('externalxfer/edit/' .$number['foreign_id'], $module['name'] . ' (' . $base . ')', array('title' => 'Goto_this_ExternalXfer_Route'));
 
+                break;
+                
             default:
-                if (isset($module['name']))
+            	Kohana::log('debug', print_r($module, true));
+                if (isset($module->name))
                 {
-                     return $module['name'] . ' (' . $base . ')';
+                     return $module->name . ' (' . $base . ')';
                 }
                 else
                 {
