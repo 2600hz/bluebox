@@ -70,18 +70,28 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
 
             $extenRoot = $xml->getExtensionRoot();
 
+	    //If allowing multi sip interfaces, then we need to change the @data field with sofia_contact.
+	    $dataString = 'user\/' .$destination['plugins']['sip']['username'] .'@' .$domain;
+	    
+	    if(arr::get($destination, 'registry', 'multi_sipinterface'))
+	    {
+		$dataString =  '${sofia_contact(*\/' .$destination['plugins']['sip']['username'] .'@' .$domain .')}';
+	    }
+
             if (arr::get($destination, 'registry', 'anonymous_reject'))
             {
                 $xml->setXmlRoot($extenRoot .$condition);
                 
-                $xml->update('/action[@application="bridge"]{@data="user\/' .$destination['plugins']['sip']['username'] .'@' .$domain .'"}');
+		//$xml->update('/action[@application="bridge"]{@data="user\/' .$destination['plugins']['sip']['username'] .'@' .$domain .'"}');
+                $xml->update('/action[@application="bridge"]{@data="'.$dataString.'"}');
 
                 $xml->setXmlRoot($extenRoot .'/condition[@bluebox="no_answer"]');
             }
             else
             {
-                $xml->update('/action[@application="bridge"]{@data="user\/' .$destination['plugins']['sip']['username'] .'@' .$domain .'"}');
-
+		//$xml->update('/action[@application="bridge"]{@data="user\/' .$destination['plugins']['sip']['username'] .'@' .$domain .'"}');
+                $xml->update('/action[@application="bridge"]{@data="'.$dataString.'"}');
+	
                 $xml->deleteNode($extenRoot .$condition);
 
                 $xml->deleteNode($extenRoot .'/condition[@bluebox="no_answer"]');
