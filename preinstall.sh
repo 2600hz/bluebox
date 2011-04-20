@@ -323,6 +323,7 @@ fSetWebUser
 fUpdateBlueboxPerm
 fUpdateSwitchPerm
 fFixSoundsPerms
+fFixRecordsPerms
 
 echo
 echo "PLEASE SET UP YOUR DB"
