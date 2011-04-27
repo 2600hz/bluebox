@@ -22,12 +22,18 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
             $xml->setAttributeValue('', 'id', $sip['username']);
 
             $xml->update('/params/param[@name="password"]{@value="' .$sip['password'] .'"}');
+            
+            Event::run('freeswitch.build_dialstring', $base);
 
-	    if (!$dialstring = arr::get($sip, 'dial-string'))
-	    {
-                $dialstring = '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}';
-	    }
-
+            if (isset($base['registry']['dialstring']))
+            {
+                $dialstring = $base['registry']['dialstring'];
+            }
+            else
+            {
+                $dialstring = '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}'; 
+            }
+            
             $xml->update('/params/param[@name="dial-string"]{@value="' . $dialstring . '"}');
 
             if ($base['context_id'] > 0)
