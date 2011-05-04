@@ -31,13 +31,20 @@ class QuickAdd_Controller extends Bluebox_Controller
         $location_id = $_POST['number']['location_id'];
 
         $external_cid = $_POST['callerid']['external_number'];
-
-        $success = Bluebox_Tenant::createUserExtension($object['user_id'], $extension, $context_id, $location_id, array(
+		
+		
+		$options = array(
                 'callerid_external_number' => $extension,
                 'callerid_external_number' => $external_cid,
                 'sip_password' => $_POST['user']['create_password']
-            )
-        );
+            );
+		
+		if($_POST['advance']['sip_username'])
+		{
+			$options['sip_username'] = $extension;	
+		}
+
+        $success = Bluebox_Tenant::createUserExtension($object['user_id'], $extension, $context_id, $location_id, $options);
 
         if (!$success)
         {
