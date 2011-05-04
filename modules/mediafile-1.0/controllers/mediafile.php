@@ -143,7 +143,16 @@ class MediaFile_Controller extends Bluebox_Controller
     }
 
     protected function save_prepare(&$mediafile)
-    {
+    {	
+		$eslManager = EslManager::getInstance();
+		$result = $eslManager->api('module_exists mod_shout');
+		$text = $eslManager->getResponse($result);
+		
+		if($text == "false")
+		{
+			EslManager::getInstance()->reload('mod_shout');
+		}
+		
         if (!strcasecmp(Router::$method, 'create'))
         {
             if (($error = $mediafile->prepare_upload()))

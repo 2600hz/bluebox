@@ -25,11 +25,16 @@
     <?php if (!strcasecmp(Router::$method, 'create')): ?>
 
         <?php echo form::open_section('File'); ?>
-    
+	    
             <div class="field">
                 <?php echo form::label('mediafile[upload]', 'Audio File (MP3 or WAV):'); ?>
                 <?php echo form::upload('mediafile[upload]'); ?>
             </div>
+	
+			<div class="field">
+            	The file size is limited to <?php echo ini_get('upload_max_filesize')?>, if you want to change this value follow this
+				<?php echo html::anchor('http://wiki.2600hz.org/display/bluebox/Modifying+the+max+file+size', 'link')  ?>.
+			</div>
 
         <?php echo form::close_section(); ?>
 
