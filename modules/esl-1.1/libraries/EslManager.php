@@ -67,7 +67,20 @@ class EslManager
     {
         self::getInstance()->reload('mod_sofia');
     }
-
+    
+    public static function eventRescanSofia()
+    {
+	$interfaces = Doctrine::getTable('SipInterface')->findAll();
+	foreach($interfaces as $interface) 
+	{ 
+            if ($id = arr::get($interface, 'sipinterface_id'))
+            {
+                self::getInstance()->api('sofia profile sipinterface_' . $id . ' killgw _all_');
+                self::getInstance()->api('sofia profile sipinterface_' . $id . ' rescan');
+            }
+	}
+    }
+	
     public static function eventReloadDingaling()
     {
         self::getInstance()->reload('mod_dingaling');
