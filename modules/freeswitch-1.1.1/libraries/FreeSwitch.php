@@ -417,7 +417,8 @@ class FreeSwitch extends Telephony_Driver
 
             if (self::$sofiaDirty)
             {
-                Event::run('freeswitch.reload.sofia');
+                Event::run('freeswitch.rescan.sofia');
+                // Event::run('freeswitch.reload.sofia');
             }
         }
 
