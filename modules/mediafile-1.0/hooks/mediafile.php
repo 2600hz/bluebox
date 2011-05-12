@@ -4,4 +4,4 @@
 
     Event::add('bluebox.media.media_file', array('MediaLib', 'generateConfiguration'));
 
-    Event::add('bluebox.maintenance', array('MediaLib', 'maintenance'));
+    //Event::add('bluebox.maintenance', array('MediaLib', 'maintenance'));
