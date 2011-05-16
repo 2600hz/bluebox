@@ -169,7 +169,6 @@ class numbermanager
                 break;
                 
             default:
-            	Kohana::log('debug', print_r($module, true));
                 if (isset($module->name))
                 {
                      return $module->name . ' (' . $base . ')';
