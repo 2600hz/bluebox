@@ -15,28 +15,17 @@ class FreeSwitch_Feature_Driver extends FreeSwitch_Base_Driver
 				try {
 					if (!$package = Package_Catalog::getInstalledPackage($packageobj->name))
 					{
-						Kohana::Log('debug', 'Package ' . $packageobj->name . ' not found.');
 						throw new featureException('Package ' . $packageobj->name . ' not found.', -10);
 					}
 
-					$driverfile = $package['directory'] . '/libraries/drivers/freeswitch/' . $obj['ftr_name'] . '.php';
-					kohana::Log('debug', 'Looking for driver ' . $driverfile);
-					if (!file_exists($driverfile))
-					{
-						kohana::Log('debug', 'Driver not found.');
-					} else {
-						kohana::Log('debug', 'Driver found.');
-						include_once $driverfile;
-						$driverclass = $obj['ftr_name'] . '_FreeSwitch_Feature_Driver';
-						try {
-							$driver = new $driverclass();
-						} catch (Exception $e) {
-							throw new featureException('Unable to find feature class ' . $driverlass);
-						}
-						$driver->set($obj);
+					$driverclass = 'FreeSwitch_ftr' . $obj['ftr_name'] . '_Driver';
+					try {
+						$driver = new $driverclass();
+					} catch (Exception $e) {
+						throw new featureException('Unable to find feature class ' . $driverlass);
 					}
+					$driver->set($obj);
 				} catch (Package_Catalog_Exception $e) {
-					kohana::Log('debug', 'Package ' . $packageobj->name . ' not found.');
 					throw new featureException('Package ' . $packageobj->name . ' not found.', -10);
 				}
 		}
@@ -55,29 +44,17 @@ class FreeSwitch_Feature_Driver extends FreeSwitch_Base_Driver
 				try {
 					if (!$package = Package_Catalog::getInstalledPackage($packageobj->name))
 					{
-						Kohana::Log('debug', 'Package ' . $packageobj->name . ' not found.');
 						throw new featureException('Package ' . $packageobj->name . ' not found.', -10);
 					}
 
-					$driverfile = $package['directory'] . '/libraries/drivers/freeswitch/' . $obj['ftr_name'] . '.php';
-					kohana::Log('debug', 'Looking for driver ' . $driverfile);
-					if (!file_exists($driverfile))
-					{
-						kohana::Log('debug', 'Driver not found.');
-					} else {
-						kohana::Log('debug', 'Driver found.');
-						include $driverfile;
-						$driverclass = $obj['ftr_name'] . '_FreeSwitch_Feature_Driver';
-						try {
-							$driver = new $driverclass();
-						} catch (Exception $e) {
-							throw new featureException('Unable to find feature class ' . $driverlass);
-						}
-
-						$driver->delete($obj);
+					$driverclass = 'FreeSwitch_ftr' . $obj['ftr_name'] . '_Driver';
+					try {
+						$driver = new $driverclass();
+					} catch (Exception $e) {
+						throw new featureException('Unable to find feature class ' . $driverlass);
 					}
+					$driver->delete($obj);
 				} catch (Package_Catalog_Exception $e) {
-					kohana::Log('debug', 'Package ' . $packageobj->name . ' not found.');
 					throw new featureException('Package ' . $packageobj->name . ' not found.', -10);
 				}
 		}
@@ -97,33 +74,20 @@ class FreeSwitch_Feature_Driver extends FreeSwitch_Base_Driver
 				try {
 					if (!$package = Package_Catalog::getInstalledPackage($packageobj->name))
 					{
-						Kohana::Log('debug', 'Package ' . $packageobj->name . ' not found.');
 						throw new featureException('Package ' . $packageobj->name . ' not found.', -10);
 					}
-					$driverfile = $package['directory'] . '/libraries/drivers/freeswitch/' . $destination['ftr_name'] . '.php';
-					kohana::Log('debug', 'Looking for driver ' . $driverfile);
-					if (!file_exists($driverfile))
-					{
-						kohana::Log('debug', 'Driver not found.');
-					} else {
-						include_once $driverfile;
-						$driverclass = $destination['ftr_name'] . '_FreeSwitch_Feature_Driver';
-						kohana::Log('debug', 'Using feature driver: ' . $driverclass);
-						try {
-							$driver = new $driverclass();
-						} catch (Exception $e) {
-							throw new featureException('Unable to find feature class ' . $driverlass);
-						}
-
-						$driver->dialplan($number);
+					$driverclass = 'FreeSwitch_ftr' . $obj['ftr_name'] . '_Driver';
+					try {
+						$driver = new $driverclass();
+					} catch (Exception $e) {
+						throw new featureException('Unable to find feature class ' . $driverlass);
 					}
+					$driver->dialplan($number);
 				} catch (Package_Catalog_Exception $e) {
-					kohana::Log('debug', 'Package ' . $packageobj->name . ' not found.');
 					throw new featureException('Package ' . $packageobj->name . ' not found.', -10);
 				}
 			else
 			{
-				kohana::Log('debug', 'Package ' . $destination['ftr_package_id'] . 'Found...');
 				throw new featureException('Package ' . $destination['ftr_package_id'] . 'Found...', -10);
 			}
 		}

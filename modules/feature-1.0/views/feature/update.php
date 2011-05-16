@@ -43,7 +43,7 @@ if ($mode==='edit')
         <div class="field">
         <?php
             echo form::label(array(
-                    'for' => 'feature[]',
+                    'for' => 'feature[ftr_desc]',
                     'hint' => 'Description of feature',
                     'help' => 'Detailed description about what this feature does.'
                 ),

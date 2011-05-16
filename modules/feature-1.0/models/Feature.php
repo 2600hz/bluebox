@@ -32,7 +32,6 @@ class Feature extends Bluebox_Record
 	
 	public function get($fieldName, $load = true)
     {
-    	Kohana::log('debug', 'getting display name');
     	if (strtolower($fieldName) == 'name')
     		return parent::get('ftr_display_name', $load);
     	else
