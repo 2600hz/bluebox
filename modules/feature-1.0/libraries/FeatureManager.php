@@ -152,7 +152,7 @@ class FeatureManager
 
 		try {
 			Feature::reregister(
-				'delay_echo',
+				'delayecho',
 				'feature',
 				'Delay Echo',
 				'Echo back every sound with a 1 second delay (helpful in determining if the phone is working while preventing feedback on phones that are not full duplex)',
@@ -165,7 +165,7 @@ class FeatureManager
 
 		try {
 			Feature::reregister(
-				'tone_test',
+				'tonetest',
 				'feature',
 				'Tone Test',
 				'Play a tone',
@@ -178,7 +178,7 @@ class FeatureManager
 
 		try {
 			Feature::reregister(
-				'hold_music',
+				'holdmusic',
 				'feature',
 				'Hold Music' ,
 				'Listen to the default system hold music (to verify that it is working)',
@@ -191,7 +191,7 @@ class FeatureManager
 
 		try {
 			Feature::reregister(
-				'forward_on',
+				'forwardon',
 				'feature',
 				'Forward On' ,
 				'Forward this extension to another',
@@ -204,7 +204,7 @@ class FeatureManager
 
 		try {
 			Feature::reregister(
-				'forward_off',
+				'forwardoff',
 				'feature',
 				'Forward Off' ,
 				'Un-Forward this extension to another',
