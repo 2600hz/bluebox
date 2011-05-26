@@ -21,12 +21,12 @@ class FreeSwitch_PagingGroup_Driver extends FreeSwitch_Base_Driver
         <action application="answer"/>
         <action application="export" data="sip_invite_params=intercom=true"/>
         <action application="export" data="sip_auto_answer=true"/>
-        <action application="export"><![CDATA[alert_info=<sip:$${location_' . $number->location_id . '}>;Ring;Answer]]></action>
+        <action application="export"><![CDATA[alert_info=<sip:$${C}>;Ring;Answer]]></action>
         <action application="export"><![CDATA[sip_h_Call-Info=<sip:$${location_' . $number->location_id . '}>;answer-after=0]]></action>
         <action application="set" data="conference_auto_outcall_caller_id_name=$\${effective_caller_id_name}"/>
         <action application="set" data="conference_auto_outcall_caller_id_number=$\${effective_caller_id_number}"/>
         <action application="set" data="conference_auto_outcall_timeout=5"/>
-        <action application="set" data="conference_auto_outcall_flags=mute"/>
+        <action application="set" data="conference_auto_outcall_flags=' . ($destination['pgg_type'] == 'page' ? 'mute' : 'none') . '"/>
         ';
 
         foreach ($destination['pgg_device_ids'] as $deviceid)
@@ -36,8 +36,9 @@ class FreeSwitch_PagingGroup_Driver extends FreeSwitch_Base_Driver
         	$xmlText .= '<action application="conference_set_auto_outcall" data="user/' . $deviceobj->plugins['sip']['username'] . '@$${location_' . $deviceobj->User->location_id . '}"/>
 	';
         }
-        
-        $xmlText .= '<action application="conference" data="' . $number['number'] . '@intercom"/>
+        $conftype = ($destination['pgg_type'] == 'page' ? 'Paging' : 'Intercom');
+        $confobj = Doctrine::getTable('Conference')->findOneByName($conftype);
+        $xmlText .= '<action application="conference" data="' . $number['number'] . '@conference_' . $confobj['conference_id'] .'"/>
         <action application="conference" data="' . $number['number'] . ' kick all"/>
         ';
         $xml->replaceWithXml($xmlText);

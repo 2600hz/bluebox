@@ -19,7 +19,7 @@ class PagingManager
         }
 
         Event::$data['PagingGroupNumber'] = array(
-            'short_name' => 'paginggroup',
+            'short_name' => 'PagingGroup',
             'display_name' => 'Paging Group',
             'target_objects' => $target_objects,
             'quick_add' => '/paging/create'

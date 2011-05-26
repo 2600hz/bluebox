@@ -6,6 +6,7 @@ class PagingGroup extends Bluebox_Record
 	{
 		$this->hasColumn('pgg_id', 'integer', 11, array('primary' => true, 'unsigned' => true, 'autoincrement' => true, 'notnull' => true));
 		$this->hasColumn('pgg_name', 'string', 75, array('notnull' => true, 'notblank' => true));
+		$this->hasColumn('pgg_type', 'string', 10, array('default' => 'page'));
 		$this->hasColumn('pgg_desc', 'string', 200);
         $this->hasColumn('pgg_device_ids', 'array', 10000, array('default' => array()));
 	}

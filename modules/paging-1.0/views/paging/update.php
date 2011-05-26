@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.'); ?>
 <div id="paging_header" class="txt-center settings module_header">
-    <h2><?php echo _('Paging Group'); ?></h2>
+    <h2><?php echo _('Paging Group/Intercom Group'); ?></h2>
 </div>
 <div id="paging_update_form" class="update">
     <?php echo form::open();
@@ -10,7 +10,7 @@
             echo form::label(array(
                     'for' => 'paginggroup[pgg_name]',
                     'hint' => 'Group Name',
-                    'help' => 'Short name for this paging group.'
+                    'help' => 'Short name for this group.'
                 ),
                 'Name:'
             );
@@ -20,9 +20,22 @@
         <div class="field">
         <?php
             echo form::label(array(
+                    'for' => 'paginggroup[pgg_type]',
+                    'hint' => 'Type of Group',
+                    'help' => 'Is this a 
+                    Paging group (one way communication) or an Intercom group (two way communication).'
+                ),
+				'Group Type:'
+            );
+            echo form::dropdown('paginggroup[pgg_type]', array('page' => 'Page', 'intercom' => 'Intercom'));
+        ?>
+        </div>
+         <div class="field">
+        <?php
+            echo form::label(array(
                     'for' => 'paginggroup[pgg_desc]',
-                    'hint' => 'Description of Paging Group',
-                    'help' => 'Detailed description of what this paging group is used for.'
+                    'hint' => 'Description of group',
+                    'help' => 'Detailed description of what this group is used for.'
                 ),
 				'Description:'
             );
@@ -33,8 +46,8 @@
         <?php
             echo form::label(array(
                     'for' => 'paginggroup[pgg_device_ids]',
-                    'hint' => 'Paging group members',
-                    'help' => 'Devices that are members of this paging group.'
+                    'hint' => 'Group members',
+                    'help' => 'Devices that are members of this group.'
                 ),
 				'Group Members:'
             );
