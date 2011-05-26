@@ -76,7 +76,7 @@ class FreeSwitch_Feature_Driver extends FreeSwitch_Base_Driver
 					{
 						throw new featureException('Package ' . $packageobj->name . ' not found.', -10);
 					}
-					$driverclass = 'FreeSwitch_ftr' . $obj['ftr_name'] . '_Driver';
+					$driverclass = 'FreeSwitch_ftr' . $destination['ftr_name'] . '_Driver';
 					try {
 						$driver = new $driverclass();
 					} catch (Exception $e) {
