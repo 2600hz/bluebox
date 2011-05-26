@@ -227,6 +227,10 @@ class jquery
         ),
         'colorEffects' => array (
             'js' => 'jquery.color.js'
+        ),
+        'dualListBox' => array (
+        	'js' => 'ui.dualListBox.js',
+        	'css' => 'jquery/ui.dualListBox.css'
         )
     );
     /**
