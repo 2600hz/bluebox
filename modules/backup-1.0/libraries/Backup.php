@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Backup.php - Backup Module library
+ *
+ * @author Francis Genet & Peter Defebvre <francis.peter@2600hz.com>
+ * @license MPL
+ */
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 class Backup {
