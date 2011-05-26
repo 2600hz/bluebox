@@ -271,6 +271,16 @@ class simplerouter
                         $pattern[$key] = '{0,1}';
 
                         break;
+
+		    case '+':
+		    	$pattern[$key] = '\+';
+
+			break;
+
+		    case '*':
+		    	$pattern[$key] = '\*';
+
+			break;
                 }
 
                 // update the rule so we process this correctly

@@ -19,7 +19,7 @@
 
         <div class="field">
         <?php
-            echo form::label('location[domain]', 'Domain Name:');
+            echo form::label('location[domain]', 'Domain Name/Realm:');
             echo form::input('location[domain]');
         ?>
         </div>

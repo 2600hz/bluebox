@@ -12,17 +12,20 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
             {
                 return;
             }
-
-            $sip = $base['plugins']['sip'];
+            
+	    $sip = $base['plugins']['sip'];
+		
+	    $username=trim($sip['username']);
+	    $password=trim($sip['password']);
 
             $domain = '$${location_' .$base['User']['location_id'] .'}';
 
             FreeSwitch::setSection('user', $domain, $base['device_id']);
 
-            $xml->setAttributeValue('', 'id', $sip['username']);
+            $xml->setAttributeValue('', 'id', $username);
 
-            $xml->update('/params/param[@name="password"]{@value="' .$sip['password'] .'"}');
-
+            $xml->update('/params/param[@name="password"]{@value="' .$password.'"}');
+		
 	    if (!$dialstring = arr::get($sip, 'dial-string'))
 	    {
                 $dialstring = '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}';
@@ -48,7 +51,7 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/variables/variable[@name="toll_allow"]{@value="domestic"}');
 
-            $xml->update('/variables/variable[@name="accountcode"]{@value="' .$sip['username'] .'"}');
+            $xml->update('/variables/variable[@name="accountcode"]{@value="' .$username.'"}');
         }
         else if ($base instanceof Trunk)
         {
@@ -60,11 +63,15 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
 
                 if (!empty($plugins['sip']['username']))
                 {
-                    $xml->update('/param[@name="username"]{@value="' .$plugins['sip']['username'] .'"}');
+	    	    $username = trim($plugins['sip']['username']);
+
+                    $xml->update('/param[@name="username"]{@value="' .$username.'"}');
 
                     if (!empty($plugins['sip']['password']))
                     {
-                        $xml->update('/param[@name="password"]{@value="' .$plugins['sip']['password'] .'"}');
+	    	       $password = trim($plugins['sip']['password']);
+
+                       $xml->update('/param[@name="password"]{@value="' .$password.'"}');
                     }
                 } 
                 else

@@ -33,7 +33,7 @@ $config['default'] = array
 		'user'     => 'bluebox',
 		'pass'     => 'bluebox',
 		'host'     => '127.0.0.1',
-		'port'     => FALSE,
+		'port'     => '3306',
 		'socket'   => FALSE,
 		'database' => 'bluebox'
 	),

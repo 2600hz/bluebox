@@ -73,7 +73,22 @@
         </div>
 
     <?php echo form::close_section(); ?>
+	
+    <?php echo form::open_section('Advanced'); ?>
 
+        <div class="field">
+	    <?php echo form::label(array(
+			 'for' => 'device[registry][multi_sipinterface]',
+			 'help' => 'Allow registering over multiple SIP interfaces'
+		        ),
+			'Multiple interface support'
+		);
+	    ?>
+            <?php echo form::checkbox('device[registry][multi_sipinterface]'); ?>
+        </div>
+	
+    <?php echo form::close_section(); ?>
+	
     <?php
         if (isset($views))
         { 
