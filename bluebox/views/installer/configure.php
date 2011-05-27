@@ -38,7 +38,7 @@
 
         <div class="field dbCredentials">
         <?php
-            echo form::label(array('for' => 'dbPortSelection', 'hint' => 'Leave blank to use the default'), 'Database Port:');
+	    echo form::label('dbPortSelection', 'Database Port:');
             echo form::input('dbPortSelection');
         ?>
         </div>
