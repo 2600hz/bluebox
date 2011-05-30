@@ -2,7 +2,7 @@
 
 class Regenerate_Controller extends Bluebox_Controller
 {
-    public function account($account_id = NULL)
+    public function account($account_id = NULL, $redirect = TRUE)
     {
         if ($account_id && users::masqueradeAccount($account_id))
         {
@@ -62,7 +62,10 @@ class Regenerate_Controller extends Bluebox_Controller
 
         $this->returnQtipAjaxForm();
 
-        url::redirect(Router_Core::$controller);
+        if($redirect)
+        {
+            url::redirect(Router_Core::$controller);
+        }
     }
 
     public function context($context_id)
