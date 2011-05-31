@@ -9,3 +9,5 @@
     Event::add('freeswitch.reload.sofia', array('EslManager', 'eventReloadSofia'));
 
     Event::add('freeswitch.reload.dingaling', array('EslManager', 'eventReloadDingaling'));
+
+    Event::add('freeswitch.rescan.sofia', array('EslManager', 'eventRescanSofia'));
