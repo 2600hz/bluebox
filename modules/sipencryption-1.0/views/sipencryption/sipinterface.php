@@ -3,6 +3,19 @@
 	<?php
 		echo form::label(
 			array(
+				'for' => 'sipencryption[enable]',
+		    	'hint' => 'Check to enable',
+		    	'help' => 'If enabled, media will be encrypted if the device registered using TLS.'
+		    ),
+		    'Enabled:'
+		);
+	    echo form::checkbox('sipencryption[enable]', 'ENABLE');
+    ?>
+	</div>
+	<div class="field">
+	<?php
+		echo form::label(
+			array(
 				'for' => 'sipencryption[type]',
 		    	'hint' => 'Encryption Type',
 		    	'help' => 'Use either TLSv1 or SSLv23.'
@@ -38,4 +51,4 @@
         echo form::input('sipencryption[certdir]', '$${base_dir}/conf/ssl');
     ?>
     </div>
-    <?php echo form::close_section(); ?>
+<?php echo form::close_section(); ?>

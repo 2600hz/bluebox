@@ -41,6 +41,12 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
             
             $xml->update('/action[@application="export"][@bluebox="sipCalleeIdNumber"]{@data="sip_callee_id_number=' .$number['number'] .'"}');
 
+            if (arr::get($number, 'registry', 'enable_encryption'))
+	        {
+	        	$condition = '/condition[@field="${sip_has_crypto}"][@expression="^(AES_CM_128_HMAC_SHA1_32|AES_CM_128_HMAC_SHA1_80)$"][@break="never"]';
+	        	$xml->update($condition.'/action[@application="export"]{@data="sip_secure_media=true"}');
+	        }
+            
 //            if(arr::get($destination, 'plugins', 'sip', 'sip_invite_format') == Sip_Plugin::SIP_FORMAT_DIGITS)
 //            {
 //                $xml->update('/action[@application="export"][@bluebox="settingXmlInviteFormat"]{@data="sip_invite_req_uri=sip:' .$number['number'] .'${regex(${sofia_contact(' . $destination['plugins']['sip']['username'] .'\@$${location_1})}|(\@.*)|$1)}"}');
