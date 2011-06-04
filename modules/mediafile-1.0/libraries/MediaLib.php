@@ -15,17 +15,26 @@ class MediaLib
     {
         kohana::log('debug', 'Preforming maintenance on the media files');
         
-        $records = Doctrine::getTable('MediaFile')->findAll();
+	$accountId = users::getAttr('account_id'); 
+	if(!empty($accountId))
+	{ 
+        	$records = Doctrine::getTable('MediaFile')->findAll();
 
-        foreach ($records as $record)
-        {
-            if (!is_file($record->filepath(TRUE)))
-            {
-                kohana::log('debug', 'The mediafile_id ' .$record['mediafile_id'] .' no longer exists...');
+	        foreach ($records as $record)
+        	{
+			kohana::log('debug', 'the path is '.$record->filepath(TRUE).' and does it exists? '.is_file($record->filepath(TRUE))  );			
+       		     	//if (!file_exists($record->filepath(TRUE)))
+			if(!is_file($record->filepath(TRUE)))
+            		{
+			     	//kohana::log('debug', 'mediafile_id to be deleted :'.$record->filepath(TRUE));
+				kohana::log('debug', 'The mediafile_id ' .$record['mediafile_id'] .' no longer exists...');
 
-                $record->delete();
-            }
-        }
+	                	$record->delete();
+        	    	}
+        	}
+	}
+	else
+		kohana::log('debug', 'Account_ID Empty or Invalid, canceling the maintenance on the media files');
     }
 
     public static function generateConfiguration()

@@ -33,7 +33,7 @@
             {
                 if (!isset($simpleroute['contexts'][$context['context_id']]))
                 {
-                    $default = TRUE;
+                    $default = FALSE;
                 }
             }
         ?>
