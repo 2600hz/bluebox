@@ -13,7 +13,6 @@ class FreeSwitch_ftrintercom_Driver extends FreeSwitch_Feature_Driver
          <action application="export"><![CDATA[sip_h_Call-Info=<sip:$${location_' . $number->location_id . '}>;answer-after=0]]></action>
          <action application="export" data="sip_invite_params=intercom=true"/>
          <action application="export" data="sip_auto_answer=true"/>
-         <action application="export" data="sip_auto_answer=true"/>
          <action application="bridge" data="user/\${dialed_ext}@$${location_' . $number->location_id . '}"/>
 ';
         $xml->replaceWithXml($xmlText);
