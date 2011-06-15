@@ -9,7 +9,7 @@
 		    ),
 		    'Enabled:'
 		);
-	    echo form::checkbox('sipencryption[enable]', 'ENABLE');
+	    echo form::checkbox('sipencryption[enable]', 'TRUE');
     ?>
 	</div>
 	<div class="field">
