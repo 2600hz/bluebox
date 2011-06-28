@@ -115,22 +115,6 @@
 
 <?php echo form::close_section(); ?>
 
-<?php echo form::open_section('Encryption'); ?>
-	<div class="field">
-	<?php
-		echo form::label(
-			array(
-				'for' => 'sip[encryption_enable]',
-		    	'hint' => 'Check to enable',
-		    	'help' => 'If enabled, media will be encrypted if the device registered using TLS.'
-		    ),
-		    'Enabled:'
-		);
-	    echo form::checkbox('sip[encryption_enable]', 'ENABLE');
-    ?>
-	</div>
-<?php echo form::close_section(); ?>
-
 <script type="text/javascript">
 
 	$(function() {

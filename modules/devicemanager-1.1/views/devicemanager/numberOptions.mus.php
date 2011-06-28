@@ -48,6 +48,9 @@
             <?php echo __('Enable Encryption'); ?>:
         </label>
 
+    </div>
+
+    <div class="field">
         <input type="checkbox" value="1" {{#enable_encryption}}checked="checked"{{/enable_encryption}} class="input" name="number{{number_id}}[registry][enable_encryption]" id="number{{number_id}}_registry_enable_encryption" />
 
         <fieldset class="hidden_inputs">

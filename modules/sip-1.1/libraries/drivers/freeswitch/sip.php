@@ -28,10 +28,7 @@ class FreeSwitch_Sip_Driver extends FreeSwitch_Base_Driver
 			
 		    if (!$dialstring = arr::get($sip, 'dial-string'))
 		    {
-		    		$dialstring = '';
-		    		if (isset($sip['encryption_enable']))
-		    			$dialstring = ($sip['encryption_enable'] == 'ENABLE') ? '{sip_secure_media=${regex(${sofia_contact(${dialed_user}@${dialed_domain})}|transport=tls)},' : '';	    			
-	                $dialstring .= '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}';
+	                $dialstring = '{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}';
 		    }
 
             $xml->update('/params/param[@name="dial-string"]{@value="' . $dialstring . '"}');
