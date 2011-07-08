@@ -21,9 +21,18 @@ class FreeSwitch_SipEncryption_Driver extends FreeSwitch_Base_Driver
 				$xml->update('/settings/param[@name="tls-bind-params"]{@value="transport=tls"}');
 			else
 				$xml->update('/settings/param[@name="tls-bind-params"]{@value=""}');
-            $xml->update('/settings/param[@name="tls-sip-port"]{@value="' . $base['plugins']['sipencryption']['port'] . '"}');
-            $xml->update('/settings/param[@name="tls-cert-dir"]{@value="' . str_replace('/', '\/', $base['plugins']['sipencryption']['certdir']) . '"}');
-            $xml->update('/settings/param[@name="tls-version"]{@value="' . $base['plugins']['sipencryption']['type'] . '"}');
+
+			if (isset($base['plugins']['sipencryption']['port']))
+				$xml->update('/settings/param[@name="tls-sip-port"]{@value="' . $base['plugins']['sipencryption']['port'] . '"}');
+			else
+				$xml->update('/settings/param[@name="tls-sip-port"]{@value="' . ($base['port']+1) . '"}');
+			
+			if (isset($base['plugins']['sipencryption']['certdir']))
+				$xml->update('/settings/param[@name="tls-cert-dir"]{@value="' . str_replace('/', '\/', $base['plugins']['sipencryption']['certdir']) . '"}');
+			else
+				$xml->update('/settings/param[@name="tls-cert-dir"]{@value="$${base_dir}\/conf\/ssl"}');
+			
+			$xml->update('/settings/param[@name="tls-version"]{@value="' . $base['plugins']['sipencryption']['type'] . '"}');
         }
     }
 
