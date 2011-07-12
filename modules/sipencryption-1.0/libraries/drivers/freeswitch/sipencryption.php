@@ -4,7 +4,6 @@ class FreeSwitch_SipEncryption_Driver extends FreeSwitch_Base_Driver
 {
     public static function conditioning()
     {
-		Kohana::log('debug', 'preRoute');
     	$xml = FreeSWITCH::createExtension('encryption');
         $condition = '/condition[@field="${sip_has_crypto}"][@expression="^(AES_CM_128_HMAC_SHA1_32|AES_CM_128_HMAC_SHA1_80)$"][@break="never"]';
         $xml->update($condition . '/action[@application="set"][@data="sip_secure_media=true"]');
