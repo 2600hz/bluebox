@@ -12,8 +12,6 @@ class FreeSwitch_SharedPresence_Driver extends FreeSwitch_Base_Driver
             if (isset($base['plugins']['sharedpresence']['spd_id']))
             {
             	$dbobj = Doctrine::getTable('SharedPresenceDB')->findOneByspd_id($base['plugins']['sharedpresence']['spd_id']);
-            	Kohana::log('debug', print_r($base['plugins']['sharedpresence']['spd_id'], true));
-            	Kohana::log('debug', print_r($dbobj, true));
             	$xml->update('/settings/param[@name="dbname"]{@value="' . (is_object($dbobj) ? $dbobj->spd_name : "") . '"}');
 	        } else {
             	$xml->update('/settings/param[@name="dbname"]{@value=""}');
