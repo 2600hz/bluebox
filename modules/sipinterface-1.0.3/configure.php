@@ -1,8 +1,8 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-class InterfaceManager_1_0_2_Configure extends Bluebox_Configure
+class InterfaceManager_1_0_3_Configure extends Bluebox_Configure
 {
-    public static $version = '1.0.2';
+    public static $version = '1.0.3';
     public static $packageName = 'sipinterface';
     public static $displayName = 'SIP Interface Manager';
     public static $author = 'Darren Schreiber';
