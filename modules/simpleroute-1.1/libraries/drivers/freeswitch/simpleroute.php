@@ -97,12 +97,6 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 	                    $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
 	                }
 
-	                if ($sip['encryption_enable'] == 'ENABLE')
-	                {
-	                	$enccond = '/condition[@field="${sip_has_crypto}"][@expression="^(AES_CM_128_HMAC_SHA1_32|AES_CM_128_HMAC_SHA1_80)$"]{@break="never"}';
-	               		$xml->update($dummy.$enccond.'/action[@application="export"][@data="sip_secure_media=true"]');	
-	                }
-
 	                $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
                 }
             }
