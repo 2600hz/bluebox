@@ -98,7 +98,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 	                }
 
 	                $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
-		}
+                }
             }
         }
     }
