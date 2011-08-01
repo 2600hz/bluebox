@@ -9,8 +9,6 @@ class Maintenance
         if (!$maintenance_event)
         {
             $maintenance_event = new MaintenanceEvent;
-
-            $maintenance_event['maintenance_event_id'] = 1;
         }
 
         $maintenance_event['last_run'] = time();
