@@ -23,3 +23,10 @@
     # Rewrite all other URLs to index.php/URL
     RewriteRule .* index.php/$0 [PT,L]
 </IfModule>
+
+# Limits the file size that a user can upload
+php_value upload_max_filesize 25M
+
+# Max execution time. Is here for the media module
+# After X seconds, the file upload will stop
+php_value max_execution_time 300

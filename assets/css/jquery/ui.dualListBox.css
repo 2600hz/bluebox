@@ -1,0 +1,10 @@
+#dlbunwrapper, #dlbactbutwrapper, #dlbselwrapper
+{
+	display: table-cell;
+}
+
+#dlbactbutwrapper
+{
+	padding: 0px 15px;
+	vertical-align: middle;
+}

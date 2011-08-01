@@ -104,6 +104,22 @@
         </div>
 
     <?php echo form::close_section(); ?>
+	
+	<?php echo form::open_section('Advance Settings'); ?>
+
+        <div class="field">
+        <?php
+            echo form::label(array(
+                        'for' => 'number[sip_username]',
+                        'hint' => 'Set SIP Username as Extension Number:'
+                    ),
+                    'SIP Username = Ext. Number:'
+                );
+			echo form::checkbox('advance[sip_username]');
+        ?>
+        </div>
+
+    <?php echo form::close_section(); ?>
 
     <?php echo form::close(TRUE); ?>
 

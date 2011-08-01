@@ -1,0 +1,32 @@
+<?php
+
+define('SYSPATH', "DUMMY");
+
+class Kohana {
+	public function config($option) {
+		GLOBAL $config;
+		return $config[substr($option,11)];
+	}
+	public static function log($type, $message) {}
+}
+class stylesheet {
+	public function add() {
+	}
+}
+
+class Bluebox_Controller {
+	public function __construct()
+	{
+	}
+}
+
+include("modules/esl-1.1/libraries/FS_Socket.php");
+include("modules/esl-1.1/libraries/EslManager.php");
+include("modules/esl-1.1/libraries/ESLconnection.php");
+include("modules/esl-1.1/libraries/ESLevent.php");
+include("modules/freeswitch-1.1/config/freeswitch.php");
+include("modules/directory-1.0/controllers/directory.php");
+
+$dircontrol=new Directory_Controller();
+
+$dircontrol->json_listing();
