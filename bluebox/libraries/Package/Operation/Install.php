@@ -50,5 +50,9 @@ class Package_Operation_Install extends Package_Operation
         $package['status'] = Package_Manager::STATUS_INSTALLED;
 
         Package_Catalog_Datastore::export($package);
+		Package_Catalog::buildCatalog();
+
+        $configureInstance = Package_Catalog::getPackageConfigureInstance($identifier);
+        $configureInstance->finalizeInstall($identifier);
     }
 }

@@ -1,0 +1,149 @@
+.clear
+{
+        clear: both;
+}
+.detail {
+    display:none;
+    clear:both;
+    padding:0 25px 10px;
+}
+.active_table
+{
+        width: 100%;
+}
+.active_table th, .active_table_data_column
+{
+        padding: 0px 10px;
+        text-align: center;
+}
+.active_table_header_row
+{
+        background-color: #f6f6f6;
+        color: #005f80;
+        height: .1em;
+        font-size: .9em;
+        font-weight: bolder;
+}
+.active_table_data_row_odd
+{
+        background-color: #e6e6e6;
+}
+.active_table_action_column
+{
+        display: inline;
+}
+.active_table_detail_column
+{
+        text-align: left;
+}
+.active_table_action_column
+{
+        margin: 0px auto;
+}
+.prompt
+{
+        padding-left: 10px;
+        color: gray;
+}
+.prompt:hover
+{
+        cursor: pointer;
+        color: black;
+}
+#callmanager_title
+{
+        float: left;
+}
+#callmanager_status, #update_button
+{
+        float: right;
+}
+#channel_list_options
+{
+        height: 135px;
+        display: none;
+}
+#channel_list_options_prompt
+{
+        background-color: #f6f6f6;
+        text-align: right;
+}
+#channel_list_options_prompt:hover
+{
+        cursor: pointer;
+        background-color: #d6d6d6;
+}
+#callstate_option_wrapper, #callstate_order_wrapper
+{
+        height: 135px;
+        width: 49%;
+}
+#callstate_option_wrapper
+{
+        float: left;
+}
+#callstate_order_wrapper
+{
+        float: right;
+}
+#callstate_option_hide
+{
+        float: right;
+}
+#callstate_order_prompt, #callstate_option_prompt
+{
+        background-color: #f6f6f6;
+}
+#callstate_option_list, #callstate_order_list
+{
+        width: 99%;
+        height: 100px;
+        overflow: auto;
+        border: 1px solid #005f80;
+        padding: 5px 5px 5px 5px;
+}
+#callmanager_channellist
+{
+        height: 80%
+        width: 90%
+        overflow: auto;
+}
+#update_datetime
+{
+        float: right;
+}
+#update_button
+{
+        padding: 5px 0px 5px 0px;
+}
+#update
+{
+        cursor: pointer;
+}
+.detail_group
+{
+        float: left;
+        padding: 5px;
+        margin: 5px;
+        border: 1px solid #005f80;
+}
+.detail_group_header
+{
+        font-size: 1.1em;
+        font-weight: bolder;
+        color: #005f80;
+}
+.detail_field_label
+{
+        font-style: italic;
+        color: #005f80;
+        padding-right: 8px;
+}
+.detail_group, .detail_field_label, .detail_field_data
+{
+        float: left;
+}
+ul.clean_indented li
+{
+        margin-left: 15px;
+}

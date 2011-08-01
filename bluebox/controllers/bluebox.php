@@ -257,6 +257,8 @@ abstract class Bluebox_Controller extends Template_Controller
         $base = strtolower($this->baseModel);
         
         $this->createView();
+        $this->template->content->mode = 'create';
+
 
         $this->loadBaseModel();
 
@@ -273,6 +275,7 @@ abstract class Bluebox_Controller extends Template_Controller
         $base = strtolower($this->baseModel);
 
         $this->createView();
+        $this->template->content->mode = 'edit';
 
         $this->loadBaseModel($id);
 

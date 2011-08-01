@@ -334,6 +334,165 @@ class form extends form_Core
         return $result;
     }
 
+	/**
+	 * Creates an HTML form dual list box element.
+	 * 
+     * @param   string|array  input name or an array of HTML attributes
+     * @param   array         select options, when using a name
+     * @param   string|array  option key or list of keys that should be selected by default
+     * @param   string        a string to be attached to the end of the attributes
+     * @return  string
+	 */
+    public static function dualListBox($data, $options, $selected = NULL, $extra = '')
+    {
+        // Add the Bluebox defaults (such as css classes)
+    	list($data, $options, $selected, $extra) = self::_addDefaults(__FUNCTION__, $data, $options, $selected, $extra);
+    	
+     	$data += array(
+    		'useFilters' => 'true',
+    		'filterUnselected' => true,
+    		'filterSelected' => true,
+    		'useCounters' => true,
+    		'layout' => 'lefttoright',
+    		'transferMode' => 'move',
+    		'useSorting' => true,
+    		'sortBy' => 'text',
+    		'selectOnSubmit' => true,
+    		'extra' => '',
+     		'size' => '6'
+    	);
+        if (!empty($data['translate']))
+        {
+            foreach ($options as $key => $value)
+            {
+                $options[$key] = self::_i18n($value);
+            }
+        }
+        
+        if (isset($data['translate']))
+        {
+            unset($data['translate']);
+        }
+        
+		if (is_array($selected))
+		{
+			// Multi-select box
+			$data['multiple'] = 'multiple';
+		}
+		else
+		{
+			// Single selection (but converted to an array)
+			$selected = array($selected);
+		}
+
+		$box2id = $box1id = trim(preg_replace('/[^a-zA-Z0-9_{}]+/imx', '_', $data['name']), '_');		
+		jquery::addPlugin('dualListBox');
+        $input = '<div id="dlbmainwrapper" class="dlbwrapper">';
+        $configjs = '$.configureBoxes({';
+ 		$unselectedlist = '<div id="dlbunwrapper" class="dlbwrapper">';
+ 		$selectedlist = '<div id="dlbselwrapper" class="dlbwrapper">';
+ 		if ($data['useFilters'])
+ 		{
+ 			if ($data['filterUnselected'])
+ 			{
+ 				$unselectedlist .= '<div id="' . $box1id . '_box1FilterWrapper" class="searchwrapper wrapper">Filter:<input type="text" id="' . $box1id . '_box1Filter" class="filterInput input"/><button type="button" class="actionbutton bluebutton" id="' . $box1id . '_box1Clear">X</button><select id="' . $box1id . '_box1Storage"></select></div>';
+ 				$configjs .= 'box1Storage: \'' . $box1id . '_box1Storage\', box1Filter: \'' . $box1id . '_box1Filter\', box1Clear: \'' . $box1id . '_box1Clear\',  ';
+ 			}
+ 				
+ 			if ($data['filterSelected'])
+ 			{
+ 				$selectedlist .= '<div id="' . $box2id . '_box2FilterWrapper" class="searchwrapper wrapper">Filter:<input type="text" id="' . $box2id . '_box2Filter" class="filterInput input"/><button type="button" class="actionbutton bluebutton" id="' . $box2id . '_box2Clear">X</button><select id="' . $box2id . '_box2Storage"></select></div>';
+ 				$configjs .= 'box2Storage: \'' . $box2id . '_box2Storage\', box2Filter: \'' . $box2id . '_box2Filter\', box2Clear: \'' . $box2id . '_box2Clear\', ';
+  			}
+
+ 			$configjs .= 'useFilters: true, ';
+ 		}
+ 		else
+ 			$configjs .= 'useFilters: false, ';
+ 		
+ 		$unselectedlist .= '<div id="' . $box1id . '_box1ListboxWrapper" class="listboxwrapper wrapper"><select id="' . $box1id . '_box1View" name="' . $data['name'] . '_unsel[]" class="unsellistbox duallistbox" multiple="multiple" ' . $data['extra'];
+ 		$selectedlist .= '<div id="' . $box2id . '_box2ListboxWrapper" class="listboxwrapper wrapper"><select id="' . $box2id . '_box2View" name="' . $data['name'] . '[]" class="sellistbox duallistbox" multiple="multiple" ' . $data['extra'];
+ 		$configjs .= 'box1View: \'' . $box1id . '_box1View\', box2View: \'' . $box2id . '_box2View\',  ';
+
+ 		if (isset($data['height']))
+ 		{
+ 			$unselectedlist .= ' height="' . $data['height'] . '"';			
+ 			$selectedlist .= ' height="' . $data['height'] . '"';			
+ 		}
+ 		if (isset($data['width']))
+ 		{
+ 			$unselectedlist .= ' width="' . $data['width'] . '"';			
+ 			$selectedlist .= ' width="' . $data['width'] . '"';			
+ 		}
+ 		if (isset($data['size']))
+ 		{
+ 			$unselectedlist .= ' size="' . $data['size'] . '"';			
+ 			$selectedlist .= ' size="' . $data['size'] . '"';			
+ 		}
+ 		$unselectedlist .= '>';
+ 		$selectedlist .= '>';
+ 		
+ 		foreach ($options as $key => $value)
+ 		{
+ 			if (in_array($key, $selected))
+ 				$selectedlist .= '<option value="' . $key . '">' . $value . '</option>';
+ 			else
+ 				$unselectedlist .= '<option value="' . $key . '">' . $value . '</option>';
+ 		}
+ 		
+ 		$unselectedlist .= '</select></div>';
+ 		$selectedlist .= '</select></div>';
+ 		
+ 		if ($data['useCounters'] = true)
+ 		{
+ 			$unselectedlist .= '<div class="counterwrapper" id="' . $box1id . '_box1CounterWrapper"><span id="' . $box1id . '_box1Counter" class="countLabel"></span></div>';
+ 			$selectedlist .= '<div class="counterwrapper" id="' . $box2id . '_box2CounterWrapper"><span id="' . $box2id . '_box2Counter" class="countLabel"></span></div>';
+ 			$configjs .= 'useCounters: true, box1Counter: \'' . $box1id . '_box1Counter\', box2Counter: \'' . $box2id . '_box2Counter\', ';
+ 		}
+ 		else
+ 			$configjs .= 'useCounters: false, ';
+ 		
+ 		$unselectedlist .= '</div>';
+ 		$selectedlist .= '</div>';
+
+ 		$actbuttons = '<div id="dlbactbutwrapper" class="dlbwrapper">';
+ 		$actbuttons .= '<button id="' . $box2id . '_toright" type="button">&nbsp;&gt;&nbsp;</button><br>';
+ 		$actbuttons .= '<button id="' . $box2id . '_alltoright" type="button">&gt;&gt;</button><br>';
+ 		$actbuttons .= '<button id="' . $box1id . '_alltoleft" type="button">&lt;&lt;</button><br>';
+ 		$actbuttons .= '<button id="' . $box1id . '_toleft" type="button">&nbsp;&lt;&nbsp;</button>';
+ 		$actbuttons .= '</div>';
+ 		
+ 		if ($data['layout'] == 'lefttoright')
+ 		{
+ 			$input .= $unselectedlist . $actbuttons . $selectedlist;
+ 			$configjs .= 'to1: \'' . $box1id . '_toleft\', ';
+ 			$configjs .= 'to2: \'' . $box2id . '_toright\', ';
+ 			$configjs .= 'allTo1: \'' . $box1id . '_alltoleft\', ';
+ 			$configjs .= 'allTo2: \'' . $box2id . '_alltoright\', ';
+ 		} else {
+ 			$input .= $unselectedlist . $actbuttons . $selectedlist;
+ 			$configjs .= 'to2: \'' . $box1id . '_toleft\', ';
+ 			$configjs .= 'to1: \'' . $box2id . '_toright\', ';
+ 			$configjs .= 'allTo2: \'' . $box1id . '_alltoleft\', ';
+ 			$configjs .= 'allTo1: \'' . $box2id . '_alltoright\', ';
+ 		}
+
+ 		$configjs .= 'transferMode: \'' . $data['transferMode'] . '\', ';
+ 		$configjs .= 'sortBy: \'' . $data['sortBy'] . '\', ';
+ 		if ($data['useSorting'])
+ 			$configjs .= 'useSorting: true, ';
+ 		else
+ 			$configjs .= 'useSorting: false, ';
+
+ 		if ($data['selectOnSubmit'])
+ 			$configjs .= 'selectOnSubmit: true });';
+ 		else
+ 			$configjs .= 'selectOnSubmit: false });';
+
+ 		$input .= "\n" . javascript::codeBlock($configjs, array('inline' => true));
+        return $input;
+    }
+    
     /**
      * Creates an HTML form submit input tag.
      *
@@ -918,6 +1077,7 @@ class form extends form_Core
                 break;
 
             case 'dropdown':
+            case 'dualListBox':
                 // create pointers to the parameters
                 $data = &$args[0];
 
@@ -1165,7 +1325,6 @@ class form extends form_Core
 
         return FALSE;
     }
-
 
     /**
      * This function will guess the i18n keys that are most likely or convert an i18n
