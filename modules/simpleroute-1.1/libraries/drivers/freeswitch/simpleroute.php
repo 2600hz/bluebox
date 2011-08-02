@@ -96,9 +96,11 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 	                {
 	                    $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
 	                }
+			$boolAllowMediaProxy = $base['registry']['allow_media_proxy']==0? 'false':'true';
+			$xml->update($dummy . '/action[@application="set"][@data="proxy_media='.$boolAllowMediaProxy.'"]');
 
 	                $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
-		}
+                }
             }
         }
     }

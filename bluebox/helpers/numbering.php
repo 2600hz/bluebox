@@ -257,10 +257,10 @@ class numbering extends form
                 }
 
                 // if we have been asked to use names instead of numbers
-                if (!empty($destination['name']))
+                if (isset($destination->name))
                 {
                     // if so then set a select option using the name
-                    $optGroup[$key .'" class="' .$type] = $destination['name'];
+                    $optGroup[$key .'" class="' .$type] = $destination->name;
                 } 
                 else
                 {
@@ -368,8 +368,8 @@ class numbering extends form
             $poolName = str_replace('Number', '', $numberType['class']);
 
             $numbers = Doctrine_Query::create()
-                ->select('n.number_id, n.number, d.name')
-                ->from('Number n, n.' .$poolName .' d')
+                ->select('n.number_id, n.number, n.foreign_id')
+                ->from('Number n')
                 ->where('(n.foreign_id <> ? AND n.foreign_id IS NOT NULL)', array(0))
                 ->andWhereIn('n.class_type', array($numberType['class']))
                 ->orderBy('number')
@@ -383,10 +383,11 @@ class numbering extends form
             foreach($numbers as $number)
             {
                 $text = $number['n_number'];
+                $numberobj = Doctrine::getTable($poolName)->find($number['n_foreign_id']);
 
-                if (!empty($number['d_name']) AND $data['useNames'])
+                if ($data['useNames']  && isset($numberobj->name))
                 {
-                    $text = $number['d_name'] .' (' .$text .')';
+                    $text = $numberobj->name .' (' .$text .')';
                 }
 
                 $value = $number['n_number_id'];

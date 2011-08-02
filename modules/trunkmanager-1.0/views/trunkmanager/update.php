@@ -54,9 +54,18 @@
             echo form::input('trunk[registry][outboundProxy]');
         ?>
         </div>
-    
-    <?php echo form::close_section(); ?>
-
+    	
+        <div class="field">
+	<?php
+	    echo form::label(array(
+		    'for' => 'trunk[registry][allow_media_proxy]',
+		    'help' => 'One of the purposes of this option is to allow FreeSwitch to handle codecs that it does not officially support'
+		),
+		'Allow Proxy Media:'
+	    );
+	    echo form::checkbox('trunk[registry][allow_media_proxy]');
+	?>
+	</div>
     <?php 
         if (isset($views))
         {

@@ -1,0 +1,33 @@
+#syncRunningConfigTable
+{
+	width: 100%;
+}
+
+.group
+{
+	color: white;
+	background-color: gray;
+	font-weight: bold;
+	padding-left: 5px;
+}
+.even
+{
+	background-color: lightgray;
+}
+
+.syncRunningConfigRow
+{
+	height: 30px;
+	margin-left: 10px;
+}
+
+.sub
+{
+	padding-left: 15px;
+}
+
+.status
+{
+	text-align: right;
+	padding-right: 10px;
+}

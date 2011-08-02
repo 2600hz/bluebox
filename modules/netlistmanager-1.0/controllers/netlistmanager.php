@@ -66,7 +66,6 @@ class NetListManager_Controller extends Bluebox_Controller
         }
     }
 
-
     protected function prepareUpdateView()
     {
         $allowList = empty($_POST['ips']['allow']) ? array() : array_flip($_POST['ips']['allow']);

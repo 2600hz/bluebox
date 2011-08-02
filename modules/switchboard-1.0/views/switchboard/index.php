@@ -8,10 +8,7 @@
  * @contact mell@ourace.com
  */
 
-
-
 // need to load all the Data for devices/trunks/voicemails.
-
 
 $swdb = new Database();
 $swdb->from('device');
@@ -32,7 +29,6 @@ $swdb->where('account_id',users::getAttr('account_id'));
 $result = $swdb->get();
 $VoircemailRows = $result->as_array();
 
-
 $swdb->from('context');
 $swdb->select('context_id,account_id');
 $swdb->where('account_id',users::getAttr('account_id'));
@@ -45,16 +41,12 @@ if( $DevListHeight < 500 ){ $DevListHeight= 500;}
 ?>
 <style>
 
-
 .calldividercall{background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/connectgreen.gif');float:left;height:100px;width: 26px;}
 .calldividertrunk{
 	background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/connecttrunk.gif');
 	float:left;height:100px;width: 26px;font-size: 10px;line-height:12px;
 }
 .nocallsop{background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/nocallsop.gif');width: 550px;min-height: <?php echo $DevListHeight;?>px}
-
-
-
 
 .TrunkItemU{width: 150px;min-height: 75px;float: left;background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/trunk_unknown_bg.gif');}
 .TrunkItemG{width: 150px;min-height: 75px;float: left;background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images/trunk_good_bg.gif');}
@@ -63,8 +55,6 @@ if( $DevListHeight < 500 ){ $DevListHeight= 500;}
 .TrunkDivider{width: 150px;min-height: 15px;float: left;}
 .TrunkLable{width: 150px;font-weight: bold;color: #fff;text-align: center;}
 .tsdiv{text-align: left;font-weight: bold;color: #000;width: 150px;}
-
-
 
 .DeviceItem{
 width: 150px;height: 80px;float: left;
@@ -102,8 +92,7 @@ background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images
 		<?php echo form::input(array('id' => 'manual_entry_record', 'value' => '','size' =>'80', 'type'=>'hidden')); ?>
 		
 		<?php echo form::button(array('id' => 'manual_entry', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => 'Send','style'=>'display:none'));?>
-		
-		
+				
 		<?php echo form::button(array('id' => 'manual_kill', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Kill--'));?>
 		<?php echo form::button(array('id' => 'manual_park', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Park--'));?>
 		<?php echo form::button(array('id' => 'manual_hold', 'param' => 'version', 'class' => 'switchboardEvent', 'value' => '--Put On Hold--'));?>
@@ -119,8 +108,7 @@ background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images
 	<div id="sipinterfaces_tab">
             <div id="sip-interfaces"></div>
         </div>
-	
-	
+		
         <div id="SwitchBoardContainer" style="width:900px;min-height: 500px;border: 1px solid #000;overflow-x: hidden;">
 	
 	<div id="DeviceList" style="width:150px;float:left;min-height: 500px;">
@@ -173,15 +161,10 @@ background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images
     var g_ChanList = new Array();
     var g_SelectedUUID1 = "";
     var g_SelectItem1 = "";
-    
-    
     var g_DevID = "";
     var g_DevContext = "";
     var g_DevDivID = "";
     var g_EpocDiff = getEpocTimeDiff();
-
-
-    
     var g_DeviceCount = 0;
     var g_DevListArray = new Array();
     //--------------------------------------------------------------  Items to javascript
@@ -211,7 +194,6 @@ background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images
 	$g_OpsPanLeftPadLength .= "</div>";
 	?>
 	var g_OpsPanLeftFiller = '<?php echo $g_OpsPanLeftPadLength?>';
-	
 	var g_TrunkCount = 0;
 	var g_TrunkArray = new Array();
 	var g_TrunkNameArray = new Array();
@@ -229,10 +211,8 @@ background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images
 		}else{
 		echo "g_TrunkStatusMathArray[g_TrunkCount++] = '@" . $TrunkRows[$idex]->server . "';\n";
 		}
-		
 	}
 	?>
-	
 	var g_ContextCount = 0;
 	var g_ContextArray = new Array();
 	<?php
@@ -243,7 +223,6 @@ background: url('<?php echo url::base(); ?>modules/switchboard-1.0/assets/images
 	
 //if in this list then it is recording otherwise it is not recording
 var g_RecordingList = new Array();
-	
 	
 function RemoveFromRecordingArray( uuid ) {
 	var TempRecArray = new Array();
@@ -269,7 +248,6 @@ function IsRecording( inuuid ) {
 	}
 	return false;
 }	
-	
 	
 function IsInTheContext( InContext ) {
 	for(var ix=0;ix<g_ContextArray.length;ix++) {
@@ -471,7 +449,7 @@ function RebuildCommands( inuuid ) {
 	document.getElementById('manual_entry_xfer'	).value = "uuid_transfer " + inuuid + " -both " + g_DevID + " xml " + g_DevContext;
 	var sndfile = document.getElementById('media_widget_file_list').value
 	document.getElementById('manual_entry_sound').value = "uuid_broadcast " + inuuid + " " + sndfile + " both";
-	document.getElementById('manual_entry_record').value = "uuid_record " + inuuid + " start /usr/local/freeswitch/recordings"+ inuuid + "wav";
+	document.getElementById('manual_entry_record').value = "uuid_record " + inuuid + " start /opt/freeswitch/recordings"+ inuuid + ".wav";
 	CheckButtonStates() ;
 }
 

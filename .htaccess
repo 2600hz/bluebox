@@ -9,7 +9,7 @@
     RewriteRule ^modules/.*/assets/.*$ - [L]
 
     # Protect application and system files from being viewed
-    RewriteRule ^(bluebox|modules|system|upload)/ - [F,L]
+    #RewriteRule ^(bluebox|modules|system|upload)/ - [F,L]
 
     # Catch requests for XML or JSON and send them through an alternate entry point
     RewriteRule ^(.+)\.json$ json.php/$1 [T=application/json,L]
@@ -23,3 +23,10 @@
     # Rewrite all other URLs to index.php/URL
     RewriteRule .* index.php/$0 [PT,L]
 </IfModule>
+
+# Limits the file size that a user can upload
+php_value upload_max_filesize 25M
+
+# Max execution time. Is here for the media module
+# After X seconds, the file upload will stop
+php_value max_execution_time 300

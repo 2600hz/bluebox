@@ -16,7 +16,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
 
         $xml->setXmlRoot($root);
 
-        $xml->update('/param[@name="name"]{@value="' . $xmppData['name'] . '"}');
+        $xml->update('/param[@name="name"]{@value="dingaling_' . $xmppData['xmpp_id'] . '"}');
 
         $login = preg_replace('/\//', '\/', $xmppData['login']);
         $xml->update('/param[@name="login"]{@value="' . $login . '"}');

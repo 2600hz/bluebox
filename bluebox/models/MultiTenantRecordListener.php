@@ -89,20 +89,26 @@ class MultiTenantRecordListener extends Doctrine_Record_Listener
     {   
         $q = &$event->getQuery();
 
-        $q->andWhere('account_id = ' .$this->getUserId());
+        if (!isset($q->_hasRunMultiTenantPre) || (isset($q->_hasRunMultiTenantPre) && $q->_hasRunMultiTenantPre === False))
+			$q->andWhere('account_id = ' .$this->getUserId() . ' or account_id = -1');
+        $q->_hasRunMultiTenantPre = True;
     }
 
     public function preDqlSelect($event)
     {
         $q = &$event->getQuery();
 
-        $q->andWhere('account_id = ' .$this->getUserId());
+        if (!isset($q->_hasRunMultiTenantPre) || (isset($q->_hasRunMultiTenantPre) && $q->_hasRunMultiTenantPre === False))
+			$q->andWhere('account_id = ' .$this->getUserId() . ' or account_id = -1');
+        $q->_hasRunMultiTenantPre = True;
     }
 
     public function preDqlDelete($event)
     {
         $q = &$event->getQuery();
 
-        $q->andWhere('account_id = ' .$this->getUserId());
+        if (!isset($q->_hasRunMultiTenantPre) || (isset($q->_hasRunMultiTenantPre) && $q->_hasRunMultiTenantPre === False))
+			$q->andWhere('account_id = ' .$this->getUserId() . ' or account_id = -1');
+        $q->_hasRunMultiTenantPre = True;
     }
 }

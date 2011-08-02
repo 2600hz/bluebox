@@ -90,7 +90,6 @@ fCheckSELinux() {
     fi
 }
 
-
 fSetWebUser() {
     webuser_guess=nobody
 
@@ -217,6 +216,40 @@ fFixSoundsPerms() {
     chmod -R g+w $sound_dir/*
 }
 
+fFixRecordsPerms() {
+
+    [ -d '/usr/local/freeswitch/recordings/' ] && recorddir_guess="/usr/local/freeswitch/recordings"
+
+    [ -d '/opt/freeswitch/recordings/' ] && recorddir_guess="/opt/freeswitch/recordings"
+
+    echo
+	echo "RECORDING FILE PRIVILEGES"
+    echo "---------------------------------------------------------"
+    echo "We need to verify the path to your recording files."
+    echo -n "Record file dir [$recorddir_guess]? "
+
+    if [ ! -z $accept_all ]; then
+		record_dir="$recorddir_guess"
+       echo
+	else
+		read ans
+
+        if [ -z $ans ]; then
+			record_dir="$recorddir_guess"
+        else
+			record_dir="$ans"
+        fi
+	fi
+
+    [ -z "$record_dir" -o ! -d "$record_dir" ] && return 0
+
+    echo "# chgrp -R $webuser $record_dir/*"
+    chgrp -R $webuser $record_dir/*
+
+    echo "# chmod -R g+w $record_dir/*"
+    chmod -R g+w $record_dir/*
+}
+
 fUpdateSwitchPerm() {
     [ -d '/usr/local/freeswitch/conf/' ] && softswitch_guess="/usr/local/freeswitch/conf"
 
@@ -288,6 +321,7 @@ fSetWebUser
 fUpdateBlueboxPerm
 fUpdateSwitchPerm
 fFixSoundsPerms
+fFixRecordsPerms
 
 echo
 echo "PLEASE SET UP YOUR DB"
