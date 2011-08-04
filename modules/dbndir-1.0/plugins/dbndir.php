@@ -11,7 +11,12 @@ class Dbndir_Plugin extends Bluebox_Plugin
         return TRUE;
     }
     
-	public static function provideNumberTargets()
+    public static function provideNumberOptions()
+    {
+        Event::$data['DbndirNumber'] = 'dbndir/numberOptions.mus';
+    }
+    
+    public static function provideNumberTargets()
 	{
 			$target_objects = array();
 
