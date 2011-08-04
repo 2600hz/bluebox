@@ -131,7 +131,10 @@ $config['filemap'][12] = array (
     'query' => '//document/section[@name="configuration"]/configuration[@name="distributor.conf"]/lists'
 );
 
-
+$config['filemap'][]= array (
+    'filename' => $config['cfg_root'] .'/autoload_configs/directory.conf.xml',
+    'query' => '//document/section[@name="configuration"]/configuration[@name="directory.conf"]'
+);
 // Base file - note that because the query string is //document, this section will contain
 // the remaining document and any includes for other filemap sections
 /*$config['filemap'][] = array (

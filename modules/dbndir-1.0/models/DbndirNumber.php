@@ -3,7 +3,6 @@
 class DbndirNumber extends Number
 {
     public static $description = 'Dial By Name Dir';
-	public $name_field = 'dbn_name';
 
     public function setUp()
     {
@@ -21,7 +20,7 @@ class DbndirNumber extends Number
             if (is_subclass_of($class, 'Number') or ($class == 'Number'))
             {
                 $deviceTable = Doctrine::getTable($class);
-                $deviceTable->bind(array('Dbndir', array('local' => 'foreign_id', 'foreign' => 'dbn_id')), Doctrine_Relation::ONE);
+                $deviceTable->bind(array('dbndir', array('local' => 'foreign_id', 'foreign' => 'dbn_id')), Doctrine_Relation::ONE);
             }
         $this->actAs('TelephonyEnabled');
     }

@@ -7,7 +7,6 @@ class Dbndir extends Bluebox_Record
 		$this->hasColumn('dbn_id', 'integer', 11, array('primary' => true, 'unsigned' => true, 'autoincrement' => true, 'notnull' => true));
 		$this->hasColumn('dbn_name', 'string', 25, array('notnull' => true, 'notblank' => true));
 		$this->hasColumn('dbn_desc', 'string', 1000);
-		$this->hasColumn('dbn_profile', 'string', 25, array('notnull' => true, 'notblank' => true, 'default' => 'default'));
 		$this->hasColumn('dbn_max_menu_attempts', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'notblank' => true, 'default' => 3));
 		$this->hasColumn('dbn_min_search_digits', 'integer', 11, array('unsigned' => true, 'notnull' => true, 'notblank' => true, 'default' => 3));
 		$this->hasColumn('dbn_terminator_key', 'string', 1, array('notnull' => true, 'notblank' => true, 'default' => '#'));
@@ -23,11 +22,29 @@ class Dbndir extends Bluebox_Record
 
 	public function setUp()
 	{
+		$this->hasMany('DbndirNumber as Number', array('local' => 'dbn_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
+		
 		$this->actAs('GenericStructure');
 		$this->actAs('Timestampable');
 		$this->actAs('TelephonyEnabled');
 		$this->actAs('MultiTenant');
 	}
+
+	public function contains($fieldName)
+    {
+    	if (strtolower($fieldName) == 'name')
+    		return parent::contains('dbn_name');
+    	else
+    		return parent::contains($fieldName);
+    }
+	
+	public function get($fieldName, $load = true)
+    {
+    	if (strtolower($fieldName) == 'name')
+    		return parent::get('dbn_name', $load);
+    	else
+    		return parent::get($fieldName, $load);
+    }
 }
 
 ?>

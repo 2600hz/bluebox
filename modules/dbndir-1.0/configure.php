@@ -12,8 +12,7 @@ class Ddndir_1_0_Configure extends Bluebox_Configure
     public static $default = TRUE;
     public static $type = Package_Manager::TYPE_MODULE;
     public static $required = array(
-        'core' => 0.1,
-    	'feature' => 1.0
+        'core' => 0.1
     );
     public static $navLabel = 'Dial-By-Name';
     public static $navBranch = '/Applications/';
