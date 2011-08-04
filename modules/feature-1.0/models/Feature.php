@@ -14,6 +14,7 @@ class Feature extends Bluebox_Record
 
 	public function setUp()
 	{
+		$this->hasMany('FeatureNumber as Number', array('local' => 'ftr_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
 		$this->hasOne('package', array('local' => 'ftr_package_id', 'foreign' => 'package_id', 'onDelete' => 'CASCADE'));
 
 		$this->actAs('GenericStructure');
