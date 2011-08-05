@@ -87,12 +87,12 @@ class AutoAttendant_Controller extends Bluebox_Controller
         foreach($numberTypes as $numberType)
         {
             $numbers = Doctrine_Query::create()
-                ->select('n.number_id, n.number, d.name')
-                ->from('Number n, n.' .str_replace('Number', '', $numberType['class']) .' d')
-                ->where('(n.foreign_id <> ? AND n.foreign_id IS NOT NULL)', array(0))
-                ->andWhereIn('n.class_type', array($numberType['class']))
+                ->select('*')
+                ->from('Number')
+                ->where('(foreign_id <> ? AND foreign_id IS NOT NULL)', array(0))
+                ->andWhereIn('class_type', array($numberType['class']))
                 ->orderBy('number')
-                ->execute(array(), Doctrine::HYDRATE_SCALAR);
+                ->execute(array());
 
             if (empty($numbers))
             {
@@ -111,8 +111,8 @@ class AutoAttendant_Controller extends Bluebox_Controller
             foreach($numbers as $number)
             {
                 $numberingOptions['destinations'][] = array(
-                    'value' => $number['n_number_id'],
-                    'text' => $number['d_name'] .' (' .$number['n_number'] .')',
+                    'value' => $number['number_id'],
+                    'text' => $number[str_replace('Number', '', $numberType['class'])]['name'] .' (' .$number['number'] .')',
                     'class' => $numberType['class'],
                 );
             }
