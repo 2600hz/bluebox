@@ -2,6 +2,7 @@
 class Dbndir_Plugin extends Bluebox_Plugin
 {
     protected $baseModel = 'dbndir';
+    protected $name = 'dbndir';
     
     protected function viewSetup()
     {
@@ -33,10 +34,16 @@ class Dbndir_Plugin extends Bluebox_Plugin
 			}
 
 			Event::$data['DbndirNumber'] = array(
-			'short_name' => 'Dbndir',
-			'display_name' => 'Dial By Name Directory',
-			'target_objects' => $target_objects,
-			'quick_add' =>'/dbndir/create'
+				'short_name' => 'Dbndir',
+				'display_name' => 'Dial By Name Directory',
+				'target_objects' => $target_objects,
+				'quick_add' =>'/dbndir/create'
 			);
+	}
+	
+	public function save()
+	{
+		Kohana::log('debug', 'dbndir');
+		parent::save();
 	}
 }
