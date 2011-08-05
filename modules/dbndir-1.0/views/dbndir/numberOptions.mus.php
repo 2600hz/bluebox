@@ -8,11 +8,7 @@
 				),
 				'Transfer Context:'
 			);
-<<<<<<< HEAD
 			echo numbering::selectContext('dbndir[tran_context_id]');
-=======
-			echo numbering::selectContext('number[plugins][dbndir][tran_context_id]');
->>>>>>> origin/master
 		?>
 	</div>
 <?php echo form::close_section(); ?>
