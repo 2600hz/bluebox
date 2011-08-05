@@ -41,7 +41,7 @@ class Xmlcdr_Controller extends Bluebox_Controller {
         // Setup the base grid object
         $grid = jgrid::grid($this->baseModel, array(
                 'caption' => 'Caller Detail Records',
-                'sortname' => 'x.start_stamp',
+                'sortname' => 'start_stamp',
                 'sortorder' => 'desc'
                 )
         );
