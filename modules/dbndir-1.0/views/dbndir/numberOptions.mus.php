@@ -1,4 +1,6 @@
-<?php echo form::open_section('Options'); ?>
+<?php 
+echo form::open_section('Options');
+?>
 	<div class="field">
 		<?php
 			echo form::label(array(
@@ -11,4 +13,6 @@
 			echo numbering::selectContext('dbndir[tran_context_id]');
 		?>
 	</div>
-<?php echo form::close_section(); ?>
+<?php 
+echo form::close_section(); 
+?>
