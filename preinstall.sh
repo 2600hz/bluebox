@@ -288,6 +288,19 @@ fUpdateSwitchPerm() {
     chmod -R g+w $softswitch_dir/*
 }
 
+fCopyConfigs() {
+    echo "Checking config files"
+    [ ! -e 'bluebox/config/config.php' ] && echo "# Copying bluebox/config/config.php" && cp bluebox/config/config.php.dist bluebox/config/config.php 2>&1	
+    [ ! -e 'bluebox/config/database.php' ] && echo "# Copying bluebox/config/database.php" && cp bluebox/config/database.php.dist bluebox/config/database.php 2>&1	
+    [ ! -e 'bluebox/config/email.php' ] && echo "# Copying bluebox/config/email.php" && cp bluebox/config/email.php.dist bluebox/config/email.php 2>&1	
+    [ ! -e 'bluebox/config/locale.php' ] && echo "# Copying bluebox/config/locale.php" && cp bluebox/config/locale.php.dist bluebox/config/locale.php 2>&1	
+    [ ! -e 'bluebox/config/session.php' ] && echo "# Copying bluebox/config/session.php" && cp bluebox/config/session.php.dist bluebox/config/session.php 2>&1	
+    [ ! -e 'bluebox/config/telephony.php' ] && echo "# Copying bluebox/config/telephony.php" && cp bluebox/config/telephony.php.dist bluebox/config/telephony.php 2>&1	
+    [ ! -e 'bluebox/config/upload.php' ] && echo "# Copying bluebox/config/upload.php" && cp bluebox/config/upload.php.dist bluebox/config/upload.php 2>&1	
+    [ ! -e 'modules/freeswitch-1.1.1/config/freeswitch.php' ] && echo "# Copying modules/freeswitch-1.1.1/config/freeswitch.php" && cp modules/freeswitch-1.1.1/config/freeswitch.php.dist modules/freeswitch-1.1.1/config/freeswitch.php 2>&1	
+    [ ! -e 'modules/asterisk-1.0/config/asterisk.php' ] && echo "# Copying modules/asterisk-1.0/config/asterisk.php" && cp modules/asterisk-1.0/config/asterisk.php.dist modules/asterisk-1.0/config/asterisk.php 2>&1	
+}
+
 cd `dirname $0`
 while [ -n "$*" ]; do
     case "x$1" in   
@@ -317,6 +330,7 @@ done
 fWelcome
 
 fCheckSELinux
+fCopyConfigs
 fSetWebUser
 fUpdateBlueboxPerm
 fUpdateSwitchPerm

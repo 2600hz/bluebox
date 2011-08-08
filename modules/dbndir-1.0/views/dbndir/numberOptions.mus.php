@@ -1,4 +1,6 @@
-<?php echo form::open_section('Options'); ?>
+<?php 
+echo form::open_section('Options');
+?>
 	<div class="field">
 		<?php
 			echo form::label(array(
@@ -8,11 +10,9 @@
 				),
 				'Transfer Context:'
 			);
-<<<<<<< HEAD
 			echo numbering::selectContext('dbndir[tran_context_id]');
-=======
-			echo numbering::selectContext('number[plugins][dbndir][tran_context_id]');
->>>>>>> origin/master
 		?>
 	</div>
-<?php echo form::close_section(); ?>
+<?php 
+echo form::close_section(); 
+?>
