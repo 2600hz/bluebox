@@ -354,6 +354,16 @@ abstract class Bluebox_Controller extends Template_Controller
 
         return FALSE;
     }
+
+    public function renderJson() {
+        // TODO: Output json, bitches!
+        $base = strtolower($this->baseModel);       // Assume all lowercase
+        if (isset($this->$base)) {
+            echo json_encode($this->$base->toArray());
+        } else {
+            echo json_encode(array('error' => 'No $$baseModel object available to use on this page'));
+        }
+    }
     
     /**
      * This function process the render, catching the output

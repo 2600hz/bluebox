@@ -98,9 +98,14 @@ class MultiTenantRecordListener extends Doctrine_Record_Listener
     {
         $q = &$event->getQuery();
 
-        if (!isset($q->_hasRunMultiTenantPre) || (isset($q->_hasRunMultiTenantPre) && $q->_hasRunMultiTenantPre === False))
-			$q->andWhere('account_id = ' .$this->getUserId() . ' or account_id = -1');
-        $q->_hasRunMultiTenantPre = True;
+	$uid=$this->getUserId();
+
+	if (!is_null($uid)) {
+
+	        if (!isset($q->_hasRunMultiTenantPre) || (isset($q->_hasRunMultiTenantPre) && $q->_hasRunMultiTenantPre === False))
+				$q->andWhere('account_id = ' .$uid . ' or account_id = -1');
+	        $q->_hasRunMultiTenantPre = True;
+	}
     }
 
     public function preDqlDelete($event)
