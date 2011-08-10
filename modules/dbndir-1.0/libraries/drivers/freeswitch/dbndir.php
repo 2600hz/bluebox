@@ -96,7 +96,7 @@ class FreeSwitch_dbndir_Driver extends FreeSwitch_Base_Driver
             {
                 $xml->update('/variables/variable[@name="directory_full_name"]{@value="' . $dbndir['full_name'] . '"}');
             } else {
- 				$username = $dbndir->User->first_name . ' ' . $dbndir->User->last_name;           	
+ 				$username = $dbnData->User->first_name . ' ' . $dbnData->User->last_name;           	
                 $xml->update('/variables/variable[@name="directory_full_name"]{@value="' . $username . '"}');
             }
             
