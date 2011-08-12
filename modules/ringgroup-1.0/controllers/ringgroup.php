@@ -111,37 +111,40 @@ class RingGroup_Controller extends Bluebox_Controller
 
         $members = array();
 
-        foreach ($object['members'] as $key => $member)
-        {
-            if (empty($member['id']))
-            {
-                continue;
-            }
-
-            $idFilter = create_function('$array', 'return ( $array[\'id\'] == ' .$member['id'] .');');
-
-            $memberDetails = array_filter($avaliableMemebers, $idFilter);
-
-            $memberDetails = reset($memberDetails);
-
-            if (empty($memberDetails['bridge']))
-            {
-                continue;
-            }
-
-            $members[] = array(
-                'bridge' => $memberDetails['bridge'],
-                'id' => $memberDetails['id'],
-                'type' => $memberDetails['type'],
-                'options' => array(
-                    //'group_confirm_file' => '/path/to/prompt.wav',
-                    //'group_confirm_key' => 4,
-                    //'leg_timeout' => 60,
-                    'ignore_early_media' => 'true'
-                )
-            );
-        }
-
+		foreach($object['members'] as $key => $type)
+		{
+			Kohana::log('debug', 'Processing ' .$key . ' type members');
+			foreach ($type as $member)
+			{
+				if (empty($member['id']))
+				{
+					continue;
+				}
+	
+				$idFilter = create_function('$array', 'return ( $array[\'id\'] == ' .$member['id'] . ' && !strcmp($array[\'type\'],\'' .$key . '\'));');
+				$memberDetails = array_filter($avaliableMemebers, $idFilter);
+	
+				$memberDetails = reset($memberDetails);
+	
+				if (empty($memberDetails['bridge']))
+				{
+					continue;
+				}
+	
+				$members[] = array(
+						'bridge' => $memberDetails['bridge'],
+						'id' => $memberDetails['id'],
+						'type' => $memberDetails['type'],
+						'options' => array(
+							//'group_confirm_file' => '/path/to/prompt.wav',
+							//'group_confirm_key' => 4,
+							//'leg_timeout' => 60,
+							'ignore_early_media' => 'true'
+							)
+						);
+			}
+		}
+        
         $object['members'] = $members;
 
         parent::save_prepare($object);

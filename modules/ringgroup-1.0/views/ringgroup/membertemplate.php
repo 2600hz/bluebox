@@ -16,7 +16,7 @@
 
             <label for="checkbox_{{type}}_{{id}}" class="label" id="label_checkbox_{{type}}_{{id}}" style="width:160px; font-weight:normal; margin-top: ">Assign this {{type}}</label>
 
-            <input type="checkbox" class="checkbox input {{type}}" rel="{{type}}" value="{{id}}" name="ringgroup[members][][id]" id="checkbox_{{type}}_{{id}}" style="margin:3px 0 0 15px;">
+            <input type="checkbox" class="checkbox input {{type}}" rel="{{type}}" value="{{id}}" name="ringgroup[members][{{type}}][][id]" id="checkbox_{{type}}_{{id}}" style="margin:3px 0 0 15px;">
 
         </li>
 
