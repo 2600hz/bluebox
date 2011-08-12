@@ -182,7 +182,7 @@ fUpdateBlueboxPerm() {
 }
 
 fFixSoundsPerms() {
-    [ -d '/var/lib/asterisk/sounds/' ] && sounddir_guess="/var/lib/asterisk/sounds/"
+    [ -d '/var/lib/asterisk/sounds/' ] && sounddir_guess="/var/lib/asterisk/sounds"
 
     [ -d '/usr/local/freeswitch/sounds/' ] && sounddir_guess="/usr/local/freeswitch/sounds"
 
@@ -209,11 +209,11 @@ fFixSoundsPerms() {
 
     [ -z "$sound_dir" -o ! -d "$sound_dir" ] && return 0
 
-    echo "# chgrp -R $webuser $sound_dir/*"
-    chgrp -R $webuser $sound_dir/*
+    echo "# chgrp -R $webuser $sound_dir"
+    chgrp -R $webuser $sound_dir
 
-    echo "# chmod -R g+w $sound_dir/*"
-    chmod -R g+w $sound_dir/*
+    echo "# chmod -R g+w $sound_dir"
+    chmod -R g+w $sound_dir
 }
 
 fFixRecordsPerms() {
@@ -243,11 +243,11 @@ fFixRecordsPerms() {
 
     [ -z "$record_dir" -o ! -d "$record_dir" ] && return 0
 
-    echo "# chgrp -R $webuser $record_dir/*"
-    chgrp -R $webuser $record_dir/*
+    echo "# chgrp -R $webuser $record_dir"
+    chgrp -R $webuser $record_dir
 
-    echo "# chmod -R g+w $record_dir/*"
-    chmod -R g+w $record_dir/*
+    echo "# chmod -R g+w $record_dir"
+    chmod -R g+w $record_dir
 }
 
 fUpdateSwitchPerm() {
@@ -281,11 +281,11 @@ fUpdateSwitchPerm() {
 
     [ -z "$softswitch_dir" -o ! -d "$softswitch_dir" ] && return 0
 
-    echo "# chgrp -R $webuser $softswitch_dir/*"
-    chgrp -R $webuser $softswitch_dir/*
+    echo "# chgrp -R $webuser $softswitch_dir"
+    chgrp -R $webuser $softswitch_dir
 
-    echo "# chmod -R g+w $softswitch_dir/*"
-    chmod -R g+w $softswitch_dir/*
+    echo "# chmod -R g+w $softswitch_dir"
+    chmod -R g+w $softswitch_dir
 }
 
 fCopyConfigs() {
