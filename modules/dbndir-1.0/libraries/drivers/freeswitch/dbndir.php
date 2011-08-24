@@ -125,11 +125,9 @@ class FreeSwitch_dbndir_Driver extends FreeSwitch_Base_Driver
 	}
 	
 	public static function dialplan($Number)
-    {
-        $xml = Telephony::getDriver()->xml;
-        $destination = $Number['Destination'];
-        
-        $xmlText = '<action application="directory" data="dbnprofile_' . $destination['dbn_id'] . ' $${location_' . $Number->Location->location_id . '} context_' . $Number->plugins['dbndir']['tran_context_id'] . '"/>';
+    {    	
+        $xml = Telephony::getDriver()->xml;        
+        $xmlText = '<action application="directory" data="dbnprofile_' . $Number['Destination']['dbn_id'] . ' $${location_' . $Number->Location->location_id . '} context_' . $Number['dialplan']['dbndir']['trancontextid'] . '"/>';
         $xml->replaceWithXml($xmlText);
 	}
 	
