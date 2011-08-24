@@ -13,4 +13,4 @@ $config['language'] = array('en_US', 'English_United States');
  * Locale timezone. Defaults to use the server timezone.
  * @see http://php.net/timezones
  */
-$config['timezone'] = 'America/New_York';
+$config['timezone'] = 'America/Los_Angeles';
