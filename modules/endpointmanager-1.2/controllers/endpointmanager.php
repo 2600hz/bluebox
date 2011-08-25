@@ -3,7 +3,7 @@
 class EndpointManager_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'Endpoint';
-    protected $authBypass = array('configfile');
+    protected $authBypass = array('config');
 
     private function _identify_configfile($configfile,$debug) {
 	$prov=$this->_getprovisioningdata();
@@ -88,7 +88,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 	throw new Exception("Multiple possibilities for file $configfile");
     }
 
-    public function configfile ()
+    public function config ()
     {
 	$file=implode(DIRECTORY_SEPARATOR,func_get_args());
 	$configfileinfo=$this->_identify_configfile($file,array_key_exists('debug',$_REQUEST));
@@ -119,6 +119,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 		}
 		
 	}
+	$provisioner_lib->provisioning_type='http';
+	# Note: slashes are forward slashes in windows too, because this is in web-space.
+	$provisioner_lib->provisioning_path=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config';
 	$provisioner_lib->server[1]['ip'] = $dns;
 	$provisioner_lib->server[1]['port'] = 5060;
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
