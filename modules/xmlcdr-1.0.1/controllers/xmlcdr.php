@@ -147,7 +147,6 @@ class Xmlcdr_Controller extends Bluebox_Controller {
     public function service($key = NULL) {
         $this->auto_render = FALSE;
 
-
         if($this->input->post()) {
             $xml = $this->input->post('cdr');
             XmlcdrManager::addXMLCDR($xml);
