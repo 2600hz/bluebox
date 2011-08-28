@@ -1,6 +1,14 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class FreeSwitch_ValetParkingLot_Driver extends FreeSwitch_Base_Driver
 {
+	public static function set($number)
+	{
+	}
+	
+	public static function delete($number)
+	{
+	}
+	
     public static function dialplan($number)
     {
         $xml = Telephony::getDriver()->xml;

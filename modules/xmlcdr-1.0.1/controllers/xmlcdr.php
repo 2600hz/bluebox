@@ -81,18 +81,7 @@ class Xmlcdr_Controller extends Bluebox_Controller {
                 'arguments' => 'xml_cdr_id'
                 )
         );
-        
-        // Only display records from the domains associated with the account
-        $domainlist = Doctrine_Query::create()
-           	->select('domain')
-        	->from('Location')
-        	->fetchArray();
-		$inlist = array();
-		foreach ($domainlist as $domain)
-		{
-        	$inlist[] = $domain['domain'];
-		}
-        $grid->whereIn('domain_name', '', $inlist);
+
 
         // Let plugins populate the grid as well
         $this->grid = $grid;
@@ -100,6 +89,8 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
         // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
+
+//             $this->template->content = new View('xmlcdr/index');
 
     }
 
@@ -155,6 +146,7 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 
     public function service($key = NULL) {
         $this->auto_render = FALSE;
+
 
         if($this->input->post()) {
             $xml = $this->input->post('cdr');
