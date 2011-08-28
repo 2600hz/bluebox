@@ -85,7 +85,7 @@ class Xmlcdr_Controller extends Bluebox_Controller {
         
         $this->grid = jgrid::grid($this->baseModel, array(
                 'gridName' => 'downloadrange',
-                'caption' => 'Caller Detail Records',
+                'caption' => 'Call Detail Records',
                 'sortorder' => 'desc'
             )
         )
@@ -95,11 +95,9 @@ class Xmlcdr_Controller extends Bluebox_Controller {
         ->add('caller_id_name', 'Caller Name')
         ->add('caller_id_number', 'Caller Number')
         ->add('destination_number', 'Destination', array('callback' => array($this, 'formatNumber')))
-        ->add('duration', 'Duration')
+        ->add('duration', 'Duration', array('callback' => array($this, 'formatDuration')))
         ->add('hangup_cause', 'Call End Cause')
-        ->addAction('xmlcdr/details', 'Details', array('arguments' => 'xml_cdr_id', 'attributes' => array('class' => 'qtipAjaxForm')
-                )
-        );
+        ->addAction('xmlcdr/details', 'Details', array('arguments' => 'xml_cdr_id', 'attributes' => array('class' => 'qtipAjaxForm')));
         
         // Only display records from the domains associated with the account
         $domainlist = Doctrine_Query::create()
