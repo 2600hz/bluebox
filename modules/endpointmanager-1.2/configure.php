@@ -5,7 +5,7 @@ class EndpointManager_1_2_Configure extends Bluebox_Configure
     public static $version = 1.2;
     public static $packageName = 'endpointmanager';
     public static $displayName = 'Endpoint Manager';
-    public static $author = 'Andrew Nagy';
+    public static $author = 'Andrew Nagy & Jort Bloem';
     public static $vendor = 'The Provisioner Project';
     public static $license = 'MPL';
     public static $summary = 'Endpoint provisioning and management tool.';
