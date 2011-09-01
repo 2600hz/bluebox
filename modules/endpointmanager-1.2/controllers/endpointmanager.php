@@ -91,7 +91,8 @@ class EndpointManager_Controller extends Bluebox_Controller
     public function config ()
     {
 	$file=implode(DIRECTORY_SEPARATOR,func_get_args());
-	$configfileinfo=$this->_identify_configfile($file,array_key_exists('debug',$_REQUEST));
+	$debug=array_key_exists('debug',$_REQUEST);
+	$configfileinfo=$this->_identify_configfile($file,$debug);
 
 	if (!array_key_exists('endpoint',$configfileinfo)) {
 		# TODO - if there is no endpoint, there may still be enough data to serve the config. We know the filename, model, family, and other info.
@@ -102,18 +103,34 @@ class EndpointManager_Controller extends Bluebox_Controller
 	foreach (array('mac','model') AS $attr) {
 		$provisioner_lib->$attr=$configfileinfo['endpoint'][$attr];
 	}
-        $provisioner_lib->timezone = date_offset_get(new DateTime);
+	$defaults = Doctrine::getTable('package')->findOneby('name','endpointmanager');
+	if (isset($defaults['registry']['defaults'])) {
+		$defaults=$defaults['registry']['defaults'];
+	} else {
+		$defaults=array();
+	}
+	if (isset($defaults['global']['timezone'])) {
+		$tz=$defaults['global']['timezone'];
+	} else {
+		$tz=date_default_timezone_get();
+	}
+	$provision_lib->DateTimeZone=new DateTimeZone($tz);
+	$provision_lib->timezone=$provision_lib->DateTimeZone->getOffset(new DateTime());
 
+	$lineinfo=unserialize($configfileinfo['endpoint']->lines);
 	$lines=array();
-	foreach (unserialize($configfileinfo['endpoint']->lines) AS $index=>$line) {
-		if (!empty($line['sip'])) {
-			$device=Doctrine::getTable('Device')->find($line['sip']);
+	for ($index=1; $index<=$configfileinfo['provisioning']['lines']; $index++) {
+		if ((!array_key_exists($index,$lineinfo)) or (empty($lineinfo[$index]['sip']))) {
+			$provisioner_lib->lines[$index]=array();
+		} else {
+			$device=Doctrine::getTable('Device')->find($lineinfo[$index]['sip']);
 			$provisioner_lib->lines[$index]=array(
 				"line"=>$index,
 				"ext"=>$device['plugins']['sip']['username'],
 				'displayname' => $device["plugins"]["sip"]["username"], // TODO - get this somewhere?!?!?
 				'secret' => $device['plugins']['sip']['password'],
 				'subscribe_mwi' => 1, // Todo - map this properly to voicemail boxes
+				'user_host'=>$device['User']['Location']['domain'],
 			);
         		$dns = $device['User']['Location']['domain'];
 		}
@@ -126,11 +143,76 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$provisioner_lib->server[1]['port'] = 5060;
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
         $provisioner_lib->processor_info = 'Endpoint Manager 1.2 for Blue.Box';
+	$provisioner_lib->options=array();
+	foreach ($configfileinfo['provisioning']['templates'] AS $templatedata) {
+		foreach ($templatedata['subcategory'] AS $subcat) {
+			foreach ($subcat['item'] AS $item) {
+				if (in_array($item['type'],array('break','group'))) {
+					continue; 
+				} elseif (in_array($item['type'],array('loop_line_options'))) {
+					foreach ($item['data']['item'] AS $subitem) {
+						if ($subitem['type']=='break') { 
+							continue; 
+						} elseif (in_array($subitem['type'],array('input','radio','list'))) {
+							$realvar=$subitem['variable'];
+							if (substr($realvar,0,1)=='$') {
+								$realvar=substr($realvar,1);
+							}
+							for ($index=1; $index<=$configfileinfo['provisioning']['lines']; $index++) {
+								if (!array_key_exists($realvar,$provisioner_lib->lines[$index])) {
+									$provisioner_lib->lines[$index][$realvar]=$subitem['default_value'];
+								}
+							}
+						} else {
+							if ($debug) {
+								#TODO: other types?
+								print "Unknown type:\n";
+								print_r($subitem);
+							}
+						}
+					}
+				} elseif (in_array($item['type'],array('input','radio','list'))) {
+				} elseif (in_array($item['type'],array('input','radio','list'))) {
+					$realvar=$item['variable'];
+					if (substr($realvar,0,1)=='$') {
+						$realvar=substr($realvar,1);
+					}
+					if (!array_key_exists($realvar,$provisioner_lib->options)) {
+						$provisioner_lib->options[$realvar]=$item['default_value'];
+					}
+				} else {
+					if ($debug) {
+						#TODO: other types, including loops?
+						print "Unknown type:\n";
+						print_r($item);
+					}
+				}
+			}
+		}
+	}
 	$data = $provisioner_lib->parse_config_file($provisioner_lib->open_config_file($configfileinfo['possibility']['file']), FALSE);
 	print $data;
 	
 	exit;
     }
+   public function settings() {
+	$this->view->title="Global Endpoint Settings"; // Some pages have the title automagically - how does that work?
+
+        // $this->loadBaseModel($id):
+        $this->package = Doctrine::getTable('package')->findOneby('name','endpointmanager');
+        $this->view->set_global('base', 'package');
+	if (isset($this->package['registry']['defaults']['global']['timezone'])) {
+		$this->view->savedtimezone=$this->package['registry']['defaults']['global']['timezone'];
+	} else {
+		$this->view->savedtimezone=null;
+	}
+        Event::run('bluebox.load_base_model', $this->package);
+
+        $this->updateOnSubmit($this->package);
+
+        $this->prepareUpdateView('Package');
+	
+   }
 
    public function index() 
    {
@@ -207,7 +289,6 @@ class EndpointManager_Controller extends Bluebox_Controller
 
    private function _getprovisioningdata() {
 	# Note: $this->privateprovdata is PRIVATE to this function - do not use it directly. If you want the data, call this function.
-	# TODO: bluebox style caching, building the data if neccesary.
 	if (property_exists($this,'privateprovdata')) {
 		return $this->privateprovdata;
 	}
@@ -227,6 +308,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 			$data['oui'][$oui['oui']]=$brand["directory"];
 		}
 		foreach ($brandxml['data']['brands']['family_list']['family'] AS $family) {
+			$templates=array(); # $templates[$templatename]
 			$familyxml=$this->_xmlread("$xmlbase$brand[directory]/$family[directory]/family_data.xml",array("model_list","files"));
 			$seen=array();
 			foreach (explode(",",$familyxml['data']['configuration_files']) AS $conf_file) {
@@ -278,17 +360,29 @@ class EndpointManager_Controller extends Bluebox_Controller
 					"familyname"=>$family["name"],
 					"family"=>$family['directory'],
 					"path"=>"$xmlbase$brand[directory]/$family[directory]/",
-					"templates"=>$model['template_data']['files'],
+#					"templates"=>$model['template_data']['files'],
 				);
+				foreach ($model['template_data']['files'] AS $file) {
+					if (!array_key_exists($file,$templates)) {
+						$templates[$file]=$this->_xmlread($file,array("item","subcategory"));
+					}
+					$data['phones'][$brand["directory"]][$model["model"]]["templates"][]=$templates[$file]['template_data']['category'];
+				}
 			}
 		}
 	}
 	$cache->set('endpointmanager->provisioningdata',$data,NULL,3600);
 	return $data;
    }
+   public function dump() {
+	header('Content-type: text/plain');
+	print_r($this->_getprovisioningdata());
+	exit;
+   }
 
    protected function prepareUpdateView($baseModel = NULL) {
 	parent::prepareUpdateView($baseModel);
+	if (($baseModel!='Endpoint') && (!is_null($baseModel))) { return; }
 	$brandandmodel=$this->endpoint['brand']."|".$this->endpoint['model'];
 	$prov=$this->_getprovisioningdata();
 	# Note: this is not endpoint[brandandmodel], because it gets split into two fields in pre_save.
@@ -308,6 +402,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$select.="</select>\n";
 	$this->view->brandandmodelselect=$select;
 	$linedata=unserialize($this->endpoint['lines']);
+	if (!is_array($linedata)) {
+		$linedata=array();
+	}
 
 	$brand=$this->endpoint['brand'];
 	$model=$this->endpoint['model'];
@@ -333,6 +430,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$this->view->oui=$prov['oui'];
    }
    protected function pre_save(&$object) {
+	if (get_class($object)!='Endpoint') {return;}
 	$mac=strtolower(str_replace(array(' ',':','_','\\','/'),array(),$object['mac']));
 	if (strlen($mac)!=12) {
 		throw new Exception("Invalid mac address - it should be 12 characters long, optionally with colons.");
