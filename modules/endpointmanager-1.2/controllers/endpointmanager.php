@@ -114,8 +114,8 @@ class EndpointManager_Controller extends Bluebox_Controller
 	} else {
 		$tz=date_default_timezone_get();
 	}
-	$provision_lib->DateTimeZone=new DateTimeZone($tz);
-	$provision_lib->timezone=$provision_lib->DateTimeZone->getOffset(new DateTime());
+	$provisioner_lib->DateTimeZone=new DateTimeZone($tz);
+	$provisioner_lib->timezone=$provisioner_lib->DateTimeZone->getOffset(new DateTime());
 
 	$lineinfo=unserialize($configfileinfo['endpoint']->lines);
 	$lines=array();
@@ -190,9 +190,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 			}
 		}
 	}
-	$data = $provisioner_lib->parse_config_file($provisioner_lib->open_config_file($configfileinfo['possibility']['file']), FALSE);
-	print $data;
-	
+	print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
 	exit;
     }
    public function settings() {
