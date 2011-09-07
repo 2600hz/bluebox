@@ -41,20 +41,25 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
                 $xml->deleteChildren();
 
-		foreach (array_keys($pattern) AS $pattern_index) 
-		{
+                $pattern_string = '';
 
-	                $condition = '/condition[@field="destination_number"][@break="never"][@expression="' .$pattern[$pattern_index] . '"][@bluebox="pattern_' .$simple_route_id . '_part_' . ($pattern_index+1) .'"]';
+                foreach (array_keys($pattern) AS $pattern_index) 
+                {
+                    $pattern_string .= '|' . $pattern[$pattern_index];
+                }
 
-	                if (!empty($options['prepend']))
-	                {
-	                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' . $options['prepend'] . '"}');
-	                }
-	                else
-	                {
-	                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend="}');
-	                }
-		}
+                $pattern_string = substr($pattern_string, 1);
+
+                $condition = '/condition[@field="destination_number"][@expression="' .$pattern_string . '"][@bluebox="pattern_' .$simple_route_id . '_parts"]';
+
+                if (!empty($options['prepend']))
+                {
+                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' . $options['prepend'] . '"}');
+                }
+                else
+                {
+                    $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend="}');
+                }
 
                 if (!empty($simpleroute['caller_id_name']))
                 {
@@ -84,22 +89,23 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
                     }
                 }
 
-		foreach (array_keys($pattern) AS $pattern_index) 
+                foreach (array_keys($pattern) AS $pattern_index) 
                 {
-	                $dummy = '/condition[@field="destination_number"][@break="never"][@expression="' . $pattern[$pattern_index] . '"][@bluebox="pattern_' .$simple_route_id . '_part_' . ($pattern_index+1) .'_out"]';
+                    $dummy = '/condition[@field="destination_number"][@break="never"][@expression="' . $pattern[$pattern_index] . '"][@bluebox="pattern_' .$simple_route_id . '_part_' . ($pattern_index+1) .'_out"]';
 
-	                if (!empty($simpleroute['continue_on_fail']))
-	                {
-	                    $xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="failure_causes=NORMAL_CLEARING,ORIGINATOR_CANCEL,CRASH"}');
-	                }
-	                else
-	                {
-	                    $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
-	                }
-			$boolAllowMediaProxy = $base['registry']['allow_media_proxy']==0? 'false':'true';
-			$xml->update($dummy . '/action[@application="set"][@data="proxy_media='.$boolAllowMediaProxy.'"]');
+                    if (!empty($simpleroute['continue_on_fail']))
+                    {
+                        $xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="failure_causes=NORMAL_CLEARING,ORIGINATOR_CANCEL,CRASH"}');
+                    }
+                    else
+                    {
+                        $xml->deleteNode($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]');
+                    }
 
-	                $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
+                    $boolAllowMediaProxy = $base['registry']['allow_media_proxy']==0? 'false':'true';
+                    $xml->update($dummy . '/action[@application="set"][@data="proxy_media='.$boolAllowMediaProxy.'"]');
+
+                    $xml->update($dummy . '/action[@application="bridge"][@bluebox="out_trunk_' .$base['trunk_id'] .'"]{@data="sofia\/gateway\/trunk_' .$base['trunk_id'] . '\/${prepend}$1"}');
                 }
             }
         }
