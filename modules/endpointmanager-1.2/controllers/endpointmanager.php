@@ -124,12 +124,20 @@ class EndpointManager_Controller extends Bluebox_Controller
 			$provisioner_lib->lines[$index]=array();
 		} else {
 			$device=Doctrine::getTable('Device')->find($lineinfo[$index]['sip']);
+			if (isset($device['plugins']['callerid']['internal_name'])) {
+				$displayname=$device['plugins']['callerid']['internal_name'];
+			} elseif (isset($device['plugins']['callerid']['external_name'])) {
+				$displayname=$device['plugins']['callerid']['external_name'];
+			} else {
+				$displayname=$device['plugins']['sip']['username'];
+			}
+	
 			$provisioner_lib->lines[$index]=array(
 				"line"=>$index,
 				"ext"=>$device['plugins']['sip']['username'],
-				'displayname' => $device["plugins"]["sip"]["username"], // TODO - get this somewhere?!?!?
+				'displayname' => $displayname,
 				'secret' => $device['plugins']['sip']['password'],
-				'subscribe_mwi' => 1, // Todo - map this properly to voicemail boxes
+				'subscribe_mwi' => 1,
 				'user_host'=>$device['User']['Location']['domain'],
 			);
         		$dns = $device['User']['Location']['domain'];
@@ -144,52 +152,7 @@ class EndpointManager_Controller extends Bluebox_Controller
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
         $provisioner_lib->processor_info = 'Endpoint Manager 1.2 for Blue.Box';
 	$provisioner_lib->options=array();
-	foreach ($configfileinfo['provisioning']['templates'] AS $templatedata) {
-		foreach ($templatedata['subcategory'] AS $subcat) {
-			foreach ($subcat['item'] AS $item) {
-				if (in_array($item['type'],array('break','group'))) {
-					continue; 
-				} elseif (in_array($item['type'],array('loop_line_options'))) {
-					foreach ($item['data']['item'] AS $subitem) {
-						if ($subitem['type']=='break') { 
-							continue; 
-						} elseif (in_array($subitem['type'],array('input','radio','list'))) {
-							$realvar=$subitem['variable'];
-							if (substr($realvar,0,1)=='$') {
-								$realvar=substr($realvar,1);
-							}
-							for ($index=1; $index<=$configfileinfo['provisioning']['lines']; $index++) {
-								if (!array_key_exists($realvar,$provisioner_lib->lines[$index])) {
-									$provisioner_lib->lines[$index][$realvar]=$subitem['default_value'];
-								}
-							}
-						} else {
-							if ($debug) {
-								#TODO: other types?
-								print "Unknown type:\n";
-								print_r($subitem);
-							}
-						}
-					}
-				} elseif (in_array($item['type'],array('input','radio','list'))) {
-				} elseif (in_array($item['type'],array('input','radio','list'))) {
-					$realvar=$item['variable'];
-					if (substr($realvar,0,1)=='$') {
-						$realvar=substr($realvar,1);
-					}
-					if (!array_key_exists($realvar,$provisioner_lib->options)) {
-						$provisioner_lib->options[$realvar]=$item['default_value'];
-					}
-				} else {
-					if ($debug) {
-						#TODO: other types, including loops?
-						print "Unknown type:\n";
-						print_r($item);
-					}
-				}
-			}
-		}
-	}
+	$provisioner_lib->prepare_for_generateconfig();
 	print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
 	exit;
     }
