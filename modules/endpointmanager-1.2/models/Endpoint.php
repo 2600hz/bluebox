@@ -10,7 +10,7 @@ class Endpoint extends Bluebox_Record
         // COLUMN DEFINITIONS
 	$this->hasColumn('endpoint_id', 'integer', 11, array('unsigned' => true, 'primary' => true, 'autoincrement' => true));
 	$this->hasColumn('name','string',512);
-	$this->hasColumn('mac','string',12,array('notnull'=>true,'notblank'=>true));
+	$this->hasColumn('mac','string',12,array('notnull'=>true,'notblank'=>true,'unique'=>true));
 	$this->hasColumn('brand','string',30,array('notnull'=>true,'notblank'=>true));
 	$this->hasColumn('model','string',30,array('notnull'=>true,'notblank'=>true));
 	$this->hasColumn('settings','string');
