@@ -20,6 +20,7 @@ class EndpointManager_1_2_Configure extends Bluebox_Configure
     public static $navBranch = '/Applications/';
     public static $navURL = 'endpointmanager/index';
     public static $navSubmenu = array(
+	'Global Settings' => 'endpointmanager/settings',
         'Search Endpoints' => 'endpointmanager/index',
         'Add Endpoint' => 'endpointmanager/create',
         'Edit Endpoint' => array(
