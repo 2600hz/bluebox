@@ -100,6 +100,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 	}
         $class = "endpoint_" . $configfileinfo["possibility"]["make"] . "_" . $configfileinfo["provisioning"]["family"] . '_phone';
 	$provisioner_lib = new $class();
+	$provisioner_lib->options=array();
 	foreach (array('mac','model') AS $attr) {
 		$provisioner_lib->$attr=$configfileinfo['endpoint'][$attr];
 	}
@@ -110,11 +111,15 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$defaults=array();
 	}
 	if (isset($defaults['global']['timezone'])) {
-		$tz=$defaults['global']['timezone'];
+		$provisioner_lib->DateTimeZone=new DateTimeZone($defaults['global']['timezone']);
 	} else {
-		$tz=date_default_timezone_get();
+		$provisioner_lib->DateTimeZone=new DateTimeZone(date_default_timezone_get());
 	}
-	$provisioner_lib->DateTimeZone=new DateTimeZone($tz);
+	if ($provisioner_lib->brand_name=='snom') {
+		if (isset($defaults['snom']['options']['tone_scheme'])) {
+			$provisioner_lib->options['tone_scheme']=$defaults['snom']['options']['tone_scheme'];
+		}
+	}
 	$provisioner_lib->timezone=$provisioner_lib->DateTimeZone->getOffset(new DateTime());
 
 	$lineinfo=unserialize($configfileinfo['endpoint']->lines);
@@ -151,11 +156,54 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$provisioner_lib->server[1]['port'] = 5060;
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
         $provisioner_lib->processor_info = 'Endpoint Manager 1.2 for Blue.Box';
-	$provisioner_lib->options=array();
 	$provisioner_lib->prepare_for_generateconfig();
 	print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
 	exit;
     }
+   private function _autoquestion($make,$model,$templatevariable,$forvariable,$caption,$currentvalue=NULL) {
+	$prov=$this->_getprovisioningdata();
+	$structures=$prov['phones'][$make][$model]['templates'];
+	while (count($structures)>=1) {
+		$item=array_pop($structures);
+		if (!is_array($item)) {
+		} elseif ((isset($item['variable'])) && ($item['variable']==$templatevariable)) {
+			$question=$item;
+			break;
+		} else {
+			foreach ($item AS $value) {
+				$structures[]=$value;
+			}
+		}
+		if (count($structures)==0) { // question not found.
+			return;
+		}
+	}
+
+	if ((is_null($currentvalue)) && (isset($item['default_value']))) {
+		$currentvalue=$item['default_value'];
+	}
+	$result='<div class="field">';
+	$result.=form::label(array(
+		'for'=>$forvariable,
+		'hint'=>$item['description'],
+	//	'help'=> - from $item['help']?
+		), $caption.':');
+	switch ($item['type']) {
+		case 'input':
+			$result.=form::input('endpoint[mac]');
+			break;
+		case 'list':
+			$result.="<select name='$forvariable'>";
+			foreach ($item['data'] AS $data) {
+				$selected=($data['value']==$currentvalue)?"selected":"";
+				$result.="<option value='$data[value]' $selected>$data[text]</option>";
+			}
+			$result.="</select>";
+			break;
+	}
+	$result.='</div>';
+	return $result;
+   }
    public function settings() {
 	$this->view->title="Global Endpoint Settings"; // Some pages have the title automagically - how does that work?
 
@@ -167,6 +215,25 @@ class EndpointManager_Controller extends Bluebox_Controller
 	} else {
 		$this->view->savedtimezone=null;
 	}
+	if (isset($this->package['registry']['defaults']['snom']['options']['tone_scheme'])) {
+		$tonescheme=$this->package['registry']['defaults']['snom']['options']['tone_scheme'];
+	} else {
+		$tonescheme=NULL;
+	}
+
+	$additionalquestions=array(
+		'Snom'=>array(
+			$this->_autoquestion("snom","300",'$tone_scheme','package[registry][defaults][snom][options][tone_scheme]','Tone scheme',$tonescheme),
+			#$this->_autoquestion("snom","300",'$http_user','package[registry][defaults][snom][options][http_user]','HTTP User',
+		)
+	);
+	$this->view->additionalquestions="";
+	foreach ($additionalquestions AS $make=>$questionlist) {
+		$this->view->additionalquestions.=form::open_section("$make Settings");
+		$this->view->additionalquestions.=implode("",$questionlist);
+	 	$this->view->additionalquestions.=form::close_section();
+	}
+
         Event::run('bluebox.load_base_model', $this->package);
 
         $this->updateOnSubmit($this->package);
@@ -325,7 +392,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 				);
 				foreach ($model['template_data']['files'] AS $file) {
 					if (!array_key_exists($file,$templates)) {
-						$templates[$file]=$this->_xmlread($file,array("item","subcategory"));
+						$templates[$file]=$this->_xmlread($file,array("item","subcategory","data"));
 					}
 					$data['phones'][$brand["directory"]][$model["model"]]["templates"][]=$templates[$file]['template_data']['category'];
 				}
