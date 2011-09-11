@@ -8,6 +8,7 @@
 	<?php echo form::open(); ?>
 
 	<?php echo form::open_section('Global Settings'); ?>
+	<div class='field'>
 	<?php echo form::label(array(
 		'for'=>'package[registry][defaults][global][timezone]',
 		'hint'=>'Default timezone for all phones',
@@ -16,8 +17,11 @@
 
 		echo timezone::dropdown("package[registry][defaults][global][timezone]",$savedtimezone);
 	?>
+	</div>
 
 	<?php echo form::close_section(); ?>
+
+	<?php echo $additionalquestions; ?>
 
 	<?php echo form::close(TRUE); ?>
 </div>
