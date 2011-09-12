@@ -88,6 +88,44 @@ class EndpointManager_Controller extends Bluebox_Controller
 	throw new Exception("Multiple possibilities for file $configfile");
     }
 
+    /* 
+	This gets function gets the global defaults for all phones. There are some hard-coded default defaults.
+     */
+    private function _get_defaults() {
+	$default_defaults=array(
+		'global'=>array(
+			'timezone'=>date_default_timezone_get(),
+			'vlan'=>"0",
+			'pcp'=>"5",
+			'tftppath'=>'/tftpboot',
+		),
+		'snom'=>array(
+			'tone_scheme'=>'USA',
+			'http_user'=>'admin',
+			'http_pass'=>'snom',
+		),
+	);
+	$flag=0;
+	$store = Doctrine::getTable('package')->findOneby('name','endpointmanager');
+	$reg=array_merge_recursive($store->registry);
+	$queue=array(array(&$reg,array("defaults"=>$default_defaults)));
+	while ($queueent=array_shift($queue)) {
+		foreach ($queueent[1] AS $key=>$val) {
+			if (!array_key_exists($key,$queueent[0])) {
+				$queueent[0][$key]=$val;
+				$flag=1;
+			} elseif ((is_array($queueent[0][$key])) && (is_array($queueent[1][$key]))) {
+				$queue[]=array(&$queueent[0][$key],$queueent[1][$key]);
+			}
+		}
+	}
+	if ($flag==1) {
+		$store->registry=$reg;
+		$store->save();
+	}
+	return $store->registry['defaults'];
+    }
+
     public function config ()
     {
 	$file=implode(DIRECTORY_SEPARATOR,func_get_args());
@@ -104,23 +142,15 @@ class EndpointManager_Controller extends Bluebox_Controller
 	foreach (array('mac','model') AS $attr) {
 		$provisioner_lib->$attr=$configfileinfo['endpoint'][$attr];
 	}
-	$defaults = Doctrine::getTable('package')->findOneby('name','endpointmanager');
-	if (isset($defaults['registry']['defaults'])) {
-		$defaults=$defaults['registry']['defaults'];
-	} else {
-		$defaults=array();
-	}
-	if (isset($defaults['global']['timezone'])) {
-		$provisioner_lib->DateTimeZone=new DateTimeZone($defaults['global']['timezone']);
-	} else {
-		$provisioner_lib->DateTimeZone=new DateTimeZone(date_default_timezone_get());
-	}
-	if ($provisioner_lib->brand_name=='snom') {
-		if (isset($defaults['snom']['options']['tone_scheme'])) {
-			$provisioner_lib->options['tone_scheme']=$defaults['snom']['options']['tone_scheme'];
-		}
-	}
+	$defaults = $this->_get_defaults();
+
+	$provisioner_lib->DateTimeZone=new DateTimeZone($defaults['global']['timezone']);
 	$provisioner_lib->timezone=$provisioner_lib->DateTimeZone->getOffset(new DateTime());
+
+	if (array_key_exists($provisioner_lib->brand_name,$defaults)) {
+		$provisioner_lib->options=array_merge_recursive($defaults[$provisioner_lib->brand_name],$provisioner_lib->options);
+	}
+
 
 	$lineinfo=unserialize($configfileinfo['endpoint']->lines);
 	$lines=array();
@@ -190,7 +220,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 		), $caption.':');
 	switch ($item['type']) {
 		case 'input':
-			$result.=form::input('endpoint[mac]');
+			$result.=form::input($forvariable,$currentvalue);
 			break;
 		case 'list':
 			$result.="<select name='$forvariable'>";
@@ -207,24 +237,18 @@ class EndpointManager_Controller extends Bluebox_Controller
    public function settings() {
 	$this->view->title="Global Endpoint Settings"; // Some pages have the title automagically - how does that work?
 
+	$defaults = $this->_get_defaults();
+
         // $this->loadBaseModel($id):
         $this->package = Doctrine::getTable('package')->findOneby('name','endpointmanager');
         $this->view->set_global('base', 'package');
-	if (isset($this->package['registry']['defaults']['global']['timezone'])) {
-		$this->view->savedtimezone=$this->package['registry']['defaults']['global']['timezone'];
-	} else {
-		$this->view->savedtimezone=null;
-	}
-	if (isset($this->package['registry']['defaults']['snom']['options']['tone_scheme'])) {
-		$tonescheme=$this->package['registry']['defaults']['snom']['options']['tone_scheme'];
-	} else {
-		$tonescheme=NULL;
-	}
+	$this->view->savedtimezone=$defaults['global']['timezone'];
 
 	$additionalquestions=array(
 		'Snom'=>array(
-			$this->_autoquestion("snom","300",'$tone_scheme','package[registry][defaults][snom][options][tone_scheme]','Tone scheme',$tonescheme),
-			#$this->_autoquestion("snom","300",'$http_user','package[registry][defaults][snom][options][http_user]','HTTP User',
+			$this->_autoquestion("snom","300",'$tone_scheme','package[registry][defaults][snom][tone_scheme]','Tone scheme',$defaults['snom']['tone_scheme']),
+			$this->_autoquestion("snom","300",'$http_user','package[registry][defaults][snom][http_user]','HTTP User',$defaults['snom']['http_user']),
+			$this->_autoquestion("snom","300",'$http_pass','package[registry][defaults][snom][http_user]','HTTP Password',$defaults['snom']['http_pass']),
 		)
 	);
 	$this->view->additionalquestions="";
