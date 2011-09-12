@@ -1288,13 +1288,13 @@ class form extends form_Core
 
             $viewVar = arr::smart_cast($viewVar);
 
-            if (($viewValue = arr::get_string($viewVar, $name, TRUE)))
+            if (!is_null($viewValue = arr::get_string($viewVar, $name, TRUE)))
             {
                 return $viewValue;
             }
         }
 
-        if (($postValue = arr::get_string($_POST, $name)))
+        if (!is_null($postValue = arr::get_string($_POST, $name)))
         {
             return $postValue;
         }
