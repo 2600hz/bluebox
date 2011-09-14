@@ -312,6 +312,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 			$lists=array($lists);
 		}
 		$filename=$xml;
+		if (!file_exists($filename)) {
+			throw new Exception("Could not find file $filename");
+		}
 		$xml=new XMLReader();
 		$xml->open($filename);
 		$assoc=$this->_xmlread($xml,$lists);
