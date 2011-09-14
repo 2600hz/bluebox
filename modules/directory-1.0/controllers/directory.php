@@ -320,7 +320,8 @@ class Directory_Controller extends Bluebox_Controller
 			$status['ext'][$row['cid_num']]='InUse';
 			$conf[$row['cid_num']]=$row['dest']; # Remember the conference they are in for later.
 		# Otherwise they are just busy.
-		} else {
+		# Erm - some calls seem to be getting stuck as "hangup"?
+		} elseif ($row['callstate']!='HANGUP') {
 			$status['ext'][$row['cid_num']]='InUse';
 		}
 	}
