@@ -153,6 +153,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 
 
 	$lineinfo=unserialize($configfileinfo['endpoint']->lines);
+	if ($lineinfo===false) {
+		$lineinfo=array();
+	}
 	$lines=array();
 	for ($index=1; $index<=$configfileinfo['provisioning']['lines']; $index++) {
 		if ((!array_key_exists($index,$lineinfo)) or (empty($lineinfo[$index]['sip']))) {
@@ -175,15 +178,16 @@ class EndpointManager_Controller extends Bluebox_Controller
 				'subscribe_mwi' => 1,
 				'user_host'=>$device['User']['Location']['domain'],
 			);
-        		$dns = $device['User']['Location']['domain'];
 		}
 		
 	}
 	$provisioner_lib->provisioning_type='http';
 	# Note: slashes are forward slashes in windows too, because this is in web-space.
 	$provisioner_lib->provisioning_path=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config';
-	$provisioner_lib->server[1]['ip'] = $dns;
-	$provisioner_lib->server[1]['port'] = 5060;
+
+	if (!isset($provisioner_lib->server[1])) {
+		$provisioner_lib->server[1]=array('ip'=>$configfileinfo['endpoint']['Account']['Location'][0]['domain'],'port'=>5060);
+	}
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
         $provisioner_lib->processor_info = 'Endpoint Manager 1.2 for Blue.Box';
 	$provisioner_lib->prepare_for_generateconfig();
