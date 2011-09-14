@@ -95,8 +95,8 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$default_defaults=array(
 		'global'=>array(
 			'timezone'=>date_default_timezone_get(),
-			'vlan'=>"0",
-			'pcp'=>"5",
+			'vlan_id'=>"0",
+			'vlan_qos'=>"5",
 			'tftppath'=>'/tftpboot',
 		),
 		'snom'=>array(
@@ -146,11 +146,12 @@ class EndpointManager_Controller extends Bluebox_Controller
 
 	$provisioner_lib->DateTimeZone=new DateTimeZone($defaults['global']['timezone']);
 	$provisioner_lib->timezone=$provisioner_lib->DateTimeZone->getOffset(new DateTime());
+	$provisioner_lib->vlan_id=$defaults['global']['vlan_id'];
+	$provisioner_lib->vlan_qos=$defaults['global']['vlan_qos'];
 
 	if (array_key_exists($provisioner_lib->brand_name,$defaults)) {
 		$provisioner_lib->options=array_merge_recursive($defaults[$provisioner_lib->brand_name],$provisioner_lib->options);
 	}
-
 
 	$lineinfo=unserialize($configfileinfo['endpoint']->lines);
 	if ($lineinfo===false) {
@@ -252,7 +253,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 		'Snom'=>array(
 			$this->_autoquestion("snom","300",'$tone_scheme','package[registry][defaults][snom][tone_scheme]','Tone scheme',$defaults['snom']['tone_scheme']),
 			$this->_autoquestion("snom","300",'$http_user','package[registry][defaults][snom][http_user]','HTTP User',$defaults['snom']['http_user']),
-			$this->_autoquestion("snom","300",'$http_pass','package[registry][defaults][snom][http_user]','HTTP Password',$defaults['snom']['http_pass']),
+			$this->_autoquestion("snom","300",'$http_pass','package[registry][defaults][snom][http_pass]','HTTP Password',$defaults['snom']['http_pass']),
 		)
 	);
 	$this->view->additionalquestions="";
