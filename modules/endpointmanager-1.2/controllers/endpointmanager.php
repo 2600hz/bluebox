@@ -97,12 +97,15 @@ class EndpointManager_Controller extends Bluebox_Controller
 			'timezone'=>date_default_timezone_get(),
 			'vlan_id'=>"0",
 			'vlan_qos'=>"5",
-			'tftppath'=>'/tftpboot',
+			'ntpserver'=>'ntp.ubuntu.com',
 		),
 		'snom'=>array(
 			'tone_scheme'=>'USA',
 			'http_user'=>'admin',
 			'http_pass'=>'snom',
+			'time_24_format'=>'off',
+			'date_us_format'=>'on',
+			'admin_pass'=>'1234',
 		),
 	);
 	$flag=0;
@@ -195,7 +198,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 	print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
 	exit;
     }
-   private function _autoquestion($make,$model,$templatevariable,$forvariable,$caption,$currentvalue=NULL) {
+   private function _autoquestion($make,$model,$templatevariable,$forvariable,$currentvalue=NULL) {
 	$prov=$this->_getprovisioningdata();
 	$structures=$prov['phones'][$make][$model]['templates'];
 	while (count($structures)>=1) {
@@ -220,9 +223,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$result='<div class="field">';
 	$result.=form::label(array(
 		'for'=>$forvariable,
-		'hint'=>$item['description'],
+	//	'hint'=>$item['description'],
 	//	'help'=> - from $item['help']?
-		), $caption.':');
+		), $item['description'].':');
 	switch ($item['type']) {
 		case 'input':
 			$result.=form::input($forvariable,$currentvalue);
@@ -251,9 +254,12 @@ class EndpointManager_Controller extends Bluebox_Controller
 
 	$additionalquestions=array(
 		'Snom'=>array(
-			$this->_autoquestion("snom","300",'$tone_scheme','package[registry][defaults][snom][tone_scheme]','Tone scheme',$defaults['snom']['tone_scheme']),
-			$this->_autoquestion("snom","300",'$http_user','package[registry][defaults][snom][http_user]','HTTP User',$defaults['snom']['http_user']),
-			$this->_autoquestion("snom","300",'$http_pass','package[registry][defaults][snom][http_pass]','HTTP Password',$defaults['snom']['http_pass']),
+			$this->_autoquestion("snom","300",'$tone_scheme','package[registry][defaults][snom][tone_scheme]',$defaults['snom']['tone_scheme']),
+			$this->_autoquestion("snom","300",'$http_user','package[registry][defaults][snom][http_user]',$defaults['snom']['http_user']),
+			$this->_autoquestion("snom","300",'$http_pass','package[registry][defaults][snom][http_pass]',$defaults['snom']['http_pass']),
+			$this->_autoquestion("snom","300",'$admin_pass','package[registry][defaults][snom][admin_pass]',$defaults['snom']['admin_pass']),
+			$this->_autoquestion("snom","300",'$time_24_format','package[registry][defaults][snom][time_24_format]',$defaults['snom']['time_24_format']),
+			$this->_autoquestion("snom","300",'$date_us_format','package[registry][defaults][snom][date_us_format]',$defaults['snom']['date_us_format']),
 		)
 	);
 	$this->view->additionalquestions="";
