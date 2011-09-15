@@ -90,8 +90,10 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
                 // Dialplans are a bit different - we don't want to keep anything that is currently in an extension, in the event it's totally changed
                 $xml->deleteChildren();
 
+                $num = str_replace(array('*','+'), array('\*','\+'), $obj['number']); 
+
                 // Check what number they dialed
-                $condition = '/condition[@field="destination_number"]{@expression="^' .$obj['number'] .'$"}';
+                $condition = '/condition[@field="destination_number"]{@expression="^' . $num .'$"}';
 
                 $xml->update($condition .'/action[@application="set"][@data="vm-operator-extension=' .$obj['number'] .'"]');
 
