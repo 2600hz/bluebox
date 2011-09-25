@@ -9,6 +9,12 @@
 </div>
 
 <div id="endpoint_update_form" class="update endpoint">
+<script>
+	models=<?php echo $models_json; ?>;
+	function update_models(brand) {
+		document.getElementById('model_select').innerHTML="<option value=''>Select</option>"+models[brand];
+	}
+</script>
 
 	<?php echo form::open(); ?>
 	<?php echo form::open_section('Endpoint information'); ?>
@@ -40,10 +46,20 @@
 	<div class="field">
 	<?php
 		echo form::label(array(
-			'for'=>'brandandmodel',
-			'hint'=>'Manufacturer and model of this phone',
-			), 'Make And Model:');
-		echo $brandandmodelselect;
+			'for'=>'endpoint[brand]',
+			'hint'=>'Manufacturer of this phone',
+			), 'Make:');
+		echo $brandnameselect;
+	?>
+	</div>
+		
+	<div class="field">
+	<?php
+		echo form::label(array(
+			'for'=>'endpoint[model]',
+			'hint'=>'Model of this phone',
+			), 'Model:');
+		echo "<select id=model_select name=endpoint[model] >$modelselect</select>\n";
 	?>
 	</div>
 		
