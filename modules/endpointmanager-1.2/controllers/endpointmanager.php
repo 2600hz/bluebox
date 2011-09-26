@@ -530,5 +530,39 @@ class EndpointManager_Controller extends Bluebox_Controller
 	parent::pre_save($object);
 
    }
+    protected function updateOnSubmit($base)
+    {
+	// Parts copied from parent::updateOnSubmit
+        if ($action = $this->submitted())
+        {
+            Event::run('bluebox.updateOnSubmit', $action);
+
+            if ($action == self::SUBMIT_CONFIRM) {
+		if (!isset($_POST['dontsave']) || ($_POST['dontsave']!='true')) {
+			if ($this->formSave($base)) {
+				$this->returnQtipAjaxForm($base);
+				url::redirect(Router_Core::$controller);
+			}
+		} else { // This else clause is copied from parent::formSave().
+		        if (get_parent_class($base) == 'Bluebox_Record') {
+				$baseClass = get_class($base);
+			} else {
+				$baseClass = get_parent_class($base);
+			}
+
+		        // Import any post vars with the key of this model into the object
+		        $formData = $this->input->post(strtolower($baseClass), array());
+	
+		        $base->fromArray($formData);
+		}
+            } 
+            else if ($action == self::SUBMIT_DENY)
+            {
+                $this->exitQtipAjaxForm();
+
+                url::redirect(Router_Core::$controller);
+            }
+        }
+    }
 
 }

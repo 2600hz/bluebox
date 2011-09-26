@@ -24,10 +24,15 @@
 			update_models(brand);
 		}
 	}
+	function update_model() {
+		document.getElementById('dontsave_hidden').value='true';
+		document.getElementById('endpointmanager_edit').submit();
+	}
 </script>
 
 	<?php echo form::open(); ?>
 	<?php echo form::open_section('Endpoint information'); ?>
+	<?php echo form::hidden('dontsave','false'); ?>
 
 	<div class="field">
 	<?php 
@@ -69,7 +74,7 @@
 			'for'=>'endpoint[model]',
 			'hint'=>'Model of this phone',
 			), 'Model:');
-		echo "<select id=model_select name=endpoint[model] >$modelselect</select>\n";
+		echo "<select id=model_select onchange='update_model();' name=endpoint[model] >$modelselect</select>\n";
 	?>
 	</div>
 		
