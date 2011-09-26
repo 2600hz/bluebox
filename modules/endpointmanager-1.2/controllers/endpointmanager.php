@@ -456,7 +456,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$brandandmodel=$this->endpoint['brand']."|".$this->endpoint['model'];
 	$prov=$this->_getprovisioningdata();
 	$models=array();
-	$brandname="<select name='endpoint[brand]' onchange='update_models(this.value)'>";
+	$brandname="<select id='brand_select' name='endpoint[brand]' onchange='update_models(this.value)'>";
 	if (is_null($this->endpoint['brand'])) {
 		$brandname.="<option value=''>Select</option>";
 	}
@@ -512,8 +512,8 @@ class EndpointManager_Controller extends Bluebox_Controller
 	} else {
 		$this->view->models=null;
 	}
-	$this->view->oui=$prov['oui'];
    }
+
    protected function pre_save(&$object) {
 	if (get_class($object)!='Endpoint') {return;}
 	$mac=strtolower(str_replace(array(' ',':','_','\\','/'),array(),$object['mac']));

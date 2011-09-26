@@ -10,9 +10,19 @@
 
 <div id="endpoint_update_form" class="update endpoint">
 <script>
+	oui=<?php echo $oui_json; ?>;
 	models=<?php echo $models_json; ?>;
 	function update_models(brand) {
 		document.getElementById('model_select').innerHTML="<option value=''>Select</option>"+models[brand];
+	}
+	function check_oui(input) {
+		// Convert mac to caps, remove non-mac characters (e.g. :), and get the first 6 characters - the OUI.
+		brand=oui[input.value.toUpperCase().replace(/[^\dA-F]/g,'').substr(0,6)];
+		select=document.getElementById('brand_select');
+		if ((brand!=null) && (brand!=select.value)) {
+			select.value=brand;
+			update_models(brand);
+		}
 	}
 </script>
 
@@ -39,7 +49,7 @@
 			'hint'=>'Network identifier this endpoint',
 			'help'=>'This is a code, made up of numbers and letters a-f, often written underneat the phone. It is 12 characters long, and may have colons between pairs of characters.'
 			), 'Endpoint MAC address:');
-		echo form::input('endpoint[mac]');
+		echo form::input('endpoint[mac]',NULL,'onkeyup="check_oui(this)" onchange="check_oui(this)"');
 	?>
 	</div>
 		
@@ -64,7 +74,7 @@
 	</div>
 		
 	<?php echo form::close_section(); ?>
-
+	<div id='model_settings'>
 	<?php if (!is_null($models)) { ?>
 
 	<?php echo form::open_section('Lines'); ?>
@@ -103,6 +113,7 @@
 
 	<?php echo form::close_section(); ?>
 	<?php } ?>
+	</div>
 
 	<?php echo form::close(TRUE); ?>
 
