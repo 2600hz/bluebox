@@ -82,7 +82,10 @@ class EndpointManager_Controller extends Bluebox_Controller
 		return $matches[0];
 	}
 	if (count($matches)==0) {
-		throw new Exception("Could not find config file $configfile");
+		//throw new Exception("Could not find config file $configfile");
+                //Throw 404, don't throw kohana error message, phones expecting firmware get html and get confused..or crash
+                header("HTTP/1.0 404 Not Found");
+                die();
 	}
 	# TODO - if there are multiple possibilities, all with the same digest, which do not require per-phone settings, we could call it a success.
 	throw new Exception("Multiple possibilities for file $configfile");
@@ -132,13 +135,27 @@ class EndpointManager_Controller extends Bluebox_Controller
     public function config ()
     {
 	$file=implode(DIRECTORY_SEPARATOR,func_get_args());
+        //die($file);
 	$debug=array_key_exists('debug',$_REQUEST);
+        
+        require_once(dirname(dirname(__FILE__)).'/libraries/endpoint/base.php');
+        
+        $data = Provisioner_Globals::dynamic_global_files($file,dirname(dirname(__FILE__)).'/firmwares/','http://'.$_SERVER["SERVER_ADDR"].Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config/');
+        if($data !== FALSE) {
+            print $data;
+            exit;
+        }
+        
 	$configfileinfo=$this->_identify_configfile($file,$debug);
 
 	if (!array_key_exists('endpoint',$configfileinfo)) {
 		# TODO - if there is no endpoint, there may still be enough data to serve the config. We know the filename, model, family, and other info.
-		throw new Exception("Could not work out which endpoint the file belongs to");
+		//throw new Exception("Could not work out which endpoint the file belongs to");
+                //Please don't send kohana 404s it serisouly confuses phones when they expect firmwares (polycom) but get html.
+                header("HTTP/1.0 404 Not Found");
+                die();
 	}
+        
         $class = "endpoint_" . $configfileinfo["possibility"]["make"] . "_" . $configfileinfo["provisioning"]["family"] . '_phone';
 	$provisioner_lib = new $class();
 	$provisioner_lib->options=array();
