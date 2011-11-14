@@ -354,6 +354,9 @@ class EndpointManager_Controller extends Bluebox_Controller
    }
 
    private function _getprovisioningdata() {
+	# This makes an OUI case-insensitive, in a regex.
+	$repl=array('A'=>'[aA]','B'=>'[bB]','C'=>'[cC]','D'=>'[dD]','E'=>'[eE]','F'=>'[fF]');
+	
 	# Note: $this->privateprovdata is PRIVATE to this function - do not use it directly. If you want the data, call this function.
 	if (property_exists($this,'privateprovdata')) {
 		return $this->privateprovdata;
@@ -369,9 +372,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$masterxml=$this->_xmlread($xmlbase."master.xml",array('brands'));
 	foreach ($masterxml['data']['brands'] AS $brand) {
 		$data['phones'][$brand["directory"]]=array();
-		$brandxml=$this->_xmlread("$xmlbase$brand[directory]/brand_data.xml",array('family','oui_list'));
-		foreach ($brandxml['data']['brands']['oui_list'] AS $oui) {
-			$data['oui'][$oui['oui']]=$brand["directory"];
+		$brandxml=$this->_xmlread("$xmlbase$brand[directory]/brand_data.xml",array('family','oui'));
+		foreach ($brandxml['data']['brands']['oui_list']['oui'] AS $oui) {
+			$data['oui'][$oui]=$brand["directory"];
 		}
 		foreach ($brandxml['data']['brands']['family_list']['family'] AS $family) {
 			$templates=array(); # $templates[$templatename]
@@ -387,9 +390,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 				$parse=(strpos($contents,'{')!==FALSE);
 				$digest=md5($parse);
 				if (strpos($munged_conf,'\$mac')!==FALSE) {
-					foreach ($brandxml['data']['brands']['oui_list'] AS $oui) {
+					foreach ($brandxml['data']['brands']['oui_list']['oui'] AS $oui) {
 						$data['files'][]=array(
-							"regex"=>str_replace('\$mac',"(".$oui['oui']."[\da-f]{6})",$munged_conf),
+							"regex"=>str_replace('\$mac',"(".str_replace(array_keys($repl),array_values($repl),strtoupper($oui))."[\da-fA-F]{6})",$munged_conf),
 							"fields"=>$fields[1],
 							"makename"=>$brand["name"],
 							"make"=>$brand["directory"],
@@ -449,24 +452,40 @@ class EndpointManager_Controller extends Bluebox_Controller
    protected function prepareUpdateView($baseModel = NULL) {
 	parent::prepareUpdateView($baseModel);
 	if (($baseModel!='Endpoint') && (!is_null($baseModel))) { return; }
+
 	$brandandmodel=$this->endpoint['brand']."|".$this->endpoint['model'];
 	$prov=$this->_getprovisioningdata();
-	# Note: this is not endpoint[brandandmodel], because it gets split into two fields in pre_save.
-	$select="<select name='brandandmodel' class='endpoint_brandandmodel_selector'>\n";
+	$models=array();
+	$brandname="<select id='brand_select' name='endpoint[brand]' onchange='update_models(this.value)'>";
+	if (is_null($this->endpoint['brand'])) {
+		$brandname.="<option value=''>Select</option>";
+	}
 	foreach ($prov['phones'] AS $brand=>$branddata) {
 		$modeldata=array_values($branddata);
-		$select.="\t<optgroup label='".$modeldata[0]['makename']."'>\n";
-		foreach ($branddata AS $model=>$modeldata) {
-			if ($brandandmodel=="$brand|$model") {
-				$select.="\t\t<option selected value='$brand|$model'>$modeldata[makename] $model</option>\n";
+		if ($this->endpoint['brand']==$brand) {
+			$selected="selected";
+		} else {
+			$selected="";
+		}
+		$brandname.="\t<option value='$brand' $selected>".$modeldata[0]["makename"]."</option>\n";
+		$models[$brand]='';
+		foreach (array_keys($branddata) AS $model) {
+			if ($this->endpoint['model']==$model) {
+				$models[$brand].="<option selected>$model</option>";
 			} else {
-				$select.="\t\t<option value='$brand|$model'>$modeldata[makename] $model</option>\n";
+				$models[$brand].="<option>$model</option>";
 			}
 		}
-		$select.="\t</optgroup>\n";
 	}
-	$select.="</select>\n";
-	$this->view->brandandmodelselect=$select;
+	#print_r($models);
+	$this->view->brandnameselect=$brandname."</select>";
+	$this->view->oui_json=json_encode($prov['oui']);
+	$this->view->models_json=json_encode($models);
+	if (is_null($this->endpoint['brand'])) {
+		$this->view->modelselect="<option value=''>Select</select>";
+	} else {
+		$this->view->modelselect=$models[$this->endpoint['brand']];
+	}
 	$linedata=unserialize($this->endpoint['lines']);
 	if (!is_array($linedata)) {
 		$linedata=array();
@@ -474,7 +493,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 
 	$brand=$this->endpoint['brand'];
 	$model=$this->endpoint['model'];
-	if (isset($brand) && isset($model)) {
+	if (($brand!='') && ($model!='')) {
 		$this->view->models=$prov['phones'][$brand][$model];
 		$deviceSelect=array();
 		foreach (Doctrine::getTable("Device")->findAll(Doctrine::HYDRATE_ARRAY) AS $device) {
@@ -493,8 +512,8 @@ class EndpointManager_Controller extends Bluebox_Controller
 	} else {
 		$this->view->models=null;
 	}
-	$this->view->oui=$prov['oui'];
    }
+
    protected function pre_save(&$object) {
 	if (get_class($object)!='Endpoint') {return;}
 	$mac=strtolower(str_replace(array(' ',':','_','\\','/'),array(),$object['mac']));
@@ -505,14 +524,45 @@ class EndpointManager_Controller extends Bluebox_Controller
 		throw new Exception("Invalid mac address - it should contain only digits (0-9), letters a-f, and optionally colons.");
 	}
 	$object['mac']=$mac;
-	$brandandmodel=explode("|",$_POST['brandandmodel']);
-	$object['brand']=$brandandmodel[0];
-	$object['model']=$brandandmodel[1];
 	if (array_key_exists('lines',$_POST)) {
 		$object['lines']=serialize($_POST['lines']);;
 	}
 	parent::pre_save($object);
 
    }
+    protected function updateOnSubmit($base)
+    {
+	// Parts copied from parent::updateOnSubmit
+        if ($action = $this->submitted())
+        {
+            Event::run('bluebox.updateOnSubmit', $action);
+
+            if ($action == self::SUBMIT_CONFIRM) {
+		if (!isset($_POST['dontsave']) || ($_POST['dontsave']!='true')) {
+			if ($this->formSave($base)) {
+				$this->returnQtipAjaxForm($base);
+				url::redirect(Router_Core::$controller);
+			}
+		} else { // This else clause is copied from parent::formSave().
+		        if (get_parent_class($base) == 'Bluebox_Record') {
+				$baseClass = get_class($base);
+			} else {
+				$baseClass = get_parent_class($base);
+			}
+
+		        // Import any post vars with the key of this model into the object
+		        $formData = $this->input->post(strtolower($baseClass), array());
+	
+		        $base->fromArray($formData);
+		}
+            } 
+            else if ($action == self::SUBMIT_DENY)
+            {
+                $this->exitQtipAjaxForm();
+
+                url::redirect(Router_Core::$controller);
+            }
+        }
+    }
 
 }
