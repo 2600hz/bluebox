@@ -26,7 +26,11 @@
 	}
 	function update_model() {
 		document.getElementById('dontsave_hidden').value='true';
-		document.getElementById('endpointmanager_edit').submit();
+		form=document.getElementById('endpointmanager_edit');
+		if (form==null) {
+			form=document.getElementById('endpointmanager_create');
+		}
+		form.submit();
 	}
 </script>
 
