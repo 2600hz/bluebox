@@ -296,6 +296,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 
    public function index() 
    {
+	
 	$this->template->content = new View('generic/grid');
 	// Setup the base grid object
 	$grid = jgrid::grid($this->baseModel, array(
@@ -325,7 +326,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 
         // Produce a grid in the view
         $this->view->grid = $this->grid->produce();
-
+		$this->template->content .= 'Please set your phones or DHCP options to: http://'.$_SERVER["SERVER_ADDR"].preg_replace('/\/index$/i', '/config/', $_SERVER["PHP_SELF"]);
    }
 
    private function _xmlread($xml,$lists=array()) 
