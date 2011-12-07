@@ -24,7 +24,7 @@
 
 	<div class="field">
 	    <?php echo form::label('customfeaturecode[dialplan_code]','Dialplan:'); ?>
-	    <?php echo form::textarea('customfeaturecode[dialplan_code]'); ?>
+	    <?php echo form::textarea(array('name'=>'customfeaturecode[dialplan_code]','cols'=>80,'rows'=>20)); ?>
 	</div>
 
     <?php echo form::close_section(); ?>
