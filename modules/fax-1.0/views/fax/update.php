@@ -200,7 +200,8 @@
         ?>
         </div>
 	<?php
-		echo form::hidden('faxprofile[fxp_id]');
+		if ($mode !== 'create')
+			echo form::hidden('faxprofile[fxp_id]');
         echo form::close_section();
         if (isset($views))
         {

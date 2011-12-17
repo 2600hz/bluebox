@@ -91,10 +91,14 @@ class fax_Controller extends Bluebox_Controller
 					kohana::Log('debug', 'Looking for view ' . $formfile);
 					if (file_exists($formfile))
 					{
-						kohana::Log('debug', 'View file found.');
-						$faxprofobj = Doctrine::getTable('FaxProfile')->find($faxprof['fxp_id']);
-						
 						$featureFormView = new View($packageobj->name . '/' . $faxdisp['fxd_name']);
+						kohana::Log('debug', 'View file found.');
+
+						if (isset($faxprof['fxp_id']) && !empty($faxprof['fxp_id']) && $faxprof['fxp_id'] != '')
+							$faxprofobj = Doctrine::getTable('FaxProfile')->find($faxprof['fxp_id']);
+						else 
+							$faxprofobj = new FaxProfile();	
+						
 						$featureFormView->set_global('faxprofile', $faxprofobj);
 						echo $featureFormView->render(TRUE);
 					} else {
