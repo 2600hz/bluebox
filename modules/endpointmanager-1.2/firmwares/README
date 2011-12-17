@@ -1,0 +1,4 @@
+Put firmwares or other random files that the phone will want to look for
+Examples:
+-bootrom.ld
+-contacts/<mac>.xml

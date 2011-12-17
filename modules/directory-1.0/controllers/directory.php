@@ -123,8 +123,8 @@ class Directory_Controller extends Bluebox_Controller
 	$level=0;
 	$branches='';
 	foreach (Doctrine_Query::create()->select("g.grouping_id,g.name,g.level")->from("Grouping g")->where("g.level>0")->orderBy("g.lft")->execute() AS $branch) {
-		if ($branch["level"]<$level) {
-			$branches.=str_repeat("</div>",$level-$branch["level"]);
+		if ($branch["level"]<=$level) {
+			$branches.=str_repeat("</div>",$level-$branch["level"]+1);
 		}
 		$level=$branch["level"];
 		$branches.="<h$level>".$branch["name"]."</h$level><div class='grouping'>";
@@ -320,7 +320,8 @@ class Directory_Controller extends Bluebox_Controller
 			$status['ext'][$row['cid_num']]='InUse';
 			$conf[$row['cid_num']]=$row['dest']; # Remember the conference they are in for later.
 		# Otherwise they are just busy.
-		} else {
+		# Erm - some calls seem to be getting stuck as "hangup"?
+		} elseif ($row['callstate']!='HANGUP') {
 			$status['ext'][$row['cid_num']]='InUse';
 		}
 	}
