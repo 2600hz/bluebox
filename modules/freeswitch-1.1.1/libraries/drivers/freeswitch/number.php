@@ -45,12 +45,12 @@ class FreeSwitch_Number_Driver extends FreeSwitch_Base_Driver
             foreach ($obj->NumberContext as $context)
             {
                 // Add any "global" hooks that come before the processing of any numbers (this is per context)
-                dialplan::start('context_' .$context['context_id']);
+                dialplan::start('context_' .$context['context_id'], $context->Number);
 
                 FreeSwitch_NumberContext_Driver::set($context);
 
                 // Add any "global" hooks that come after the processing of any numbers (this is per context)
-                dialplan::end('context_' .$context['context_id']);
+                dialplan::end('context_' .$context['context_id'], $context->Number);
 
                 $assignedContexts[] = $context['context_id'];
             }

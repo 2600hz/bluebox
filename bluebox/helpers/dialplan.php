@@ -78,40 +78,40 @@ class dialplan
      * This function should be called when you want to start/initialize a context in a dialplan
      * @param string $context Name of Context
      */
-    public static function start($context = NULL)
+    public static function start($context = NULL, $obj = NULL)
     {
         $driver = Telephony::getDriver();
 
         // 1. Network setup is first
-        $driver->network($context);
+        $driver->network($context, $obj);
 
         // 2. Now, let's condition any variables or settings
-        $driver->conditioning($context);
+        $driver->conditioning($context, $obj);
 
         // 3. Make any pre-routing decisions (blacklist, virtual numbers, etc.)
-        $driver->preRoute($context);
+        $driver->preRoute($context, $obj);
 
         // 4. Make any post-routing decisions (after-hours, etc.)
-        $driver->postRoute($context);
+        $driver->postRoute($context, $obj);
 
         // 5. Do any pre-answer work (set ring type, moh, etc.)
-        $driver->preAnswer($context);
+        $driver->preAnswer($context, $obj);
 
         // 6. Do any post-answer tasks, like forced greetings ("your call may be monitored"), bong tones, etc.
-        $driver->postAnswer($context);
+        $driver->postAnswer($context, $obj);
     }
 
     /**
      * This function should be called when you want to end a context in a dialplan
      * @param string $context Context to end
      */
-    public static function end($context = FALSE)
+    public static function end($context = FALSE, $obj = NULL)
     {
         $driver = Telephony::getDriver();
 
         // 7. Any final things to do? Play a goodbye message? A survey? Write a special log? etc.
-        $driver->postExecute($context);
+        $driver->postExecute($context, $obj);
 
-        $driver->catchAll($context);
+        $driver->catchAll($context, $obj);
     }
 }

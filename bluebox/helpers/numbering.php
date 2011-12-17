@@ -100,7 +100,7 @@ class numbering extends form
         $selected = array_flip($options['Assigned']);
 
         // see if there are any posts for this dropdown
-        if($post = arr::parse_str($data['name'], $_POST))
+        if($post = parse_str($data['name'], $_POST))
         {
             $selected += $post;
         }

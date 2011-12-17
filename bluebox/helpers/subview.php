@@ -70,6 +70,16 @@ class subview
                         kohana::log('debug', 'Not rendering view due to qtipAjaxForm request');
                         continue;
                     }
+                    
+                    if (isset($renderConditions['mode']))
+                    {
+                    	if ( (!is_array($renderConditions['mode'])))
+                    		$renderConditions['mode'] = array($renderConditions['mode']);
+                    		
+                    	# get mode of controller and check in renderConditions['renderMode] to see if it exists
+                    	if (!in_array(Bluebox_Controller::getControllerMode(), $renderConditions['mode']))
+                    		continue;
+                    }
 
                 }
 

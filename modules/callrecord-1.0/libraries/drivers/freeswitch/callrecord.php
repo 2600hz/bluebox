@@ -80,7 +80,7 @@ class FreeSwitch_CallRecord_Driver extends FreeSwitch_Base_Driver
         <action application="set" data="RECORD_DATE=\${strftime(%Y-%m-%d %H:%M)}"/>
         <action application="set" data="RECORD_STEREO=true"/>
       </condition>
-
+	
 XML;
 
         $xml->replaceWithXml($content);
@@ -100,7 +100,7 @@ XML;
       <condition field="\${callrecord_outbound}" expression="^.+$">
         <action application="record_session" data="$filename"/>
       </condition>
-
+    
 XML;
 
         $xml->replaceWithXml($content);
