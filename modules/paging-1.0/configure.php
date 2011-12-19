@@ -33,7 +33,8 @@ class paging_1_0_0_Configure extends Bluebox_Configure
    	   		'enter-sound' => 'tone_stream://%(200,0,500,600,700)',
     		'exit-sound' => '',
     		'tts-engine' => '',
-    		'tts-voice' => ''
+    		'tts-voice' => '',
+    		'comfort-noise' => false
     	);
   	   	$confobj->save();
   	   	
@@ -45,7 +46,8 @@ class paging_1_0_0_Configure extends Bluebox_Configure
     		'exit-sound' => '',
     		'tts-engine' => '',
     		'tts-voice' => '',
-    		'member-flags' => 'mute'
+    		'member-flags' => 'mute',
+    		'comfort-noise' => false
     	);
    	   	$confobj->save();
   	   	
