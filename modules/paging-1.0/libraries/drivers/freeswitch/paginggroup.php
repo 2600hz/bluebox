@@ -26,9 +26,11 @@ class FreeSwitch_PagingGroup_Driver extends FreeSwitch_Base_Driver
         <action application="set" data="sip_exclude_contact=${network_addr}"/>
         ';
         if ($destination['pgg_type'] === 'page')
-        	$xmlText = '        <action application="set" data="conference_auto_outcall_flags=mute"/>';
+        	$xmlText .= '        <action application="set" data="conference_auto_outcall_flags=mute"/>
+        	';
         else
-        	$xmlText = '        <action application="set" data="conference_auto_outcall_flags=none"/>';
+        	$xmlText .= '        <action application="set" data="conference_auto_outcall_flags=none"/>
+        	';
         
         foreach ($destination['pgg_device_ids'] as $deviceid)
         {
