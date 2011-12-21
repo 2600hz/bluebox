@@ -23,6 +23,8 @@ class FreeSwitch_PagingGroup_Driver extends FreeSwitch_Base_Driver
         <action application="set" data="conference_auto_outcall_caller_id_name=${effective_caller_id_name}"/>
         <action application="set" data="conference_auto_outcall_caller_id_number=${effective_caller_id_number}"/>
         <action application="set" data="conference_auto_outcall_timeout=3"/>
+		<action application="set" data="conference_auto_outcall_prefix={sip_auto_answer=true}"/>
+		<action application="set" data="sip_exclude_contact=${network_addr}"/>
         ';
 
         foreach ($destination['pgg_device_ids'] as $deviceid)
