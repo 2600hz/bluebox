@@ -30,11 +30,20 @@ class paging_1_0_0_Configure extends Bluebox_Configure
     	$confobj->name = 'Intercom';
     	$confobj->profile= array(
      		'energy-level' => '0',
-   	   		'enter-sound' => 'tone_stream://%(200,0,500,600,700)',
+   	   		'enter-sound' => 'tone_stream://%(800,0,500,600,700)',
     		'exit-sound' => '',
     		'tts-engine' => '',
     		'tts-voice' => '',
-    		'comfort-noise' => false
+    		'comfort-noise' => 1,
+    		'kicked-sound' => '',
+    		'locked-sound' => '',
+    		'is-locked-sound' => '',
+    		'is-unlocked-sound' => '',
+    		'muted-sound' => '',
+    		'unmuted-sound' => '',
+    		'caller-controls' => 'none',
+    		'pin-sound' => '',
+    		'bad-pin-sound' => ''
     	);
   	   	$confobj->save();
   	   	
@@ -42,13 +51,21 @@ class paging_1_0_0_Configure extends Bluebox_Configure
     	$confobj->name = 'Paging';
     	$confobj->profile= array(
      		'energy-level' => '0',
-   	   		'enter-sound' => 'tone_stream://%(200,0,500,600,700)',
+   	   		'enter-sound' => 'tone_stream://%(800,0,500,600,700)',
     		'exit-sound' => '',
     		'tts-engine' => '',
     		'tts-voice' => '',
-    		'member-flags' => 'mute',
-    		'comfort-noise' => false
-    	);
+    		'comfort-noise' => 1,
+    		'kicked-sound' => '',
+    		'locked-sound' => '',
+    		'is-locked-sound' => '',
+    		'is-unlocked-sound' => '',
+    		'muted-sound' => '',
+    		'unmuted-sound' => '',
+    		'caller-controls' => 'none',
+    		'pin-sound' => '',
+    		'bad-pin-sound' => ''
+       	);
    	   	$confobj->save();
   	   	
   	    message::success("Default Conference profiles created...");

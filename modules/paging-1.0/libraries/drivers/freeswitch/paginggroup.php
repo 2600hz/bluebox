@@ -19,14 +19,17 @@ class FreeSwitch_PagingGroup_Driver extends FreeSwitch_Base_Driver
         $xmlText = '        
         <action application="set" data="api_hangup_hook=conference ' . $destination['pgg_id'] . ' kick all"/>
         <action application="answer"/>
-        <action application="export" data="sip_invite_params=intercom=true"/>
         <action application="set" data="conference_auto_outcall_caller_id_name=${effective_caller_id_name}"/>
         <action application="set" data="conference_auto_outcall_caller_id_number=${effective_caller_id_number}"/>
         <action application="set" data="conference_auto_outcall_timeout=3"/>
-		<action application="set" data="conference_auto_outcall_prefix={sip_auto_answer=true}"/>
-		<action application="set" data="sip_exclude_contact=${network_addr}"/>
+        <action application="set" data="conference_auto_outcall_prefix={sip_auto_answer=true}"/>
+        <action application="set" data="sip_exclude_contact=${network_addr}"/>
         ';
-
+        if ($destination['pgg_type'] === 'page')
+        	$xmlText = '        <action application="set" data="conference_auto_outcall_flags=mute"/>';
+        else
+        	$xmlText = '        <action application="set" data="conference_auto_outcall_flags=none"/>';
+        
         foreach ($destination['pgg_device_ids'] as $deviceid)
         {
         	$deviceobj = Doctrine::getTable('Device')->FindOneBy('device_id', $deviceid);
