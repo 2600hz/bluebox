@@ -30,7 +30,7 @@ class paging_1_0_0_Configure extends Bluebox_Configure
     	$confobj->name = 'Intercom';
     	$confobj->profile= array(
      		'energy-level' => '0',
-   	   		'enter-sound' => 'tone_stream://%(800,0,500,600,700)',
+   	   		'enter-sound' => 'tone_stream://%(500,500,500,600,700);loops=2',
     		'exit-sound' => '',
     		'tts-engine' => '',
     		'tts-voice' => '',
@@ -51,7 +51,7 @@ class paging_1_0_0_Configure extends Bluebox_Configure
     	$confobj->name = 'Paging';
     	$confobj->profile= array(
      		'energy-level' => '0',
-   	   		'enter-sound' => 'tone_stream://%(800,0,500,600,700)',
+   	   		'enter-sound' => 'tone_stream://%(500,500,500,600,700);loops=2',
     		'exit-sound' => '',
     		'tts-engine' => '',
     		'tts-voice' => '',
@@ -75,9 +75,15 @@ class paging_1_0_0_Configure extends Bluebox_Configure
     {
     	$confobj = Doctrine::getTable('Conference')->findOneByName('Intercom');
     	if ($confobj)
+    	{
     		$confobj->delete();
+    		$confobj->save();
+    	}
     	$confobj = Doctrine::getTable('Conference')->findOneByName('Paging');
     	if ($confobj)
+    	{
     		$confobj->delete();
+    		$confobj->save();
+    	}
     }
 }

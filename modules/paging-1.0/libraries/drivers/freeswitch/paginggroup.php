@@ -37,7 +37,7 @@ class FreeSwitch_PagingGroup_Driver extends FreeSwitch_Base_Driver
         	$deviceobj = Doctrine::getTable('Device')->FindOneBy('device_id', $deviceid);
         	Kohana::log('debug', print_r($deviceobj['registry'], true));
         	$xmlText .= '<action application="conference_set_auto_outcall" data="user/' . $deviceobj->plugins['sip']['username'] . '@$${location_' . $deviceobj->User->location_id . '}"/>
-	';
+        	';
         }
         $conftype = ($destination['pgg_type'] == 'page' ? 'Paging' : 'Intercom');
         $confobj = Doctrine::getTable('Conference')->findOneByName($conftype);
