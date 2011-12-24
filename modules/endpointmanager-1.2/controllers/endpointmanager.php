@@ -6,89 +6,58 @@ class EndpointManager_Controller extends Bluebox_Controller
     protected $authBypass = array('config');
 
     private function _identify_configfile($configfile,$debug) {
-	$prov=$this->_getprovisioningdata();
-	$matches=array();
-	if ($debug) {
-		print "Searching for config file $configfile\n";
-	}
-	
-	foreach ($prov['files'] AS $index=>$possibility) {
-		if ($debug) {
-			print "Checking $index:\n";
-			print_r($possibility);
-		}
-		if (preg_match('/^'.$possibility['regex'].'$/',$configfile,$args)) {
-			$onematch=array("possibility"=>$possibility);
-			array_shift($args);
-			if (count($args)>0) {
-				$onematch["args"]=array_combine($possibility['fields'],$args);
-			}
-			if (array_key_exists('mac',$onematch['args'])) {
-				$ep=$onematch["endpoint"]=Doctrine::getTable('Endpoint')->findOneBy('mac',$onematch['args']['mac']);
-				if (!is_object($ep)) {
-					throw new Exception("Mac address ".$onematch["args"]["mac"]." is not set up in this system");
-				}
-				if (array_key_exists('phones',$prov) && array_key_exists($ep->brand,$prov['phones']) && array_key_exists($ep->model,$prov['phones'][$ep->brand])) {
-					$onematch['provisioning']=$prov['phones'][$ep->brand][$ep->model];
-				}
-				# If this file does not belong to this make/model, skip it.
-				if (($ep->brand!=$possibility['make']) || ($prov['phones'][$ep->brand][$ep->model]['family']!=$possibility['family'])) {
-					if ($debug) {
-						print "FAIL: Brand or Model doesn't match for endpoint with this mac address\n";
-					}
-					continue;
-				}
-			}
-			# Eliminate possibilities where the string matched as "model" is not a valid model, or the model belongs to another family.
-			if (array_key_exists('model',$onematch['args'])) {
-				if (!array_key_exists($onematch['args']['model'],$prov['phones'][$possibility['make']])) {
-					if ($debug) {
-						print "FAIL: filename refers to a particular model, but this brand does not have that model\n";
-					}
-					continue;
-				}
-				if ($prov['phones'][$possibility['make']][$onematch['args']['model']]['family'] !== $possibility['family']) {
-					if ($debug) {
-						print "FAIL: filename refers to a particular model, but that model is in a different family\n";
-					}
-					continue;
-				}
-				# If there is a model and a mac, and the model doesnt match the model in the mac's endpoint, skip it.
-				if (array_key_exists('endpoint',$onematch)) {
-					if ($onematch['endpoint']->model != $onematch['args']['model']) {
-						if ($debug) {
-							print "FAIL: filename refers to a particular model, but phone with that mac is not that model\n";
-						}
-						continue;
-					}
-				}
-				if (!array_key_exists('provisioning',$onematch)) {
-					if (array_key_exists('phones',$prov) && array_key_exists($possibility['make'],$prov['phones']) && array_key_exists($onematch['args']['model'],$prov['phones'][$possibility['make']])) {
-						$onematch['provisioning']=$prov['phones'][$possibility['make']][$onematch['args']['model']];
-					}
-				}
-			}
-			if ($debug) {
-				print "SUCCESS\n";
-			}
-			array_push($matches,$onematch);
-		} else {
-			if ($debug) {
-				print "FAIL - Regex doesn't match\n";
-			}
-		}
-	}
-	if (count($matches)==1) {
-		return $matches[0];
-	}
-	if (count($matches)==0) {
-		//throw new Exception("Could not find config file $configfile");
-                //Throw 404, don't throw kohana error message, phones expecting firmware get html and get confused..or crash
+        $output = array();
+        
+        $filename = basename($_SERVER["PHP_SELF"]);
+        $strip = str_replace('spa', '', $filename);
+        if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
+        $p = Doctrine::getTable('Endpoint')->findOneBy('mac',$matches[0]);
+            if($p) {
+                $dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . 'endpoint/' . $p->brand;
+                foreach (glob($dir."/*", GLOB_ONLYDIR) as $filename) {
+                    $filename = $filename .'/family_data.json';
+                    if(file_exists($filename)) {
+                        $data = $this->_jsonread($filename);
+                        $f = $this->arraysearchrecursive($p->model, $data, 'model');
+                        if($f !== FALSE) {
+                            $output['family'] = $data['data']['directory'];
+                            $output['brand'] = $p->brand;
+                            $output['mac'] = $p->mac;
+                            $output['model'] = $p->model;
+                            $output['lines'] = $p->lines;
+                            $output['settings'] = $p->settings;
+                            $output['max_lines'] = $data['data']['model_list'][$f[2]]['lines'];
+                            return($output);
+                        }
+                    }
+                }
+            } else {
                 header("HTTP/1.0 404 Not Found");
-                die();
-	}
-	# TODO - if there are multiple possibilities, all with the same digest, which do not require per-phone settings, we could call it a success.
-	throw new Exception("Multiple possibilities for file $configfile");
+                die();            
+            }
+        } else {
+            header("HTTP/1.0 404 Not Found");
+            die();             
+        }
+    }
+    
+    private function arraysearchrecursive($Needle, $Haystack, $NeedleKey="", $Strict=false, $Path=array()) {
+        if (!is_array($Haystack))
+            return false;
+        foreach ($Haystack as $Key => $Val) {
+            if (is_array($Val) &&
+                    $SubPath = $this->arraysearchrecursive($Needle, $Val, $NeedleKey, $Strict, $Path)) {
+                $Path = array_merge($Path, Array($Key), $SubPath);
+                return $Path;
+            } elseif ((!$Strict && $Val == $Needle &&
+                    $Key == (strlen($NeedleKey) > 0 ? $NeedleKey : $Key)) ||
+                    ($Strict && $Val === $Needle &&
+                    $Key == (strlen($NeedleKey) > 0 ? $NeedleKey : $Key))) {
+                $Path[] = $Key;
+                return $Path;
+            }
+        }
+        return false;
     }
 
     /* 
@@ -147,38 +116,31 @@ class EndpointManager_Controller extends Bluebox_Controller
         }
         
 	$configfileinfo=$this->_identify_configfile($file,$debug);
-
-	if (!array_key_exists('endpoint',$configfileinfo)) {
-		# TODO - if there is no endpoint, there may still be enough data to serve the config. We know the filename, model, family, and other info.
-		//throw new Exception("Could not work out which endpoint the file belongs to");
-                //Please don't send kohana 404s it serisouly confuses phones when they expect firmwares (polycom) but get html.
-                header("HTTP/1.0 404 Not Found");
-                die();
-	}
         
-        $class = "endpoint_" . $configfileinfo["possibility"]["make"] . "_" . $configfileinfo["provisioning"]["family"] . '_phone';
+        $class = "endpoint_" . $configfileinfo["brand"] . "_" . $configfileinfo["family"] . '_phone';
 	$provisioner_lib = new $class();
 	$provisioner_lib->options=array();
-	foreach (array('mac','model') AS $attr) {
-		$provisioner_lib->$attr=$configfileinfo['endpoint'][$attr];
-	}
+
 	$defaults = $this->_get_defaults();
 
 	$provisioner_lib->DateTimeZone=new DateTimeZone($defaults['global']['timezone']);
-	$provisioner_lib->timezone=$provisioner_lib->DateTimeZone->getOffset(new DateTime());
-	$provisioner_lib->vlan_id=$defaults['global']['vlan_id'];
-	$provisioner_lib->vlan_qos=$defaults['global']['vlan_qos'];
 
+        $provisioner_lib->brand_name = $configfileinfo["brand"];
+        $provisioner_lib->family_line = $configfileinfo["family"];
+        $provisioner_lib->model = $configfileinfo["model"];
+        
+        $provisioner_lib->mac = $configfileinfo["mac"];
+        
 	if (array_key_exists($provisioner_lib->brand_name,$defaults)) {
-		$provisioner_lib->options=array_merge_recursive($defaults[$provisioner_lib->brand_name],$provisioner_lib->options);
+		$provisioner_lib->settings=array_merge_recursive($defaults[$provisioner_lib->brand_name],$provisioner_lib->settings);
 	}
 
-	$lineinfo=unserialize($configfileinfo['endpoint']->lines);
+	$lineinfo=unserialize($configfileinfo['lines']);
 	if ($lineinfo===false) {
 		$lineinfo=array();
 	}
 	$lines=array();
-	for ($index=1; $index<=$configfileinfo['provisioning']['lines']; $index++) {
+	for ($index=1; $index<=$configfileinfo['max_lines']; $index++) {
 		if ((!array_key_exists($index,$lineinfo)) or (empty($lineinfo[$index]['sip']))) {
 			$provisioner_lib->lines[$index]=array();
 		} else {
@@ -191,28 +153,58 @@ class EndpointManager_Controller extends Bluebox_Controller
 				$displayname=$device['plugins']['sip']['username'];
 			}
 	
-			$provisioner_lib->lines[$index]=array(
+			$provisioner_lib->settings['line'][]=array(
 				"line"=>$index,
-				"ext"=>$device['plugins']['sip']['username'],
+				"username"=>$device['plugins']['sip']['username'],
+                            	"authname"=>$device['plugins']['sip']['username'],
 				'displayname' => $displayname,
 				'secret' => $device['plugins']['sip']['password'],
 				'subscribe_mwi' => 1,
-				'user_host'=>$device['User']['Location']['domain'],
+				'server_host'=>$device['User']['Location']['domain'],
+                                'server_port' => 5060,
+                                'server_expires' => 3600,
+                                'backup_server_host' => '',
+                                'backup_server_port' => 5060,
 			);
 		}
 		
 	}
-	$provisioner_lib->provisioning_type='http';
-	# Note: slashes are forward slashes in windows too, because this is in web-space.
-	$provisioner_lib->provisioning_path=Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config';
+        $pp = Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config';
+        $provisioner_lib->settings['provision'] = array(
+            "type" => "dynamic",
+            "protocol" => "http",
+            "path" => $pp,
+            "encryption" => FALSE,
+            );
 
-	if (!isset($provisioner_lib->server[1])) {
-		$provisioner_lib->server[1]=array('ip'=>$configfileinfo['endpoint']['Account']['Location'][0]['domain'],'port'=>5060);
-	}
+        $provisioner_lib->settings['network'] = array(
+            "dhcp" => TRUE,
+            "ipv4" => "",
+            "ipv6" => "",
+            "subnet" => "255.255.255.0",
+            "gateway" => ""
+            );
+        
+        $provisioner_lib->settings['network']['vlan'] = array(
+          "id" => $defaults['global']['vlan_id'],
+          "qos" => $defaults['global']['vlan_qos']
+        );
+        
+        $provisioner_lib->settings['network']['local_port'] = 5060; //here incase we want to randomize it...
+        
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
-        $provisioner_lib->processor_info = 'Endpoint Manager 1.2 for Blue.Box';
-	$provisioner_lib->prepare_for_generateconfig();
-	print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
+        $provisioner_lib->processor_info = 'Endpoint Manager 1.3 for Blue.Box';
+	//$provisioner_lib->prepare_for_generateconfig();
+	//print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
+        
+        $rd = $provisioner_lib->generate_all_files();
+                
+        if(array_key_exists($file, $rd)) {
+            print $rd[$file];
+        } else {
+            header("HTTP/1.0 404 Not Found");
+            die();
+        }
 	exit;
     }
    private function _autoquestion($make,$model,$templatevariable,$forvariable,$currentvalue=NULL) {
@@ -328,46 +320,11 @@ class EndpointManager_Controller extends Bluebox_Controller
 
    }
 
-   private function _xmlread($xml,$lists=array()) 
+   private function _jsonread($json) 
    {
-	if (!is_object($xml)) {
-		if (!is_array($lists)) {
-			$lists=array($lists);
-		}
-		$filename=$xml;
-		if (!file_exists($filename)) {
-			throw new Exception("Could not find file $filename");
-		}
-		$xml=new XMLReader();
-		$xml->open($filename);
-		$assoc=$this->_xmlread($xml,$lists);
-		$xml->close();
-		return $assoc;
-	}
-	$tree = null;
-	while($xml->read()) {
-	        if($xml->nodeType == XMLReader::END_ELEMENT) {
-			return $tree;
-		} else if($xml->nodeType == XMLReader::ELEMENT) {
-			$node = array();
-			$tag=$xml->name;
-
-			if(!$xml->isEmptyElement) {
-				$childs = $this->_xmlread($xml, $lists);
-				if (in_array($tag,$lists)) {
-					$tree[$tag][] = $childs;
-				} else {
-					$tree[$tag] = $childs;
-				}
-			}
-
-		} else if($xml->nodeType == XMLReader::TEXT) {
-			$node = array();
-			$node = $xml->value;
-			$tree = $node;
-		}
-	}
-	return $tree;
+       $data = file_get_contents($json);
+       
+	return json_decode($data,TRUE);
    }
 
    private function _getprovisioningdata() {
@@ -386,16 +343,16 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$data =array('oui'=>array(),'phones'=>array(),"files"=>array());
 	$xmlbase=dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . 'endpoint' . DIRECTORY_SEPARATOR;
 
-	$masterxml=$this->_xmlread($xmlbase."master.xml",array('brands'));
+	$masterxml=$this->_jsonread($xmlbase."master.json");
 	foreach ($masterxml['data']['brands'] AS $brand) {
 		$data['phones'][$brand["directory"]]=array();
-		$brandxml=$this->_xmlread("$xmlbase$brand[directory]/brand_data.xml",array('family','oui'));
-		foreach ($brandxml['data']['brands']['oui_list']['oui'] AS $oui) {
+		$brandxml=$this->_jsonread("$xmlbase$brand[directory]/brand_data.json");
+		foreach ($brandxml['data']['brands']['oui_list'] AS $oui) {
 			$data['oui'][$oui]=$brand["directory"];
 		}
-		foreach ($brandxml['data']['brands']['family_list']['family'] AS $family) {
+		foreach ($brandxml['data']['brands']['family_list'] AS $family) {
 			$templates=array(); # $templates[$templatename]
-			$familyxml=$this->_xmlread("$xmlbase$brand[directory]/$family[directory]/family_data.xml",array("model_list","files"));
+			$familyxml=$this->_jsonread("$xmlbase$brand[directory]/$family[directory]/family_data.json");
 			$seen=array();
 			foreach (explode(",",$familyxml['data']['configuration_files']) AS $conf_file) {
 				preg_match_all('|\$([a-z]+)|',$conf_file,$fields);
@@ -407,7 +364,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 				$parse=(strpos($contents,'{')!==FALSE);
 				$digest=md5($parse);
 				if (strpos($munged_conf,'\$mac')!==FALSE) {
-					foreach ($brandxml['data']['brands']['oui_list']['oui'] AS $oui) {
+					foreach ($brandxml['data']['brands']['oui_list'] AS $oui) {
 						$data['files'][]=array(
 							"regex"=>str_replace('\$mac',"(".str_replace(array_keys($repl),array_values($repl),strtoupper($oui))."[\da-fA-F]{6})",$munged_conf),
 							"fields"=>$fields[1],
@@ -436,7 +393,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 				}
 			}
 			foreach ($familyxml['data']['model_list'] AS $model) {
-				foreach ($model['template_data']['files'] AS &$filename) {
+				foreach ($model['template_data'] AS &$filename) {
 					$filename="$xmlbase$brand[directory]/$family[directory]/$filename";
 				}
 				$data['phones'][$brand["directory"]][$model["model"]]=array(
@@ -448,9 +405,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 					"path"=>"$xmlbase$brand[directory]/$family[directory]/",
 #					"templates"=>$model['template_data']['files'],
 				);
-				foreach ($model['template_data']['files'] AS $file) {
+				foreach ($model['template_data'] AS $file) {
 					if (!array_key_exists($file,$templates)) {
-						$templates[$file]=$this->_xmlread($file,array("item","subcategory","data"));
+						$templates[$file]=$this->_jsonread($file);
 					}
 					$data['phones'][$brand["directory"]][$model["model"]]["templates"][]=$templates[$file]['template_data']['category'];
 				}

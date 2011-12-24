@@ -94,15 +94,9 @@
 
 
 	<div id="line_list" style="border:0 !important;">
-		<ul>
-			<?php 
-				for ($line=1; $line<=$models['lines']; $line++) {
-					print " <li><a href='#line_$line'><span style='font-size: 90%'>Line $line</span></a></li>\n";
-				}
-			?>
-		</ul>
 		<?php 
 			for ($line=1; $line<=$models['lines']; $line++) {
+                                print "<a href='#line_$line'><span style='font-size: 90%'>Line $line</span></a>";
 				print "<div id='line_$line' class='assign_number_tab'>";
 				print '<div class="field">';
 				echo form::label(array(
