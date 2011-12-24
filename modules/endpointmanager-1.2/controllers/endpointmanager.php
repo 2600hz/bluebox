@@ -59,6 +59,12 @@ class EndpointManager_Controller extends Bluebox_Controller
         }
         return false;
     }
+    
+    private function siteURL() {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+        $domainName = $_SERVER['HTTP_HOST'];
+        return $protocol.$domainName;
+    }
 
     /* 
 	This gets function gets the global defaults for all phones. There are some hard-coded default defaults.
@@ -104,8 +110,16 @@ class EndpointManager_Controller extends Bluebox_Controller
     public function config ()
     {
 	$file=implode(DIRECTORY_SEPARATOR,func_get_args());
-        //die($file);
+        if(empty($file)) {
+            echo "Endpoint Manager works!";
+            exit;
+        }
 	$debug=array_key_exists('debug',$_REQUEST);
+        
+        if(!file_exists(dirname(dirname(__FILE__)).'/libraries/endpoint/base.php')) {
+            header('HTTP/1.1 500 Internal Server Error');
+            exit;
+        }
         
         require_once(dirname(dirname(__FILE__)).'/libraries/endpoint/base.php');
         
@@ -169,7 +183,8 @@ class EndpointManager_Controller extends Bluebox_Controller
 		}
 		
 	}
-        $pp = Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config';
+
+        $pp = $this->siteURL().strstr($_SERVER["PHP_SELF"], 'endpointmanager', true).'endpointmanager/config/';
         $provisioner_lib->settings['provision'] = array(
             "type" => "dynamic",
             "protocol" => "http",
@@ -190,6 +205,7 @@ class EndpointManager_Controller extends Bluebox_Controller
           "qos" => $defaults['global']['vlan_qos']
         );
         
+        $provisioner_lib->settings['ntp'] = $defaults['global']['ntpserver'];
         $provisioner_lib->settings['network']['local_port'] = 5060; //here incase we want to randomize it...
         
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
@@ -288,36 +304,51 @@ class EndpointManager_Controller extends Bluebox_Controller
 
    public function index() 
    {
-	$this->template->content = new View('generic/grid');
-	// Setup the base grid object
-	$grid = jgrid::grid($this->baseModel, array(
-                'caption' => 'Endpoints'
-            )
-        );
-	$grid->add('name','Name');
-	$grid->add('mac','MAC',array('key'=>true));
-	$grid->add('brand','Brand');
-	$grid->add('model','Model');
+       if(file_exists(dirname(dirname(__FILE__)).'/libraries/endpoint/master/json')) {
+           $message = "<b>To use Endpoint Manager you must run the commands below as root:</b><br />".
+                   "<b>From this location: </b><br />".
+                   "<i>".$_SERVER['DOCUMENT_ROOT'].dirname(dirname($_SERVER["PHP_SELF"]))."</i><br />".
+                   "<b>Note: They must be run in this order! </b><br />".
+                   "<i>git stash</i><br />".
+                   "<i>git pull</i><br />".
+                   "<i>git stash apply</i><br />".
+                   "<i>git submodule update --init --recursive</i><br />";
+           $this->template->content = $message;
+       } else {
+           $message = "<b>Set your phones/dhcp option 66 to:</b> <i>".$this->siteURL().$_SERVER["PHP_SELF"].'/config/</i><br />'.
+                    '<b>Put Firmwares or other files you wish the phones to retrieve under:</b> <i>'.strstr(__DIR__,'controllers',TRUE).'firmwares/</i>';
+       
+            $this->template->content = new View('generic/grid');
+            // Setup the base grid object
+            $grid = jgrid::grid($this->baseModel, array(
+                        'caption' => 'Endpoints'
+                            )
+            );
+            $grid->add('name', 'Name');
+            $grid->add('mac', 'MAC', array('key' => true));
+            $grid->add('brand', 'Brand');
+            $grid->add('model', 'Model');
 
-        $grid->addAction('endpointmanager/edit', 'Edit', array(
+            $grid->addAction('endpointmanager/edit', 'Edit', array(
                 'arguments' => 'endpoint_id',
                 'width' => '120'
-            )
-        );
-        $grid->addAction('endpointmanager/delete', 'Delete', array(
+                    )
+            );
+            $grid->addAction('endpointmanager/delete', 'Delete', array(
                 'arguments' => 'endpoint_id',
                 'width' => '20'
-            )
-        );
+                    )
+            );
 
+            // Let plugins populate the grid as well
+            $this->grid = $grid;
+            plugins::views($this);
 
-        // Let plugins populate the grid as well
-        $this->grid = $grid;
-        plugins::views($this);
-
-        // Produce a grid in the view
-        $this->view->grid = $this->grid->produce();
-
+            // Produce a grid in the view
+            $this->view->grid = $this->grid->produce();
+            
+            $this->template->content .= $message;
+       }
    }
 
    private function _jsonread($json) 
