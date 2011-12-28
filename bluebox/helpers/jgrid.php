@@ -83,7 +83,7 @@ class jgrid
             '100',
             '250'
         );
-        $this->jquery['rowNum'] = '12';
+        $this->jquery['rowNum'] = '100';
         $this->jquery['height'] = 'auto';
         $this->jquery['autowidth'] = true;
         $this->jquery['recordtext'] = __('View') . ' {0} - {1} ' . __('of') . ' {2}';
@@ -370,7 +370,7 @@ class jgrid
                     if (!empty($arg['del']) && empty($this->jquery['navGrid']['del']['url'])) {
                         $this->jquery['navGrid']['del']['url'] = $_SERVER['REQUEST_URI'] . '?gridName=' . $this->gridName;
                         $this->jquery['navGrid']['del']['afterSubmit'] = 'function (resMsg) {  $(\'#' .$this->gridName .'AjaxMessageReceiver\').html(resMsg.responseText); return [true]; }';
-                    }    
+                    }
                     $navGrid = &$this->jquery['navGrid']['options'];
                     break;
                 case 1:
@@ -685,7 +685,7 @@ class jgrid
             $colModel['sortable'] = false;
             $colModel['align'] = 'center';
         }
-        jquery::addPlugin('betagrid');  
+        jquery::addPlugin('betagrid');
         $jqueryGrid = jquery::addQuery('#' . $attributes['table']['id'])->jqGrid($this->jquery);
         // This has to come after the jquery helper but the above if block for $createNavGrid must come before
         if ($createNavGrid) {
@@ -1094,7 +1094,7 @@ class jgrid
             // The column is the right most string of path after split on DELIM
             $column = $path[1];
             // If we recieved a path with no DELIM assume it is in reference to baseModel
-            
+
         } else {
             // The model is the baseModel
             $model = $this->baseModel;
