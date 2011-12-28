@@ -4,12 +4,12 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
 {
     public static function set($device)
     {
-        
+
     }
 
     public static function delete($device)
     {
-        
+
     }
 
     public static function dialplan($number)
@@ -38,13 +38,13 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
             {
                 $xml->update('/action[@application="export"][@bluebox="sipCalleeIdName"]{@data="sip_callee_id_name=' .$destination['name'] .'"}');
             }
-            
+
             $xml->update('/action[@application="export"][@bluebox="sipCalleeIdNumber"]{@data="sip_callee_id_number=' .$number['number'] .'"}');
-            
-//            if(arr::get($destination, 'plugins', 'sip', 'sip_invite_format') == Sip_Plugin::SIP_FORMAT_DIGITS)
-//            {
-//                $xml->update('/action[@application="export"][@bluebox="settingXmlInviteFormat"]{@data="sip_invite_req_uri=sip:' .$number['number'] .'${regex(${sofia_contact(' . $destination['plugins']['sip']['username'] .'\@$${location_1})}|(\@.*)|$1)}"}');
-//            }
+
+            if(arr::get($destination, 'plugins', 'sip', 'sip_invite_format') == Sip_Plugin::SIP_FORMAT_DIGITS)
+            {
+                $xml->update('/action[@application="export"][@bluebox="settingXmlInviteFormat"]{@data="sip_invite_req_uri=sip:' .$number['number'] .'${regex(${sofia_contact(' . $destination['plugins']['sip']['username'] .'\@' . $domain .')}|(\@.*)|$1)}"}');
+            }
 //            else if(arr::get($destination, 'plugins', 'sip', 'sip_invite_format') == Sip_Plugin::SIP_FORMAT_E164)
 //            {
 //                if (!$extNumber = arr::get($destination, 'plugins', 'callerid', 'external_number'))
@@ -61,10 +61,10 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
 //
 //                $xml->update('/action[@application="export"][@bluebox="settingXmlInviteFormat"]{@data="sip_invite_req_uri=sip:+' .$extNumber .'${regex(${sofia_contact(' . $destination['plugins']['sip']['username'] .'\@$${location_1})}|(\@.*)|$1)}"}');
 //            }
-//            else
-//            {
-//                $xml->deleteNode('/action[@application="export"][@bluebox="settingXmlInviteFormat"]');
-//            }
+            else
+            {
+                $xml->deleteNode('/action[@application="export"][@bluebox="settingXmlInviteFormat"]');
+            }
 
             $condition = '/condition[@field="${privacy_hide_number}"][@expression="false"][@break="never"]';
 
@@ -72,7 +72,7 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
 
 	    //If allowing multi sip interfaces, then we need to change the @data field with sofia_contact.
 	    $dataString = 'user\/' .$destination['plugins']['sip']['username'] .'@' .$domain;
-	    
+
 	    if(arr::get($destination, 'registry', 'multi_sipinterface'))
 	    {
 		$dataString =  '${sofia_contact(*\/' .$destination['plugins']['sip']['username'] .'@' .$domain .')}';
@@ -81,7 +81,7 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
             if (arr::get($destination, 'registry', 'anonymous_reject'))
             {
                 $xml->setXmlRoot($extenRoot .$condition);
-                
+
 		//$xml->update('/action[@application="bridge"]{@data="user\/' .$destination['plugins']['sip']['username'] .'@' .$domain .'"}');
                 $xml->update('/action[@application="bridge"]{@data="'.$dataString.'"}');
 
@@ -91,7 +91,7 @@ class FreeSwitch_Device_Driver extends FreeSwitch_Base_Driver
             {
 		//$xml->update('/action[@application="bridge"]{@data="user\/' .$destination['plugins']['sip']['username'] .'@' .$domain .'"}');
                 $xml->update('/action[@application="bridge"]{@data="'.$dataString.'"}');
-	
+
                 $xml->deleteNode($extenRoot .$condition);
 
                 $xml->deleteNode($extenRoot .'/condition[@bluebox="no_answer"]');
