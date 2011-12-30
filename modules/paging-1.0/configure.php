@@ -30,7 +30,7 @@ class paging_1_0_0_Configure extends Bluebox_Configure
     	$confobj->name = 'Intercom';
     	$confobj->profile= array(
      		'energy-level' => '0',
-   	   		'enter-sound' => 'tone_stream://%(500,500,500,600,700);loops=2',
+   	   		'enter-sound' => 'tone_stream://%(150,75,500,600,700);loops=2',
     		'exit-sound' => '',
     		'tts-engine' => '',
     		'tts-voice' => '',
@@ -51,7 +51,7 @@ class paging_1_0_0_Configure extends Bluebox_Configure
     	$confobj->name = 'Paging';
     	$confobj->profile= array(
      		'energy-level' => '0',
-   	   		'enter-sound' => 'tone_stream://%(500,500,500,600,700);loops=2',
+   	   		'enter-sound' => 'tone_stream://%(150,75,500,600,700);loops=2',
     		'exit-sound' => '',
     		'tts-engine' => '',
     		'tts-voice' => '',
