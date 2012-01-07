@@ -2,12 +2,12 @@
 
 class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
 {
-    public static function set($obj) 
+    public static function set($obj)
     {
 
     }
 
-    public static function delete($obj) 
+    public static function delete($obj)
     {
 
     }
@@ -21,6 +21,24 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
         $registry = (array)$destination['registry'];
 
         switch ($registry['feature']) {
+            case 'parking_void':
+                $xml->setXmlRoot($xml->getExtensionRoot());
+
+                $condition = '/condition[@field="destination_number"]';
+
+                $formated_number = $xml->getAttributeValue($condition, 'expression');
+
+                $formated_number = preg_replace('/\$$/', '([0-9]+)$', $formated_number);
+
+                $xml->setAttributeValue($condition, 'expression', $formated_number);
+
+                $xml->setXmlRoot($xml->getExtensionRoot() . $condition);
+
+                $xml->update('/action[@application="answer"]');
+                $xml->update('/action[@application="valet_park"][@data="account_' . $destination['account_id']  . ' $1"]');
+
+                break;
+
             case 'ivr_return':
                 $xml->deleteChildren();
 
@@ -39,26 +57,26 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
             case 'forward_on':
                 $xmlText = <<<XML
 XML;
-            
+
                 break;
-            
+
             case 'forward_off':
                 $xmlText = <<<XML
 XML;
                 break;
-            
+
             case 'redial':
                 $xmlText = <<<XML
 <action application="transfer" data="\${hash(select/\${domain_name}-last_dial/\${caller_id_number})}"/>
 XML;
                 break;
-            
+
             case 'call_return':
                 $xmlText = <<<XML
 <action application="transfer" data="\${hash(select/\${domain_name}-call_return/\${caller_id_number})}"/>
 XML;
                 break;
-            
+
             case 'voicemail':
 
                 $vmdomain = 'voicemail_' .$destination['account_id'];
@@ -101,7 +119,7 @@ XML;
                 $xml->setXmlRoot($xml->getExtensionRoot() .'/condition[@field="${user_data(${sip_from_user}@${sip_from_host} param mwi-account)}"][@expression="^(.+)@(.+)$"]');
 
                 $xmlText = <<<XML
-                
+
         <action application="answer"/>
         <action application="sleep" data="1000"/>
         <action application="set" data="voicemail_authorized=\${sip_authorized}"/>
@@ -114,7 +132,7 @@ XML;
 
 XML;
                 break;
-            
+
             case 'park':
                 $xmlText = <<<XML
 
@@ -125,7 +143,7 @@ XML;
 
 XML;
                 break;
-            
+
             case 'unpark':
                 $xmlText = <<<XML
 
@@ -136,28 +154,28 @@ XML;
 
 XML;
                 break;
-            
+
             case 'echo':
                 $xmlText = <<<XML
 <action application="answer"/>
 <action application="echo"/>
 XML;
                 break;
-            
+
             case 'delay_echo':
                 $xmlText = <<<XML
 <action application="answer"/>
 <action application="delay_echo" data="1000"/>
 XML;
                 break;
-            
+
             case 'tone_test':
                 $xmlText = <<<XML
 <action application="answer"/>
 <action application="playback" data="tone_stream://%(1000,0,2600);loops=-1"/>
 XML;
                 break;
-            
+
             case 'hold_music':
                 $xmlText = <<<XML
 <action application="answer"/>
@@ -176,9 +194,9 @@ XML;
 		$xmlText = <<<XML
 
 	<action application="answer"/>
-	<action application="eavesdrop" data="\${hash(select/spymap/$1)}"/> 
+	<action application="eavesdrop" data="\${hash(select/spymap/$1)}"/>
         <action application="hangup" data=""/>
-      
+
 XML;
 		break;
 
