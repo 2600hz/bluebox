@@ -21,16 +21,44 @@ class FreeSwitch_FeatureCode_Driver extends FreeSwitch_Base_Driver
         $registry = (array)$destination['registry'];
 
         switch ($registry['feature']) {
+            case 'call_intercept':
+                $xml->setXmlRoot($xml->getExtensionRoot());
+
+                $condition = '/condition[@field="destination_number"]';
+
+                $formatted_number = $xml->getAttributeValue($condition, 'expression');
+
+                $formatted_number = preg_replace('/\$$/', '([0-9]+)$', $formatted_number);
+
+                $xml->setAttributeValue($condition, 'expression', $formatted_number);
+
+                $xpath = new DOMXPath($xml);
+                $condition_list = $xpath->query($xml->getExtensionRoot() . $condition);
+                $first_condition = $condition_list->item(0);
+                $new_condition = $xml->createElement('condition');
+                $new_condition->setAttribute('field', '${regex(m:/${destination_number}/' . $formatted_number . '/$1)}');
+                $new_condition->setAttribute('expression', '^${interceptgroup}$');
+                $first_condition->parentNode->insertBefore($new_condition, $first_condition);
+
+                $xml->setXmlRoot($xml->getExtensionRoot() . $condition);
+
+                $xml->update('/action[@application="answer"]');
+                $xml->update('/action[@application="set"][@data="intercept_unanswered_only=true"]');
+                $xml->update('/action[@application="intercept"][@data="${hash(select\/intercept_' . $destination['account_id'] .'\/$1)}"]');
+                $xml->update('/action[@application="sleep"][@data="2000"]');
+
+                break;
+
             case 'parking_void':
                 $xml->setXmlRoot($xml->getExtensionRoot());
 
                 $condition = '/condition[@field="destination_number"]';
 
-                $formated_number = $xml->getAttributeValue($condition, 'expression');
+                $formatted_number = $xml->getAttributeValue($condition, 'expression');
 
-                $formated_number = preg_replace('/\$$/', '([0-9]+)$', $formated_number);
+                $formatted_number = preg_replace('/\$$/', '([0-9]+)$', $formatted_number);
 
-                $xml->setAttributeValue($condition, 'expression', $formated_number);
+                $xml->setAttributeValue($condition, 'expression', $formatted_number);
 
                 $xml->setXmlRoot($xml->getExtensionRoot() . $condition);
 
