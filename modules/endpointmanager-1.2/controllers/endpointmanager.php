@@ -11,7 +11,8 @@ class EndpointManager_Controller extends Bluebox_Controller
         $filename = basename($_SERVER["PHP_SELF"]);
         $strip = str_replace('spa', '', $filename);
         if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
-        $p = Doctrine::getTable('Endpoint')->findOneBy('mac',$matches[0]);
+	$mac=strtolower($matches[0]);
+        $p = Doctrine::getTable('Endpoint')->findOneBy('mac',$mac);
             if($p) {
                 $dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . 'endpoint/' . $p->brand;
                 foreach (glob($dir."/*", GLOB_ONLYDIR) as $filename) {
@@ -33,11 +34,15 @@ class EndpointManager_Controller extends Bluebox_Controller
                 }
             } else {
                 header("HTTP/1.0 404 Not Found");
-                die();            
+		print "Device with MAC $mac not found\n";
+		Kohana::log('debug', "Device with MAC $mac not found, looking for file $configfile");
+		exit;
             }
         } else {
             header("HTTP/1.0 404 Not Found");
-            die();             
+	    print "No MAC address found in file $configfile\n";
+	    Kohana::log('debug', "No MAC address found in requested filename $configfile");
+	    exit;
         }
     }
     
