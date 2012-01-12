@@ -24,7 +24,7 @@
 
         <div class="field">
             <?php echo form::label('featurecode[registry][feature]', 'Feature:'); ?>
-            <?php echo form::dropdown('featurecode[registry][feature]', 
+            <?php echo form::dropdown('featurecode[registry][feature]',
                     array(//'forward_on' => 'Call-Forward Activate',
                           //'forward_off' => 'Call-Forward Disable',
                           'ivr_return' => 'Return to last AutoAttendant',
@@ -35,6 +35,8 @@
                           'voicemail_noauth' => 'Check Voicemail (No Authorization, Mailbox = Device MWI)',
                           'park' => 'Park',
                           'unpark' => 'Unpark / Pickup',
+                          'parking_void' => 'Parking void (Park into/Unpark any parking lot)',
+                          'call_intercept' => 'Call Intercept (intercept call from allowed Intercept Group)',
                           'echo' => 'Echo Test',
                           'delay_echo' => 'Delayed Echo Test',
                           'tone_test' => 'Miliwatt Tone Test',
