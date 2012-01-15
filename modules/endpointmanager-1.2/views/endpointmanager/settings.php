@@ -41,6 +41,16 @@
 	?>
 	</div>
 
+	<div class='field'>
+	<?php echo form::label(array(
+		'for'=>'package[registry][defaults][global][ntpserver]',
+		'hint'=>'DNS or IP of network time (NTP) server',
+		), 'Network Time (NTP) Server');
+
+		echo form::input('package[registry][defaults][global][ntpserver]');
+	?>
+	</div>
+
 	<?php echo form::close_section(); ?>
 
 	<?php echo $additionalquestions; ?>

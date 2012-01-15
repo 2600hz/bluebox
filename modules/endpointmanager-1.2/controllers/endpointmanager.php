@@ -90,6 +90,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 			'date_us_format'=>'on',
 			'admin_pass'=>'1234',
 		),
+		'cisco'=>array(
+			'date_template'=>'M/D/YA',
+		),
 	);
 	$flag=0;
 	$store = Doctrine::getTable('package')->findOneby('name','endpointmanager');
@@ -159,9 +162,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$lineinfo=array();
 	}
 	$lines=array();
-	for ($index=1; $index<=$configfileinfo['max_lines']; $index++) {
+	for ($index=0; $index<$configfileinfo['max_lines']; $index++) {
 		if ((!array_key_exists($index,$lineinfo)) or (empty($lineinfo[$index]['sip']))) {
-			$provisioner_lib->lines[$index]=array();
+			$provisioner_lib->lines[]=array();
 		} else {
 			$device=Doctrine::getTable('Device')->find($lineinfo[$index]['sip']);
 			if (isset($device['plugins']['callerid']['internal_name'])) {
@@ -290,6 +293,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 			$this->_autoquestion("snom","300",'$admin_pass','package[registry][defaults][snom][admin_pass]',$defaults['snom']['admin_pass']),
 			$this->_autoquestion("snom","300",'$time_24_format','package[registry][defaults][snom][time_24_format]',$defaults['snom']['time_24_format']),
 			$this->_autoquestion("snom","300",'$date_us_format','package[registry][defaults][snom][date_us_format]',$defaults['snom']['date_us_format']),
+		),
+		'Cisco'=>array(
+			$this->_autoquestion("cisco","7941G",'$date_template','package[registry][defaults][cisco][date_template]',$defaults['cisco']['date_template']),
 		)
 	);
 	$this->view->additionalquestions="";
