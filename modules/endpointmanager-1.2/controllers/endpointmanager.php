@@ -78,9 +78,23 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$default_defaults=array(
 		'global'=>array(
 			'timezone'=>date_default_timezone_get(),
-			'vlan_id'=>"0",
-			'vlan_qos'=>"5",
-			'ntpserver'=>'ntp.ubuntu.com',
+			'network'=>array(
+				'vlan'=>array('id'=>0,'qos'=>5),
+				"dhcp" => TRUE,
+				"ipv4" => "",
+				"ipv6" => "",
+				"subnet" => "255.255.255.0",
+				"gateway" => "",
+        			'local_port' => 5060, //here incase we want to randomize it...
+			),
+			'ntp'=>'ntp.ubuntu.com',
+			'voicemail_extension'=>'*97',
+			'provision'=>array(
+				"type" => "dynamic",
+				"protocol" => "http",
+				"path" => $this->siteURL().strstr($_SERVER["PHP_SELF"], 'endpointmanager', true).'endpointmanager/config/',
+				"encryption" => FALSE,
+			),
 		),
 		'snom'=>array(
 			'tone_scheme'=>'USA',
@@ -92,6 +106,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 		),
 		'cisco'=>array(
 			'date_template'=>'M/D/YA',
+			'preferredcodec'=>'g711alaw',
 		),
 	);
 	$flag=0;
@@ -153,6 +168,7 @@ class EndpointManager_Controller extends Bluebox_Controller
         
         $provisioner_lib->mac = $configfileinfo["mac"];
         
+	$provisioner_lib->settings=array_merge_recursive($defaults['global'],$provisioner_lib->settings);
 	if (array_key_exists($provisioner_lib->brand_name,$defaults)) {
 		$provisioner_lib->settings=array_merge_recursive($defaults[$provisioner_lib->brand_name],$provisioner_lib->settings);
 	}
@@ -192,29 +208,6 @@ class EndpointManager_Controller extends Bluebox_Controller
 		
 	}
 
-        $pp = $this->siteURL().strstr($_SERVER["PHP_SELF"], 'endpointmanager', true).'endpointmanager/config/';
-        $provisioner_lib->settings['provision'] = array(
-            "type" => "dynamic",
-            "protocol" => "http",
-            "path" => $pp,
-            "encryption" => FALSE,
-            );
-
-        $provisioner_lib->settings['network'] = array(
-            "dhcp" => TRUE,
-            "ipv4" => "",
-            "ipv6" => "",
-            "subnet" => "255.255.255.0",
-            "gateway" => ""
-            );
-        
-        $provisioner_lib->settings['network']['vlan'] = array(
-          "id" => $defaults['global']['vlan_id'],
-          "qos" => $defaults['global']['vlan_qos']
-        );
-        
-        $provisioner_lib->settings['ntp'] = $defaults['global']['ntpserver'];
-        $provisioner_lib->settings['network']['local_port'] = 5060; //here incase we want to randomize it...
         
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
         $provisioner_lib->processor_info = 'Endpoint Manager 1.3 for Blue.Box';
@@ -296,6 +289,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 		),
 		'Cisco'=>array(
 			$this->_autoquestion("cisco","7941G",'$date_template','package[registry][defaults][cisco][date_template]',$defaults['cisco']['date_template']),
+			$this->_autoquestion("cisco","7941G",'$preferredcodec','package[registry][defaults][cisco][preferredcodec]',$defaults['cisco']['preferredcodec']),
 		)
 	);
 	$this->view->additionalquestions="";
@@ -529,19 +523,29 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$this->view->models=null;
 	}
    }
+   protected function formSave(&$object,$saveMessage = NULL, $saveEvents = array()) {
+	if (get_class($object)=='Package') {
+		$reg=$object->registry;
+		$reg['defaults']=$_POST['package']['registry']['defaults'];
+		$object->registry=$reg;
+		unset($_POST['package']['registry']);
+	}
+	return parent::formSave($object,$saveMessage,$saveEvents);
+   }
 
    protected function pre_save(&$object) {
-	if (get_class($object)!='Endpoint') {return;}
-	$mac=strtolower(str_replace(array(' ',':','_','\\','/'),array(),$object['mac']));
-	if (strlen($mac)!=12) {
-		throw new Exception("Invalid mac address - it should be 12 characters long, optionally with colons.");
-	}
-	if (preg_match('/^[0-9a-f]{12}$/',$mac)!==1) {
-		throw new Exception("Invalid mac address - it should contain only digits (0-9), letters a-f, and optionally colons.");
-	}
-	$object['mac']=$mac;
-	if (array_key_exists('lines',$_POST)) {
-		$object['lines']=serialize($_POST['lines']);;
+	if (get_class($object)=='Endpoint') {
+		$mac=strtolower(str_replace(array(' ',':','_','\\','/'),array(),$object['mac']));
+		if (strlen($mac)!=12) {
+			throw new Exception("Invalid mac address - it should be 12 characters long, optionally with colons.");
+		}
+		if (preg_match('/^[0-9a-f]{12}$/',$mac)!==1) {
+			throw new Exception("Invalid mac address - it should contain only digits (0-9), letters a-f, and optionally colons.");
+		}
+		$object['mac']=$mac;
+		if (array_key_exists('lines',$_POST)) {
+			$object['lines']=serialize($_POST['lines']);;
+		}
 	}
 	parent::pre_save($object);
 
