@@ -11,7 +11,8 @@ class EndpointManager_Controller extends Bluebox_Controller
         $filename = basename($_SERVER["PHP_SELF"]);
         $strip = str_replace('spa', '', $filename);
         if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
-        $p = Doctrine::getTable('Endpoint')->findOneBy('mac',$matches[0]);
+	$mac=strtolower($matches[0]);
+        $p = Doctrine::getTable('Endpoint')->findOneBy('mac',$mac);
             if($p) {
                 $dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . 'endpoint/' . $p->brand;
                 foreach (glob($dir."/*", GLOB_ONLYDIR) as $filename) {
@@ -33,11 +34,15 @@ class EndpointManager_Controller extends Bluebox_Controller
                 }
             } else {
                 header("HTTP/1.0 404 Not Found");
-                die();            
+		print "Device with MAC $mac not found\n";
+		Kohana::log('debug', "Device with MAC $mac not found, looking for file $configfile");
+		exit;
             }
         } else {
             header("HTTP/1.0 404 Not Found");
-            die();             
+	    print "No MAC address found in file $configfile\n";
+	    Kohana::log('debug', "No MAC address found in requested filename $configfile");
+	    exit;
         }
     }
     
@@ -73,9 +78,25 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$default_defaults=array(
 		'global'=>array(
 			'timezone'=>date_default_timezone_get(),
-			'vlan_id'=>"0",
-			'vlan_qos'=>"5",
-			'ntpserver'=>'ntp.ubuntu.com',
+			'network'=>array(
+				'vlan'=>array('id'=>0,'qos'=>5),
+				"dhcp" => TRUE,
+				"ipv4" => "",
+				"ipv6" => "",
+				"subnet" => "255.255.255.0",
+				"gateway" => "",
+        			'local_port' => 5060, //here incase we want to randomize it...
+			),
+			'ntp'=>'ntp.ubuntu.com',
+			'voicemail_extension'=>'*97',
+			'provision'=>array(
+				"type" => "dynamic",
+				"protocol" => "http",
+				"path" => $this->siteURL().strstr($_SERVER["PHP_SELF"], 'endpointmanager', true).'endpointmanager/config/',
+				"encryption" => FALSE,
+			),
+			'dateformat'=>'little-endian',
+			'tonescheme'=>'USA',
 		),
 		'snom'=>array(
 			'tone_scheme'=>'USA',
@@ -84,6 +105,11 @@ class EndpointManager_Controller extends Bluebox_Controller
 			'time_24_format'=>'off',
 			'date_us_format'=>'on',
 			'admin_pass'=>'1234',
+		),
+		'cisco'=>array(
+			'date_template'=>'M/D/YA',
+			'preferredcodec'=>'g711alaw',
+			'image_name'=>'',
 		),
 	);
 	$flag=0;
@@ -133,7 +159,6 @@ class EndpointManager_Controller extends Bluebox_Controller
         
         $class = "endpoint_" . $configfileinfo["brand"] . "_" . $configfileinfo["family"] . '_phone';
 	$provisioner_lib = new $class();
-	$provisioner_lib->options=array();
 
 	$defaults = $this->_get_defaults();
 
@@ -145,6 +170,7 @@ class EndpointManager_Controller extends Bluebox_Controller
         
         $provisioner_lib->mac = $configfileinfo["mac"];
         
+	$provisioner_lib->settings=array_merge_recursive($defaults['global'],$provisioner_lib->settings);
 	if (array_key_exists($provisioner_lib->brand_name,$defaults)) {
 		$provisioner_lib->settings=array_merge_recursive($defaults[$provisioner_lib->brand_name],$provisioner_lib->settings);
 	}
@@ -154,9 +180,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$lineinfo=array();
 	}
 	$lines=array();
-	for ($index=1; $index<=$configfileinfo['max_lines']; $index++) {
+	for ($index=0; $index<$configfileinfo['max_lines']; $index++) {
 		if ((!array_key_exists($index,$lineinfo)) or (empty($lineinfo[$index]['sip']))) {
-			$provisioner_lib->lines[$index]=array();
+			$provisioner_lib->lines[]=array();
 		} else {
 			$device=Doctrine::getTable('Device')->find($lineinfo[$index]['sip']);
 			if (isset($device['plugins']['callerid']['internal_name'])) {
@@ -184,29 +210,6 @@ class EndpointManager_Controller extends Bluebox_Controller
 		
 	}
 
-        $pp = $this->siteURL().strstr($_SERVER["PHP_SELF"], 'endpointmanager', true).'endpointmanager/config/';
-        $provisioner_lib->settings['provision'] = array(
-            "type" => "dynamic",
-            "protocol" => "http",
-            "path" => $pp,
-            "encryption" => FALSE,
-            );
-
-        $provisioner_lib->settings['network'] = array(
-            "dhcp" => TRUE,
-            "ipv4" => "",
-            "ipv6" => "",
-            "subnet" => "255.255.255.0",
-            "gateway" => ""
-            );
-        
-        $provisioner_lib->settings['network']['vlan'] = array(
-          "id" => $defaults['global']['vlan_id'],
-          "qos" => $defaults['global']['vlan_qos']
-        );
-        
-        $provisioner_lib->settings['ntp'] = $defaults['global']['ntpserver'];
-        $provisioner_lib->settings['network']['local_port'] = 5060; //here incase we want to randomize it...
         
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
         $provisioner_lib->processor_info = 'Endpoint Manager 1.3 for Blue.Box';
@@ -223,9 +226,9 @@ class EndpointManager_Controller extends Bluebox_Controller
         }
 	exit;
     }
-   private function _autoquestion($make,$model,$templatevariable,$forvariable,$currentvalue=NULL) {
+   private function _autoquestion($make,$family,$templatevariable,$forvariable,$currentvalue=NULL) {
 	$prov=$this->_getprovisioningdata();
-	$structures=$prov['phones'][$make][$model]['templates'];
+	$structures=$prov['phones'][$make][$family]['templates'];
 	while (count($structures)>=1) {
 		$item=array_pop($structures);
 		if (!is_array($item)) {
@@ -276,16 +279,26 @@ class EndpointManager_Controller extends Bluebox_Controller
         $this->package = Doctrine::getTable('package')->findOneby('name','endpointmanager');
         $this->view->set_global('base', 'package');
 	$this->view->savedtimezone=$defaults['global']['timezone'];
+	$this->view->additional_global_questions=implode("",array(
+		$this->_autoquestion('','','$vlan_id','package[registry][defaults][global][network][vlan][id]',$defaults['global']['network']['vlan']['id']),
+		$this->_autoquestion('','','$vlan_qos','package[registry][defaults][global][network][vlan][qos]',$defaults['global']['network']['vlan']['qos']),
+		$this->_autoquestion('','','$voicemail_extension','package[registry][defaults][global][voicemail_extension]',$defaults['global']['voicemail_extension']),
+		$this->_autoquestion('','','$ntp','package[registry][defaults][global][ntp]',$defaults['global']['ntp']),
+		$this->_autoquestion('','','$timeformat','package[registry][defaults][global][timeformat]',$defaults['global']['timeformat']),
+		$this->_autoquestion('','','$dateformat','package[registry][defaults][global][dateformat]',$defaults['global']['dateformat']),
+		$this->_autoquestion('','','$tonescheme','package[registry][defaults][global][tonescheme]',$defaults['global']['tonescheme']),
+	));
 
 	$additionalquestions=array(
 		'Snom'=>array(
-			$this->_autoquestion("snom","300",'$tone_scheme','package[registry][defaults][snom][tone_scheme]',$defaults['snom']['tone_scheme']),
-			$this->_autoquestion("snom","300",'$http_user','package[registry][defaults][snom][http_user]',$defaults['snom']['http_user']),
-			$this->_autoquestion("snom","300",'$http_pass','package[registry][defaults][snom][http_pass]',$defaults['snom']['http_pass']),
-			$this->_autoquestion("snom","300",'$admin_pass','package[registry][defaults][snom][admin_pass]',$defaults['snom']['admin_pass']),
-			$this->_autoquestion("snom","300",'$time_24_format','package[registry][defaults][snom][time_24_format]',$defaults['snom']['time_24_format']),
-			$this->_autoquestion("snom","300",'$date_us_format','package[registry][defaults][snom][date_us_format]',$defaults['snom']['date_us_format']),
-		)
+			$this->_autoquestion("snom","3xx820m3",'$http_user','package[registry][defaults][snom][http_user]',$defaults['snom']['http_user']),
+			$this->_autoquestion("snom","3xx820m3",'$http_pass','package[registry][defaults][snom][http_pass]',$defaults['snom']['http_pass']),
+			$this->_autoquestion("snom","3xx820m3",'$admin_pass','package[registry][defaults][snom][admin_pass]',$defaults['snom']['admin_pass']),
+		),
+		'Cisco'=>array(
+			$this->_autoquestion("cisco","sip79x1G",'$preferredcodec','package[registry][defaults][cisco][preferredcodec]',$defaults['cisco']['preferredcodec']),
+			$this->_autoquestion("cisco","sip79x1G",'$image_name','package[registry][defaults][cisco][image_name]',$defaults['cisco']['image_name']),
+		),
 	);
 	$this->view->additionalquestions="";
 	foreach ($additionalquestions AS $make=>$questionlist) {
@@ -424,33 +437,28 @@ class EndpointManager_Controller extends Bluebox_Controller
 				}
 			}
 			foreach ($familyxml['data']['model_list'] AS $model) {
-				foreach ($model['template_data'] AS &$filename) {
-					$filename="$xmlbase$brand[directory]/$family[directory]/$filename";
-				}
-				$data['phones'][$brand["directory"]][$model["model"]]=array(
+				$data['phones'][$brand["directory"]][$family["directory"]]['models'][$model["model"]]=array(
 					"lines"=>$model["lines"],
 					"makename"=>$brand["name"],
 					"make"=>$brand["directory"],
 					"familyname"=>$family["name"],
 					"family"=>$family['directory'],
 					"path"=>"$xmlbase$brand[directory]/$family[directory]/",
-#					"templates"=>$model['template_data']['files'],
 				);
-				foreach ($model['template_data'] AS $file) {
-					if (!array_key_exists($file,$templates)) {
-						$templates[$file]=$this->_jsonread($file);
-					}
-					$data['phones'][$brand["directory"]][$model["model"]]["templates"][]=$templates[$file]['template_data']['category'];
+				foreach ($model["template_data"] as $filename) {
+					$data['phones'][$brand["directory"]][$family["directory"]]['templates'][$filename]=$this->_jsonread("$xmlbase$brand[directory]/$family[directory]/$filename");
 				}
 			}
 		}
 	}
+	$data['phones']['']['']['templates']['global_template_data.json']=$this->_jsonread("$xmlbase/global_template_data.json");
 	$cache->set('endpointmanager->provisioningdata',$data,NULL,3600);
 	return $data;
    }
    public function dump() {
+	$data=$this->_getprovisioningdata();
 	header('Content-type: text/plain');
-	print_r($this->_getprovisioningdata());
+	print_r($data);
 	exit;
    }
 
@@ -466,7 +474,10 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$brandname.="<option value=''>Select</option>";
 	}
 	foreach ($prov['phones'] AS $brand=>$branddata) {
-		$modeldata=array_values($branddata);
+		if ($brand=='') continue; // special "global" settings.
+		foreach ($branddata AS $family) {
+			$modeldata=array_values($family['models']);
+		}
 		if ($this->endpoint['brand']==$brand) {
 			$selected="selected";
 		} else {
@@ -474,15 +485,16 @@ class EndpointManager_Controller extends Bluebox_Controller
 		}
 		$brandname.="\t<option value='$brand' $selected>".$modeldata[0]["makename"]."</option>\n";
 		$models[$brand]='';
-		foreach (array_keys($branddata) AS $model) {
-			if ($this->endpoint['model']==$model) {
-				$models[$brand].="<option selected>$model</option>";
-			} else {
-				$models[$brand].="<option>$model</option>";
+		foreach ($branddata AS $family) {
+			foreach (array_keys($family['models']) AS $model) {
+				if ($this->endpoint['model']==$model) {
+					$models[$brand].="<option selected>$model</option>";
+				} else {
+					$models[$brand].="<option>$model</option>";
+				}
 			}
 		}
 	}
-	#print_r($models);
 	$this->view->brandnameselect=$brandname."</select>";
 	$this->view->oui_json=json_encode($prov['oui']);
 	$this->view->models_json=json_encode($models);
@@ -499,7 +511,12 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$brand=$this->endpoint['brand'];
 	$model=$this->endpoint['model'];
 	if (($brand!='') && ($model!='')) {
-		$this->view->models=$prov['phones'][$brand][$model];
+		foreach ($prov['phones'][$brand] as $familyname=>$familyarray) {
+			if (array_key_exists($model,$familyarray['models'])) {
+				$family=$familyname;
+			}
+		}
+		$this->view->models=$prov['phones'][$brand][$family]['models'][$model];
 		$deviceSelect=array();
 		foreach (Doctrine::getTable("Device")->findAll(Doctrine::HYDRATE_ARRAY) AS $device) {
 			for ($line=1; $line<=$this->view->models['lines']; $line++) {
@@ -518,19 +535,29 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$this->view->models=null;
 	}
    }
+   protected function formSave(&$object,$saveMessage = NULL, $saveEvents = array()) {
+	if (get_class($object)=='Package') {
+		$reg=$object->registry;
+		$reg['defaults']=$_POST['package']['registry']['defaults'];
+		$object->registry=$reg;
+		unset($_POST['package']['registry']);
+	}
+	return parent::formSave($object,$saveMessage,$saveEvents);
+   }
 
    protected function pre_save(&$object) {
-	if (get_class($object)!='Endpoint') {return;}
-	$mac=strtolower(str_replace(array(' ',':','_','\\','/'),array(),$object['mac']));
-	if (strlen($mac)!=12) {
-		throw new Exception("Invalid mac address - it should be 12 characters long, optionally with colons.");
-	}
-	if (preg_match('/^[0-9a-f]{12}$/',$mac)!==1) {
-		throw new Exception("Invalid mac address - it should contain only digits (0-9), letters a-f, and optionally colons.");
-	}
-	$object['mac']=$mac;
-	if (array_key_exists('lines',$_POST)) {
-		$object['lines']=serialize($_POST['lines']);;
+	if (get_class($object)=='Endpoint') {
+		$mac=strtolower(str_replace(array(' ',':','_','\\','/'),array(),$object['mac']));
+		if (strlen($mac)!=12) {
+			throw new Exception("Invalid mac address - it should be 12 characters long, optionally with colons.");
+		}
+		if (preg_match('/^[0-9a-f]{12}$/',$mac)!==1) {
+			throw new Exception("Invalid mac address - it should contain only digits (0-9), letters a-f, and optionally colons.");
+		}
+		$object['mac']=$mac;
+		if (array_key_exists('lines',$_POST)) {
+			$object['lines']=serialize($_POST['lines']);;
+		}
 	}
 	parent::pre_save($object);
 
