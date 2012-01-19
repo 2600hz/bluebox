@@ -95,6 +95,8 @@ class EndpointManager_Controller extends Bluebox_Controller
 				"path" => $this->siteURL().strstr($_SERVER["PHP_SELF"], 'endpointmanager', true).'endpointmanager/config/',
 				"encryption" => FALSE,
 			),
+			'dateformat'=>'little-endian',
+			'tonescheme'=>'USA',
 		),
 		'snom'=>array(
 			'tone_scheme'=>'USA',
@@ -107,6 +109,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 		'cisco'=>array(
 			'date_template'=>'M/D/YA',
 			'preferredcodec'=>'g711alaw',
+			'image_name'=>'',
 		),
 	);
 	$flag=0;
@@ -156,7 +159,6 @@ class EndpointManager_Controller extends Bluebox_Controller
         
         $class = "endpoint_" . $configfileinfo["brand"] . "_" . $configfileinfo["family"] . '_phone';
 	$provisioner_lib = new $class();
-	$provisioner_lib->options=array();
 
 	$defaults = $this->_get_defaults();
 
@@ -224,9 +226,9 @@ class EndpointManager_Controller extends Bluebox_Controller
         }
 	exit;
     }
-   private function _autoquestion($make,$model,$templatevariable,$forvariable,$currentvalue=NULL) {
+   private function _autoquestion($make,$family,$templatevariable,$forvariable,$currentvalue=NULL) {
 	$prov=$this->_getprovisioningdata();
-	$structures=$prov['phones'][$make][$model]['templates'];
+	$structures=$prov['phones'][$make][$family]['templates'];
 	while (count($structures)>=1) {
 		$item=array_pop($structures);
 		if (!is_array($item)) {
@@ -277,20 +279,26 @@ class EndpointManager_Controller extends Bluebox_Controller
         $this->package = Doctrine::getTable('package')->findOneby('name','endpointmanager');
         $this->view->set_global('base', 'package');
 	$this->view->savedtimezone=$defaults['global']['timezone'];
+	$this->view->additional_global_questions=implode("",array(
+		$this->_autoquestion('','','$vlan_id','package[registry][defaults][global][network][vlan][id]',$defaults['global']['network']['vlan']['id']),
+		$this->_autoquestion('','','$vlan_qos','package[registry][defaults][global][network][vlan][qos]',$defaults['global']['network']['vlan']['qos']),
+		$this->_autoquestion('','','$voicemail_extension','package[registry][defaults][global][voicemail_extension]',$defaults['global']['voicemail_extension']),
+		$this->_autoquestion('','','$ntp','package[registry][defaults][global][ntp]',$defaults['global']['ntp']),
+		$this->_autoquestion('','','$timeformat','package[registry][defaults][global][timeformat]',$defaults['global']['timeformat']),
+		$this->_autoquestion('','','$dateformat','package[registry][defaults][global][dateformat]',$defaults['global']['dateformat']),
+		$this->_autoquestion('','','$tonescheme','package[registry][defaults][global][tonescheme]',$defaults['global']['tonescheme']),
+	));
 
 	$additionalquestions=array(
 		'Snom'=>array(
-			$this->_autoquestion("snom","300",'$tone_scheme','package[registry][defaults][snom][tone_scheme]',$defaults['snom']['tone_scheme']),
-			$this->_autoquestion("snom","300",'$http_user','package[registry][defaults][snom][http_user]',$defaults['snom']['http_user']),
-			$this->_autoquestion("snom","300",'$http_pass','package[registry][defaults][snom][http_pass]',$defaults['snom']['http_pass']),
-			$this->_autoquestion("snom","300",'$admin_pass','package[registry][defaults][snom][admin_pass]',$defaults['snom']['admin_pass']),
-			$this->_autoquestion("snom","300",'$time_24_format','package[registry][defaults][snom][time_24_format]',$defaults['snom']['time_24_format']),
-			$this->_autoquestion("snom","300",'$date_us_format','package[registry][defaults][snom][date_us_format]',$defaults['snom']['date_us_format']),
+			$this->_autoquestion("snom","3xx820m3",'$http_user','package[registry][defaults][snom][http_user]',$defaults['snom']['http_user']),
+			$this->_autoquestion("snom","3xx820m3",'$http_pass','package[registry][defaults][snom][http_pass]',$defaults['snom']['http_pass']),
+			$this->_autoquestion("snom","3xx820m3",'$admin_pass','package[registry][defaults][snom][admin_pass]',$defaults['snom']['admin_pass']),
 		),
 		'Cisco'=>array(
-			$this->_autoquestion("cisco","7941G",'$date_template','package[registry][defaults][cisco][date_template]',$defaults['cisco']['date_template']),
-			$this->_autoquestion("cisco","7941G",'$preferredcodec','package[registry][defaults][cisco][preferredcodec]',$defaults['cisco']['preferredcodec']),
-		)
+			$this->_autoquestion("cisco","sip79x1G",'$preferredcodec','package[registry][defaults][cisco][preferredcodec]',$defaults['cisco']['preferredcodec']),
+			$this->_autoquestion("cisco","sip79x1G",'$image_name','package[registry][defaults][cisco][image_name]',$defaults['cisco']['image_name']),
+		),
 	);
 	$this->view->additionalquestions="";
 	foreach ($additionalquestions AS $make=>$questionlist) {
@@ -429,33 +437,28 @@ class EndpointManager_Controller extends Bluebox_Controller
 				}
 			}
 			foreach ($familyxml['data']['model_list'] AS $model) {
-				foreach ($model['template_data'] AS &$filename) {
-					$filename="$xmlbase$brand[directory]/$family[directory]/$filename";
-				}
-				$data['phones'][$brand["directory"]][$model["model"]]=array(
+				$data['phones'][$brand["directory"]][$family["directory"]]['models'][$model["model"]]=array(
 					"lines"=>$model["lines"],
 					"makename"=>$brand["name"],
 					"make"=>$brand["directory"],
 					"familyname"=>$family["name"],
 					"family"=>$family['directory'],
 					"path"=>"$xmlbase$brand[directory]/$family[directory]/",
-#					"templates"=>$model['template_data']['files'],
 				);
-				foreach ($model['template_data'] AS $file) {
-					if (!array_key_exists($file,$templates)) {
-						$templates[$file]=$this->_jsonread($file);
-					}
-					$data['phones'][$brand["directory"]][$model["model"]]["templates"][]=$templates[$file]['template_data']['category'];
+				foreach ($model["template_data"] as $filename) {
+					$data['phones'][$brand["directory"]][$family["directory"]]['templates'][$filename]=$this->_jsonread("$xmlbase$brand[directory]/$family[directory]/$filename");
 				}
 			}
 		}
 	}
+	$data['phones']['']['']['templates']['global_template_data.json']=$this->_jsonread("$xmlbase/global_template_data.json");
 	$cache->set('endpointmanager->provisioningdata',$data,NULL,3600);
 	return $data;
    }
    public function dump() {
+	$data=$this->_getprovisioningdata();
 	header('Content-type: text/plain');
-	print_r($this->_getprovisioningdata());
+	print_r($data);
 	exit;
    }
 
@@ -471,7 +474,10 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$brandname.="<option value=''>Select</option>";
 	}
 	foreach ($prov['phones'] AS $brand=>$branddata) {
-		$modeldata=array_values($branddata);
+		if ($brand=='') continue; // special "global" settings.
+		foreach ($branddata AS $family) {
+			$modeldata=array_values($family['models']);
+		}
 		if ($this->endpoint['brand']==$brand) {
 			$selected="selected";
 		} else {
@@ -479,15 +485,16 @@ class EndpointManager_Controller extends Bluebox_Controller
 		}
 		$brandname.="\t<option value='$brand' $selected>".$modeldata[0]["makename"]."</option>\n";
 		$models[$brand]='';
-		foreach (array_keys($branddata) AS $model) {
-			if ($this->endpoint['model']==$model) {
-				$models[$brand].="<option selected>$model</option>";
-			} else {
-				$models[$brand].="<option>$model</option>";
+		foreach ($branddata AS $family) {
+			foreach (array_keys($family['models']) AS $model) {
+				if ($this->endpoint['model']==$model) {
+					$models[$brand].="<option selected>$model</option>";
+				} else {
+					$models[$brand].="<option>$model</option>";
+				}
 			}
 		}
 	}
-	#print_r($models);
 	$this->view->brandnameselect=$brandname."</select>";
 	$this->view->oui_json=json_encode($prov['oui']);
 	$this->view->models_json=json_encode($models);
@@ -504,7 +511,12 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$brand=$this->endpoint['brand'];
 	$model=$this->endpoint['model'];
 	if (($brand!='') && ($model!='')) {
-		$this->view->models=$prov['phones'][$brand][$model];
+		foreach ($prov['phones'][$brand] as $familyname=>$familyarray) {
+			if (array_key_exists($model,$familyarray['models'])) {
+				$family=$familyname;
+			}
+		}
+		$this->view->models=$prov['phones'][$brand][$family]['models'][$model];
 		$deviceSelect=array();
 		foreach (Doctrine::getTable("Device")->findAll(Doctrine::HYDRATE_ARRAY) AS $device) {
 			for ($line=1; $line<=$this->view->models['lines']; $line++) {
