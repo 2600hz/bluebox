@@ -96,7 +96,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
                 	}
                 
                	 	$xml->update($condition . '/action[@application="set"][@data="hangup_after_bridge=true"]');
-                	$xml->update($condition . '/action[@application="bridge"]{@data="dingaling\/' . $xmppData['name'] . '\/+${prepend}$1@' . $xmppData['registry']['outboundserver'] . '"}');
+                	$xml->update($condition . '/action[@application="bridge"]{@data="dingaling\/' . $xmppData['xmpp_id'] . '\/+${prepend}$1@' . $xmppData['registry']['outboundserver'] . '"}');
 		}
             }
         }
