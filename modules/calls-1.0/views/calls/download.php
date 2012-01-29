@@ -1,5 +1,3 @@
-
-
 <div id="calls_download_form" class="update callsdownload">
     <?php echo form::open(); ?>
 

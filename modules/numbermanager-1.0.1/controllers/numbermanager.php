@@ -92,7 +92,7 @@ class NumberManager_Controller extends Bluebox_Controller
         $this->view->grid = $this->grid->produce();
     }
 
-    public function create($class_type = NULL)
+    public function create($class_type = NULL, $foreign_id = NULL)
     {
         if (!empty($_REQUEST['create_class_type']))
         {
@@ -101,6 +101,15 @@ class NumberManager_Controller extends Bluebox_Controller
         else if (!is_null($class_type))
         {
             $this->create_class_type = $class_type;
+        }
+        
+        if (!empty($_REQUEST['foreign_id']))
+        {
+            $this->create_foreign_id = $_REQUEST['foreign_id'];
+        }
+        else if (!is_null($foreign_id))
+        {
+            $this->create_foreign_id = $foreign_id;
         }
 
         parent::create();
@@ -120,11 +129,18 @@ class NumberManager_Controller extends Bluebox_Controller
             }
         }
         
+        if (!empty($this->create_foreign_id))
+        {
+        	$this->view->create_foreign_id = $this->create_foreign_id;
+        }
+        
         return parent::prepareUpdateView();
     }
 
     public function qtipAjaxReturn($data)
     {
+    	Kohana::log('debug', print_r($_REQUEST, true));
+    	
         if (!empty($data) AND $data instanceof Number)
         {
             $number = $data->toArray();
@@ -185,7 +201,19 @@ class NumberManager_Controller extends Bluebox_Controller
 
     protected function save_prepare(&$object)
     {
-        if (!empty($_POST['number']['class_type']))
+    	Kohana::log('debug', print_r($_REQUEST,true));
+    	
+		if (!empty($_REQUEST['create_class_type']))
+		{
+			$object['class_type'] = $_REQUEST['create_class_type'];
+		}
+
+		if (!empty($_REQUEST['create_foreign_id']))
+		{
+			$object['foreign_id'] = $_REQUEST['create_foreign_id'];
+		}
+
+		if (!empty($_POST['number']['class_type']))
         {
             $registryVar = 'number_' .strtolower(str_replace('Number', '', $_POST['number']['class_type']));
 
@@ -195,6 +223,8 @@ class NumberManager_Controller extends Bluebox_Controller
             }
         }
 
+        Kohana::log('debug', $object->class_type);
+        
         parent::save_prepare($object);
     }
 }

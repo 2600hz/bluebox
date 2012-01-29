@@ -47,7 +47,7 @@
 
             <div style="text-align: right; padding-bottom: 5px;" class="avaliable_numbers_quick_add">
 
-                <?php echo html::anchor('/numbermanager/create/' .$class_type ,'<span>' .__('Add New Number') .'</span>', array('class' => 'qtipAjaxForm')); ?>
+                <?php echo html::anchor('/numbermanager/create/' .$class_type . '/' . $foreign_id,'<span>' .__('Add New Number') .'</span>', array('class' => 'qtipAjaxForm')); ?>
 
             </div>
 

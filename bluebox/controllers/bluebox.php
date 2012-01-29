@@ -35,12 +35,23 @@ abstract class Bluebox_Controller extends Template_Controller
      * @var Validation A validator object for validating form data. This is global to this controller and can be used by plugins.
      */
     public static $validation;
-
+    
     /**
      * TODO: This is part of the silliest hack I have ever had to do,
      * see function post_template
      */
     public static $onPageAssets = array('js' => array(), 'css' => array());
+    
+    /**
+     * Mode that the controller is running in so that other code can make descisions about what to do. Possible modes are create,
+     * edit, and view.
+     */
+	private static $_controllerMode = 'create';
+    
+	/**
+	 * If set to true
+	 */
+    private $_afterCreate = 'edit';
     
     /**
      * Our constructor. Here, we setup our template controller, including the general layout, any skins we're using, and so on.
@@ -257,8 +268,8 @@ abstract class Bluebox_Controller extends Template_Controller
         $base = strtolower($this->baseModel);
         
         $this->createView();
-        $this->template->content->mode = 'create';
 
+        $this->setControllerMode('create');
 
         $this->loadBaseModel();
 
@@ -275,8 +286,9 @@ abstract class Bluebox_Controller extends Template_Controller
         $base = strtolower($this->baseModel);
 
         $this->createView();
-        $this->template->content->mode = 'edit';
 
+        $this->setControllerMode('edit');
+                
         $this->loadBaseModel($id);
 
         $this->updateOnSubmit($this->$base);
@@ -293,13 +305,15 @@ abstract class Bluebox_Controller extends Template_Controller
 
         $this->createView();
 
+        $this->setControllerMode('delete');
+        
         $this->loadBaseModel($id);
 
         $this->deleteOnSubmit($this->$base);
 
         $this->prepareDeleteView(NULL, $id);
     }
-
+    
     /**
      * Return the baseModel
      *
@@ -315,6 +329,27 @@ abstract class Bluebox_Controller extends Template_Controller
         return $this->authBypass;
     }
 
+	/**
+	 * Set the mode that the controller is operating in for both a static variable in the controller so that other code
+	 * can retreive it, and as a variable in the view.  Ex. 'create', 'edit', 'view', 'delete'
+	 * 
+	 * @param string $newMode  Operating mode
+	 */
+    public function setControllerMode($newMode = 'create')
+    {
+    	$this->template->content->mode = $newMode;
+    	self::$_controllerMode = $newMode;
+    }
+    
+    /**
+     * 
+     * Returns the mode that the controller is operating in set by setControllerMode.
+     */
+    public static function getControllerMode()
+    {
+    	return self::$_controllerMode;
+    }
+    
     /**
      * Checks for the existance of speciall vars in the post to determine
      * if the page has been submitted and if so weither the action was cancle or
@@ -680,7 +715,16 @@ abstract class Bluebox_Controller extends Template_Controller
             {
                 $this->returnQtipAjaxForm($base);
 
-                url::redirect(Router_Core::$controller);
+                if (self::$_controllerMode === 'create' && $this->_afterCreate !== '')
+                {
+                	$base = strtolower($this->baseModel);
+                	$idarr = $this->$base->identifier();
+                	reset($idarr);
+                	$id = current($idarr);
+                	url::redirect(Router_Core::$controller . '/' . $this->_afterCreate . '/' . $id);
+                }
+                else
+                	url::redirect(Router_Core::$controller);
             } 
             else if ($action == self::SUBMIT_DENY)
             {
@@ -756,7 +800,7 @@ abstract class Bluebox_Controller extends Template_Controller
             if (!$this->$base)
             {
                 // Send any errors back to the index
-                message::set('Unable to locate ' .ucfirst($baseModel) .' id ' .$id .'!');
+                message::set('Unable to locate ' . ucfirst($baseModel) . ' id ' .$id .'!');
 
                 $this->returnQtipAjaxForm(NULL);
 
