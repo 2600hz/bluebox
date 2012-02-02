@@ -5,9 +5,92 @@ class EndpointManager_Controller extends Bluebox_Controller
     protected $baseModel = 'Endpoint';
     protected $authBypass = array('config');
 
-    private function _identify_configfile($configfile,$debug) {
-        $output = array();
-        
+    private function _identify_configfile_regex($configfile) {
+	$debug=array_key_exists('debug',$_REQUEST);
+	$prov=$this->_getprovisioningdata();
+	$matches=array();
+	if ($debug) {
+		print "<pre>";
+		print "Searching for config file $configfile\n";
+	}
+	foreach ($prov['files'] AS $index=>$possibility) {
+		if (array_key_exists('search',$_REQUEST)) {
+			$debug=($_REQUEST['search']==implode("|",array($possibility["brand"],$possibility["family"],$possibility['file'])));
+		}
+		if ($debug) {
+			print "\n\nChecking $index:\n";
+			print_r($possibility);
+		}
+
+		if (!preg_match('/^'.$possibility['regex'].'$/',$configfile,$args)) {
+			if ($debug) 
+				print "FAIL: regex\n";
+			continue;
+		}
+
+		$onematch=array("details"=>$possibility,'args'=>array());
+		array_shift($args);
+		if (count($args)>0) {
+			$onematch["args"]=array_combine($possibility['fields'],$args);
+		}
+
+		if (array_key_exists('mac',$onematch['args'])) {
+			$ep=Doctrine::getTable('Endpoint')->findOneBy('mac',$onematch['args']['mac']);
+			$onematch["endpoint"]=$ep;
+			if (!is_object($ep)) {
+				if ($debug)
+					print "FAIL: MAC address not found\n";
+				continue;
+			}
+			if (array_key_exists('phones',$prov) && array_key_exists($ep->brand,$prov['phones']) && array_key_exists($ep->model,$prov['phones'][$ep->brand])) {
+				$onematch['provisioning']=$prov['phones'][$ep->brand][$ep->model];
+			}
+			# If this file does not belong to this brand/model, skip it.
+			if ($ep->brand!=$possibility['brand']) { 
+				if ($debug)
+					print "FAIL: Make doesn't match\n";
+				continue;
+			}
+			if (!array_key_exists($ep->model,$prov['phones'][$ep->brand][$possibility['family']]['models'])) {
+				if ($debug)
+					print "FAIL: Model doesn't match\n";
+				continue;
+			}
+		}
+		if ($debug) {
+			print "SUCCESS\n";
+		} elseif (array_key_exists('search',$_REQUEST)) {
+			print "\n\nChecking $index:\n";
+			print_r($possibility);
+			print "SUCCESS\n";
+		}
+		array_push($matches,$onematch);
+	}
+	if ($debug) {
+		print "\n\n\n\n\n\n"; print_r($matches);
+	}
+	if (count($matches)==0) {
+		if ((!$debug) && (!array_key_exists('search',$_REQUEST))) {
+			header("HTTP/1.0 404 Not Found");
+		}
+		print "File not found\n";
+		Kohana::log('debug', "No match found for requested filename $configfile");
+		exit;
+	}
+	if (count($matches)>1) {
+		if ((!$debug) && (!array_key_exists('search',$_REQUEST))) {
+			header("HTTP/1.0 404 Not Found");
+		}
+		print "Multiple possible files found\n<!--\n";
+		print_r($matches);
+		print "\n-->";
+		Kohana::log('debug', "Multiple matches found for requested filename $configfile");
+		exit;
+	}
+	return $matches[0];
+    }
+
+    private function _identify_configfile($configfile) {
         $filename = basename($_SERVER["PHP_SELF"]);
         $strip = str_replace('spa', '', $filename);
         if(preg_match('/[0-9A-Fa-f]{12}/i', $strip, $matches) && !(preg_match('/[0]{10}[0-9]{2}/i',$strip))) {
@@ -21,14 +104,17 @@ class EndpointManager_Controller extends Bluebox_Controller
                         $data = $this->_jsonread($filename);
                         $f = $this->arraysearchrecursive($p->model, $data, 'model');
                         if($f !== FALSE) {
-                            $output['family'] = $data['data']['directory'];
-                            $output['brand'] = $p->brand;
-                            $output['mac'] = $p->mac;
-                            $output['model'] = $p->model;
-                            $output['lines'] = $p->lines;
-                            $output['settings'] = $p->settings;
-                            $output['max_lines'] = $data['data']['model_list'][$f[2]]['lines'];
-                            return($output);
+				return array(
+					'endpoint'=>$p,
+					'args'=>array('mac'=>$mac),
+					'details'=>array(
+						'brand'=>basename($dir),
+						'family'=>$data['data']['directory'],
+						'familyname'=>$data['data']['name'],
+						'path'=>$dir.DIRECTORY_SEPARATOR.$data['data']['directory'].DIRECTORY_SEPARATOR,
+					),
+					'linecount'=>$data['data']['model_list'][$f[2]]['lines'],
+				);
                         }
                     }
                 }
@@ -96,6 +182,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 				"encryption" => FALSE,
 			),
 			'dateformat'=>'little-endian',
+			'timeformat'=>'24-hour',
 			'tonescheme'=>'USA',
 		),
 		'snom'=>array(
@@ -104,12 +191,16 @@ class EndpointManager_Controller extends Bluebox_Controller
 			'http_pass'=>'snom',
 			'time_24_format'=>'off',
 			'date_us_format'=>'on',
-			'admin_pass'=>'1234',
+			'admin_mode_password'=>'1234',
 		),
 		'cisco'=>array(
 			'date_template'=>'M/D/YA',
-			'preferredcodec'=>'g711alaw',
+			'preferredcodec'=>'none',
 			'image_name'=>'',
+			'firmware'=>array(
+				'SPA941'=>'','SPA942'=>'','SPA2102'=>'',
+				'SIP7941_SIP7961'=>'','SIP7942_SIP7962'=>'','SIP7945_SIP7965'=>'',
+			),
 		),
 	);
 	$flag=0;
@@ -132,55 +223,80 @@ class EndpointManager_Controller extends Bluebox_Controller
 	}
 	return $store->registry['defaults'];
     }
+    private function _findfamily($brand,$model) {
+	$prov=$this->_getprovisioningdata();
+	foreach ($prov['phones'][$brand] AS $family=>$familydata) {
+		if (array_key_exists($model,$familydata['models'])) {
+			return $family;
+		}
+	}
+	return;
+    }
 
     public function config ()
     {
-	$file=implode(DIRECTORY_SEPARATOR,func_get_args());
+	$use_regex=false;
+	if (array_key_exists('file',$_REQUEST)) {
+		$file=$_REQUEST['file'];
+	} else {
+		$file=implode(DIRECTORY_SEPARATOR,func_get_args());
+	}
         if(empty($file)) {
             echo "Endpoint Manager works!";
             exit;
         }
-	$debug=array_key_exists('debug',$_REQUEST);
-        
         if(!file_exists(dirname(dirname(__FILE__)).'/libraries/endpoint/base.php')) {
             header('HTTP/1.1 500 Internal Server Error');
             exit;
         }
         
         require_once(dirname(dirname(__FILE__)).'/libraries/endpoint/base.php');
-        
+
         $data = Provisioner_Globals::dynamic_global_files($file,dirname(dirname(__FILE__)).'/firmwares/','http://'.$_SERVER["SERVER_ADDR"].Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config/');
         if($data !== FALSE) {
             print $data;
             exit;
         }
+	if ($use_regex) {
+		$configfileinfo=$this->_identify_configfile_regex($file);
+	} else {
+		$configfileinfo=$this->_identify_configfile($file);
+	}
         
-	$configfileinfo=$this->_identify_configfile($file,$debug);
-        
-        $class = "endpoint_" . $configfileinfo["brand"] . "_" . $configfileinfo["family"] . '_phone';
+        $class = "endpoint_" . $configfileinfo["details"]["brand"] . "_" . $configfileinfo["details"]["family"] . '_phone';
 	$provisioner_lib = new $class();
 
 	$defaults = $this->_get_defaults();
 
 	$provisioner_lib->DateTimeZone=new DateTimeZone($defaults['global']['timezone']);
 
-        $provisioner_lib->brand_name = $configfileinfo["brand"];
-        $provisioner_lib->family_line = $configfileinfo["family"];
-        $provisioner_lib->model = $configfileinfo["model"];
+        $provisioner_lib->brand_name = $configfileinfo['endpoint']["brand"];
+        $provisioner_lib->family_line = $this->_findfamily($configfileinfo['endpoint']['brand'],$configfileinfo['endpoint']["model"]);
+        $provisioner_lib->model = $configfileinfo['endpoint']["model"];
         
-        $provisioner_lib->mac = $configfileinfo["mac"];
+        $provisioner_lib->mac = $configfileinfo["endpoint"]["mac"];
         
 	$provisioner_lib->settings=array_merge_recursive($defaults['global'],$provisioner_lib->settings);
 	if (array_key_exists($provisioner_lib->brand_name,$defaults)) {
 		$provisioner_lib->settings=array_merge_recursive($defaults[$provisioner_lib->brand_name],$provisioner_lib->settings);
 	}
+	if (array_key_exists('firmware',$provisioner_lib->settings) && is_array($provisioner_lib->settings['firmware'])) {
+		foreach ($provisioner_lib->settings['firmware'] AS $key=>$value) {
+			if (in_array($provisioner_lib->model,explode("/",$key))) {
+				$provisioner_lib->settings['firmware']=$provisioner_lib->settings['firmware'][$provisioner_lib->model];
+			}
+		}
+		if (is_array($provisioner_lib->settings['firmware'])) {
+			$provisioner_lib->settings['firmware']='';
+		}
+	}
 
-	$lineinfo=unserialize($configfileinfo['lines']);
+	$lineinfo=unserialize($configfileinfo['endpoint']['lines']);
 	if ($lineinfo===false) {
 		$lineinfo=array();
 	}
 	$lines=array();
-	for ($index=0; $index<$configfileinfo['max_lines']; $index++) {
+	for ($index=0; $index<$configfileinfo['linecount']; $index++) {
 		if ((!array_key_exists($index,$lineinfo)) or (empty($lineinfo[$index]['sip']))) {
 			$provisioner_lib->lines[]=array();
 		} else {
@@ -213,22 +329,28 @@ class EndpointManager_Controller extends Bluebox_Controller
         
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
         $provisioner_lib->processor_info = 'Endpoint Manager 1.3 for Blue.Box';
-	//$provisioner_lib->prepare_for_generateconfig();
-	//print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
-        
-        $rd = $provisioner_lib->generate_all_files();
-                
-        if(array_key_exists($file, $rd)) {
-            print $rd[$file];
-        } else {
-            header("HTTP/1.0 404 Not Found");
-            die();
-        }
+	if ($use_regex) {
+		header("content-type: text/plain");
+		$provisioner_lib->prepare_for_generateconfig();
+		print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
+		exit;
+	} else {
+		header("content-type: text/plain");
+        	$rd = $provisioner_lib->generate_all_files();
+        	if(array_key_exists($file, $rd)) {
+		    header("content-type: text/plain");
+        	    print $rd[$file];
+	        } else {
+	            header("HTTP/1.0 404 Not Found");
+		    print "File $file not found\n";
+	            die();
+        	}
+	}
 	exit;
     }
-   private function _autoquestion($make,$family,$templatevariable,$forvariable,$currentvalue=NULL) {
+   private function _autoquestion($brand,$family,$templatevariable,$forvariable,$currentvalue=NULL,$replacementquestion=NULL) {
 	$prov=$this->_getprovisioningdata();
-	$structures=$prov['phones'][$make][$family]['templates'];
+	$structures=$prov['phones'][$brand][$family]['templates'];
 	while (count($structures)>=1) {
 		$item=array_pop($structures);
 		if (!is_array($item)) {
@@ -241,19 +363,22 @@ class EndpointManager_Controller extends Bluebox_Controller
 			}
 		}
 		if (count($structures)==0) { // question not found.
+			print "<!--";
+			print_r($prov['phones'][$brand][$family]['templates']);
+			print "--!>";
+			throw new exception("template question $templatevariable not found in $brand $family");
 			return;
 		}
 	}
-
 	if ((is_null($currentvalue)) && (isset($item['default_value']))) {
 		$currentvalue=$item['default_value'];
 	}
-	$result='<div class="field">';
+	$result="<div class='field'>";
 	$result.=form::label(array(
 		'for'=>$forvariable,
 	//	'hint'=>$item['description'],
 	//	'help'=> - from $item['help']?
-		), $item['description'].':');
+		), ($replacementquestion!==NULL?$replacementquestion:$item['description']).':');
 	switch ($item['type']) {
 		case 'input':
 			$result.=form::input($forvariable,$currentvalue);
@@ -267,6 +392,40 @@ class EndpointManager_Controller extends Bluebox_Controller
 			$result.="</select>";
 			break;
 	}
+	$result.='</div>';
+	return $result;
+   }
+
+   // $glob can be either a glob, or it can be an array of options.
+   public function _auto_firmware($make,$family,$models,$defaults,$description,$glob=array(),$suffix="") {
+	if (!is_array($glob)) {
+		$search=dirname(dirname(__FILE__))."/firmwares/$glob$suffix";
+		$glob=array();
+		foreach (glob($search) AS $val) {
+			$glob[$val]=basename($val,$suffix);
+		}
+	}
+	if (!array_key_exists($make,$defaults)) {
+		$defaults[$make]=array();
+	}
+	if (!array_key_exists('firmware',$defaults[$make])) {
+		$defaults[$make]['firmware']=array();
+	}
+	if (!array_key_exists($models,$defaults[$make]['firmware'])) {
+		$defaults[$make]['firmware'][$models]="";
+	}
+
+	$result="<div class='field'>";
+	$result.=form::label(array(
+		'for'=>"package[registry][defaults][$make][firmware][$models]",
+		), $description.':');
+	$result.="<select name='package[registry][defaults][$make][firmware][$models]'>";
+	$result.="<option value=''>(none)</option>";
+	foreach ($glob AS $file=>$display) {
+		$selected=($file==$defaults[$make]['firmware'][$models])?"selected":"";
+		$result.="<option value='$file' $selected>$display</option>";
+	}
+	$result.="</select>";
 	$result.='</div>';
 	return $result;
    }
@@ -293,18 +452,30 @@ class EndpointManager_Controller extends Bluebox_Controller
 		'Snom'=>array(
 			$this->_autoquestion("snom","3xx820m3",'$http_user','package[registry][defaults][snom][http_user]',$defaults['snom']['http_user']),
 			$this->_autoquestion("snom","3xx820m3",'$http_pass','package[registry][defaults][snom][http_pass]',$defaults['snom']['http_pass']),
-			$this->_autoquestion("snom","3xx820m3",'$admin_pass','package[registry][defaults][snom][admin_pass]',$defaults['snom']['admin_pass']),
+			$this->_autoquestion("snom","3xx820m3",'$admin_mode_password','package[registry][defaults][snom][admin_mode_password]',$defaults['snom']['admin_mode_password']),
+   			$this->_auto_firmware("snom","3xx820m3","300",$defaults,"Snom 300 firmware","snom300*",".bin"),
+   			$this->_auto_firmware("snom","3xx820m3","320",$defaults,"Snom 320 firmware","snom320*",".bin"),
+   			$this->_auto_firmware("snom","3xx820m3","360",$defaults,"Snom 360 firmware","snom360*",".bin"),
+   			$this->_auto_firmware("snom","3xx820m3","370",$defaults,"Snom 370 firmware","snom370*",".bin"),
+   			$this->_auto_firmware("snom","3xx820m3","820",$defaults,"Snom 820 firmware","snom820*",".bin"),
 		),
-		'Cisco'=>array(
+		'Cisco/Linksys'=>array(
 			$this->_autoquestion("cisco","sip79x1G",'$preferredcodec','package[registry][defaults][cisco][preferredcodec]',$defaults['cisco']['preferredcodec']),
-			$this->_autoquestion("cisco","sip79x1G",'$image_name','package[registry][defaults][cisco][image_name]',$defaults['cisco']['image_name']),
+   			$this->_auto_firmware("cisco","sip79x1G","SIP7941_SIP7961",$defaults,"7941/7961 SIP firmware","SIP41.*",".loads"),
+   			$this->_auto_firmware("cisco","sip79x1G","SIP7942_SIP7962",$defaults,"7942/7962 SIP firmware","SIP42.*",".loads"),
+   			$this->_auto_firmware("cisco","sip79x1G","SIP7945_SIP7965",$defaults,"7945/7965 SIP firmware","SIP45.*",".loads"),
+
+   			$this->_auto_firmware("cisco","spa","SPA941",$defaults,"SPA-941 firmware","spa941-*",".bin"),
+   			$this->_auto_firmware("cisco","spa","SPA942",$defaults,"SPA-942 firmware","spa942-*",".bin"),
+   			$this->_auto_firmware("cisco","spa","SPA2102",$defaults,"SPA-2102 firmware","spa2100-*",".bin"),
 		),
 	);
 	$this->view->additionalquestions="";
-	foreach ($additionalquestions AS $make=>$questionlist) {
-		$this->view->additionalquestions.=form::open_section("$make Settings");
-		$this->view->additionalquestions.=implode("",$questionlist);
-	 	$this->view->additionalquestions.=form::close_section();
+	ksort($additionalquestions);
+	foreach ($additionalquestions AS $brand=>$questionlist) {
+		$this->view->additionalquestions.=form::open_section("$brand Settings")."\n";
+		$this->view->additionalquestions.=implode("\n",$questionlist)."\n";
+	 	$this->view->additionalquestions.=form::close_section()."\n\n\n";
 	}
 
         Event::run('bluebox.load_base_model', $this->package);
@@ -366,9 +537,41 @@ class EndpointManager_Controller extends Bluebox_Controller
 
    private function _jsonread($json) 
    {
-       $data = file_get_contents($json);
-       
-	return json_decode($data,TRUE);
+	if (!file_exists($json)) {
+		throw new exception("Could not find json file $json");
+	}
+	$data = file_get_contents($json);
+	if ($data===NULL) {
+		throw new exception("Could not read json file $json");
+	}
+	$data=json_decode($data,TRUE);
+	if(!function_exists('json_last_error')) { 
+		return $data;
+	};
+
+	$errno=json_last_error();
+	$errors=array(
+		'NONE'=>NULL, // NULL => OK.
+		'DEPTH'=>'The maximum stack depth has been exceeded',
+		'STATE_MISMATCH'=>'Invalid or malformed JSON',
+		'CTRL_CHAR'=>'Control character error, possibly incorrectly encoded',
+		'SYNTAX'=>'Syntax error',
+		'UTF8'=>'Malformed UTF-8 characters, possibly incorrectly encoded',
+	);
+	foreach ($errors AS $const=>$message) {
+		$const='JSON_ERROR_'.$const;
+		if (!defined($const)) {
+			continue;
+		}
+		if (constant($const)!=$errno) {
+			continue;
+		}
+		if ($message==NULL) {
+			return $data;
+		}
+		throw new exception("Error parsing json file $json: $message");
+	}
+	throw new exception("Error parsing json file $json: Unknown error $errno");
    }
 
    private function _getprovisioningdata() {
@@ -397,50 +600,61 @@ class EndpointManager_Controller extends Bluebox_Controller
 		foreach ($brandxml['data']['brands']['family_list'] AS $family) {
 			$templates=array(); # $templates[$templatename]
 			$familyxml=$this->_jsonread("$xmlbase$brand[directory]/$family[directory]/family_data.json");
-			$seen=array();
-			foreach (explode(",",$familyxml['data']['configuration_files']) AS $conf_file) {
-				preg_match_all('|\$([a-z]+)|',$conf_file,$fields);
-				# Note - this is done in two steps, to allow things to $model to be replaced with a wildcard
-				$munged_conf=str_replace('\\','\\\\',$conf_file);
-				$munged_conf=str_replace(array('/',".",'$'),array('\/','\.','\$'),$munged_conf);
-				$munged_conf=str_replace(array('\\$model','\\$ext'),array('(.+)','(\d+)'),$munged_conf);
-				$contents=file_get_contents("$xmlbase$brand[directory]/$family[directory]/$conf_file");
-				$parse=(strpos($contents,'{')!==FALSE);
-				$digest=md5($parse);
-				if (strpos($munged_conf,'\$mac')!==FALSE) {
-					foreach ($brandxml['data']['brands']['oui_list'] AS $oui) {
-						$data['files'][]=array(
-							"regex"=>str_replace('\$mac',"(".str_replace(array_keys($repl),array_values($repl),strtoupper($oui))."[\da-fA-F]{6})",$munged_conf),
-							"fields"=>$fields[1],
-							"makename"=>$brand["name"],
-							"make"=>$brand["directory"],
-							"familyname"=>$family["name"],
-							"family"=>$family['directory'],
-							"file"=>$conf_file,
-							"path"=>"$xmlbase$brand[directory]/$family[directory]/",
-							"parse"=>$parse,
-							"digest"=>$digest,
-						);
-					}
-				} else {
-					$data['files'][]=array(
-						"regex"=>$munged_conf,
-						"fields"=>$fields[1],
-						"makename"=>$brand["name"],
-						"make"=>$brand["directory"],
-						"familyname"=>$family["name"],
-						"family"=>$family['directory'],
-						"file"=>"$xmlbase$brand[directory]/$family[directory]/$conf_file",
-						"parse"=>$parse,
-						"digest"=>$digest,
-					);
+			$conf_files=array();
+			if (array_key_exists("files",$familyxml['data'])) {
+				foreach ($familyxml['data']['files'] AS $file=>$conf_file) {
+					$conf_file['file']=$file;
+					$conf_files[]=$conf_file;
+				}
+			} else {
+				foreach (explode(",",$familyxml['data']['configuration_files']) AS $conf_file) {
+					$conf_files[]=array("file"=>$conf_file);
 				}
 			}
+			foreach ($conf_files AS $conf_file) {
+				# Add a regex, if it doesn't exist
+				if (!array_key_exists('fields',$conf_file)) {
+					preg_match_all('|\$([a-z]+)|',$conf_file['file'],$fields);
+					$conf_file['fields']=$fields[1];
+				}
+				if (!array_key_exists('regex',$conf_file)) {
+					$conf_file['regex']=$conf_file['file'];
+					$conf_file['regex']=str_replace('\\','\\\\',$conf_file['regex']);
+					$conf_file['regex']=str_replace(array('/',".",'$'),array('\/','\.','\$'),$conf_file['regex']);
+					foreach ($conf_file['fields'] AS $param) {
+						if ($param=='mac') {
+							$replace='';
+							foreach ($brandxml['data']['brands']['oui_list'] AS $oui) {
+								if ($replace!='')
+									$replace.="|";
+								$replace.=str_replace(array_keys($repl),array_values($repl),strtoupper($oui))."[\da-fA-F]{6}";
+							}
+						} elseif ($param=='model') {
+							$models=array();
+							foreach ($familyxml['data']['model_list'] AS $model) {
+								$models[]=$model["model"];
+							}
+							$replace=implode("|",$models);
+						} else {
+							$replace='.*';
+						}
+						$conf_file['regex']=str_replace('\$'.$param,'('.$replace.')',$conf_file['regex']);
+					}
+					$conf_file['regex']='^'.$conf_file['regex'].'$';
+				}
+				$conf_file['brandname']=$brand['name'];
+				$conf_file["brand"]=$brand["directory"];
+				$conf_file["familyname"]=$family["name"];
+				$conf_file["family"]=$family["directory"];
+				$conf_file["path"]="$xmlbase$brand[directory]/$family[directory]/";
+				$data['files'][]=$conf_file;
+			}
+
 			foreach ($familyxml['data']['model_list'] AS $model) {
 				$data['phones'][$brand["directory"]][$family["directory"]]['models'][$model["model"]]=array(
 					"lines"=>$model["lines"],
-					"makename"=>$brand["name"],
-					"make"=>$brand["directory"],
+					"brandname"=>$brand["name"],
+					"brand"=>$brand["directory"],
 					"familyname"=>$family["name"],
 					"family"=>$family['directory'],
 					"path"=>"$xmlbase$brand[directory]/$family[directory]/",
@@ -483,7 +697,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 		} else {
 			$selected="";
 		}
-		$brandname.="\t<option value='$brand' $selected>".$modeldata[0]["makename"]."</option>\n";
+		$brandname.="\t<option value='$brand' $selected>".$modeldata[0]["brandname"]."</option>\n";
 		$models[$brand]='';
 		foreach ($branddata AS $family) {
 			foreach (array_keys($family['models']) AS $model) {
