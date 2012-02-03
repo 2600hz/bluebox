@@ -58,10 +58,6 @@ abstract class Bluebox_Record extends Doctrine_Record
 
     public function save()
     {
-        $identifier = $this->identifier();
-
-        $identifier = implode(', ', $identifier);
-
         // If column aggregation is used on this model we will have $class_type defined. Ensure it's set model is loaded
         if (!empty($this->class_type))
         {
@@ -502,5 +498,18 @@ abstract class Bluebox_Record extends Doctrine_Record
         }
 
         return $invalidRecords;
+    }
+    
+    public static function dictionary($addopt = null)
+    {
+    	$reclist = Doctrine::getTable(get_called_class())->findAll();
+    	$dict = array();
+    	foreach ($reclist as $currec)
+    	{
+   			$dict[$currec->id] = $currec->name;
+    	}
+    	if (is_array($addopt))
+    		$dict = $addopt + $dict;
+    	return $dict;
     }
 }

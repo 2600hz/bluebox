@@ -11,6 +11,7 @@ class form extends form_Core
     const BUTTONS_DELETE_CANCEL = 'delete_cancel';
     const BUTTONS_OK_CANCEL = 'ok_cancel';
     const BUTTONS_YES_NO = 'yes_no';
+    const BUTTONS_SAVE_CLOSE = 'save_close';
 
     /**
      * This var allows users to add classes to any or all form elements.  Array
@@ -557,7 +558,22 @@ class form extends form_Core
 
         if($buttons === TRUE)
         {
-            $buttons = self::BUTTONS_SAVE_CANCEL;
+        	switch (Bluebox_Controller::getControllerMode())
+        	{
+        		case 'create':
+        			$buttons = self::BUTTONS_SAVE_CANCEL;
+        			break;
+        		case 'edit':
+        			$buttons = self::BUTTONS_SAVE_CLOSE;
+        			break;
+        		case 'delete':
+        			$buttons = self::BUTTONS_DELETE_CANCEL;
+        			break;
+        		case 'view':
+        		default:
+        			$buttons = self::BUTTONS_OKONLY;
+        			break;
+        	}
         }
 
         switch ($buttons)
@@ -568,6 +584,17 @@ class form extends form_Core
                 $result .= form::confirm_button();
 
                 $result .= form::cancel_button();
+
+                $result .= '</div>';
+
+                break;
+
+            case self::BUTTONS_SAVE_CLOSE:
+                $result .= '<div class="buttons form_bottom">';
+
+                $result .= form::confirm_button();
+
+                $result .= form::cancel_button('Close');
 
                 $result .= '</div>';
 
@@ -615,7 +642,6 @@ class form extends form_Core
 
                 break;
         }
-
 
         list($extra) = self::_addDefaults(__FUNCTION__, $extra);
         

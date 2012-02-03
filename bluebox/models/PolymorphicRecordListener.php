@@ -16,12 +16,12 @@ class PolymorphicRecordListener extends Doctrine_Record_Listener
         $invalid = $conn->transaction->getInvalid();
 
         if(!empty($invalid)) {
-            kohana::log('debug', 'Initializing foreign_id');
+            Kohana::log('debug', 'Initializing foreign_id');
             if (!is_int($invoker['foreign_id'])) {
                 $invoker['foreign_id'] = 0;
             }
         } else {
-            kohana::log('debug', 'Leaving foreign_id alone');
+            Kohana::log('debug', 'Leaving foreign_id alone');
         }
     }
 }

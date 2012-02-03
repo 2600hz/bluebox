@@ -53,7 +53,11 @@
             <input type="hidden" class=" hidden" value="<?php echo $create_class_type; ?>" name="create_class_type">
 
             <input type="hidden" class=" hidden" value="<?php echo $create_number_type; ?>" name="number[NumberPool][][number_type_id]">
+            
+            <input type="hidden" class="hidden" value="<?php echo $create_foreign_id; ?>" name="create_foreign_id">
 
+            <input type="hidden" class=" hidden" value="<?php echo $create_foreign_id; ?>" name="number[NumberPool][][create_foriegn_id]">
+            
         </fieldset>
             
     <?php endif; ?>
