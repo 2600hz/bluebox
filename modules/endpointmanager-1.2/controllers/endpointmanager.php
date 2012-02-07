@@ -338,7 +338,6 @@ class EndpointManager_Controller extends Bluebox_Controller
 		print $provisioner_lib->generate_file($file,$configfileinfo['possibility']['file']);
 		exit;
 	} else {
-		header("content-type: text/plain");
         	$rd = $provisioner_lib->generate_all_files();
         	if(array_key_exists($file, $rd)) {
 		    header("content-type: text/plain");
@@ -383,9 +382,6 @@ class EndpointManager_Controller extends Bluebox_Controller
 	//	'help'=> - from $item['help']?
 		), ($replacementquestion!==NULL?$replacementquestion:$item['description']).':');
 	switch ($item['type']) {
-		case 'input':
-			$result.=form::input($forvariable,$currentvalue);
-			break;
 		case 'list':
 			$result.="<select name='$forvariable'>";
 			foreach ($item['data'] AS $data) {
@@ -393,6 +389,10 @@ class EndpointManager_Controller extends Bluebox_Controller
 				$result.="<option value='$data[value]' $selected>$data[text]</option>";
 			}
 			$result.="</select>";
+			break;
+		case 'input':
+		case 'default':
+			$result.=form::input($forvariable,$currentvalue);
 			break;
 	}
 	$result.='</div>';
