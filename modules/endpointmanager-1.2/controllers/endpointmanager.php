@@ -350,7 +350,12 @@ class EndpointManager_Controller extends Bluebox_Controller
 	}
 	exit;
     }
-   private function _autoquestion($brand,$family,$templatevariable,$forvariable,$currentvalue=NULL,$replacementquestion=NULL) {
+   private function _autoquestion($brand,$family,$templatevariable,$target,$replacementquestion=NULL) {
+	$forvariable='package[registry][defaults]['.implode("][",$target)."]";
+	$currentvalue=$this->view->defaults;
+	foreach ($target AS $field) {
+		$currentvalue=$currentvalue[$field];
+	}
 	$prov=$this->_getprovisioningdata();
 	$structures=$prov['phones'][$brand][$family]['templates'];
 	while (count($structures)>=1) {
@@ -400,22 +405,32 @@ class EndpointManager_Controller extends Bluebox_Controller
    }
 
    // $glob can be either a glob, or it can be an array of options.
-   public function _auto_firmware($make,$family,$models,$defaults,$description,$glob=array(),$suffix="") {
-	if (!is_array($glob)) {
-		$search=dirname(dirname(__FILE__))."/firmwares/$glob$suffix";
-		$glob=array();
-		foreach (glob($search) AS $val) {
-			$glob[$val]=basename($val,$suffix);
+   public function _auto_firmware($make,$family,$models,$description) {
+	$prov=$this->_getprovisioningdata();
+	$familyinfo=&$prov['phones'][$make][$family]['models'];
+	foreach (explode("_",$models) as $onemodel) {
+		if ((array_key_exists($onemodel,$familyinfo)) && (array_key_exists("firmware",$familyinfo[$onemodel]))) {
+			$glob=$familyinfo[$onemodel]["firmware"];
+		} else {
+			throw new exception("Could not find firmware info for $make $family $onemodel");
 		}
 	}
-	if (!array_key_exists($make,$defaults)) {
-		$defaults[$make]=array();
+
+	if (!is_array($glob)) {
+		$search=dirname(dirname(__FILE__))."/firmwares/$glob";
+		$glob=array();
+		foreach (glob($search) AS $val) {
+			$glob[$val]=basename($val);
+		}
 	}
-	if (!array_key_exists('firmware',$defaults[$make])) {
-		$defaults[$make]['firmware']=array();
+	if (!array_key_exists($make,$this->view->defaults)) {
+		$this->view->defaults[$make]=array();
 	}
-	if (!array_key_exists($models,$defaults[$make]['firmware'])) {
-		$defaults[$make]['firmware'][$models]="";
+	if (!array_key_exists('firmware',$this->view->defaults[$make])) {
+		$this->view->defaults[$make]['firmware']=array();
+	}
+	if (!array_key_exists($models,$this->view->defaults[$make]['firmware'])) {
+		$this->view->defaults[$make]['firmware'][$models]="";
 	}
 
 	$result="<div class='field'>";
@@ -425,7 +440,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 	$result.="<select name='package[registry][defaults][$make][firmware][$models]'>";
 	$result.="<option value=''>(none)</option>";
 	foreach ($glob AS $file=>$display) {
-		$selected=($file==$defaults[$make]['firmware'][$models])?"selected":"";
+		$selected=($file==$this->view->defaults[$make]['firmware'][$models])?"selected":"";
 		$result.="<option value='$file' $selected>$display</option>";
 	}
 	$result.="</select>";
@@ -435,42 +450,40 @@ class EndpointManager_Controller extends Bluebox_Controller
    public function settings() {
 	$this->view->title="Global Endpoint Settings"; // Some pages have the title automagically - how does that work?
 
-	$defaults = $this->_get_defaults();
+	$this->view->defaults = $this->_get_defaults();
 
         // $this->loadBaseModel($id):
         $this->package = Doctrine::getTable('package')->findOneby('name','endpointmanager');
         $this->view->set_global('base', 'package');
-	$this->view->savedtimezone=$defaults['global']['timezone'];
+	$this->view->savedtimezone=$this->view->defaults['global']['timezone'];
 	$this->view->additional_global_questions=implode("",array(
-		$this->_autoquestion('','','$vlan_id','package[registry][defaults][global][network][vlan][id]',$defaults['global']['network']['vlan']['id']),
-		$this->_autoquestion('','','$vlan_qos','package[registry][defaults][global][network][vlan][qos]',$defaults['global']['network']['vlan']['qos']),
-		$this->_autoquestion('','','$voicemail_extension','package[registry][defaults][global][voicemail_extension]',$defaults['global']['voicemail_extension']),
-		$this->_autoquestion('','','$ntp','package[registry][defaults][global][ntp]',$defaults['global']['ntp']),
-		$this->_autoquestion('','','$timeformat','package[registry][defaults][global][timeformat]',$defaults['global']['timeformat']),
-		$this->_autoquestion('','','$dateformat','package[registry][defaults][global][dateformat]',$defaults['global']['dateformat']),
-		$this->_autoquestion('','','$tonescheme','package[registry][defaults][global][tonescheme]',$defaults['global']['tonescheme']),
+		$this->_autoquestion('','','$vlan_id',array('global','network','vlan','id')),
+		$this->_autoquestion('','','$vlan_qos',array('global','network','vlan','qos')),
+		$this->_autoquestion('','','$voicemail_extension',array('global','voicemail_extension')),
+		$this->_autoquestion('','','$ntp',array('global','ntp')),
+		$this->_autoquestion('','','$timeformat',array('global','timeformat')),
+		$this->_autoquestion('','','$dateformat',array('global','dateformat')),
+		$this->_autoquestion('','','$tonescheme',array('global','tonescheme')),
 	));
 
 	$additionalquestions=array(
 		'Snom'=>array(
-			$this->_autoquestion("snom","3xx820m3",'$http_user','package[registry][defaults][snom][http_user]',$defaults['snom']['http_user']),
-			$this->_autoquestion("snom","3xx820m3",'$http_pass','package[registry][defaults][snom][http_pass]',$defaults['snom']['http_pass']),
-			$this->_autoquestion("snom","3xx820m3",'$admin_mode_password','package[registry][defaults][snom][admin_mode_password]',$defaults['snom']['admin_mode_password']),
-   			$this->_auto_firmware("snom","3xx820m3","300",$defaults,"Snom 300 firmware","snom300*",".bin"),
-   			$this->_auto_firmware("snom","3xx820m3","320",$defaults,"Snom 320 firmware","snom320*",".bin"),
-   			$this->_auto_firmware("snom","3xx820m3","360",$defaults,"Snom 360 firmware","snom360*",".bin"),
-   			$this->_auto_firmware("snom","3xx820m3","370",$defaults,"Snom 370 firmware","snom370*",".bin"),
-   			$this->_auto_firmware("snom","3xx820m3","820",$defaults,"Snom 820 firmware","snom820*",".bin"),
+			$this->_autoquestion("snom","3xx820m3",'$http_user',array('snom','http_user')),
+			$this->_autoquestion("snom","3xx820m3",'$http_pass',array('snom','http_pass')),
+			$this->_autoquestion("snom","3xx820m3",'$admin_mode_password',array('snom','admin_mode_password')),
+   			$this->_auto_firmware("snom","3xx820m3","300","Snom 300 firmware"),
+   			$this->_auto_firmware("snom","3xx820m3","320","Snom 320 firmware"),
+   			$this->_auto_firmware("snom","3xx820m3","360","Snom 360 firmware"),
+   			$this->_auto_firmware("snom","3xx820m3","370","Snom 370 firmware"),
+   			$this->_auto_firmware("snom","3xx820m3","820","Snom 820 firmware"),
 		),
 		'Cisco/Linksys'=>array(
-			$this->_autoquestion("cisco","sip79x1G",'$preferredcodec','package[registry][defaults][cisco][preferredcodec]',$defaults['cisco']['preferredcodec']),
-   			$this->_auto_firmware("cisco","sip79x1G","SIP7941_SIP7961",$defaults,"7941/7961 SIP firmware","SIP41.*",".loads"),
-   			$this->_auto_firmware("cisco","sip79x1G","SIP7942_SIP7962",$defaults,"7942/7962 SIP firmware","SIP42.*",".loads"),
-   			$this->_auto_firmware("cisco","sip79x1G","SIP7945_SIP7965",$defaults,"7945/7965 SIP firmware","SIP45.*",".loads"),
+			$this->_autoquestion("cisco","sip79x1G",'$preferredcodec',array('cisco','preferredcodec')),
+   			$this->_auto_firmware("cisco","sip79x1G","7941G_7961G","7941/7961 SIP firmware"),
 
-   			$this->_auto_firmware("cisco","spa","SPA941",$defaults,"SPA-941 firmware","spa941-*",".bin"),
-   			$this->_auto_firmware("cisco","spa","SPA942",$defaults,"SPA-942 firmware","spa942-*",".bin"),
-   			$this->_auto_firmware("cisco","spa","SPA2102",$defaults,"SPA-2102 firmware","spa2100-*",".bin"),
+   			$this->_auto_firmware("cisco","spa","SPA941","SPA-941 firmware"),
+   			$this->_auto_firmware("cisco","spa","SPA942","SPA-942 firmware"),
+   			$this->_auto_firmware("cisco","linksysata","SPA2102","SPA-2102 firmware"),
 		),
 	);
 	$this->view->additionalquestions="";
@@ -662,6 +675,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 					"family"=>$family['directory'],
 					"path"=>"$xmlbase$brand[directory]/$family[directory]/",
 				);
+				if (array_key_exists("firmware",$model)) {
+					$data['phones'][$brand["directory"]][$family["directory"]]['models'][$model["model"]]["firmware"]=$model["firmware"];
+				}
 				foreach ($model["template_data"] as $filename) {
 					$data['phones'][$brand["directory"]][$family["directory"]]['templates'][$filename]=$this->_jsonread("$xmlbase$brand[directory]/$family[directory]/$filename");
 				}
