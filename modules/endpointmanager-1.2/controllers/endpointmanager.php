@@ -154,6 +154,9 @@ class EndpointManager_Controller extends Bluebox_Controller
     private function siteURL() {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
         $domainName = $_SERVER['HTTP_HOST'];
+	if (in_array($domainName,array('127.0.0.1','localhost'))) {
+		$domainName=gethostname();
+	}
         return $protocol.$domainName;
     }
 
@@ -252,7 +255,7 @@ class EndpointManager_Controller extends Bluebox_Controller
         
         require_once(dirname(dirname(__FILE__)).'/libraries/endpoint/base.php');
 
-        $data = Provisioner_Globals::dynamic_global_files($file,dirname(dirname(__FILE__)).'/firmwares/','http://'.$_SERVER["SERVER_ADDR"].Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config/');
+        $data = Provisioner_Globals::dynamic_global_files($file,dirname(dirname(__FILE__)).'/firmwares/',$this->siteURL().Kohana::config('core.site_domain').Kohana::config('core.index_page').'/endpointmanager/config/');
         if($data !== FALSE) {
             print $data;
             exit;
