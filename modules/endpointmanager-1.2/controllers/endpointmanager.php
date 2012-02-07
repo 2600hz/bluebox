@@ -391,7 +391,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 			$result.="</select>";
 			break;
 		case 'input':
-		case 'default':
+		default:
 			$result.=form::input($forvariable,$currentvalue);
 			break;
 	}
