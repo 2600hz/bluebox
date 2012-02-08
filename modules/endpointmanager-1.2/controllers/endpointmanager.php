@@ -166,6 +166,7 @@ class EndpointManager_Controller extends Bluebox_Controller
     private function _get_defaults() {
 	$default_defaults=array(
 		'global'=>array(
+			'linedisplay'=>'name',
 			'timezone'=>date_default_timezone_get(),
 			'network'=>array(
 				'vlan'=>array('id'=>0,'qos'=>5),
@@ -304,7 +305,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 			$provisioner_lib->lines[]=array();
 		} else {
 			$device=Doctrine::getTable('Device')->find($lineinfo[$index]['sip']);
-			if (isset($device['plugins']['callerid']['internal_name'])) {
+			if ($defaults['global']['linedisplay']=='extension') {
+				$displayname=$device['plugins']['sip']['username'];
+			} elseif (isset($device['plugins']['callerid']['internal_name'])) {
 				$displayname=$device['plugins']['callerid']['internal_name'];
 			} elseif (isset($device['plugins']['callerid']['external_name'])) {
 				$displayname=$device['plugins']['callerid']['external_name'];

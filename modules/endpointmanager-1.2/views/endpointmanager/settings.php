@@ -18,6 +18,15 @@
 		echo timezone::dropdown("package[registry][defaults][global][timezone]",$savedtimezone);
 	?>
 	</div>
+	<div class='field'>
+	<?php echo form::label(array(
+		'for'=>'package[registry][defaults][global][linedisplay]',
+		'hint'=>'What to display next to line buttons on the phone',
+		), 'Line Display:');
+
+		echo form::dropdown("package[registry][defaults][global][linedisplay]",array('name'=>'Device Name','extension'=>'SIP Username'),$defaults['global']['linedisplay']);
+	?>
+	</div>
 
 	<?php echo $additional_global_questions; ?>
 
