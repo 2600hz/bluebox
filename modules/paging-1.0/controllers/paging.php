@@ -14,7 +14,7 @@ class paging_Controller extends Bluebox_Controller
 
         // Setup the base grid object
         $grid = jgrid::grid($this->baseModel, array(
-                'caption' => 'Paging Groups'
+                'caption' => 'Paging/Intercom Groups'
             )
         );
 

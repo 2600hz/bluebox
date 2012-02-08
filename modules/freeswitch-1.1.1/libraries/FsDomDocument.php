@@ -534,7 +534,7 @@ class FsDomDocument extends DOMDocument
         Kohana::log('debug', 'Start XML Replace');
         // Create the base if it doesn't already exist. Delete all children of the base
         //$query = $this->preUpdate($query);
-        Kohana::log('debug', 'Looking for $query (create it if missing)');
+        Kohana::log('debug', 'Looking for ' . $query . ' (create it if missing)');
         $base = $this->set($query);
 
         // Delete anything already there

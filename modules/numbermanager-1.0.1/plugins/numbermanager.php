@@ -148,7 +148,8 @@ class NumberManager_Plugin extends Bluebox_Plugin
 
         $subview->render_conditional = array(
             'qtipAjaxForm' => FALSE,
-            'ajax' => FALSE
+            'ajax' => FALSE,
+        	'mode' => 'edit'
         );
 
         $base = $this->getBaseModelObject();
@@ -221,6 +222,8 @@ class NumberManager_Plugin extends Bluebox_Plugin
         $subview->numbers = $numbers;
 
         $subview->class_type = $class_type;
+        
+        $subview->foreign_id = $foreign_id;
 
         $this->views[] = $subview;
 

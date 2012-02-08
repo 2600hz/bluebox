@@ -14,6 +14,8 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/params/param[@name="vm-message-ext"]{@value="' . $base['audio_format'] . '"}');
 
+            $xml->update('/params/param[@name="vm-disk-quota"]{@value="300"}');
+
             $xml->setAttributeValue('', 'id', $base['mailbox']);
 
             if (!empty($base['registry']['email_address']))

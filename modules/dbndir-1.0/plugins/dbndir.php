@@ -40,10 +40,4 @@ class Dbndir_Plugin extends Bluebox_Plugin
 				'quick_add' =>'/dbndir/create'
 			);
 	}
-	
-	public function save()
-	{
-		Kohana::log('debug', 'dbndir');
-		parent::save();
-	}
 }

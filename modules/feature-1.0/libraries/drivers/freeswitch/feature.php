@@ -99,13 +99,13 @@ class FreeSwitch_Feature_Driver extends FreeSwitch_Base_Driver
         // This XML code will track the number dialed, the caller ID of the last inbound call and/or some other basic info
         $newXml = <<<XML
 
-  <condition>
-    <action application="hash" data="insert/\${domain_name}-spymap/\${caller_id_number}/\${uuid}"/>
-    <action application="hash" data="insert/\${domain_name}-last_dial/\${caller_id_number}/\${destination_number}"/>
-    <action application="hash" data="insert/\${domain_name}-last_dial/global/\${uuid}"/>
-    <action application="set" data="RFC2822_DATE=\${strftime(%a, %d %b %Y %T %z)}"/>
-  </condition>
-
+      <condition>
+        <action application="hash" data="insert/\${domain_name}-spymap/\${caller_id_number}/\${uuid}"/>
+        <action application="hash" data="insert/\${domain_name}-last_dial/\${caller_id_number}/\${destination_number}"/>
+        <action application="hash" data="insert/\${domain_name}-last_dial/global/\${uuid}"/>
+        <action application="set" data="RFC2822_DATE=\${strftime(%a, %d %b %Y %T %z)}"/>
+      </condition>
+    
 XML;
         $xml->replaceWithXml($newXml);
     }
