@@ -5,6 +5,3 @@
 [submodule "modules/provisioner-1.1/libraries"]
 	path = modules/provisioner-1.1/libraries
 	url = git://github.com/tm1000/Provisioner.git
-[submodule "modules/endpointmanager-1.2/libraries"]
-	path = modules/endpointmanager-1.2/libraries
-	url = git://github.com/tm1000/Provisioner.git
