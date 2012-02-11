@@ -83,21 +83,21 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
 
                 $xml->deleteChildren();
 
-		foreach(array_keys($pattern) as $pattern_index)
-		{
-
-                	$condition = '/condition[@field="destination_number"][@break="never"][@expression="' . $pattern[$pattern_index] . '"][@bluebox="pattern_' .$simple_route_id .'_part_' . $pattern_index . '"]';
-
-                	if (!empty($options['prepend'])) {
-                    		$xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' .$options['prepend'] . '"}');
-                	}
-                	else {
-                    		$xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend="}');
-                	}
-                
-               	 	$xml->update($condition . '/action[@application="set"][@data="hangup_after_bridge=true"]');
-                	$xml->update($condition . '/action[@application="bridge"]{@data="dingaling\/' . $xmppData['name'] . '\/+${prepend}$1@' . $xmppData['registry']['outboundserver'] . '"}');
-		}
+				foreach(array_keys($pattern) as $pattern_index)
+				{
+		
+		                	$condition = '/condition[@field="destination_number"][@break="never"][@expression="' . $pattern[$pattern_index] . '"][@bluebox="pattern_' .$simple_route_id .'_part_' . $pattern_index . '"]';
+		
+		                	if (!empty($options['prepend'])) {
+		                    		$xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' .$options['prepend'] . '"}');
+		                	}
+		                	else {
+		                    		$xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend="}');
+		                	}
+		                
+		               	 	$xml->update($condition . '/action[@application="set"][@data="hangup_after_bridge=true"]');
+		                	$xml->update($condition . '/action[@application="bridge"]{@data="dingaling\/dingaling_' . $xmppData['xmpp_id'] . '\/+${prepend}$1@' . $xmppData['registry']['outboundserver'] . '"}');
+				}
             }
         }
     }
