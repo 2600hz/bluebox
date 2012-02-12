@@ -28,7 +28,7 @@ class FeatureManager
 
     public static function provideNumberOptions()
     {
-        Event::$data['FeatureNumber'] = 'feature/featureOptions.mus';
+        Event::$data['FeatureNumber'] = 'feature/featureOptions';
     }
 
 	public function installDefaultFeatures()

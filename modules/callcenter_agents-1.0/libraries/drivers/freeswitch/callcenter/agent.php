@@ -19,7 +19,7 @@ class FreeSwitch_callcenter_agent_Driver extends FreeSwitch_Base_Driver
 		$locationRec = Doctrine::getTable('Location')->find($ccData->cca_locationid);
 		$ccData->cca_contact = str_replace('/', '\/', $ccData->cca_contact);
 
-		$updatestr = '/agent[@name="' . $ccData->cca_loginid . '\@' . $locationRec->domain . '"]{@type="' . $ccData->cca_type . '"}{@contact="' . $ccData->cca_contact . '"}';
+		$updatestr = '/agent[@bluebox="' . $ccData->cca_id . '"]{@name="' . $ccData->cca_loginid . '\@' . $locationRec->domain . '"}{@type="' . $ccData->cca_type . '"}{@contact="' . $ccData->cca_contact . '"}';
 
 		if (isset($ccData->cca_status) && !empty($ccData->cca_status) && $ccData->cca_status != '')
 				$updatestr .= '{@status="' . $ccData->cca_status . '"}';
@@ -46,7 +46,7 @@ class FreeSwitch_callcenter_agent_Driver extends FreeSwitch_Base_Driver
 	{
 		$xml = Telephony::getDriver()->xml;
 		$locationRec = Doctrine::getTable('Location')->find($ccData->cca_locationid);
-		$root = '//document/section[@name="configuration"]/configuration[@name="callcenter.conf"][@description="CallCenter"]/agents/agent[@name="' . $ccData->cca_loginid . '\@' . $locationRec->domain . '"]';
+		$root = '//document/section[@name="configuration"]/configuration[@name="callcenter.conf"][@description="CallCenter"]/agents/agent[@bluebox="' . $ccData->cca_id . '"]';
 		$xml->setXmlRoot($root);
 		$xml->deleteNode();
 		if (CallCenterManager::updateRealtime() == 'realtime')
@@ -79,7 +79,7 @@ class FreeSwitch_callcenter_agent_Driver extends FreeSwitch_Base_Driver
 	public static function removeRunning($agentname)
 	{
 		$eslCon = EslManager::getInstance();
-		$responseobj = $eslCon->sendRecv('api callcenter_config agent del ' . $agentname);
+		$responseobj = $eslCon->api('callcenter_config agent del ' . $agentname);
 		$responsestr = $responseobj->getBody();
 		if (substr(trim($responsestr), 0, 4) == '-ERR')
 				throw new callcenterException($responsestr);
@@ -90,7 +90,7 @@ class FreeSwitch_callcenter_agent_Driver extends FreeSwitch_Base_Driver
 	public static function addRunning($agentname, $agenttype)
 	{
 		$eslCon = EslManager::getInstance();
-		$responseobj = $eslCon->sendRecv('api callcenter_config agent add ' . $agentname . ' ' . $agenttype);
+		$responseobj = $eslCon->api('callcenter_config agent add ' . $agentname . ' ' . $agenttype);
 		$responsestr = $responseobj->getBody();
 		if (substr(trim($responsestr), 0, 4) == '-ERR')
 			throw new callcenterException($responsestr);
@@ -99,7 +99,7 @@ class FreeSwitch_callcenter_agent_Driver extends FreeSwitch_Base_Driver
 	public static function setRunning($agentname, $varname, $varvalue)
 	{
 		$eslCon = EslManager::getInstance();
-		$responseobj = $eslCon->sendRecv('api callcenter_config agent set ' . $varname . ' ' . $agentname . ' ' . $varvalue);
+		$responseobj = $eslCon->api('callcenter_config agent set ' . $varname . ' ' . $agentname . ' ' . $varvalue);
 		$responsestr = $responseobj->getBody();
 		if (substr(trim($responsestr), 0, 4) == '-ERR')
 				throw new callcenterException($responsestr);
@@ -108,7 +108,7 @@ class FreeSwitch_callcenter_agent_Driver extends FreeSwitch_Base_Driver
 	public function getRunningList()
 	{
 		$eslCon = EslManager::getInstance();
-		$responseobj = $eslCon->sendRecv('api callcenter_config agent list');
+		$responseobj = $eslCon->api('callcenter_config agent list');
 		$responsestr = $responseobj->getBody();
 		if (trim($responsestr) == '0 total.'  || trim($responsestr) == '+OK')
 				return array();

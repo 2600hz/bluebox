@@ -41,7 +41,6 @@ class feature_Controller extends Bluebox_Controller
 		$currentuser = users::getCurrentUser();
 		if ($currentuser['user_type'] == User::TYPE_SYSTEM_ADMIN)
 		{
-
 			navigation::getNavTree();
 			$submenu = navigation::getCurrentSubMenu();
 			navigation::addSubmenuOption('feature', 'Re-Install Default Features', 'feature/installDefaultFeatures');
@@ -82,14 +81,10 @@ class feature_Controller extends Bluebox_Controller
 					}
 
 					$formfile = $package['directory'] . '/views/' . $packageobj->name . '/' . $feature['ftr_name'] . '.php';
-					kohana::Log('debug', 'Looking for view ' . $formfile);
 					if (!file_exists($formfile))
 					{
-						kohana::Log('debug', 'View file not found.');
 						exit();
 					} else {
-						kohana::Log('debug', 'View file found.');
-
 						$featureFormView = new View($packageobj->name . '/' . $feature['ftr_name']);
 						$featureFormView->set_global('Feature', (object) $feature);
 						echo $featureFormView->render(TRUE);

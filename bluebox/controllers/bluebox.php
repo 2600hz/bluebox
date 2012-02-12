@@ -299,7 +299,7 @@ abstract class Bluebox_Controller extends Template_Controller
     /**
      * This generic delete function will remove entries of $baseModel
      */
-    public function delete($id = NULL, $forceDelete = false)
+    public function delete($id = NULL, $forceDelete = null)
     {
         $base = strtolower($this->baseModel);
 
@@ -758,10 +758,8 @@ abstract class Bluebox_Controller extends Template_Controller
 
     protected function createView($baseModel = NULL, $forceDelete = NULL)
     {
-    	Kohana::log('debug', Router::$controller . '/update_' . strtolower($this->baseModel) . '.php');
-    	
         // Overload the update view
-        if (($forceDelete) or (strcasecmp(Router::$method, 'delete') == 0 and $forceDelete !== FALSE))
+        if (($forceDelete) || (strcasecmp(Router::$method, 'delete') == 0 && $forceDelete !== FALSE))
             $this->template->content = new View('generic/delete');
         else
         	try {
@@ -867,7 +865,7 @@ abstract class Bluebox_Controller extends Template_Controller
         }
 
         Event::run('bluebox.prepare_delete_view', $this->view);
-
+        
         // Execute plugin hooks here, after we've loaded the core data sets
         plugins::views($this);
     }
