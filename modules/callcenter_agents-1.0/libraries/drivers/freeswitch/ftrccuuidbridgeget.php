@@ -1,6 +1,5 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 class FreeSwitch_ftrccuuidbridgeget_Driver extends FreeSwitch_Feature_Driver
-                 ftrccuuidbridgeget
 {
     public static function dialplan($number)
     {
