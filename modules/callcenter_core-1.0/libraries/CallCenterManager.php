@@ -513,7 +513,7 @@ class CallCenterManager {
 			Feature::reregister(
 				'ccagentloginget',
 				'callcenter_agents',
-				'Agent Log Out Dialplan (Get Agent ID)',
+				'Agent Log In Dialplan (Get Agent ID)',
 				'Request user them Log in to the Callcenter.',
 				User::TYPE_SYSTEM_ADMIN
 			);
