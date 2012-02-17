@@ -18,28 +18,17 @@
 		echo timezone::dropdown("package[registry][defaults][global][timezone]",$savedtimezone);
 	?>
 	</div>
-
 	<div class='field'>
 	<?php echo form::label(array(
-		'for'=>'package[registry][defaults][global][vlan_id]',
-		'hint'=>'VLAN to put the phone in (0-4094)',
-		'help'=>'Specify which VLAN the phone should be in.<br>Valid values are 0 through 4094.<br>0 means do not use a VLAN.<br>If in doubt, use 0.',
-		), 'VLAN Number');
+		'for'=>'package[registry][defaults][global][linedisplay]',
+		'hint'=>'What to display next to line buttons on the phone',
+		), 'Line Display:');
 
-		echo form::input('package[registry][defaults][global][vlan_id]');
+		echo form::dropdown("package[registry][defaults][global][linedisplay]",array('name'=>'Device Name','extension'=>'SIP Username'),$defaults['global']['linedisplay']);
 	?>
 	</div>
 
-	<div class='field'>
-	<?php echo form::label(array(
-		'for'=>'package[registry][defaults][global][vlan_qos]',
-		'hint'=>'Priority Code Point/QOS',
-		'help'=>'Specify the priority (QOS) for the VOIP traffic.<br>Valid values are 0 through 7.<br>Higher number means higher priority.'
-		), 'Priority Code Point/QOS');
-
-		echo form::input('package[registry][defaults][global][vlan_qos]');
-	?>
-	</div>
+	<?php echo $additional_global_questions; ?>
 
 	<?php echo form::close_section(); ?>
 
