@@ -12,7 +12,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
 
         // Build the Dinagling profile...
         $root = '//document/section[@name="configuration"]/configuration[@name="dingaling.conf"]' .
-                '/profile[@name="dingaling_' . $xmppData['xmpp_id'] . '"]';
+                '/profile[@type="client"][@name="dingaling_' . $xmppData['xmpp_id'] . '"]';
 
         $xml->setXmlRoot($root);
 
