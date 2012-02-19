@@ -16,7 +16,7 @@ class FeatureCode extends Bluebox_Record
         $this->hasColumn('feature_code_id', 'integer', 11, array('unsigned' => TRUE , 'notnull' => TRUE , 'primary' => TRUE, 'autoincrement' => TRUE));
         $this->hasColumn('name', 'string', 80, array('notnull' => TRUE, 'minlength' => 2));
         $this->hasColumn('description', 'string', 512);
-	$this->hasColumn('custom_feature_code_id', 'integer', 11);
+	$this->hasColumn('custom_feature_code_id', 'integer', 11, array('unsigned' => TRUE));
     }
 
     /**
