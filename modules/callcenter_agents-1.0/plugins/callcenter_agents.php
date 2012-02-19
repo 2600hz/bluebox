@@ -34,7 +34,7 @@ class callcenter_agents_Plugin extends Bluebox_Plugin
 			)
 		);
 
-		$subview = new View('callcenter_agents/tiers.mus');
+		$subview = new View('callcenter_agents/tiers');
 		$subview->tiergrid = $grid->produce();        
 		$this->views[] = $subview;
 	}

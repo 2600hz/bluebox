@@ -299,11 +299,11 @@ abstract class Bluebox_Controller extends Template_Controller
     /**
      * This generic delete function will remove entries of $baseModel
      */
-    public function delete($id = NULL)
+    public function delete($id = NULL, $forceDelete = null)
     {
         $base = strtolower($this->baseModel);
 
-        $this->createView();
+        $this->createView(NULL, $forceDelete);
 
         $this->setControllerMode('delete');
         
@@ -759,20 +759,26 @@ abstract class Bluebox_Controller extends Template_Controller
     protected function createView($baseModel = NULL, $forceDelete = NULL)
     {
         // Overload the update view
-        if (($forceDelete) or (strcasecmp(Router::$method, 'delete') == 0 and $forceDelete !== FALSE))
-        {
+        if (($forceDelete) || (strcasecmp(Router::$method, 'delete') == 0 && $forceDelete !== FALSE))
             $this->template->content = new View('generic/delete');
-        }
         else
-        {
-            $this->template->content = new View(Router::$controller . '/update');
-        }
+        	try {
+        		$this->template->content = new View(Router::$controller . '/update_' . strtolower($this->baseModel) . '.mus');
+        	}
+        	catch (Exception $e)
+        	{
+        		try {
+        			$this->template->content = new View(Router::$controller . '/update_' . strtolower($this->baseModel));
+        		}
+	        	catch (Exception $e)
+	        	{
+	        		$this->template->content = new View(Router::$controller . '/update');
+	        	}
+        	}
 
         if (is_null($baseModel))
-        {
-            $baseModel = ucfirst($this->baseModel);
-        }
-
+            $baseModel = ucfirst($baseModel);
+ 
         $this->view->title = ucfirst(Router::$method) .' ' .inflector::humanizeModelName($baseModel);
 
         Event::run('bluebox.create_view', $this->view);
@@ -859,7 +865,7 @@ abstract class Bluebox_Controller extends Template_Controller
         }
 
         Event::run('bluebox.prepare_delete_view', $this->view);
-
+        
         // Execute plugin hooks here, after we've loaded the core data sets
         plugins::views($this);
     }
