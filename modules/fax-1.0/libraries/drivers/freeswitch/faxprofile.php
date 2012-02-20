@@ -254,7 +254,7 @@ class FreeSwitch_faxprofile_Driver extends FreeSwitch_Base_Driver
         FaxDispositionManager::dialplan($number);      
         $xml->update('/action[@application="answer"]');
         $xml->update('/action[@application="playback"][@data="silence_stream:\/\/2000"]');
-        $xml->update('/action[@application="rxfax"][@data="' .  str_replace('/', '\/', $destination->fxp_spool_dir . '/${uuid}.rxfax.tif"]'));
+        $xml->update('/action[@application="rxfax"][@data="' .  str_replace('/', '\/', $destination->fxp_spool_dir . '${uuid}.rxfax.tif"]'));
         $xml->update('/action[@application="hangup"]');
     }
     
