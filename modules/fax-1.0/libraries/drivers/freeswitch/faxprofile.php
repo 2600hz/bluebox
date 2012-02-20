@@ -171,7 +171,7 @@ class FreeSwitch_faxprofile_Driver extends FreeSwitch_Base_Driver
 				}
 				
 				if (isset($faxprofile->fxp_spool_dir) && !empty($faxprofile->fxp_spool_dir) && $faxprofile->fxp_spool_dir != '')
-					$xml->update('/param[@name="spool-dir"]{@value="' . str_replace('/', '\/', $faxprofile->fxp_spool_dir) . '"}');
+					$xml->update('/param[@name="spool-dir"]{@value="' . str_replace('/', '\/', '/' . $faxprofile->fxp_spool_dir) . '"}');
 				else
 				{
 					$xml->deleteNode('/param[@name="spool-dir"]');
