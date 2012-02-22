@@ -11,6 +11,8 @@
 # Script will backup the following directories:
 
 BACKUP_CORE="/var/lib/mysql
+/opt/freeswitch/sounds/music
+/var/www/html/bluebox/uploads
 /opt/freeswitch/storage/
 /var/log/freeswitch/cdr-csv
 /opt/freeswitch/conf"
