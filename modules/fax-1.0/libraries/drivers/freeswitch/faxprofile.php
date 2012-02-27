@@ -243,6 +243,8 @@ class FreeSwitch_faxprofile_Driver extends FreeSwitch_Base_Driver
         
         $transferNumbObj = Doctrine::getTable('Number')->findOneBy('number_id', $plugins['fax']['autodetect_number']);
         $xml->update('/action[@application="spandsp_start_fax_detect"]{@data="transfer ' . $transferNumbObj->number . ' 5"}');
+        
+        FaxDispositionManager::preNumber($transferNumbObj);
     }
         
 	public static function dialplan($number)
