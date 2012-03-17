@@ -8,7 +8,7 @@ class FreeSwitch_SharedPresence_Driver extends FreeSwitch_Base_Driver
         {
             $xml = FreeSwitch::setSection('sofia', 'sipinterface_' . $base['sipinterface_id']);
             $xml->update('/settings/param[@name="manage-presence"]{@value="' . (isset($base['plugins']['sharedpresence']['mode']) ? $base['plugins']['sharedpresence']['mode'] : 'true') . '"}');
-            $xml->update('/settings/param[@name="manage-shared-appearence"]{@value="' . (isset($base['plugins']['sharedpresence']['mode']) && $base['plugins']['sharedpresence']['mode'] != 'false' ? 'true' : 'false') . '"}');
+            $xml->update('/settings/param[@name="manage-shared-appearance"]{@value="' . (isset($base['plugins']['sharedpresence']['mode']) && $base['plugins']['sharedpresence']['mode'] != 'false' ? 'true' : 'false') . '"}');
             if (isset($base['plugins']['sharedpresence']['spd_id']))
             {
             	$dbobj = Doctrine::getTable('SharedPresenceDB')->findOneByspd_id($base['plugins']['sharedpresence']['spd_id']);
