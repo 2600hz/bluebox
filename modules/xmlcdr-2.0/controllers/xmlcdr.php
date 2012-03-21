@@ -195,7 +195,7 @@ class Xmlcdr_Controller extends Bluebox_Controller {
 				echo "\n";
 			}
 		} else {
-			ob_end_clean();
+			ob_clean();
 			echo '<cdrs>' . "\n";
 			foreach ($exprecs as $exprec)
 			{
