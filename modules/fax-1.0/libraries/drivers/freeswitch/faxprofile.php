@@ -171,7 +171,7 @@ class FreeSwitch_faxprofile_Driver extends FreeSwitch_Base_Driver
 				}
 				
 				if (isset($faxprofile->fxp_spool_dir) && !empty($faxprofile->fxp_spool_dir) && $faxprofile->fxp_spool_dir != '')
-					$xml->update('/param[@name="spool-dir"]{@value="' . str_replace('/', '\/', $faxprofile->fxp_spool_dir) . '"}');
+					$xml->update('/param[@name="spool-dir"]{@value="' . str_replace('/', '\/', '/' . $faxprofile->fxp_spool_dir) . '"}');
 				else
 				{
 					$xml->deleteNode('/param[@name="spool-dir"]');
@@ -243,6 +243,8 @@ class FreeSwitch_faxprofile_Driver extends FreeSwitch_Base_Driver
         
         $transferNumbObj = Doctrine::getTable('Number')->findOneBy('number_id', $plugins['fax']['autodetect_number']);
         $xml->update('/action[@application="spandsp_start_fax_detect"]{@data="transfer ' . $transferNumbObj->number . ' 5"}');
+        
+        FaxDispositionManager::preNumber($transferNumbObj);
     }
         
 	public static function dialplan($number)
@@ -254,7 +256,7 @@ class FreeSwitch_faxprofile_Driver extends FreeSwitch_Base_Driver
         FaxDispositionManager::dialplan($number);      
         $xml->update('/action[@application="answer"]');
         $xml->update('/action[@application="playback"][@data="silence_stream:\/\/2000"]');
-        $xml->update('/action[@application="rxfax"][@data="' .  str_replace('/', '\/', $destination->fxp_spool_dir . '/${uuid}.rxfax.tif"]'));
+        $xml->update('/action[@application="rxfax"][@data="' .  str_replace('/', '\/', $destination->fxp_spool_dir . '${uuid}.rxfax.tif"]'));
         $xml->update('/action[@application="hangup"]');
     }
     
