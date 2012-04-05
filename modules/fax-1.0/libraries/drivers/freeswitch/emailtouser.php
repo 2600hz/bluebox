@@ -41,14 +41,13 @@ class FreeSwitch_emailtouser_Driver extends Disposition_Driver
 	}
 	
 	
-	public static function dialplan($number)
+	public static function prenumber($number)
 	{
         $xml = Telephony::getDriver()->xml;
         $number = Event::$data;
-        $plugins = $number['plugins'];
-
+ 
         $destination = $number['Destination'];
-        if (isset($destination['User']))
+        if (!($destination instanceof FaxProfile))
         {
         	$domain = '$${location_' . $destination['User']['location_id'] . '}';
         	$dialeduser = $destination['plugins']['sip']['username'] .'@' . $domain;
@@ -56,7 +55,7 @@ class FreeSwitch_emailtouser_Driver extends Disposition_Driver
         	$xml->update('/action[@application="set"][@bluebox="settingDialeduser"]{@data="dialedUser=' . $dialeduser . '"}');
         }
         
-        parent::dialplan($number);
+        parent::prenumber($number);
 	}
 
     public static function conditioning()

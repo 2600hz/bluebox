@@ -91,6 +91,8 @@ class Xmlcdr_Controller extends Bluebox_Controller {
         )
         // Add the base model columns to the grid
         ->add('xml_cdr_id', 'ID', array('hidden' => true, 'key' => true))
+        ->add('start_stamp', 'Start', array('callback' => array($this, 'formatNumber')))
+        ->add('end_stamp', 'End', array('callback' => array($this, 'formatNumber')))
         ->add('direction', 'Direction')
         ->add('caller_id_name', 'Caller Name')
         ->add('caller_id_number', 'Caller Number')
