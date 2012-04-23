@@ -16,7 +16,7 @@ class FreeSwitch_callcenter_queue_Driver extends FreeSwitch_Base_Driver
 		$locationRec = Doctrine::getTable('Location')->find($ccData->ccq_locationid);
 
 		$xml = Telephony::getDriver()->xml;
-		$root = '//document/section[@name="configuration"]/configuration[@name="callcenter.conf"][@description="CallCenter"]/queues/queue[@bluebox="' . $ccData->ccq_id . '"]{@name="' . $ccData->ccq_name . '\@' . $locationRec->domain . '"}';
+		$root = '//document/section[@name="configuration"]/configuration[@name="callcenter.conf"][@description="CallCenter"]/queues/queue[@name="' . $ccData->ccq_name . '\@' . $locationRec->domain . '"]';
 		$xml->setXmlRoot($root);
 
 		$xml->update('/param[@name="strategy"]{@value="' . $ccData->ccq_strategy . '"}');
@@ -96,7 +96,7 @@ class FreeSwitch_callcenter_queue_Driver extends FreeSwitch_Base_Driver
 	{
 		$xml = Telephony::getDriver()->xml;
 		$locationRec = Doctrine::getTable('Location')->find($ccData->ccq_locationid);
-		$root = '//document/section[@name="configuration"]/configuration[@name="callcenter.conf"][@description="CallCenter"]/queues/queue[@bluebox="' . $ccData->ccq_id . '"]';
+		$root = '//document/section[@name="configuration"]/configuration[@name="callcenter.conf"][@description="CallCenter"]/queues/queue[@name="' . $ccData->ccq_name . '\@' . $locationRec->domain . '"]';
 		$xml->setXmlRoot($root);
 		$xml->deleteNode();
 
