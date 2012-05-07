@@ -12,7 +12,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 	'F_CONFERENCE'=>'Conference',
 	'F_CONTACTS'=>'Contacts',
 	'F_ADR_BOOK'=>'Directory',
-	'F_DND'=>'DND',
+	'F_DND'=>'Do not disturb',
 	'F_FAVORITES'=>'Favorites',
 	'F_REDIRECT'=>'Forward All',
 	'F_SUPPORT'=>'Help',
@@ -359,8 +359,12 @@ class EndpointManager_Controller extends Bluebox_Controller
 		}
 		
 	}
-	if ($provisioner_lib->brand_name == "snom") {
-		foreach ($configfileinfo["endpoint"]->registry["buttons"] AS $index=>$button) {
+	$settings=unserialize($configfileinfo['endpoint']->settings);
+	if (!is_array($settings)) {
+		$settings=array();
+	}
+	if (($provisioner_lib->brand_name == "snom") && (array_key_exists("buttons",$settings))) {
+		foreach ($settings["buttons"] AS $index=>$button) {
 			if ($button["type"]=='none') {
 				// do nothing!
 			} elseif ($button["type"]=='sipaccount') {
@@ -891,6 +895,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 		}
 		$this->view->functionkeys=0;
 		$this->view->buttons=array();
+		$settings=unserialize($this->endpoint->settings);
 		foreach ($myfamily["models"][$model]["templates"] AS $template) {
 			$queue=array(&$myfamily["templates"][$template]);
 			$matches=array();
@@ -904,37 +909,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 						for ($button=$item["item"][0]["loop_start"]; $button<=$item["item"][0]["loop_end"]; $button++) {
 							$view=new View('endpointmanager/button-snom.mus');
 							$view->keyeventfunctions=$this->keyevents;
-array(
-								'F_ACCEPTED_LIST'=>'Accepted Calls',
-								'F_CALL_LIST'=>'Call Lists',
-								'F_REGS'=>'Change Active ID',
-								'F_CANCEL'=>'Clear Pickup Info',
-								'F_CONFERENCE'=>'Conference',
-								'F_CONTACTS'=>'Contacts',
-								'F_ADR_BOOK'=>'Directory',
-								'F_DND'=>'DND',
-								'F_FAVORITES'=>'Favorites',
-								'F_REDIRECT'=>'Forward All',
-								'F_SUPPORT'=>'Help',
-								'F_R'=>'Hold',
-								'F_DIRECTORY_SEARCH'=>'LDAP Directory',
-								'F_LOGOFF_ALL'=>'Logoff Identities',
-								'F_SETTINGS'=>'Menu',
-								'F_MISSED_LIST'=>'Missed Calls',
-								'F_DIALOG'=>'Monitor Calls',
-								'F_MUTE'=>'Mute',
-								'F_NEXT_ID'=>'Next Outgoing ID',
-								'F_PREV_ID'=>'Prev. Outgoing ID',
-								'F_REBOOT'=>'Reboot',
-								'F_RECORD'=>'Record',
-								'F_REDIAL'=>'Redial',
-								'F_RETRIEVE'=>'Retrieve',
-								'F_TRANSFER'=>'Transfer',
-								'KEY_F_PKEY_LIST'=>'Virtual Keys',
-							);
 							$view->button=$button;
-							if (isset($this->endpoint["registry"]["buttons"][$button])) {
-								$view->buttondata=$this->endpoint["registry"]["buttons"][$button];
+							if (isset($settings["buttons"][$button])) {
+								$view->buttondata=$settings["buttons"][$button];
 							} else {
 								$view->buttondata=array();
 							}
@@ -995,6 +972,14 @@ array(
 		$object['mac']=$mac;
 		if (array_key_exists('lines',$_POST)) {
 			$object['lines']=serialize($_POST['lines']);;
+		}
+		if (array_key_exists('buttons',$_POST)) {
+			$settings=unserialize($object['settings']);
+			if (!is_array($settings)) {
+				$settings=array();
+			}
+			$settings['buttons']=$_POST['buttons'];
+			$object->settings=serialize($settings);
 		}
 	}
 	parent::pre_save($object);
