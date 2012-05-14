@@ -14,7 +14,8 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/params/param[@name="vm-message-ext"]{@value="' . $base['audio_format'] . '"}');
 
-            $xml->update('/params/param[@name="vm-disk-quota"]{@value="300"}');
+            //Uncomment the following line if you want to blindly limit the voicemail box storage - value is in seconds
+            //$xml->update('/params/param[@name="vm-disk-quota"]{@value="300"}');
 
             $xml->setAttributeValue('', 'id', $base['mailbox']);
 
