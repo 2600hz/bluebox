@@ -52,7 +52,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
                 $condition = '/condition[@field="destination_number"][@expression="' .$pattern_string . '"][@bluebox="pattern_' .$simple_route_id . '_parts"]';
 
-                if (!empty($options['prepend']))
+                if (isset($options['prepend']))
                 {
                     $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' . $options['prepend'] . '"}');
                 }
