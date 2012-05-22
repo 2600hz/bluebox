@@ -342,7 +342,6 @@ class EndpointManager_Controller extends Bluebox_Controller
 		exit;
 	} else {
         	$rd = $provisioner_lib->generate_all_files();
-                if($provisioner_lib->brand_name == 'snom') $file = strtolower($file);
         	if(array_key_exists($file, $rd)) {
 		    header("content-type: text/plain");
         	    print $rd[$file];
