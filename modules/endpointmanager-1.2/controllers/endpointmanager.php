@@ -4,6 +4,34 @@ class EndpointManager_Controller extends Bluebox_Controller
 {
     protected $baseModel = 'Endpoint';
     protected $authBypass = array('config');
+    private $keyevents=array(
+	'F_ACCEPTED_LIST'=>'Accepted Calls',
+	'F_CALL_LIST'=>'Call Lists',
+	'F_REGS'=>'Change Active ID',
+	'F_CANCEL'=>'Clear Pickup Info',
+	'F_CONFERENCE'=>'Conference',
+	'F_CONTACTS'=>'Contacts',
+	'F_ADR_BOOK'=>'Directory',
+	'F_DND'=>'Do not disturb',
+	'F_FAVORITES'=>'Favorites',
+	'F_REDIRECT'=>'Forward All',
+	'F_SUPPORT'=>'Help',
+	'F_R'=>'Hold',
+	'F_DIRECTORY_SEARCH'=>'LDAP Directory',
+	'F_LOGOFF_ALL'=>'Logoff Identities',
+	'F_SETTINGS'=>'Menu',
+	'F_MISSED_LIST'=>'Missed Calls',
+	'F_DIALOG'=>'Monitor Calls',
+	'F_MUTE'=>'Mute',
+	'F_NEXT_ID'=>'Next Outgoing ID',
+	'F_PREV_ID'=>'Prev. Outgoing ID',
+	'F_REBOOT'=>'Reboot',
+	'F_RECORD'=>'Record',
+	'F_REDIAL'=>'Redial',
+	'F_RETRIEVE'=>'Retrieve',
+	'F_TRANSFER'=>'Transfer',
+	'KEY_F_PKEY_LIST'=>'Virtual Keys',
+    );
 
     private function _identify_configfile_regex($configfile) {
 	$debug=array_key_exists('debug',$_REQUEST);
@@ -300,9 +328,9 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$lineinfo=array();
 	}
 	$lines=array();
+	$provisioner_lib->settings["line"]=array();
 	for ($index=0; $index<$configfileinfo['linecount']; $index++) {
 		if ((!array_key_exists($index,$lineinfo)) or (empty($lineinfo[$index]['sip']))) {
-			$provisioner_lib->lines[]=array();
 		} else {
 			$device=Doctrine::getTable('Device')->find($lineinfo[$index]['sip']);
 			if ($defaults['global']['linedisplay']=='extension') {
@@ -331,7 +359,74 @@ class EndpointManager_Controller extends Bluebox_Controller
 		}
 		
 	}
-
+	$settings=unserialize($configfileinfo['endpoint']->settings);
+	if (!is_array($settings)) {
+		$settings=array();
+	}
+	if (($provisioner_lib->brand_name == "snom") && (array_key_exists("buttons",$settings))) {
+		foreach ($settings["buttons"] AS $index=>$button) {
+			if ($button["type"]=='none') {
+				// do nothing!
+			} elseif ($button["type"]=='sipaccount') {
+				if (isset($provisioner_lib->settings['line'][$button["sipaccount"]-1])) {
+					$displayname=$provisioner_lib->settings['line'][$button["sipaccount"]-1]["displayname"];
+				} else {
+					$displayname="?";
+				}
+				$provisioner_lib->settings["loops"]["functionkey"][$index]=array(
+					"type"=>"line",
+					"label"=>$displayname,
+					"context"=>"active",
+					"value"=>""
+				);
+			} elseif ($button["type"]=="keyevent") {
+				$provisioner_lib->settings["loops"]["functionkey"][$index]=array(
+					"type"=>"keyevent",
+					"label"=>$this->keyevents[$button["keyevent"]],
+					"context"=>"active",
+					"value"=>$button["keyevent"],
+				);
+			} elseif ($button["type"]=="blf") {
+				$dev= Doctrine::getTable('Device')->findOneBy('device_id',$button["blf"]);
+				if (isset($dev->plugins["callerid"]["internal_name"])) {
+					$displayname=$dev->plugins["callerid"]["internal_name"];
+				} else {
+					$displayname=$dev->name;
+				}
+				$provisioner_lib->settings["loops"]["functionkey"][$index]=array(
+					"type"=>"blf",
+					"label"=>$displayname,
+					"context"=>"active",
+					"value"=>"<sip:".$dev->plugins["sip"]["username"].'@'.$device['User']['Location']['domain'].">|*22"
+				);
+			} elseif ($button["type"]=="speeddial") {
+				$sd=Doctrine::getTable("ExternalXfer")->findOneBy('external_xfer_id',$button["speeddial"]);
+				$provisioner_lib->settings["loops"]["functionkey"][$index]=array(
+					"type"=>"dest",
+					"label"=>$sd->name,
+					"context"=>"active",
+					"value"=>$sd->Number[0]["number"].'@'.$device['User']['Location']['domain']
+				);
+			} elseif ($button["type"]=="internal_dial") {
+				$provisioner_lib->settings["loops"]["functionkey"][$index]=array(
+					"type"=>"dest",
+					"label"=>$button["internal_dial_label"],
+					"context"=>"active",
+					"value"=>$button["internal_dial"].'@'.$device['User']['Location']['domain']
+				);
+			} elseif ($button["type"]=="external_dial") {
+				$provisioner_lib->settings["loops"]["functionkey"][$index]=array(
+					"type"=>"dest",
+					"label"=>$button["external_dial_label"],
+					"context"=>"active",
+					"value"=>"1".$button["external_dial"].'@'.$device['User']['Location']['domain']
+				);
+			} else {
+				$provisioner_lib->settings["loops"]["functionkey"][$index]=array("type"=>"bob","label"=>"bob","context"=>"active","value"=>"val");
+				print_r($button);
+			}
+		}
+	}
         
         $provisioner_lib->root_dir = dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR;
         $provisioner_lib->processor_info = 'Endpoint Manager 1.3 for Blue.Box';
@@ -594,17 +689,17 @@ class EndpointManager_Controller extends Bluebox_Controller
    }
 
    private function _getprovisioningdata() {
+	$cache=Cache::instance();
+	if ($data=$cache->get('endpointmanager->provisioningdata')) {
+		$this->privateprovdata=$data;
+		return $data;
+	}
 	# This makes an OUI case-insensitive, in a regex.
 	$repl=array('A'=>'[aA]','B'=>'[bB]','C'=>'[cC]','D'=>'[dD]','E'=>'[eE]','F'=>'[fF]');
 	
 	# Note: $this->privateprovdata is PRIVATE to this function - do not use it directly. If you want the data, call this function.
 	if (property_exists($this,'privateprovdata')) {
 		return $this->privateprovdata;
-	}
-	$cache=Cache::instance();
-	if ($data=$cache->get('endpointmanager->provisioningdata')) {
-		$this->privateprovdata=$data;
-		return $data;
 	}
 	$data =array('oui'=>array(),'phones'=>array(),"files"=>array());
 	$xmlbase=dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . 'endpoint' . DIRECTORY_SEPARATOR;
@@ -677,6 +772,7 @@ class EndpointManager_Controller extends Bluebox_Controller
 					"familyname"=>$family["name"],
 					"family"=>$family['directory'],
 					"path"=>"$xmlbase$brand[directory]/$family[directory]/",
+					"templates"=>$model["template_data"],
 				);
 				if (array_key_exists("firmware",$model)) {
 					$data['phones'][$brand["directory"]][$family["directory"]]['models'][$model["model"]]["firmware"]=$model["firmware"];
@@ -752,23 +848,106 @@ class EndpointManager_Controller extends Bluebox_Controller
 				$family=$familyname;
 			}
 		}
+		$linelist="";
 		$this->view->models=$prov['phones'][$brand][$family]['models'][$model];
-		$deviceSelect=array();
+		$devices=array();
 		foreach (Doctrine::getTable("Device")->findAll(Doctrine::HYDRATE_ARRAY) AS $device) {
-			for ($line=1; $line<=$this->view->models['lines']; $line++) {
-				if (!array_key_exists($line,$deviceSelect)) {
-					$deviceSelect[$line]="";
-				}
-				if (array_key_exists($line,$linedata) && ($device['device_id']==$linedata[$line]['sip'])) {
-					$deviceSelect[$line].="\n\t<option selected value='$device[device_id]'>$device[name]</option>";
-				} else {
-					$deviceSelect[$line].="\n\t<option value='$device[device_id]'>$device[name]</option>";
+			$devices[$device["device_id"]]=$device["plugins"]["callerid"]["internal_number"].": ".$device["name"];
+		}
+		$speeddials=array();
+		foreach (Doctrine::getTable("ExternalXfer")->findAll(Doctrine::HYDRATE_ARRAY) AS $speeddial) {
+			$speeddials[$speeddial["external_xfer_id"]]=$speeddial["name"];
+		}
+
+		// This puts the "Select" option at the top, with everything else sorted.
+		$devices[""]="";
+		$speeddials[""]="";
+		asort($devices);
+		asort($speeddials);
+		$devices[""]="Select:";
+		$speeddials[""]="Select:";
+		$this->view->tabs="";
+		$this->view->buttontabs="";
+		$this->view->buttonlist="";
+		$linedropdown=array();
+
+		for ($line=1; $line<=$this->view->models['lines']; $line++) {
+			$linedropdown[$line]="Line ".$line;
+			$this->view->tabs.="<li><a href='#line_$line'><span style='font-size: 90%'>Line $line</span></a></li>\n";
+			$view=new View('endpointmanager/line.mus');
+			$view->speeddials=$speeddials;
+			$view->devices=$devices;
+			$view->line=$line;
+			if (!array_key_exists($line,$linedata)) {
+				$view->linedata=array("sip"=>null);
+			} else {
+				$view->linedata=$linedata[$line];
+			}
+			$linelist.=(string)$view;
+		}
+		$this->view->linelist=$linelist;
+		$phonedata=$this->_getprovisioningdata();
+		$phonedata=$phonedata["phones"][$brand];
+		foreach ($phonedata AS $family) {
+			if (array_key_exists($model,$family["models"])) {
+				$myfamily=$family;
+			}
+		}
+		$this->view->functionkeys=0;
+		$this->view->buttons=array();
+		$settings=unserialize($this->endpoint->settings);
+		foreach ($myfamily["models"][$model]["templates"] AS $template) {
+			$queue=array(&$myfamily["templates"][$template]);
+			$matches=array();
+			while (count($queue)>0) {
+				$item=array_pop($queue);
+				if (is_array($item)) {
+					foreach ($item AS $subitem) {
+						array_push($queue,$subitem);
+					}
+					if (array_key_exists("name",$item) && ($item["name"]=="functionkeys")) {
+						for ($button=$item["item"][0]["loop_start"]; $button<=$item["item"][0]["loop_end"]; $button++) {
+							$view=new View('endpointmanager/button-snom.mus');
+							$view->keyeventfunctions=$this->keyevents;
+							$view->button=$button;
+							if (isset($settings["buttons"][$button])) {
+								$view->buttondata=$settings["buttons"][$button];
+							} else {
+								$view->buttondata=array();
+							}
+							// Special exception, defaults for snom300.
+							$snom300defaults=array(2=>'F_REDIAL',3=>'F_ADR_BOOK',4=>'F_TRANSFER',5=>'F_MUTE');
+							if (($model==300) && array_key_exists($button,$snom300defaults) && (!array_key_exists("type",$view->buttondata))) {
+								$view->buttondata["type"]="keyevent";
+								$view->buttondata["keyevent"]=$snom300defaults[$button];
+							}
+							// Set defaults for function keys - button X is set to line (X+1).
+							if ($button+1<=$this->view->models["lines"]) {
+								if (!array_key_exists("type",$view->buttondata)) {
+									$view->buttondata["type"]="sipaccount";
+								}
+								if (!array_key_exists("sipaccount",$view->buttondata)) {
+									$view->buttondata["sipaccount"]=$button+1;
+								}
+							}
+							foreach (array("type","sipaccount","speeddial","blf","internal_dial","internal_dial_label","external_dial","external_dial_label","keyevent") AS $field) {
+								if (!array_key_exists($field,$view->buttondata)) {
+									$view->buttondata[$field]=null;
+								}
+							}
+							$view->devices=$devices;
+							$view->speeddials=$speeddials;
+							$view->linedropdown=$linedropdown;
+							$this->view->buttontabs.="\n<li><a href='#button_$button'><span style='font-size: 90%'>Button ".($button+1)."</span></a></li>";
+							$this->view->buttonlist.="\n".(string)$view;
+						}
+					}
 				}
 			}
 		}
-		$this->view->deviceSelect=$deviceSelect;
 	} else {
 		$this->view->models=null;
+		$this->view->linelist="";
 	}
    }
    protected function formSave(&$object,$saveMessage = NULL, $saveEvents = array()) {
@@ -793,6 +972,14 @@ class EndpointManager_Controller extends Bluebox_Controller
 		$object['mac']=$mac;
 		if (array_key_exists('lines',$_POST)) {
 			$object['lines']=serialize($_POST['lines']);;
+		}
+		if (array_key_exists('buttons',$_POST)) {
+			$settings=unserialize($object['settings']);
+			if (!is_array($settings)) {
+				$settings=array();
+			}
+			$settings['buttons']=$_POST['buttons'];
+			$object->settings=serialize($settings);
 		}
 	}
 	parent::pre_save($object);
