@@ -32,6 +32,37 @@
 		}
 		form.submit();
 	}
+	function display_button_subdiv(button) {
+		var search_off="buttons_"+button+"_type_";
+		var search_on=search_off+document.getElementById("buttons_"+button+"_type").value;
+		var divs=document.getElementsByTagName('div');
+		for (var i=divs.length; i--;) {
+			var div=divs.item(i);
+			if (div.id.indexOf(search_on)==0) {
+				div.style.display="block";
+			} else if (div.id.indexOf(search_off)==0) {
+				div.style.display="none";
+			}
+		}
+	}
+	function change_line(lineno) {
+		var label=document.getElementById("lines_"+lineno+"_sip");
+		if (label.selectedIndex==0) {
+			label="Line "+lineno+" (unused)";
+		} else {
+			label="Line "+lineno+": "+label.options.item(label.selectedIndex).label;
+		}
+		var dropdowns=document.getElementsByTagName("select");
+		for (var i=dropdowns.length-1; i--;) {
+			if ((dropdowns.item(i).id.indexOf("buttons_")==0) && (dropdowns.item(i).id.indexOf("_sipaccount")>0)) {
+				dropdowns.item(i).options.item(lineno-1).text=label;
+			}
+		}
+		for (var i=3; i--;) {
+			var select=document.getElementById("buttons_"+i+"_sipaccount");
+//			select.options.item(lineno-1).text=label;
+		}
+	}
 </script>
 
 	<?php echo form::open(); ?>
@@ -83,41 +114,49 @@
 	</div>
 		
 	<?php echo form::close_section(); ?>
-	<div id='model_settings'>
 	<?php if (!is_null($models)) { ?>
 
-	<?php echo form::open_section('Lines'); ?>
-	<style>
-		#line_list .ui-tabs-panel { border:1px solid #CCCCCC !important; }
-		#line_list .ui-widget-header { background:#FFFFFF !important; border:0 !important; }
-	</style>
-	<?php javascript::codeBlock(NULL, array('scriptname' => 'lineList')); ?>
-		$('#line_list').tabs({ fxAutoHeight: true });
-	<?php javascript::blockEnd(); ?>
-
-
-
-	<div id="line_list" style="border:0 !important;">
-		<?php 
-			for ($line=1; $line<=$models['lines']; $line++) {
-                                print "<a href='#line_$line'><span style='font-size: 90%'>Line $line</span></a>";
-				print "<div id='line_$line' class='assign_number_tab'>";
-				print '<div class="field">';
-				echo form::label(array(
-					'for'=>"lines[$line]",
-					'hint'=>'Device for this line',
-					), "Device for this line:");
-				print "<select name='lines[$line][sip]'><option value=''>Unused</option>$deviceSelect[$line]</select>";
-				print '</div></div>';
-			}
-		?>
-	</div>
-
-
-	<?php echo form::close_section(); ?>
+		<?php echo form::open_section('Lines'); ?>
+		<style>
+			#line_list .ui-tabs-panel { border:1px solid #CCCCCC !important; }
+			#line_list .ui-widget-header { background:#FFFFFF !important; border:0 !important; }
+			#button_list .ui-tabs-panel { border:1px solid #CCCCCC !important; }
+			#button_list .ui-widget-header { background:#FFFFFF !important; border:0 !important; }
+		</style>
+	
+	
+	
+		<div id="line_list" style="border:0 !important;">
+			<ul>
+			<?php print $tabs; ?>
+			</ul>
+			<?php print $linelist; ?>
+		</div>
+	
+	
+		<?php echo form::close_section(); ?>
+		<?php if ($buttons>0) { ?>
+			<?php echo form::open_section('Buttons'); ?>
+				<div id="button_list">
+					<ul>
+						<?php print $buttontabs; ?>
+					</ul>
+					<?php print $buttonlist; ?>
+					<?php echo form::close_section(); ?>
+				</div>
+		<?php } ?>
 	<?php } ?>
-	</div>
 
 	<?php echo form::close(TRUE); ?>
+	
+		<?php javascript::codeBlock(NULL, array('scriptname' => 'lineList')); ?>
+			$('#line_list').tabs({ fxAutoHeight: true });
+			$('#button_list').tabs({ fxAutoHeight: true });
+		<?php javascript::blockEnd(); ?>
+<script type="text/javascript">
+			for (var lineno=<?php print $models["lines"]+1; ?>; lineno--;) {
+				change_line(lineno);
+			}
+</script>
 
 </div>
