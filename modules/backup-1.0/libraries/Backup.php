@@ -64,7 +64,7 @@ class Backup {
 	private static function mysqlExport($sql_dump) {
 		$database = KOHANA::config('database.default');
 		
-		$command = "mysqldump -u"+$database['connection']['user']+" --password="+$database['connection']['pass']+" "+$database['connection']['database']+" > ".$sql_dump;
+		$command = "mysqldump -u".$database['connection']['user']." --password=".$database['connection']['pass']." ".$database['connection']['database']." > ".$sql_dump;
 		exec($command);
 	}
 
@@ -105,7 +105,7 @@ class Backup {
 	////////////////////////////////////////////////////////////////////////////
 
 	private static function mysqlImport($sql_dump) {
-		$command = "mysql -u"+$database['connection']['user']+" --password="+$database['connection']['pass']+" "+$database['connection']['database']+" < ".$sql_dump;
+		$command = "mysql -u".$database['connection']['user']." --password=".$database['connection']['pass']." ".$database['connection']['database']." < ".$sql_dump;
 		exec($command);
 	}
 
