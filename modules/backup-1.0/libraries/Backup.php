@@ -105,6 +105,8 @@ class Backup {
 	////////////////////////////////////////////////////////////////////////////
 
 	private static function mysqlImport($sql_dump) {
+		$database = KOHANA::config('database.default');
+		
 		$command = "mysql -u"+$database['connection']['user']+" --password="+$database['connection']['pass']+" "+$database['connection']['database']+" < ".$sql_dump;
 		exec($command);
 	}
