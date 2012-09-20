@@ -28,14 +28,14 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
                 if (empty($options['enabled']))
                 {
                     $xml->deleteNode();
-                    
+
                     continue;
                 }
 
                 if (!$pattern = simplerouter::getOutboundPattern($simple_route_id, 'freeswitch'))
                 {
                     $xml->deleteNode();
-                    
+
                     continue;
                 }
 
@@ -43,7 +43,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
                 $pattern_string = '';
 
-                foreach (array_keys($pattern) AS $pattern_index) 
+                foreach (array_keys($pattern) AS $pattern_index)
                 {
                     $pattern_string .= '|' . $pattern[$pattern_index];
                 }
@@ -52,7 +52,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
 
                 $condition = '/condition[@field="destination_number"][@expression="' .$pattern_string . '"][@bluebox="pattern_' .$simple_route_id . '_parts"]';
 
-                if (!empty($options['prepend']))
+                if (isset($options['prepend']))
                 {
                     $xml->update($condition .'/action[@application="set"][@bluebox="prepend"]{@data="prepend=' . $options['prepend'] . '"}');
                 }
@@ -89,13 +89,16 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
                     }
                 }
 
-                foreach (array_keys($pattern) AS $pattern_index) 
+                foreach (array_keys($pattern) AS $pattern_index)
                 {
                     $dummy = '/condition[@field="destination_number"][@break="never"][@expression="' . $pattern[$pattern_index] . '"][@bluebox="pattern_' .$simple_route_id . '_part_' . ($pattern_index+1) .'_out"]';
 
+                    $xml->update($dummy .'/action[@application="set"]{@data="hangup_after_bridge=true"}');
+
                     if (!empty($simpleroute['continue_on_fail']))
                     {
-                        $xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="failure_causes=NORMAL_CLEARING,ORIGINATOR_CANCEL,CRASH"}');
+                        //$xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="failure_causes=NORMAL_CLEARING,ORIGINATOR_CANCEL,CRASH"}');
+                        $xml->update($dummy .'/action[@application="set"][@bluebox="setting_continue_on_fail"]{@data="continue_on_fail=true"}');
                     }
                     else
                     {
@@ -110,7 +113,7 @@ class FreeSwitch_SimpleRoute_Driver extends FreeSwitch_Base_Driver
             }
         }
     }
-    
+
     public static function delete($base)
     {
         if (empty($base['plugins']['simpleroute']))

@@ -14,6 +14,9 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
 
             $xml->update('/params/param[@name="vm-message-ext"]{@value="' . $base['audio_format'] . '"}');
 
+            //Uncomment the following line if you want to blindly limit the voicemail box storage - value is in seconds
+            //$xml->update('/params/param[@name="vm-disk-quota"]{@value="300"}');
+
             $xml->setAttributeValue('', 'id', $base['mailbox']);
 
             if (!empty($base['registry']['email_address']))
@@ -23,14 +26,15 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
                 $xml->update('/params/param[@name="email-addr"]{@value="' .$base['registry']['email_address'] .'"}');
             }
 
-            //vm-keep-local-after-email
+            //Delete old broken setting - vm-delete-file
+            $xml->deleteNode('/params/param[@name="vm-delete-file"]');
             if (empty($base['registry']['delete_file']))
             {
-                $xml->update('/params/param[@name="vm-delete-file"]{@value="false"}');
+                $xml->update('/params/param[@name="vm-keep-local-after-email"]{@value="true"}');
             }
             else
             {
-                $xml->update('/params/param[@name="vm-delete-file"]{@value="true"}');
+                $xml->update('/params/param[@name="vm-keep-local-after-email"]{@value="false"}');
             }
 
             if (empty($base['registry']['attach_audio_file']))
@@ -120,7 +124,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         $domain = 'voicemail_' .$destination['account_id'];
 
         //voicemail_greeting_number
-        
+
         $xml->update('/action[@application="answer"]');
 
         $xml->update('/action[@application="sleep"]{@data="1000"}');
@@ -134,7 +138,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         {
             $xml->update('/action[@application="set"][@data="skip_instructions=true"]');
         }
-        
+
         $xml->update('/action[@application="voicemail"]{@data="default ' . $domain . ' ' . $destination['mailbox'] .'"}');
 
         $xml->update('/action[@application="hangup"]');
@@ -164,7 +168,7 @@ class FreeSwitch_Voicemail_Driver extends FreeSwitch_Base_Driver
         }
 
         $xml->update('/action[@application="set"][@bluebox="settingEndBridge"][@data="hangup_after_bridge=true"]');
-        
+
         $xml->update('/action[@application="set"][@bluebox="settingFail"][@data="continue_on_fail=true"]');
 
 	$xml->update('/action[@application="set"][@bluebox="autoPlay"][@data="vm_auto_play=false"]');

@@ -2,18 +2,18 @@
 
 class Sip_Plugin extends Bluebox_Plugin
 {
-    const SIP_FORMAT_DIGITS = 1;
+    const SIP_FORMAT_USER = 1;
     const SIP_FORMAT_E164 = 2;
-    const SIP_FORMAT_USER = 4;
+    const SIP_FORMAT_DIGITS = 4;
 
     protected $name = 'sip';
 
     public static function getInviteFormats()
     {
         return array(
+            self::SIP_FORMAT_USER => 'username@ip.address',
             self::SIP_FORMAT_DIGITS => '10 Digits@ip.address',
-            self::SIP_FORMAT_E164 => 'E.164 (+1)@ip.address',
-            self::SIP_FORMAT_USER => 'username@ip.address'
+            self::SIP_FORMAT_E164 => 'E.164 (+1)@ip.address'
         );
     }
 
@@ -51,9 +51,9 @@ class Sip_Plugin extends Bluebox_Plugin
 
         return TRUE;
     }
-    
-    
-    
+
+
+
     protected function validate($data, $validator)
     {
         $base = $this->getBaseModelObject();

@@ -13,6 +13,8 @@ class PagingGroup extends Bluebox_Record
 
 	public function setUp()
 	{
+		$this->hasMany('PagingGroupNumber as Number', array('local' => 'pgg_id', 'foreign' => 'foreign_id', 'owningSide' => FALSE));
+
 		$this->actAs('GenericStructure');
 		$this->actAs('Timestampable');
 		$this->actAs('TelephonyEnabled');

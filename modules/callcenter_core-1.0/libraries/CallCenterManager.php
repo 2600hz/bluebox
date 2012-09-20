@@ -58,7 +58,7 @@ class CallCenterManager {
 			$locationObj = Doctrine::getTable('Location')->find($queueObj->ccq_locationid);
 
 			$eslCon = $this->eslManager->getESL();
-			$responseobj = $eslCon->sendRecv('api callcenter_config queue list ' . $queueObj->ccq_name . '@' . $locationObj->domain);
+			$responseobj = $eslCon->sendRecv('api callcenter_config queue list members' . $queueObj->ccq_name . '@' . $locationObj->domain);
 			$responsestr = $responseobj->getBody();
 			if (trim($responsestr) == '0 total.'  || trim($responsestr) == '+OK')
 					return array();
@@ -459,9 +459,22 @@ class CallCenterManager {
 		//register features
 		try {
 			Feature::reregister(
-				'ccuuidbridge',
+				'ccuuidbridgeext',
 				'callcenter_agents',
-				'Agent UUID Bridge Dialplan',
+				'Agent UUID Bridge Dialplan (Agent ID = Extention)',
+				'UUID Agent dial in and log in to callcenter.',
+				User::TYPE_SYSTEM_ADMIN
+			);
+		} catch (featureException $e) {
+			if ($e->getCode() != 0 || $e->getCode() == -2)
+				throw $e;
+		}
+
+		try {
+			Feature::reregister(
+				'ccuuidbridgeget',
+				'callcenter_agents',
+				'Agent UUID Bridge Dialplan (Get Agent)',
 				'UUID Agent dial in and log in to callcenter.',
 				User::TYPE_SYSTEM_ADMIN
 			);
@@ -474,7 +487,7 @@ class CallCenterManager {
 			Feature::reregister(
 				'ccagentloginext',
 				'callcenter_agents',
-				'Agent Log In Dialplan',
+				'Agent Log In Dialplan (Agent ID = Extention)',
 				'Log in to the Callcenter using the current sip user.',
 				User::TYPE_SYSTEM_ADMIN
 			);
@@ -487,7 +500,7 @@ class CallCenterManager {
 			Feature::reregister(
 				'ccagentlogoutext',
 				'callcenter_agents',
-				'Agent Log Out Dialplan',
+				'Agent Log Out Dialplan (Agent ID = Extention)',
 				'Log out of the Callcenter using the current sip user.',
 				User::TYPE_SYSTEM_ADMIN
 			);
@@ -495,7 +508,33 @@ class CallCenterManager {
 			if ($e->getCode() != 0 || $e->getCode() == -2)
 				throw $e;
 		}
-	}
+
+		try {
+			Feature::reregister(
+				'ccagentloginget',
+				'callcenter_agents',
+				'Agent Log In Dialplan (Get Agent ID)',
+				'Request user them Log in to the Callcenter.',
+				User::TYPE_SYSTEM_ADMIN
+			);
+		} catch (featureException $e) {
+			if ($e->getCode() != 0 || $e->getCode() == -2)
+				throw $e;
+		}
+
+    	try {
+			Feature::reregister(
+				'ccagentlogoutget',
+				'callcenter_agents',
+				'Agent Log Out Dialplan (Get Agent ID)',
+				'Request user then Log out of the Callcenter.',
+				User::TYPE_SYSTEM_ADMIN
+			);
+		} catch (featureException $e) {
+			if ($e->getCode() != 0 || $e->getCode() == -2)
+				throw $e;
+		}
+    }
 }
 
 ?>

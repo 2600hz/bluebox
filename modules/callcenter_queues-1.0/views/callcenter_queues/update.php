@@ -202,7 +202,7 @@
     <?php echo form::close_section(); ?>
 
     <?php
-        if (isset($views) && $mode == 'edit')
+        if (isset($views))
         {
             echo subview::renderAsSections($views);
         }

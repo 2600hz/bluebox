@@ -12,7 +12,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
 
         // Build the Dinagling profile...
         $root = '//document/section[@name="configuration"]/configuration[@name="dingaling.conf"]' .
-                '/profile[@name="dingaling_' . $xmppData['xmpp_id'] . '"]';
+                '/profile[@type="client"][@name="dingaling_' . $xmppData['xmpp_id'] . '"]';
 
         $xml->setXmlRoot($root);
 
@@ -83,6 +83,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
 
                 $xml->deleteChildren();
 
+
 		foreach(array_keys($pattern) as $pattern_index)
 		{
 
@@ -96,7 +97,7 @@ class FreeSwitch_Xmpp_Driver extends FreeSwitch_Base_Driver {
                 	}
                 
                	 	$xml->update($condition . '/action[@application="set"][@data="hangup_after_bridge=true"]');
-                	$xml->update($condition . '/action[@application="bridge"]{@data="dingaling\/' . $xmppData['name'] . '\/+${prepend}$1@' . $xmppData['registry']['outboundserver'] . '"}');
+                	$xml->update($condition . '/action[@application="bridge"]{@data="dingaling\/dingaling_' . $xmppData['xmpp_id'] . '\/+${prepend}$1@' . $xmppData['registry']['outboundserver'] . '"}');
 		}
             }
         }
