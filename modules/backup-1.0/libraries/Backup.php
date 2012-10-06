@@ -63,8 +63,9 @@ class Backup {
 
 	private static function mysqlExport($sql_dump) {
 		$database = KOHANA::config('database.default');
-		
-		$command = "mysqldump -u"+$database['connection']['user']+" --password="+$database['connection']['pass']+" "+$database['connection']['database']+" > ".$sql_dump;
+
+		$command = "mysqldump -u".$database['connection']['user']." --password=".$database['connection']['pass']." ".$database['connection']['database']." > ".$sql_dump;
+
 		exec($command);
 	}
 
@@ -105,8 +106,12 @@ class Backup {
 	////////////////////////////////////////////////////////////////////////////
 
 	private static function mysqlImport($sql_dump) {
-		$command = "mysql -u"+$database['connection']['user']+" --password="+$database['connection']['pass']+" "+$database['connection']['database']+" < ".$sql_dump;
-		exec($command);
+ 		$database = KOHANA::config('database.default');
+
+		if (!isset($database['connection']['user'])) $database['connection']['user'] = 'root';
+
+		$command = "mysql -u".$database['connection']['user']." --password=".$database['connection']['pass']." ".$database['connection']['database']." < ".$sql_dump;
+		exec($command, $ouput);
 	}
 
 	public static function import($backup_file = "", $files = array("/opt/freeswitch/conf"), $sql_dump = "/dump.sql", $dir_backup_tmp = "/tmp/backup_freeswitch", $dir_backup = "/tmp/freeswitch/backup") {
