@@ -105,6 +105,12 @@
                     $(\'#dbHostName\').show();
                     $(\'#dbPathName\').hide();
                     $(\'#label_dbHostName\').text(\'' .__('Database Host:') .'\');
+                    if($(this).val().indexOf(\'mysql\') == -1)
+                    {
+                        $(\'#dbPortSelection\').val(\'5432\');
+                    } else {
+                        $(\'#dbPortSelection\').val(\'3306\');
+                    }
                 } else {
                     $(\'.dbCredentials\').hide();
                     $(\'#dbHostName\').hide();
