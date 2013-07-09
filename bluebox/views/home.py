@@ -6,5 +6,5 @@ from bluebox.models import Directory
 
 def home(request):
     directory = Directory()
-    directory.create()
+    directory.create_user()
     return HttpResponse("hello world")
