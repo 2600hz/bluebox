@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+    'bluebox'
 )
 
 # A sample logging configuration. The only tangible logging
@@ -195,4 +196,9 @@ LOGGING = {
     }
 }
 
+# Freeswitch root path (not with the conf folder)
+# Something like /usr/local/freeswitch/ (don't forget the trailing slash)
 FREESWITCH_PATH = ''
+
+# Bluebox config folder
+BLUEBLOX_CONFIG_PATH = '~/bluebox/configs/'
