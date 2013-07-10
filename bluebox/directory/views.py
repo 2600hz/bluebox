@@ -10,9 +10,11 @@ log = logging.getLogger(__name__)
 from bluebox.directory.models import Directory
 
 @csrf_exempt
-def home(request, account_id):
+def create(request, account_id):
     # Creating directory object
     directory = Directory()
+
+    log.debug(account_id)
 
     if request.method == 'PUT':
         # raw_post_data represent the received data
@@ -23,3 +25,9 @@ def home(request, account_id):
         return HttpResponse()
 
     return HttpResponse('Not a PUT')
+
+def delete(request, account_id):
+    pass
+
+def edit(request, account_id):
+    pass
