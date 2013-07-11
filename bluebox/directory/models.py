@@ -20,9 +20,9 @@ class Directory:
 
         return root
 
-    def create_user(self, data):
+    def create_user(self, account_id, data):
         # Opening the file
-        target_file = open('%sconf/directory/default/%s.xml' % (settings.FREESWITCH_PATH, data['user_id']), 'w')
+        target_file = open('%s%s/directory/%s.xml' % (settings.BLUEBLOX_CONFIG_PATH, account_id, data['user_id']), 'w')
 
         # Creating etree_obj
         etree_obj = self._generate_xml(data)
