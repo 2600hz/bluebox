@@ -15,11 +15,9 @@ def create(request, account_id):
     directory = Directory()
 
     if request.method == 'PUT':
-        # raw_post_data represent the received data
-        # and yes, it is post even though we are in a PUT request
-        json_obj = json.loads(request.raw_post_data)
+        json_obj = json.loads(request.body)
 
-        directory.create_user(json_obj)
+        directory.create_user(account_id, json_obj)
         return HttpResponse()
 
     return HttpResponse('Not a PUT')
