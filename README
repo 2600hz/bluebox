@@ -1,0 +1,10 @@
+Blue.Box v2.00 (Not even first stage of alpha)
+
+root@fs-ubuntu:/etc/bluebox# tree
+.
+└── 550e8400e29b41d4a716446655440000
+    ├── directory
+    │   └── 1052.xml
+    └── directory.xml
+
+- For each tenant we would have a folder containing all the config files needed by FS to work
