@@ -14,8 +14,6 @@ def create(request, account_id):
     # Creating directory object
     directory = Directory()
 
-    log.debug(account_id)
-
     if request.method == 'PUT':
         # raw_post_data represent the received data
         # and yes, it is post even though we are in a PUT request
