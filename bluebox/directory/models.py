@@ -1,6 +1,10 @@
+import os
+
 from lxml import etree
 
 from django.conf import settings
+
+from bluebox.helpers import Utils
 
 class Directory:
     def _generate_xml(self, data):
@@ -22,7 +26,7 @@ class Directory:
 
     def create_user(self, account_id, data):
         # Opening the file
-        target_file = open('%s%s/directory/%s.xml' % (settings.BLUEBLOX_CONFIG_PATH, account_id, data['user_id']), 'w')
+        target_file = open(Utils.get_target_file_path(account_id, 'directory', data['user_id']), 'w')
 
         # Creating etree_obj
         etree_obj = self._generate_xml(data)
@@ -31,3 +35,9 @@ class Directory:
 
         # Finally writing file to disk
         target_file.write(string_xml)
+
+        return True
+
+    def delete_user(self, account_id, user_id):
+        # simply deleting the file
+        os.remove(Utils.get_target_file_path(account_id, 'directory', user_id))
