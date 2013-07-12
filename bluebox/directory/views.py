@@ -36,4 +36,9 @@ def delete(request, account_id):
     return HttpResponse('Not a DELETE')
 
 def edit(request, account_id):
-    pass
+    directory = Directory()
+
+    if request.method == 'POST':
+        return HttpResponse('POST ok')
+
+    return HttpResponse('Not a POST')
