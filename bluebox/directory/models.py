@@ -1,4 +1,5 @@
 import os
+import ESL
 
 from lxml import etree
 
@@ -21,6 +22,9 @@ class Directory:
         # ---- param ----
         params.append(etree.Element('param', name='password', value=data['user_password']))
         params.append(etree.Element('param', name='vm-password', value=data['user_vm_password']))
+
+        esl_con = ESL.ESLconnection("127.0.0.1", "8021", "ClueCon")
+        esl_con.api('reloadxml')
 
         return root
 
