@@ -1,3 +1,5 @@
+from django.conf import settings
+
 class Utils:
     @staticmethod
     def get_target_file_path(account_id, module, filename):
