@@ -201,4 +201,5 @@ LOGGING = {
 FREESWITCH_PATH = ''
 
 # Bluebox config folder
-BLUEBLOX_CONFIG_PATH = '~/bluebox/configs/'
+#BLUEBOX_CONFIG_PATH = '/Users/francisgenet/Documents/bluebox/'
+BLUEBOX_CONFIG_PATH = '/etc/bluebox/'
