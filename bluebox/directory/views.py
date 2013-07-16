@@ -24,12 +24,11 @@ def create(request, account_id):
 
     return HttpResponse('Not a PUT')
 
-def delete(request, account_id):
+def delete(request, account_id, user_id):
     directory = Directory()
 
     if request.method == 'DELETE':
-        json_obj = json.loads(request.body)
-        directory.delete_user(account_id, json_obj['user_id'])
+        directory.delete_user(account_id, user_id)
 
         return HttpResponse('DELETE should be done')
 
