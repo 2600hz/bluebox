@@ -203,5 +203,5 @@ FREESWITCH_PATH = ''
 # Bluebox config folder
 
 #BLUEBOX_CONFIG_PATH = '/Users/francisgenet/Documents/bluebox/'
-BLUEBOX_CONFIG_PATH = '~/Documents/Python/bluebox/configs/'
-#BLUEBOX_CONFIG_PATH = '/etc/bluebox'
+#BLUEBOX_CONFIG_PATH = '/home/manu/Documents/Python/bluebox/configs'
+BLUEBOX_CONFIG_PATH = '/etc/bluebox'
