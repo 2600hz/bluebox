@@ -1,11 +1,12 @@
 import json
-
+import os
 # Logger creation
 import logging
 log = logging.getLogger(__name__)
 
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 from bluebox.directory.models import Directory
 
@@ -41,3 +42,15 @@ def edit(request, account_id):
         return HttpResponse('POST ok')
 
     return HttpResponse('Not a POST')
+
+def list(request, account_id):
+    directory = Directory()
+    lists = os.listdir("%s/%s/directory/" % (settings.BLUEBOX_CONFIG_PATH, account_id))
+    list_array = {'data':{'accounts':[]}}
+
+    for file_name in lists:
+        if os.path.isdir("%s/%s/directory/%s" % (settings.BLUEBOX_CONFIG_PATH, account_id, file_name)) == False:
+            list_array['data']['accounts'].append(file_name[:-4])
+            # if os.path.isdir("%s/%s" % (settings.BLUEBOX_CONFIG_PATH, file_name)) == True:
+
+    return HttpResponse(json.dumps(list_array, indent=4), content_type='application/json')
