@@ -47,7 +47,7 @@ def edit(request, account_id):
 
 def list(request, account_id):
     lists = os.listdir("%s/%s/directory/" % (settings.BLUEBOX_CONFIG_PATH, account_id))
-    list_array = {'data':{'accounts':[]}}
+    list_array = {'data':{'accounts':{}}}
 
     for file_name in lists:
         if os.path.isdir("%s/%s/directory/%s" % (settings.BLUEBOX_CONFIG_PATH, account_id, file_name)) == False:
@@ -56,15 +56,8 @@ def list(request, account_id):
             user = tree.find('//user')
             user_id = user.get('id')
 
-            element_dict = {file_name[:-4]:{ "id":user_id}}
-            
-            #list_array['data']['accounts'].append(element_dict)
-            list_array['data']['accounts'].extend([element_dict])
-            #plop = list_array['data']['accounts']
-            #print(plop.extend([element_dict]))
-            #print plop['data']
-            #element_dict = {file_name[:-4], "id":user_id}
-            #dataaa = json.loads(plop)
-            #print dataaa['data']
-            #list_array['data']['accounts'].append(file_name[:-4])
+            element_dict = { "id":user_id}
+
+            list_array['data']['accounts'][file_name[:-4]] = element_dict
+  
     return HttpResponse(json.dumps(list_array, indent=4), content_type='application/json')
