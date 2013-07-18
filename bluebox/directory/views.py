@@ -1,5 +1,6 @@
 import json
 import os
+
 # Logger creation
 import logging
 log = logging.getLogger(__name__)
@@ -8,7 +9,6 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
-from bluebox.directory.models import Directory
 
 @csrf_exempt
 def create(request, account_id):
