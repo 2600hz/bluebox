@@ -9,6 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 from bluebox.directory.models import Directory
+from lxml import etree
+
 
 @csrf_exempt
 def create(request, account_id):
@@ -44,13 +46,25 @@ def edit(request, account_id):
     return HttpResponse('Not a POST')
 
 def list(request, account_id):
-    directory = Directory()
     lists = os.listdir("%s/%s/directory/" % (settings.BLUEBOX_CONFIG_PATH, account_id))
     list_array = {'data':{'accounts':[]}}
 
     for file_name in lists:
         if os.path.isdir("%s/%s/directory/%s" % (settings.BLUEBOX_CONFIG_PATH, account_id, file_name)) == False:
-            list_array['data']['accounts'].append(file_name[:-4])
-            # if os.path.isdir("%s/%s" % (settings.BLUEBOX_CONFIG_PATH, file_name)) == True:
+            tree = etree.parse("%s/%s/directory/%s" % (settings.BLUEBOX_CONFIG_PATH, account_id, file_name))
 
+            user = tree.find('//user')
+            user_id = user.get('id')
+
+            element_dict = {file_name[:-4]:{ "id":user_id}}
+            
+            #list_array['data']['accounts'].append(element_dict)
+            list_array['data']['accounts'].extend([element_dict])
+            #plop = list_array['data']['accounts']
+            #print(plop.extend([element_dict]))
+            #print plop['data']
+            #element_dict = {file_name[:-4], "id":user_id}
+            #dataaa = json.loads(plop)
+            #print dataaa['data']
+            #list_array['data']['accounts'].append(file_name[:-4])
     return HttpResponse(json.dumps(list_array, indent=4), content_type='application/json')
