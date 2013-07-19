@@ -2,3 +2,5 @@
 venv/
 *.py[cod]
 logfile.log
+
+settings.py
