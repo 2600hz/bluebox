@@ -8,10 +8,10 @@ class Extension:
     def _generate_xml(self, data):
         root = etree.Element('include')
 
-        extension = etree.Element('extension', name=data['name'], bb_dialplan_module='extensions')
+        extension = etree.Element('extension', name=data['name'], bb_dialplan_module='extension')
         root.append(extension)
 
-        condition = etree.Element('condition', field='destination_number', expression='^%s$' % data['extension'])
+        condition = etree.Element('condition', field='destination_number', expression='^%s$' % data['destination_number'])
         extension.append(condition)
 
         condition.append(etree.Element('action', application='set', data='ringback=${us-ring}'))
@@ -20,9 +20,9 @@ class Extension:
         condition.append(etree.Element('action', application='set', data='hangup_after_bridge=true'))
         condition.append(etree.Element('action', application='set', data='continue_on_fail=true'))
         condition.append(etree.Element('action', application='bridge', data='user/%s@${domain_name}' % data['username']))
-        condition.append(etree.Element('action', application='answer'))
-        condition.append(etree.Element('action', application='sleep', data='1000'))
-        condition.append(etree.Element('action', application='voicemail', data='default ${domain} %s' % data['username']))
+        # condition.append(etree.Element('action', application='answer'))
+        # condition.append(etree.Element('action', application='sleep', data='1000'))
+        # condition.append(etree.Element('action', application='voicemail', data='default ${domain} %s' % data['username']))
 
         return root
 
