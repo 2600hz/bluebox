@@ -1,3 +1,6 @@
-from django.db import models
+class Conference:
+    def _generate_xml(data):
+        pass
 
-# Create your models here.
+    def create(self, account_id, data):
+        pass

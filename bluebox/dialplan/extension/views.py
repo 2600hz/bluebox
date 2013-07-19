@@ -11,11 +11,10 @@ from bluebox.dialplan.extension.models import Extension
 
 @csrf_exempt
 def create(request, account_id):
-    extension = Extension()
-
     if request.method == 'PUT':
         json_obj = json.loads(request.body)
 
+        extension = Extension()
         if extension.create(account_id, json_obj):
             return HttpResponse('OK')
         else:

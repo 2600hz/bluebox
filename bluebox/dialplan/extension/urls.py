@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, include, url
 
-from bluebox.dialplan.extensions import views
+from .views import *
 
 urlpatterns = patterns('',
-    url(r'^create/$', views.create, name='create')
-)
+    url(r'^create/$', create, name='create'),
+    url(r'^conference/', include('bluebox.dialplan.extension.conference.urls', namespace='conference'))
+)   
