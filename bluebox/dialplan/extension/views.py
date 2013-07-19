@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from bluebox.dialplan.extensions.models import Extension
+from bluebox.dialplan.extension.models import Extension
 
 @csrf_exempt
 def create(request, account_id):
