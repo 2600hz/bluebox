@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 from lxml import etree
-
+from bluebox.directory.models import Directory
 
 @csrf_exempt
 def create(request, account_id):
