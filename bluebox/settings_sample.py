@@ -98,7 +98,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'bluebox.middleware.MiddlewareBluebox'
+    'bluebox.dialplan.middleware.MiddlewareDialplan',
+    'bluebox.directory.middleware.MiddlewareDirectory',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
