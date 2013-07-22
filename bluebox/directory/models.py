@@ -1,5 +1,6 @@
 import os
 #import ESL
+import uuid
 
 from lxml import etree
 
@@ -28,8 +29,11 @@ class Directory:
         return root
 
     def create(self, account_id, data):
+        # The file name
+        uuid_str = str(uuid.uuid1())
+
         # Opening the file
-        target_file = open(Utils.get_target_file_path(account_id, 'directory', data['user_id']), 'w')
+        target_file = open(Utils.get_target_file_path(account_id, 'directory', uuid_str), 'w')
 
         # Creating etree_obj
         etree_obj = self._generate_xml(data)
