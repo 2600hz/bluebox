@@ -1,15 +1,15 @@
-from django.db import models
 import os
-from lxml import etree
 import logging
 log = logging.getLogger(__name__)
+
+from lxml import etree
 
 from django.conf import settings
 
 from bluebox.helpers import Utils
 
-class Voicemail:
 
+class Voicemail:
     def _generate_xml(self,data,tree):
         application = tree.find("//condition")
         application.append(etree.Element('action', application="answer"))
