@@ -10,10 +10,21 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from lxml import etree
-#from bluebox.autoload_configs.conference.models import Conference
 
-def add(request):
-    pass
+from bluebox.autoload_configs.conference.models import Conference
+
+@csrf_exempt
+def add(request, account_id):
+    if request.method == 'PUT':
+        json_obj = json.loads(request.body)
+
+        conference = Conference()
+        if conference.add(account_id, json_obj):
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('Nope')
+    return HttpResponse ('Not a put')
+
 
 def list_config(request, account_id):
     list_profiles = {}
@@ -31,9 +42,28 @@ def list_config(request, account_id):
     
     return HttpResponse(json.dumps(list_profiles, indent=4), content_type='application/json')
 
-def edit(request):
-    pass
+@csrf_exempt
+def edit(request, account_id):
+    if request.method == 'POST':
+        json_obj = json.loads(request.body)
 
-def delete(request):
-    pass
+        conference = Conference()
+        if conference.edit(account_id, json_obj):
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('Nope')
+    return HttpResponse ('Not a POST')
+
+
+@csrf_exempt
+def delete(request, account_id):
+    if request.method == 'DELETE':
+        json_obj = json.loads(request.body)
+
+        conference = Conference()
+        if conference.delete(account_id, json_obj):
+            return HttpResponse('ok')
+        else:
+            return HttpResponse('Nope')
+    return HttpResponse ('Not a delete')
 
