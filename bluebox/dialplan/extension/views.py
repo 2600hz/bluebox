@@ -30,7 +30,7 @@ def list_extension(request, account_id):
     list_array = {'data':{'accounts':{}}}
 
     for file_name in lists:
-        if os.path.isdir("%s/%s/directory/%s" % (settings.BLUEBOX_CONFIG_PATH, account_id, file_name)) == False:
+        if not os.path.isdir("%s/%s/directory/%s" % (settings.BLUEBOX_CONFIG_PATH, account_id, file_name)):
             tree = etree.parse("%s/%s/directory/%s" % (settings.BLUEBOX_CONFIG_PATH, account_id, file_name))
 
             extension = tree.find('//extension')
